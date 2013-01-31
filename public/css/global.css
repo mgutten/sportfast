@@ -1,0 +1,274 @@
+@charset "utf-8";
+/* global.css */
+
+/* general declarations */
+html, body {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+	background: #ffffff; /* Old browsers */
+	background: -moz-radial-gradient(center, circle cover, #F5F5F5 0%, #F5F5F5 15%, #DFDFDF 100%); /* FF3.6+ */
+	background: -webkit-gradient(radial, center center, 0px, center center, 100%, color-stop(0%,#F5F5F5), color-stop(15%,#F5F5F5), color-stop(100%,#DFDFDF)); /* Chrome,Safari4+ */
+	background: -webkit-radial-gradient(center, circle cover, #F5F5F5 0%,#F5F5F5 15%,#DFDFDF 100%); /* Chrome10+,Safari5.1+ */
+	background: -o-radial-gradient(center, circle cover, #F5F5F5 0%, #F5F5F5 15%, #DFDFDF 100%); /* Opera 12+ */
+	background: -ms-radial-gradient(center, circle cover, #F5F5F5 0%, #F5F5F5 15%, #DFDFDF 100%); /* IE10+ */
+	background: radial-gradient(circle at center, #F5F5F5 0%,#DFDFDF 100%); /* W3C */
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#F5F5F5', endColorstr='#DFDFDF',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
+}
+
+div.centered-body {
+	width:61.25em;
+	margin:0em auto;
+}
+
+div.centered-body-nav {
+	height:inherit;
+}
+
+p,div,span,input {
+	font-family:"Arial"; /*futura not displayed properly by firefox */
+	-webkit-font-smoothing: antialiased;
+	font-weight:normal;
+	color:#333333;
+}
+
+#test {
+	float:left;
+	font-size:1em;
+}
+
+a {
+	text-decoration: none;
+}
+
+img {
+	border:none;
+}
+
+.darkest {
+	color:#333333;
+}
+
+.lightest {
+	color:#F3F3F3;
+}
+
+.lighter {
+	color:#E0E0E0;
+}
+
+.light {
+	color:#D2D2D2;
+}
+
+.medium {
+	color:#8d8d8d;
+}
+
+
+/* end general declarations */
+
+
+
+/* header */
+a#logo-large {
+	float:left;
+}
+
+.header-bar {
+	background: #333;
+	background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#666), to(#333));
+	background-image: -webkit-linear-gradient(top, #666, #333); 
+	background-image: -moz-linear-gradient(top, #666, #333);
+	background-image: -ms-linear-gradient(top, #666, #333);
+	background-image: -o-linear-gradient(top, #666, #333);
+	z-index:-1;
+	width:100%;
+	min-width:61.25em;
+}
+
+div#header-bar-tall {
+	height:2.5em;
+	float:left;
+	clear:both;
+}
+
+div.nav-back {
+	float:left;
+	height:inherit;
+	width:13em;
+}
+
+div.nav-back:hover {
+	background: #666;
+}
+
+
+.nav {
+	font-family:"nevis";
+	font-size: 1.063em;
+}
+
+.nav-out {
+	float:left;
+	width:100%;
+	padding: .7em 0;
+	text-align:center;
+}
+
+.nav-back#nav-back-signup {
+	background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#2EC518), to(#1C931F));
+	background-image: -webkit-linear-gradient(top, #2EC518, #1C931F); 
+	background-image: -moz-linear-gradient(top, #2EC518, #1C931F);
+	background-image: -ms-linear-gradient(top, #2EC518, #1C931F);
+	background-image: -o-linear-gradient(top, #2EC518, #1C931F);
+	width:10em;
+}
+
+.nav-back#nav-back-signup:hover {
+	background:#4EC541;
+}
+
+.nav-back#nav-back-login {
+	width:6em;
+	float:right;
+	height:inherit;
+}
+
+.nav-dropdown#nav-back-login:hover {
+	background:none;
+}
+
+
+.nav:hover {
+	color:#fff;
+}
+
+.header-dropdown-arrow {
+	width:1em;
+	height:.625em;
+}
+
+.dropdown-back-outer {
+	position:absolute;
+	width:10em;
+	height:6.6em;
+	top:0;
+	left:0;
+	z-index:-1;
+	overflow:hidden;
+	display:none;
+
+}
+
+.dropdown-back-inner {
+	height:inherit;
+	margin-top:-6.6em;
+	background:#333;
+}
+
+.dropdown-back-inner#nav-dropdown-inner-login,.dropdown-back-outer#nav-dropdown-outer-login {
+	width:14em;
+}
+	
+/* end header */
+
+/* fade effects */
+.fade-current {
+	z-index: 3;
+}
+
+.fade-next {
+	z-index: 2;
+}
+
+/* end fade effects */
+
+/* form elements */
+input[type=text],input[type=password] {
+	-moz-border-radius: 5px;
+	border-radius: 5px;
+	border:1px solid #E0E0E0;
+	padding-left:4px;
+	color:inherit;
+	font-size:inherit;
+	float:left;
+	width: 13em;
+	height: 1.4em;
+}
+
+input[type=checkbox] {
+	float:left;
+}
+
+.input-container {
+	float:left;
+	clear:both;
+	width:auto;
+	height:1.8em;
+	overflow:hidden;
+	font-size:.9em;
+	color:#777;
+	margin: .5em 0 .5em 1em;
+}
+
+.input-overlay {
+	position:relative;
+	float:left;
+	clear:both;
+	top:-1.4em;
+	margin: 0px 0px 0px .38em;
+	font-size:inherit;
+	color: inherit;
+	cursor:text;
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}
+
+#username-container {
+	margin-top: .5em;
+}
+
+#password-container {
+	margin-top: 0em;
+	margin-bottom: .2em;
+}
+
+.checkbox-container {
+	cursor: default;
+	float: left;
+	width:10em;
+}
+
+.checkbox-text {
+	padding-top:.125em;
+}
+
+#dropdown-login-submit {
+	float:left;
+}
+
+#dropdown-checkbox-forgot-container {
+	float:left;
+	font-size: .8em;
+	margin: 0px 0px 0px .8em;
+}
+
+#dropdown-forgot-password {
+	float:left;
+	clear:both;
+	margin:0 0 0 0.2em;
+	font-size:.9em;
+}
+
+
+/* end form elements */
+
+
+

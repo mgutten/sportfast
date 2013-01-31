@@ -1,0 +1,30 @@
+<div class='centered-body'>
+	<a href='<?php echo $this->url(array('controller' => 'index',
+									 'action'	  => 'index'));?>' id='logo-large'><img src='' width='200' height='100' /></a>
+</div>
+                                     
+<div class='header-bar' id='header-bar-tall'>
+    <div class='centered-body centered-body-nav'>
+        <div class='nav-back' id='nav-back-how'>
+        	<a href='<?php echo $this->url(array('controller' => 'how',
+                                             'action'	  => 'index'));?>' class='nav nav-out lightest' id='nav-how'>HOW DOES IT WORK</a>
+       	</div>
+        <div class='nav-back' id='nav-back-signup'>
+        	<a href='<?php echo $this->url(array('controller' => 'signup',
+                                             'action'	  => 'index'));?>' class='nav nav-out lightest' id='nav-signup'>SIGNUP FREE</a>
+       	</div>
+        <div class='nav-back nav-dropdown' id='nav-back-login'>
+            <a href='<?php echo $this->url(array('controller' => 'login',
+                                             	 'action'	  => 'index'));?>' class='nav nav-out lightest' id='nav-login'>LOGIN 
+            	<img src='/images/global/dropdown_arrow.png' width='10' height='6' class='header-dropdown-arrow' />
+			</a>
+            <div class='dropdown-back-outer' id='nav-dropdown-outer-login'>
+                <div class='dropdown-back-inner' id='nav-dropdown-inner-login'>
+                	<?php echo $this->loginForm;?>
+                </div>
+       		</div>
+       	</div>
+
+        	
+    </div>
+</div>

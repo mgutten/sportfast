@@ -1,6 +1,6 @@
 <?php
 
-class IndexController extends Zend_Controller_Action
+class LoginController extends Zend_Controller_Action
 {
 
     public function init()
@@ -10,8 +10,7 @@ class IndexController extends Zend_Controller_Action
 
     public function indexAction()
     {
-       	/* fixed in bootstrap //$this->_helper->layout->setLayout('global/logout');*/
-				
+        $this->view->test = $this->getRequest()->getPost('username');
     }
 
 
