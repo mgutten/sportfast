@@ -10,7 +10,7 @@ class HowController extends Zend_Controller_Action
 
     public function indexAction()
     {
-
+		$this->view->whiteBack = true;
     }
 
 

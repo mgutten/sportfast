@@ -1,0 +1,47 @@
+<!--CLOSE CENTERED-BODY DIV-->
+<div class='push'></div>
+</div>
+<div class='footer'>
+    <div class='centered-body'>
+    	<div class='footer-section' id='footer-section1'>
+        	<p class='footer-section-title light'>
+            	Help &amp; Info
+            </p>
+            <?php 
+			$links = array('FAQ' 		 => array('controller' => 'info',
+											 	  'action'	   => 'faq'),
+						   'Sport Rules' => array('controller' => 'info',
+											 	  'action'	   => 'rules'));
+			echo $this->footer($links); 
+			?>
+        </div>
+        <div class='footer-section' id='footer-section2'>
+        	<p class='footer-section-title light'>
+            	What is Sportup?
+            </p>
+			<p class='footer-section-links medium'>
+            	Sportup is your home for everything recreational. We provide a place 
+                for local athletes to coordinate and organize everything from recreational 
+                pickup games to rec leagues.
+            </p>
+        </div> 
+        <div class='footer-section' id='footer-section3'>
+        	<p class='footer-section-title light'>
+            	The Company
+            </p>
+            <?php 
+			$links = array('About Us' 		 		=> array('controller' => 'info',
+											 	  			 'action'	  => 'about'),
+						   'Contact' 				=> array('controller' => 'info',
+											 	  			 'action'	  => 'contact'),
+						   'Jobs'				 	=> array('controller' => 'info',
+											 	  			 'action'	  => 'jobs'),
+						   'Privacy Policy' 		=> array('controller' => 'info',
+											 	  			 'action'	  => 'privacy'),
+						   'Terms &amp; Conditions' => array('controller' => 'info',
+											 	  			 'action'	  => 'terms'));
+			echo $this->footer($links); 
+			?>
+        </div>         	
+    </div>
+</div>

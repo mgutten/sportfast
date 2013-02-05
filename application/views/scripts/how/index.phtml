@@ -1,2 +1,22 @@
-
-<p id='test'>View script for controller <b>How</b> and script/action name <b>index</b></p>
+<?php
+/* 
+* controller => how
+* action => index
+*/
+$this->headTitle('How Does It Work');
+$this->headLink()->prependStylesheet($this->baseUrl() . '/css/how.css');
+//$this->headScript()->prependFile($this->baseUrl() . '/js/how.js');
+?>
+<p class='dark-back how-title'>
+	You want to play some <span class='green'>recreational sports</span> with other athletes.
+</p>
+<p class='dark-back how-title' id='how-title2'>
+	Sweet.  So do we.
+</p>
+<div id='how-icon-holder'></div>
+<?php
+$this->placeholder('absolute')->captureStart();
+?>
+<div id='how-icon-container' class='dark-back absolute' holder='how-icon-holder'></div>
+<?php
+$this->placeholder('absolute')->captureEnd();

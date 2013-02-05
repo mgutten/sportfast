@@ -14,10 +14,16 @@ echo $this->doctype() . PHP_EOL; ?>
  ?>
 </head>
 <body>
-<?php echo $this->render('header/tall.phtml'); ?>
-<div class='centered-body'>
-	<?php echo $this->layout()->content . PHP_EOL; ?>
-</div>
-<?php echo  $this->render('footer.phtml') . PHP_EOL; ?>
+<?php 
+echo $this->placeholder('absolute');
+
+echo $this->render('header/tall.phtml'); 
+
+if ($this->whiteBacking) {
+	echo $this->render('global/whiteBack.phtml');
+} else {
+	echo $this->layout()->content . PHP_EOL; 
+}
+echo  $this->render('footer.phtml') . PHP_EOL; ?>
 </body>
 </html>

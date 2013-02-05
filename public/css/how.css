@@ -1,0 +1,24 @@
+/* how.css */
+.how-title {
+	font-size:2em;
+	color:#fff;
+	padding: 0 .3em;
+	text-align:center;
+	float:left;
+	margin: .3em 0 0 .4em;
+}
+
+#how-icon-holder {
+	float:left;
+	clear:both;
+	height: 18em;
+	margin-top:1em;
+}
+
+#how-icon-container {
+	position:absolute;
+	height:18em;
+	width:70em;
+	left:50%;
+	margin-left:-35em;
+}
