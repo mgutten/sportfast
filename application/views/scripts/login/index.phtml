@@ -1,4 +1,18 @@
-<br /><br />
-<div id="view-content">
-	<p><?php echo $this->test;?></p>
+<?php
+/* 
+* controller => login
+* action => index
+*/
+$this->headTitle('Login');
+$this->headLink()->prependStylesheet($this->baseUrl() . '/css/login.css');
+//$this->headScript()->prependFile($this->baseUrl() . '/js/how.js');
+?>
+<div id='login-form-container'>
+	<p class='bold' id='login-header'>
+    	LOGIN TO YOUR ACCOUNT
+    </p>
+    <img src='' id='login-header-img' />
+    <div id="login-form-back" class='white-back dropshadow'>
+        <?php echo $this->form;?>
+    </div>
 </div>

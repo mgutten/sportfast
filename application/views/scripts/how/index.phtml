@@ -7,16 +7,72 @@ $this->headTitle('How Does It Work');
 $this->headLink()->prependStylesheet($this->baseUrl() . '/css/how.css');
 //$this->headScript()->prependFile($this->baseUrl() . '/js/how.js');
 ?>
-<p class='dark-back how-title'>
-	You want to play some <span class='green'>recreational sports</span> with other athletes.
+<p class='dark-back how-title bold'>
+	You want to play some <span class='green bold'>recreational sports</span> with other athletes.
 </p>
-<p class='dark-back how-title' id='how-title2'>
+<p class='dark-back how-title bold' id='how-title2'>
 	Sweet.  So do we.
 </p>
 <div id='how-icon-holder'></div>
 <?php
 $this->placeholder('absolute')->captureStart();
 ?>
-<div id='how-icon-container' class='dark-back absolute' holder='how-icon-holder'></div>
+<div id='how-icon-container' class='absolute' holder='how-icon-holder'>
+	<div id='how-icon-inner-container' class='dark-back'>
+	<?php 
+	$partial = array(
+			array('ele' => array('image'   => 'input-icon',
+								 'header'  => 'Input preferences',
+								 'subtext' => "We believe everyone should compete one their own level.  Give us your skill level, interests, and basic info, and we'll get you a game.")
+								 ),
+			array('ele' => array('image'   => 'input-icon',
+								 'header'  => 'Sportup works',
+								 'subtext' => 'We believe that you should be free to do as you want with what you want.')
+								 ),
+			array('ele' => array('image'   => 'input-icon',
+								 'header'  => 'Pick a game',
+								 'subtext' => 'We believe that you should be free to do as you want with what you want.')
+								 ),
+			array('ele' => array('image'   => 'input-icon',
+								 'header'  => 'Show up and enjoy',
+								 'subtext' => 'We believe that you should be free to do as you want with what you want.')
+								 )
+	);
+	
+	echo $this->howicon('partials/how/icon.phtml',$partial); 
+	?>
+    </div>
+</div>
 <?php
 $this->placeholder('absolute')->captureEnd();
+?>
+<!-- bug where first child how-section will not clear how-icon-holder -->
+<div class='clear'></div>
+
+<?php
+$partial = array(
+		array('ele' => array('header'  => 'Play on your own level.',
+							 'subtext' => "We believe that everyone should have the opportunity to compete on their own level.  Games, teams, and 
+							 				tournaments are formed with this principal in mind.  Players are matched based on age, skill, and position 
+											to provide the most competitive (and fair) atmosphere possible.")
+							 ),
+		array('ele' => array('header'  => 'Rate and be rated.',
+							 'subtext' => "Ever wonder how other players view your playing style?  Now, you can finally know.  After playing in a game, 
+							 				other players will rate your play based on 3 categories: skill, sportsmanship, and best part 
+											 of your game.  <span class='green'>But be warned, you will not receive any ratings until you rate others.</span>")
+							 ),
+		array('ele' => array('header'  => 'Crave competition?  Find a team.',
+							 'subtext' => "Putting together a league team is always a hassle, and finding one to join is near impossible, but we take the hassle 
+											 out by automatically matching players of comparable skill and complementary  position.  We'll even organize and register your newly-formed 
+											 team with a local league, so all you need to worry about is showing up and playing hard.")
+							 ),
+		array('ele' => array('header'  => 'Mix it up.',
+							 'subtext' => "Like most gifted athletes, you play more than one sport.  Why should you be bogged down to the same game with the same people week after week?  
+							 				With Sportup, you can spice up your week with football Saturday, basketball Tuesday, and soccer Friday--all within a few miles of your house.")
+							 )
+);
+
+echo $this->partialLoop('partials/how/lowerSection.phtml',$partial); 
+
+
+

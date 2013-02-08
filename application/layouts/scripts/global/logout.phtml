@@ -1,7 +1,8 @@
 <?php
-//$this->headTitle()->setSeparator(' | ');
-//$this->headTitle('Sportup');
-echo $this->doctype() . PHP_EOL; ?>
+$this->headTitle()->setSeparator(' - ');
+$this->headTitle()->append('Sportup');
+$this->setEncoding('UTF-8');
+echo $this->doctype('XHTML1_TRANSITIONAL') . PHP_EOL; ?>
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
 <?php
@@ -14,16 +15,22 @@ echo $this->doctype() . PHP_EOL; ?>
  ?>
 </head>
 <body>
-<?php 
+<?php
+//placeholder for all absolutely placed elements
 echo $this->placeholder('absolute');
 
+//header layout
 echo $this->render('header/tall.phtml'); 
 
+//default whiteBacking => true
 if ($this->whiteBacking) {
 	echo $this->render('global/whiteBack.phtml');
 } else {
 	echo $this->layout()->content . PHP_EOL; 
 }
-echo  $this->render('footer.phtml') . PHP_EOL; ?>
+
+//footer layout
+echo  $this->render('footer.phtml') . PHP_EOL; 
+?>
 </body>
 </html>

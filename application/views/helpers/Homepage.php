@@ -54,21 +54,26 @@ class Application_View_Helper_Homepage
 						   'text'   => "Create, find, and challenge other teams and players in your league.  Maybe you are looking for a 
 						   				teammate to fill a gap, or just to get out and play a game you haven't played in years.  We are here for you.");
 										
-		$output   .= $this->homepageDescriptionContainer($textArray);		
-		
+		$output   .= $this->homepageDescriptionContainer($textArray);
+				
 		return $output;
 	}
 	
 	public function homepageDescriptionContainer($textArray)
 	{
-		$output = "<a href='" . $this->_view->url(array('controller' => 'how',
-														'action'	  => 'index')) . "' >
-				   <div class='homepage-description-container white-back dropshadow pointer' id='homepage-description-container" . $this->descriptionCount . "'>
-							<img src='/images/homepage/description/" . $textArray['image'] . ".jpg' id='homepage-description-img" . $this->descriptionCount . "' class='homepage-description-img pointer'/>
-							<p class='center darkest homepage-description-header pointer'>" . $textArray['header'] . "</p>
-							<p class='pointer'>" . $textArray['text'] . "
-							</p>
-				   </div></a>";
+		$output = "<div class='homepage-description-container white-back dropshadow' id='homepage-description-container" . $this->descriptionCount . "'>
+							<img src='/images/homepage/description/" . $textArray['image'] . ".png' id='homepage-description-img" . $this->descriptionCount . "' class='homepage-description-img'/>
+							<p class='center darkest homepage-description-header'>" 
+							. $textArray['header'] 
+							. "</p>
+							<p>" 
+							. $textArray['text'] 
+							. "</p>
+							<a href='" . $this->_view->url(array('controller' => 'how',
+														   'action'		=> 'index')) . "' class='homepage-learn medium'>
+								Learn more
+							</a>
+				   </div>";
 				   
 		$this->descriptionCount++;
 				   

@@ -33,8 +33,9 @@ $(function()
 		var outerEle = $(this).children('.dropdown-back-outer');
 		var innerEle = outerEle.children();
 		outerEle.show()
-			    .css('z-index', 100)
+			    .css('z-index', 100);
 		innerEle.stop().animate({marginTop : 0}, 300);
+		
 	},
 	function()
 	{
@@ -179,8 +180,11 @@ function fadeOutInputOverlay(inputEle, focusIn)
 function alignDropdownContainer(ele)
 {
 		var parent = ele.parent();
-		var top = parent.offset().top + parent.height();
-		var left = parent.offset().left;
+		//var top  = parent.offset().top + parent.height();
+		var windowWidth = $(window).width();
+		var bodyWidth   = $('.centered-body').width();
+		var top    = $('.header-bar').height();
+		var left   = parseInt(parent.offset().left,10) - ((windowWidth - bodyWidth)/2);
 		
 		if (parent.css('float') == 'right') {
 			var parentWidth = parent.width();
@@ -190,7 +194,7 @@ function alignDropdownContainer(ele)
 		}
 		
 		ele.css({top : top,
-					 left: left});
+				 left: left});
 }
 
 /**

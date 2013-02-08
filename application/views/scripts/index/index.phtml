@@ -3,7 +3,8 @@
 * controller => index
 * action => index
 */
-$this->headTitle('Sportup | Compete Everywhere');
+//change title of homepage to Sportup - Compete Everywhere
+$this->headTitle()->exchangeArray(array('Sportup','Compete Everywhere'));
 $this->headLink()->prependStylesheet($this->baseUrl() . '/css/homepage.css');
 $this->headScript()->prependFile($this->baseUrl() . '/js/homepage.js');
 
@@ -14,7 +15,7 @@ if (!$loginTest) {
 	echo $this->homepage(); //$this->getHelper('homepage')->testFunction();
 } else {
 	/* else show memberHomepage from view helper*/
-	echo 'no test';
+	echo $this->memberHomepage();
 }
 
 ?>

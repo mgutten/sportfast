@@ -37,13 +37,14 @@ body {
 }
 
 p,div,span,input {
-	font-family:"Futura-Book"; /*futura not displayed properly by firefox */
+	font-family:"Futura-Book", Arial, Helvetica; /*futura not displayed properly by firefox */
 	-webkit-font-smoothing: antialiased;
 	font-weight:normal;
 	color:#333333;
 }
 
 /* make text unselectable */
+/*
 p,div,span {
 	-webkit-touch-callout: none;
 	-webkit-user-select: none;
@@ -53,6 +54,7 @@ p,div,span {
 	user-select: none;
 	cursor:default;
 }
+*/
 
 #test {
 	float:left;
@@ -95,6 +97,10 @@ img {
 	color:#2EC518;
 }
 
+.white {
+	color:#fff;
+}
+
 .center {
 	text-align:center;
 }
@@ -102,6 +108,7 @@ img {
 .white-back {
 	background:#ffffff;
 	border:#D6D6D6 1px solid;
+	padding:.5em 1em;
 }
 
 .dark-back {
@@ -112,6 +119,11 @@ img {
 	-moz-box-shadow:    2px 2px 4px 3px #CECECE;
  	-webkit-box-shadow: 2px 2px 4px 3px #CECECE;
   	box-shadow:         1px 1px 3px 1px #CECECE;
+}
+
+.bold {
+	font-family: 'Futura LT Bold', Arial, Helvetica;
+	font-weight: bold;
 }
 
 .pointer {
@@ -128,7 +140,8 @@ img {
 	background:#fff;
 	-webkit-box-shadow: 2px 0px 8px 0px #bbb,-2px 0px 8px 0px #bbb;
 	-moz-box-shadow: 2px 0px 8px 0px #bbb,-2px 0px 8px 0px #bbb;
-	z-index:-10;
+	box-shadow: 2px 0px 8px 0px #bbb,-2px 0px 8px 0px #bbb;
+	z-index:1;
 }
 
 /* end general declarations */
@@ -146,12 +159,11 @@ img {
 	height: 5.5em; 
 }
 
-.footer {
-	margin-top:2em;
+.push {
+	height:7em;
 }
 
 /* end force footer */
-
 
 
 /* header */
@@ -168,12 +180,12 @@ img {
 	background-image: -moz-linear-gradient(top, #444, #222);
 	background-image: -ms-linear-gradient(top, #444, #222);
 	background-image: -o-linear-gradient(top, #444, #222);
-	z-index:-1;
 	width:100%;
-	min-width:61.25em;
+	min-width:70em;
 	position:absolute;
 	top:0;
 	left:0;
+	z-index:2;
 }
 
 div#header-bar-tall {
@@ -184,6 +196,8 @@ div#header-bar-tall {
 .header-nav-container {
 	float:left;
 	clear:both;
+	position:relative;
+	z-index:2;
 	width:100%;
 	height:2.5em;
 }
@@ -355,8 +369,9 @@ input[type=checkbox] {
 	height:1.8em;
 	overflow:hidden;
 	font-size:.9em;
+	padding:0 1em;
 	color:#777;
-	margin: .5em 0 .5em 1em;
+	margin: .5em 0 .5em 0em;
 }
 
 .input-overlay {
@@ -390,12 +405,13 @@ input[type=checkbox] {
 	margin:-0.0625em 0 0 .3em;
 }
 
-#dropdown-login-submit {
-	float:left;
+.dropdown-login-submit {
+	float:right;
 }
 
-#dropdown-checkbox-forgot-container {
+.dropdown-checkbox-forgot-container {
 	float:left;
+	clear:both;
 	font-size: .8em;
 	margin: 0px 0px 0px 1.3em;
 }
@@ -407,8 +423,7 @@ input[type=checkbox] {
 	font-size:.9em;
 }
 
+.error {
+	color:#C00;
 
 /* end form elements */
-
-
-

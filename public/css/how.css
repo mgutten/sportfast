@@ -1,6 +1,6 @@
 /* how.css */
 .how-title {
-	font-size:2em;
+	font-size:1.6em;
 	color:#fff;
 	padding: 0 .3em;
 	text-align:center;
@@ -8,17 +8,101 @@
 	margin: .3em 0 0 .4em;
 }
 
+/* absolute positioned icons */
+
 #how-icon-holder {
 	float:left;
 	clear:both;
-	height: 18em;
 	margin-top:1em;
+}
+
+#how-icon-inner-container {
+	margin:0 auto;
+	width:70em;
 }
 
 #how-icon-container {
 	position:absolute;
-	height:18em;
-	width:70em;
-	left:50%;
-	margin-left:-35em;
+	width:100%;
+	z-index:2;
+}
+
+#how-icon-holder,#how-icon-inner-container,#how-icon-container {
+	height: 19em;
+}
+
+.how-icon-section {
+	float:left;
+	position:relative;
+	z-index:20;
+	width:25%;
+	height:100%;
+}
+
+.how-icon-img {
+	width: 8em;
+	height:8em;
+	display:block;
+	margin: 1em auto 0 auto;
+	background:#8d8d8d;
+}
+
+.how-icon-num {
+	float:left;
+	clear:both;
+	padding: .05em .4em;
+	margin: 1em 0 0 .4em;
+	text-align:center;
+	border: 2px solid #fff;
+	font-size:1.2em;
+}
+
+.how-icon-header {
+	float:left;
+	font-size:1.2em;
+	margin: 1.25em 0 0 .4em;
+}
+
+.how-icon-subtext {
+	float:left;
+	clear:both;
+	width:80%;
+	margin: .1em 0 0 3.1em;
+}
+
+/* end absolute positioned icons */
+
+/* below icons */
+.how-section {
+	float:left;
+	width: 43%;
+	padding: 1.5em 2% 1.25em 2%;
+	cursor:default;
+}
+
+.how-section-subtext {
+	float:left;
+	clear:both;
+}
+
+.clear {
+	float:left;
+	clear:both;
+	width:100%;
+}
+
+.how-section:hover {
+	background: #E6FFE6;
+}
+
+.how-section-header {
+	font-size: 1.1em;
+}
+
+.how-section:nth-child(odd) {
+	clear:both;
+}
+
+.how-section:nth-child(even) {
+	float:right;
 }

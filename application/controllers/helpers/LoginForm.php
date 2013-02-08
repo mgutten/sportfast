@@ -22,7 +22,7 @@ class Application_Controller_Helper_LoginForm extends Zend_Controller_Action_Hel
             }
         }
 		*/
-        $view->loginForm = $form;
+        $view->dropdownLoginForm = $form;
     }
 
 }

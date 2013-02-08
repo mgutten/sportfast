@@ -7,7 +7,7 @@ class Application_Form_Login extends Zend_Form
     {
         $this->setName('loginForm');
 		$this->setMethod('POST');
-		$this->setAction('/login');
+		$this->setAction('/login/auth');
 		$this->setDecorators(array('FormElements', 'Form'));
 		
 		$this->addElementPrefixPath('My_Form_Decorator',
@@ -46,7 +46,7 @@ class Application_Form_Login extends Zend_Form
 				'ignore'   		=> true,
 				'decorators'	=> array('ViewHelper'),
 				'label'   		=> 'Login',
-				'id'			=> 'dropdown-login-submit'
+				'class'			=> 'dropdown-login-submit'
 
         ));  	
     }
