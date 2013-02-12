@@ -1,5 +1,24 @@
 <div id='body-white-back'>
 <?php
-echo $this->layout()->content;
+
+if ($this->narrowColumn == 'left') {
+	echo "<div class='body-column-narrow' style='float:left;'>
+		  <div class='body-column-narrow-inner fixed'>";
+	echo $this->placeholder('narrowColumn');
+	echo "</div></div>";
+	echo "<div class='body-column-wide' style='float:right;'>";
+	echo $this->layout()->content;
+	echo "</div>";
+} elseif ($this->narrowColumn == 'right') {
+	echo "<div class='body-column-narrow' style='float:right;'>
+			<div class='body-column-narrow-inner fixed'>";
+	echo $this->placeholder('narrowColumn');
+	echo "</div></div>";
+	echo "<div class='body-column-wide' style='float:left;'>";
+	echo $this->layout()->content;
+	echo "</div>";
+} else {
+	echo $this->layout()->content;
+}
 ?>
 </div>

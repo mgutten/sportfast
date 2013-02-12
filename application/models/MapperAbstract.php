@@ -4,19 +4,23 @@ abstract class Application_Model_MapperAbstract
 {
 	
 	protected $_dbTable;
-	protected $_dbTableClass;
-	
+	protected $_dbTableClass;	
 	
 	public function save($savingClass)
 	{			
-		$data = array('username' => $savingClass->username,
-					  'password' => $savingClass->password
-					  );
+		$data = array();
+		$columns = $savingClass->getAttribs();
+
+		foreach($columns as $column => $value) {
+			$data[$column] = $value;
+		}
 		
-		if (($id = $savingClass->id) === null) {
+		$primaryColumn = $savingClass->primaryKey;
+		$primaryKey = $data[$primaryColumn];
+		if ($primaryKey === null) {
 			$this->getDbTable()->insert($data);
 		} else {
-			$this->getDbTable()->update($data, array('userID = ?' => $id));
+			$this->getDbTable()->update($data, array($primaryColumn . ' = ?' => $primaryKey));
 		}
 
 	}

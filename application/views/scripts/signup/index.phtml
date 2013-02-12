@@ -1,0 +1,105 @@
+<?php
+/* 
+* controller => signup
+* action => index
+*/
+$this->headTitle('Signup');
+$this->headLink()->prependStylesheet($this->baseUrl() . '/css/signup.css');
+$this->headScript()->prependFile($this->baseUrl() . '/js/signup.js');
+
+$totalSteps = 4;
+$currentStep = 1;
+
+echo $this->partial('partials/signup/stepContainer.phtml',array('title'		  =>'Account Info',
+																'currentStep' =>$currentStep,
+																'totalSteps'  =>$totalSteps));
+$currentStep++;
+echo $this->form->firstName;
+echo $this->form->lastName;
+echo $this->form->sex;
+?>
+<img src='/images/signup/sex/male.png' class='signup-sex-img pointer' id='signup-sex-male' tooltip='Male'/>
+<img src='/images/signup/sex/female.png' class='signup-sex-img pointer' id='signup-sex-female' tooltip='Female'/>
+<?php
+echo "<div class='clear'></div>";
+echo $this->form->dobMonth;
+echo "<span class='signup-dob-slash'>/</span>";
+echo $this->form->dobDay;
+echo "<span class='signup-dob-slash'>/</span>";
+echo $this->form->dobYear;
+echo $this->form->heightFeet;
+echo $this->form->heightInches;
+echo $this->form->weight;
+echo "<div class='clear signup-clear-large'></div>";
+echo $this->form->email;
+echo "<div class='clear'></div>";
+echo $this->form->signupPassword;
+echo $this->form->signupPassword->setLabel('Re-enter Password');
+
+
+
+?>
+</div>
+
+<?php
+
+echo $this->partial('partials/signup/stepContainer.phtml',array('title'		  =>'Sports',
+																'currentStep' =>$currentStep,
+																'totalSteps'  =>$totalSteps));
+$currentStep++;
+echo $this->form->firstName;
+echo $this->form->lastName;
+
+?>
+</div>
+<?php
+
+echo $this->partial('partials/signup/stepContainer.phtml',array('title'		  =>'Import Picture',
+																'currentStep' =>$currentStep,
+																'totalSteps'  =>$totalSteps));
+$currentStep++;
+echo $this->form->firstName;
+echo $this->form->lastName;
+
+?>
+</div>
+<?php
+
+echo $this->partial('partials/signup/stepContainer.phtml',array('title'		  =>'Agree',
+																'currentStep' =>$currentStep,
+																'totalSteps'  =>$totalSteps));
+$currentStep++;
+echo $this->form->firstName;
+echo $this->form->lastName;
+
+?>
+</div>
+<?php
+
+$this->placeholder('narrowColumn')->captureStart();
+?>
+<div class='narrow-column-picture'>
+</div>
+
+<div id='narrow-column-account-info'>
+    <div class='narrow-column-header' tooltip='testing to see what exactly the correct alignment for tooltips is'> 
+        Account Info
+    </div>
+    
+    <div class='narrow-column-body'>
+        <div id='account-info-name' class='capitalize'>
+        	<span id='account-info-first-name' class='bold'></span>
+            <span id='account-info-last-name' class='bold'></span>
+        </div>
+        <div id='account-info-age' class=''>
+        </div>
+       
+        
+ 	</div>
+</div>
+
+<div class='narrow-column-header'>
+	Sports
+</div>
+<?php
+$this->placeholder('narrowColumn')->captureEnd();

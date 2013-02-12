@@ -1,0 +1,37 @@
+<?php
+$this->headTitle()->setSeparator(' - ');
+$this->headTitle()->append('Sportup');
+$this->setEncoding('UTF-8');
+echo $this->doctype('XHTML1_TRANSITIONAL') . PHP_EOL; ?>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<?php
+		echo $this->headMeta() . PHP_EOL;
+ 		echo $this->headTitle() . PHP_EOL;
+ 		echo $this->headLink()->prependStylesheet($this->baseUrl() . '/css/global.css') . PHP_EOL;
+		echo $this->headScript()->prependFile($this->baseUrl() . '/js/global.js')
+								->prependFile($this->baseUrl() . '/js/jquery-1.8.min.js') . PHP_EOL;
+								
+ ?>
+</head>
+<body>
+<?php
+//placeholder for all absolutely placed elements
+echo $this->placeholder('absolute');
+echo $this->tooltip();
+
+//header layout
+echo $this->render($this->headerLayout . '.phtml'); 
+
+//default whiteBacking => true
+if ($this->whiteBacking) {
+	echo $this->render('global/whiteBack.phtml');
+} else {
+	echo $this->layout()->content . PHP_EOL; 
+}
+
+//footer layout
+echo  $this->render('footer.phtml') . PHP_EOL; 
+?>
+</body>
+</html>

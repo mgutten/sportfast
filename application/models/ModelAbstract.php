@@ -17,7 +17,7 @@ abstract class Application_Model_ModelAbstract
 	{
 		$method = 'set' . $name;
 		if (('mapper' == $name) || !method_exists($this, $method)) {
-			throw new Exception('Invalid model property');
+			throw new Exception('Invalid model property ' . $name);
 		}
 		$this->$method($value);
 	}
@@ -26,9 +26,19 @@ abstract class Application_Model_ModelAbstract
 	{
 		$method	= 'get' . $name;
 		if (('mapper' == $name) || !method_exists($this, $method)) {
-			throw new Exception('Invalid model property');
+			throw new Exception('Invalid model property ' . $name);
 		}
 		return $this->$method();
+	}
+	
+	public function getAttribs()
+	{
+		return $this->_attribs;
+	}
+	
+	public function getPrimaryKey()
+	{
+		return $this->_primaryKey;
 	}
 	
 	public function setOptions(array $options)
@@ -80,6 +90,11 @@ abstract class Application_Model_ModelAbstract
 	{
 		$this->getMapper()->save($this);
 		return $this;
+	}
+	
+	public function getVars()
+	{
+		return get_object_vars($this);
 	}
 		
 

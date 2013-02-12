@@ -3,7 +3,9 @@
 
 /* general declarations */
 
-@font-face {font-family: 'Futura-Book';src: url('/webfonts/25AA4D_0_0.eot');src: url('/webfonts/25AA4D_0_0.eot?#iefix') format('embedded-opentype'),url('/webfonts/25AA4D_0_0.woff') format('woff'),url('/webfonts/25AA4D_0_0.ttf') format('truetype');}
+@font-face {font-family: 'Futura-Book';src: url('/webfonts/futura/25AA4D_0_0.eot');src: url('/webfonts/futura/25AA4D_0_0.eot?#iefix') format('embedded-opentype'),url('/webfonts/futura/25AA4D_0_0.woff') format('woff'),url('/webfonts/futura/25AA4D_0_0.ttf') format('truetype');}
+
+@font-face {font-family: 'Futura-Heavy';src: url('/webfonts/futuraHeavy/25CEC6_0_0.eot');src: url('/webfonts/futuraHeavy/25CEC6_0_0.eot?#iefix') format('embedded-opentype'),url('/webfonts/futuraHeavy/25CEC6_0_0.woff') format('woff'),url('/webfonts/futuraHeavy/25CEC6_0_0.ttf') format('truetype');}
 
 
 * {
@@ -41,6 +43,11 @@ p,div,span,input {
 	-webkit-font-smoothing: antialiased;
 	font-weight:normal;
 	color:#333333;
+}
+
+.header {
+	font-family: Arial, Helvetica, sans-serif;
+	font-weight: bold;
 }
 
 /* make text unselectable */
@@ -94,7 +101,8 @@ img {
 }
 
 .green {
-	color:#2EC518;
+	color:#58bf12;
+	/* 64ce1c */
 }
 
 .white {
@@ -122,18 +130,26 @@ img {
 }
 
 .bold {
-	font-family: 'Futura LT Bold', Arial, Helvetica;
-	font-weight: bold;
+	font-family: 'Futura-Heavy', Arial, Helvetica;
+	line-height: 1.2em;
+}
+
+.capitalize {
+	text-transform: capitalize;
 }
 
 .pointer {
 	cursor:pointer;
 }
 
+.clear {
+	clear:both;
+}
+
 #body-white-back {
 	width: 92.5%;
 	margin-left:.75%;
-	padding: 1.5em 1.75em;
+	padding: 1.5em 1.5em;
 	position:relative;
 	float:left;
 	clear:both;
@@ -145,6 +161,54 @@ img {
 }
 
 /* end general declarations */
+
+
+/* body declarations */
+
+.body-column-narrow {
+	width:25%;
+	position: relative;
+}
+
+.body-column-narrow-inner {
+	padding-left:1.5em;
+
+}
+
+.body-column-wide {
+	width:74.95%;
+	height: 100em;
+}
+
+.narrow-column-picture {
+	width: 100%;
+	height:10em;
+	background:#222;
+}
+
+.narrow-column-header {
+	float:left;
+	clear:both;
+	width:100%;
+	font-size:1.1em;
+	background:#E0E0E0; /* same as .lightest */
+	text-align:center;
+	padding: .1em 0;
+	cursor:pointer;
+	margin-top: .5em;
+}
+
+.narrow-column-header-selected {
+	background:#C6C6C6;
+}
+/*
+.narrow-column-header:hover {
+	background:#D2D2D2;
+}
+
+/* end body declarations */
+
+
 
 /* force footer to bottom of page */
 .centered-body.body-wrapper {
@@ -209,7 +273,7 @@ div#header-bar-tall {
 }
 
 div.nav-back:hover {
-	background: #444;
+	/*background: #444;*/
 }
 
 
@@ -226,16 +290,16 @@ div.nav-back:hover {
 }
 
 .nav-back#nav-back-signup {
-	background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#2EC518), to(#1C931F));
-	background-image: -webkit-linear-gradient(top, #2EC518, #1C931F); 
-	background-image: -moz-linear-gradient(top, #2EC518, #1C931F);
-	background-image: -ms-linear-gradient(top, #2EC518, #1C931F);
-	background-image: -o-linear-gradient(top, #2EC518, #1C931F);
+	background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#58bf12), to(#1C931F));
+	background-image: -webkit-linear-gradient(top, #58bf12, #1C931F); 
+	background-image: -moz-linear-gradient(top, #58bf12, #1C931F);
+	background-image: -ms-linear-gradient(top, #58bf12, #1C931F);
+	background-image: -o-linear-gradient(top, #58bf12, #1C931F);
 	width:10em;
 }
 
 .nav-back#nav-back-signup:hover {
-	background:#4EC541;
+	background:#58bf12;
 }
 
 .nav-back#nav-back-login {
@@ -351,7 +415,7 @@ input[type=text],input[type=password] {
 	border-radius: 5px;
 	border:1px solid #E0E0E0;
 	padding-left:4px;
-	color:inherit;
+	color:#444;
 	font-size:inherit;
 	float:left;
 	width: 13em;
@@ -364,14 +428,18 @@ input[type=checkbox] {
 
 .input-container {
 	float:left;
-	clear:both;
 	width:auto;
 	height:1.8em;
 	overflow:hidden;
 	font-size:.9em;
-	padding:0 1em;
+	padding:0 0;
 	color:#777;
 	margin: .5em 0 .5em 0em;
+}
+
+.input-container#username-container, .input-container#password-container,
+ .input-container#username-main-container, .input-container#password-main-container{
+	padding: 0 1em;
 }
 
 .input-overlay {
@@ -385,11 +453,11 @@ input[type=checkbox] {
 	cursor:text;
 }
 
-#username-container {
+div#username-container {
 	margin-top: .5em;
 }
 
-#password-container {
+div#password-container {
 	margin-top: 0em;
 	margin-bottom: .2em;
 }
@@ -425,5 +493,42 @@ input[type=checkbox] {
 
 .error {
 	color:#C00;
+}
 
 /* end form elements */
+
+
+/* tooltip */
+
+#tooltip {
+	width:auto;
+	height:auto;
+	position:absolute;
+	z-index:10;
+	opacity:0;
+	display:none;
+
+}
+
+.tooltip-tip {
+	float:left;
+	position:relative;
+	z-index:2;
+
+}
+
+#tooltip-body {
+	-moz-border-radius: 3px;
+	border-radius: 3px;
+	border:1px solid #aaa;
+	float:left;
+	clear:both;
+	font-size:.9em;
+	padding: .1em .3em;
+	margin: -.1em;
+	max-width: 18em;
+	background:#EEE;
+	color:#8d8d8d;
+}
+	
+	

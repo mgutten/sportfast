@@ -1,5 +1,5 @@
 <?php
-//include PHPass
+// Include PHPass
 require_once(APPLICATION_PATH . "/../library/My/Auth/PasswordHash.php");
 
 class LoginController extends Zend_Controller_Action
@@ -12,6 +12,7 @@ class LoginController extends Zend_Controller_Action
 
     public function indexAction()
     {
+
 		$this->view->whiteBacking = false;
         $this->view->test = $this->getRequest()->getPost('username');
 		
@@ -20,7 +21,7 @@ class LoginController extends Zend_Controller_Action
 		$password = $form->getElement('password');
 		$checkbox = $form->getElement('rememberMe');
 		
-		//change id of main login form to differ from dropdown
+		// Change id of main login form to differ from dropdown
 		$form    ->setAttrib('id','loginFormMain');
 		$username->setAttrib('id','username-main')
 				 ->setAttrib('class','dropshadow');
@@ -30,7 +31,7 @@ class LoginController extends Zend_Controller_Action
 		$checkbox->setAttrib('id','remember-me')
 				 ->setAttrib('class','medium');
 		
-		//display username if failed attempt
+		// Display username if failed attempt
 		$session = new Zend_Session_Namespace('login');
 		if ($session) {
 			$username->setValue($session->username);
@@ -39,20 +40,20 @@ class LoginController extends Zend_Controller_Action
 		
 		$this->view->form = $form;
 		
-		//$error = $this->_helper->FlashMessenger->getMessages('error');
-
     }
 	
 	
 	public function authAction()
 	{
+		
 		$request = $this->getRequest();
 		
-		//check if POST data exists
+		// Check if POST data exists
 		if (!$request->isPost()) {
 			return $this->_helper->redirector('index');
 		}
 		
+		// Set login session for auto-filling username on redirect
 		$loginSession = new Zend_Session_Namespace('login');
 		$loginSession->username = $request->getPost('username');
 		
@@ -61,8 +62,10 @@ class LoginController extends Zend_Controller_Action
             // Did not pass validation...
             $error = $form->getMessages();
 			if ($error['username']) {
+				// Username was empty
 				$error = array('Please enter your username.');
 			} elseif ($error['password']) {
+				// Password was empty
 				$error = array('Incorrect password.');
 			}
             $this->_helper->FlashMessenger->addMessage($error, 'error');
@@ -75,22 +78,42 @@ class LoginController extends Zend_Controller_Action
 											  
         $result = $auth->authenticate($authAdapter);
         if (!$result->isValid()) {
-            // Invalid username/password
+            // Invalid username/password, display errors
             $error = $result->getMessages();
 			$this->_helper->FlashMessenger->addMessage($error, 'error');
             return $this->_helper->redirector->goToUrl('/login');
         } else {
-			// Authentication success
+			// Authentication success, unset login session, set user cookie
 			Zend_Session::namespaceUnset('login');
-			setcookie('user', $auth->getIdentity(), time() + 2000, '/');
 			
-			$this->_helper->redirector->goToUrl('/how');
+			if ($request->getPost('rememberMe')) {
+				// Set cookie if user wants to be remembered
+				setcookie('user', $auth->getIdentity(), time() + (60*60*336), '/');
+			} else {
+				// Unset cookie (if existing from previous visit)
+				setcookie('user', '', time() - 1, '/');
+			}
+			
+			$this->_helper->redirector->goToUrl('/');
 		}
         
 	}
 	
+	
+	public function logoutAction()
+	{
+		// Log the user out
+		setcookie('user', '', time() - 3600, '/');
+		$auth = Zend_Auth::getInstance();
+		$auth->clearIdentity();
+		
+		$this->_helper->redirector->goToUrl('/');
+	}
+	
+	
 	public function testAction()
 	{
+		//temp page to add user to db
 		$username = 'guttenberg.m@gmail.com';
 		$password = 'Westberg.7';
 		$hasher   = new My_Auth_PasswordHash(8, false);
@@ -99,12 +122,8 @@ class LoginController extends Zend_Controller_Action
 		$user = new Application_Model_User();
 		$user->username = $username;
 		$user->password = $password;
+		$user->userID   = '5';
 		//$user->save();
-		/*
-		$users = new Application_Model_Users();
-		$results = $users->getUserBy('username','guttenberg.m@gmail.com');
-		var_dump($results->username);
-		*/
 		
 	}
 	

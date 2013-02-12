@@ -63,7 +63,7 @@ class Application_View_Helper_Homepage
 	{
 		$output = "<div class='homepage-description-container white-back dropshadow' id='homepage-description-container" . $this->descriptionCount . "'>
 							<img src='/images/homepage/description/" . $textArray['image'] . ".png' id='homepage-description-img" . $this->descriptionCount . "' class='homepage-description-img'/>
-							<p class='center darkest homepage-description-header'>" 
+							<p class='center darkest homepage-description-header bold'>" 
 							. $textArray['header'] 
 							. "</p>
 							<p>" 

@@ -3,43 +3,43 @@
 class Application_Model_User extends Application_Model_ModelAbstract
 {
 	protected $_mapperClass = 'Application_Model_UsersMapper';
-	protected $_username;
-	protected $_password;
-	protected $_userID;
+	protected $_attribs = array();
+	protected $_primaryKey = 'userID';
 				
 		
 	public function setUsername($username)
 	{
-		$this->_username = $username;
+		$this->_attribs['username'] = $username;
 		return $this;
 	}
 	
 	public function getUsername()
 	{
-		return $this->_username;
+		return $this->_attribs['username'];
 	}
 
 	public function setPassword($password)
 	{
-		$this->_password = $password;
+		$this->_attribs['password'] = $password;
 		return $this;
 	}
 	
 	public function getPassword()
 	{
-		return $this->_password;
+		return $this->_attribs['password'];
 	}	
 
 	public function setUserID($id)
 	{
-		$this->_userID = $id;
+		$this->_attribs['userID'] = $id;
 		return $this;
 	}
 	
 	public function getUserID()
 	{
-		return $this->_userID;
-	}	
+		return $this->_attribs['userID'];
+	}
+	
 
 
 }

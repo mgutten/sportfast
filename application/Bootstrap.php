@@ -15,8 +15,22 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 		$this->bootstrap('layout');
 		$this->bootstrap('view');
 		$layout = $this->getResource('layout');
-		$layout->setLayout('global/logout');
-
+		$view = $this->getResource('view');
+		
+		$auth = Zend_Auth::getInstance();
+		
+		if (!empty($_COOKIE['user']) || $auth->hasIdentity()) {
+			//user is logged in (CHANGE TO "short" WHEN READY TO DEVELOP LOGIN PAGES)
+			$headerLayout = 'header/short';
+		} else {
+			$headerLayout = 'header/tall';
+		}
+		
+		//set global layout
+		$layout->setLayout('global/global');
+		
+		//set header layout for login vs logout
+		$view->headerLayout = $headerLayout;
 		
 	}
 	
@@ -24,6 +38,7 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 	{
 		$this->bootstrap('view');
 		$view = $this->getResource('view');
+		/* default to white back for page */
 		$view->whiteBacking = true;
 		
 		return $view;

@@ -16,7 +16,7 @@ class Application_Form_Login extends Zend_Form
 		
 								
 		$this->addElement('text', 'username', array(
-				'filters'		=> array('StringTrim'),
+				'filters'		=> array('StringTrim','StringToLower'),
 				'required'		=> true,
 				'decorators'	=> array('Overlay'),
 				'label'			=> 'Username/Email'
@@ -24,7 +24,7 @@ class Application_Form_Login extends Zend_Form
 			
 				
 		$this->addElement('password', 'password', array(
-				'filters'		=> array('StringTrim','StringToLower'),
+				'filters'		=> array('StringTrim'),
 				'required'		=> true,
 				'value'			=> 'Password',
 				'decorators'	=> array('Overlay'),

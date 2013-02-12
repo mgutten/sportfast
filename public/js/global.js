@@ -1,9 +1,36 @@
 // global.js
 var mouseoverDropdown = false; /* fix issue when input is focus, then not focus and mouse is not over */
 var fadeRunning = false;
+var tooltipTimer;
+var tooltipEle = null;
 
 $(function()
 {
+	
+	/* animate hover effect for navigation */
+	$('.nav-back').hover(function() 
+	{
+		
+		if ($(this).is('.nav-dropdown') || $(this).is('#nav-back-signup')){
+			return;
+		}
+			
+		
+		if ($(this).is('#nav-back-signup')) {
+			backgroundColor = '#58bf12';
+		}
+		
+		var backgroundColor = '#555';
+		$(this).stop().animate({'background-color': backgroundColor},200);
+	},
+	function()
+	{
+		if ($(this).is('.nav-dropdown') || $(this).is('#nav-back-signup')){
+			return;
+		}
+		$(this).stop().animate({'background-color':'transparent'},200);
+	});
+	
 	/* align each dropdown with appropriate navigation */
 	$('.dropdown-back-outer').each(function()
 	{
@@ -17,6 +44,24 @@ $(function()
 				alignDropdownContainer($(this));
 			})
 	})
+	
+	
+	/* change background color of narrow-column onhover */
+	$('.narrow-column-header').hover(function()
+	{
+		$(this).stop().animate({backgroundColor: '#C6C6C6'},200);
+	},
+	function()
+	{
+		$(this).stop().animate({backgroundColor: '#E0E0E0'},200);
+	})
+	
+	
+	/* fix .fixed elements onscroll */
+	$(window).scroll(function()
+	{
+		fixElements();
+	});
 	
 	
 	/* align absolutely positioned elements to their holder */
@@ -63,7 +108,13 @@ $(function()
 	$('input[type=text],input[type=password]').focusin(function()
 	{
 		$(this).parents('.nav-dropdown').trigger('mouseover');
-		fadeOutInputOverlay($(this), true)
+		fadeOutInputOverlay($(this), true);
+		
+		// Tooltip
+		if($(this).parents('.input-container').attr('tooltip')) {
+			startTooltipTimer($(this).parents('.input-container'));
+		}
+		
 	})
 	.keyup(function()
 	{
@@ -75,7 +126,17 @@ $(function()
 		if (mouseoverDropdown == false) {
 			$(this).parents('.nav-dropdown').trigger('mouseout');
 		}
+		
+		// Tooltip
+		if($(this).parents('.input-container').attr('tooltip').length > 0) {
+			endTooltipTimer();
+			$('#tooltip').stop().animate({opacity:0},{duration:100, complete: function() {
+																				$(this).hide()
+			}});			
+		}
+				
 	});
+	
 	
 	/* onload perform fade effect for case when input box has value */
 	$('input[type=text],input[type=password]').each(function()
@@ -96,6 +157,34 @@ $(function()
 	{
 		$(this).siblings('input[type=checkbox]').trigger('click');
 	})
+	
+	
+	/* test all elements for tooltip onhover */
+	$('*').hover(function()
+	{
+
+		if($(this).parents('.input-container').attr('tooltip')) {
+			return;
+		}
+		
+		
+		if ($(this).attr('tooltip')) {
+			var ele = $(this);
+			startTooltipTimer(ele);
+		}
+	}, function()
+	{
+		if(tooltipEle.is('.input-container')) {
+			return;
+		}
+		
+		endTooltipTimer();
+		
+			$('#tooltip').stop().animate({opacity:0},{duration:100, complete: function() {
+																				$(this).hide()
+			}});
+		
+	});
 	
 		
 })
@@ -207,6 +296,87 @@ function alignAbsolute(ele)
 	var top = holder.offset().top;
 	
 	ele.css('top',top);
+}
+
+/**
+* fix ".fixed" elements on scroll
+* @params (ele => .fixed element)
+*/
+function fixElements()
+{
+	var scrollTop = $(window).scrollTop();
+	
+		$('.fixed').each(function()
+		{
+			if (scrollTop < $(this).parent().offset().top) {
+				$(this).css({position: 'static'})
+			} else if ((scrollTop >= ($(this).offset().top - 10))) {
+				
+				var width = $(this).width();
+				var height = $(this).height();
+				$(this).css({position: 'fixed',
+							 width	 : width,
+							 height  : height,
+							 top	 : 10});
+			} 
+		});
+	
+}
+
+
+/**
+* fix ".fixed" elements on scroll
+* @params (ele => .fixed element)
+*/
+function startTooltipTimer(ele)
+{
+	if(tooltipTimer) {
+		clearTimeout(tooltipTimer)
+	}
+	
+	tooltipTimer = setTimeout(function()
+					{
+						showTooltip(ele);
+					}, 500);
+	
+}
+
+function endTooltipTimer()
+{
+	clearTimeout(tooltipTimer);
+}
+
+
+/**
+* fix ".fixed" elements on scroll
+* @params (ele => .fixed element)
+*/
+function showTooltip(ele)
+{
+	tooltipEle = ele;
+	
+	var value = ele.attr('tooltip');
+	var top   = ele.offset().top + ele.innerHeight();
+	var left  = ele.offset().left;
+	
+	$('#tooltip-body').html(value);
+	
+	var tooltipWidth = $('#tooltip').innerWidth();
+	var endOfBody    = $('#body-white-back').innerWidth() + $('#body-white-back').offset().left;
+	
+	if ((tooltipWidth + left) > endOfBody) {
+		$('.tooltip-tip').css('float','right');
+		left = left - (tooltipWidth - ele.innerWidth());
+	} else {
+		$('.tooltip-tip').css('float','left');
+	}
+		
+	$('#tooltip').show()
+				 .stop()
+				 .css({top: top,
+					   left:left})
+				 .animate({opacity: 1},200);
+	
 }
 	
 

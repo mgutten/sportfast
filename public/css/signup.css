@@ -1,0 +1,91 @@
+/* signup.css */
+
+/* signup section overlay */
+
+.signup-section-container {
+	float:left;
+	clear:both;
+	width:100%;
+	margin-top: 3em;
+}
+
+.signup-section-title-container {
+	float:left;
+	clear:both;
+	width:100%;
+	height:1.6em;
+	border-bottom: solid 2px #58bf12;
+	margin-bottom: 1em;
+}
+
+.signup-section-title {
+	float:left;
+	font-size:1.5em;
+}
+
+.signup-section-steps {
+	float:right;
+	font-size:1.2em;
+	margin-top:.2em;
+}
+
+/* end signup section overlay */
+
+
+/* custom input styling */	
+
+.input-container {
+	margin-left: 1em;
+	margin-top: .3em;
+	font-size: 1.06em;
+	padding-right: .1em;
+}
+
+#username-container, #password-container {
+	font-size: .92em;
+	margin: .5em 0;
+	padding: 0 1em;
+}
+
+input.short-input {
+	width: 2em;
+}
+
+#heightFeet-container {
+	margin-left: 5.4em;
+}
+
+.signup-sex-img {
+	float:left;
+	width:30px;
+	height:30px;
+	margin: -.7em 0 0 .5em;
+	background:#8d8d8d;
+}
+
+.signup-sex-img:hover {
+	background:#58bf12;
+}
+
+.signup-sex-img#signup-sex-male {
+	margin-left: 2em;
+}
+
+.signup-clear-large {
+	height: 3em;
+}
+
+.signup-dob-slash {
+	float:left;
+	margin: .6em 0 0 .2em;
+}
+
+#dobDay-container, #dobYear-container {
+	margin-left:.2em;
+}
+
+/* end custom styling of inputs */
+
+
+/* narrow column definitions */
+
