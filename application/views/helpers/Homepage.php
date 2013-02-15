@@ -13,7 +13,7 @@ class Application_View_Helper_Homepage
 	{
 		//large images
 		$output   = "<div id='homepage-large-img-holder'></div>
-							<div id='homepage-large-img-container' class='absolute' holder='homepage-large-img-holder'>
+							<div id='homepage-large-img-container' class='absolute dropshadow' holder='homepage-large-img-holder'>
 							<img src='/images/homepage/large/soccer.jpg' class='homepage-large-img fade-current' id='homepage-large-img1' />
 							<img src='/images/homepage/large/basketball.jpg' class='homepage-large-img fade-next' id='homepage-large-img2' />
 							<img src='' class='homepage-large-img' id='homepage-large-img3' />
@@ -35,7 +35,7 @@ class Application_View_Helper_Homepage
 		
 		$output   .= $this->homepageDescriptionContainer($textArray);
 		
-		$textArray = array('image'	=> '',
+		$textArray = array('image'	=> 'ratings',
 						   'header' => "See how you stack up against your area's best.",
 						   'text'   => "Create, find, and challenge other teams and players in your league.  Maybe you are looking for a 
 						   				teammate to fill a gap, or just to get out and play a game you haven't played in years.  We are here for you.");

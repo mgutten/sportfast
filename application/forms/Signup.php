@@ -41,8 +41,7 @@ class Application_Form_Signup extends Zend_Form
 				'decorators'	=> array('Overlay'),
 				'label'			=> 'mm',
 				'class'			=> 'short-input dropshadow',
-				'maxlength'		=> 2,
-				'containerTooltip'	=> 'Date of birth:<br> e.g. 07/25/90'
+				'maxlength'		=> 2
 				));
 				
 		$this->addElement('text', 'dobDay',  array(
@@ -57,10 +56,11 @@ class Application_Form_Signup extends Zend_Form
 		$this->addElement('text', 'dobYear',  array(
 				'filters'		=> array('StringTrim','StringToLower'),
 				'required'		=> true,
-				'decorators'	=> array('Overlay'),
+				'decorators'	=> array('Overlay','QuestionMark'),
 				'label'			=> 'yy',
 				'class'			=> 'short-input dropshadow',
-				'maxlength'		=> 2
+				'maxlength'		=> 2,
+				'containerTooltip'	=> 'Date of birth:<ul><li>e.g. 07/25/90</li></ul>'
 				));
 		
 		$this->addElement('text', 'heightFeet',  array(
@@ -68,7 +68,8 @@ class Application_Form_Signup extends Zend_Form
 				'required'		=> true,
 				'decorators'	=> array('Overlay'),
 				'label'			=> 'ft',
-				'class'			=> 'short-input dropshadow'
+				'class'			=> 'short-input dropshadow',
+				'maxlength'		=> 1
 				));
 				
 		$this->addElement('text', 'heightInches',  array(
@@ -76,7 +77,8 @@ class Application_Form_Signup extends Zend_Form
 				'required'		=> true,
 				'decorators'	=> array('Overlay'),
 				'label'			=> 'in',
-				'class'			=> 'short-input dropshadow'
+				'class'			=> 'short-input dropshadow',
+				'maxlength'		=> 2
 				));
 				
 		$this->addElement('text', 'weight',  array(
@@ -84,13 +86,14 @@ class Application_Form_Signup extends Zend_Form
 				'required'		=> true,
 				'decorators'	=> array('Overlay','Errors'),
 				'label'			=> 'lb',
-				'class'			=> 'short-input dropshadow'
+				'class'			=> 'short-input dropshadow',
+				'maxlength'		=> 3
 				));		
 		
 		$this->addElement('text', 'email', array(
 				'filters'		=> array('StringTrim','StringToLower'),
 				'required'		=> true,
-				'decorators'	=> array('Overlay'),
+				'decorators'	=> array('Overlay','QuestionMark'),
 				'label'			=> 'Username/Email',
 				'class'			=> 'dropshadow',
 				'containerTooltip'	=> 'Must be a valid email address: <br> <ul><li>e.g. johnsmith@gmail.com</li></ul>'
@@ -101,8 +104,25 @@ class Application_Form_Signup extends Zend_Form
 				'required'			=> true,
 				'decorators'		=> array('Overlay'),
 				'label'				=> 'Password',
-				'class'				=> 'dropshadow',
-				'containerTooltip'	=> 'Password must be:<br><ul><li>6-12 characters long</li></ul></span>'
+				'class'				=> 'dropshadow'
+				));
+				
+		$this->addElement('text', 'streetAddress', array(
+				'filters'		=> array('StringTrim','StringToLower'),
+				'required'		=> true,
+				'decorators'	=> array('Overlay'),
+				'label'			=> 'Street Address',
+				'class'			=> 'dropshadow',
+				'containerTooltip'	=> 'Must be a valid street address: <br> <ul><li>e.g. 710 E Blithedale Ave #10</li></ul>'
+				));
+				
+		$this->addElement('text', 'city', array(
+				'filters'		=> array('StringTrim','StringToLower'),
+				'required'		=> true,
+				'decorators'	=> array('Overlay','QuestionMark'),
+				'label'			=> 'City, State',
+				'class'			=> 'dropshadow',
+				'containerTooltip'	=> 'Must be a valid street address: <br> <ul><li>e.g. 710 E Blithedale Ave #10 San Jose, CA</li></ul>'
 				));
 														
 		$this->addElement('image', 'login', array(

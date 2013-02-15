@@ -4,8 +4,66 @@ var fadeRunning = false;
 var tooltipTimer;
 var tooltipEle = null;
 
+
 $(function()
 {
+	
+	/* jquery plugin to limit value of input */
+	(function( $ ) {
+	  $.fn.limitVal = function(lower, upper) {
+	  		
+			if(this.val().length == 0) {
+				// Empty string
+				return;
+			}
+			
+			if (this.val() > upper) {
+				this.val(upper);
+			} else if(this.val() < lower) {
+				this.val(lower)
+			}
+			return;
+	
+	  };
+	})( jQuery );
+	
+	/* jquery plugin to verify based on parameters passed in */
+	(function( $ ) {
+	  $.fn.isValid = function(options) {
+		  // Create some defaults, extending them with any options that were provided
+			var settings = $.extend( {
+			  'maxLength'     : 500,
+			  'minLength'	  : 0,
+			  'regex'		  : /.*/g
+			}, options);
+			
+			var value 		     = this.val();
+			var regexPatterns    = new Array();
+			regexPatterns['num'] = /\d+/g;			
+
+			if (typeof settings.regex == 'string') {
+				settings.regex = regexPatterns[settings.regex];
+			}
+			if (value.length > settings.maxLength) {
+				// Value is longer than max allowed length
+				return false;
+			}
+			if (value.length < settings.minLength) {
+				// Value is shorter than min allowed length
+	  			return false;
+			}
+			if (!settings.regex.test(value)) {
+				// Did not pass regex test
+				return false;
+			}
+			
+			return true;
+			
+	
+	  };
+	})( jQuery );
+	
+	
 	
 	/* animate hover effect for navigation */
 	$('.nav-back').hover(function() 
@@ -55,6 +113,21 @@ $(function()
 	{
 		$(this).stop().animate({backgroundColor: '#E0E0E0'},200);
 	})
+	
+	
+	/* animate narrow-column sections onclick */
+	$('.narrow-column-header').click(function()
+	{
+		
+		var ele = $(this).siblings('.animate-hidden-container').children('.narrow-column-body');
+		var down = false;
+		if (ele.css('display') !== 'none') {
+			down = true;
+		}
+		
+		animateNotShow(ele,down);
+	});
+	
 	
 	
 	/* fix .fixed elements onscroll */
@@ -184,10 +257,35 @@ $(function()
 																				$(this).hide()
 			}});
 		
-	});
-	
+	});	
 		
 })
+
+
+
+/**
+* function to animate div down or up, not display
+* @params (ele  => element to animate,
+		   down => is ele already down? (boolean))
+*/
+function animateNotShow(ele, down)
+{
+	var height = ele.outerHeight() ;
+	
+	if (down) {
+		ele.stop().animate({marginTop: -height}, {duration:400, complete: function() {
+																			$(this).hide()
+																			}
+		});
+	} else {
+		ele.css('margin-top', -height + 'px');
+		ele.stop().show()
+				  .animate({marginTop: 0}, 400);
+		ele.addClass('animate-hidden-selected');
+	}
+
+}
+
 
 
 /**
@@ -356,7 +454,7 @@ function showTooltip(ele)
 	tooltipEle = ele;
 	
 	var value = ele.attr('tooltip');
-	var top   = ele.offset().top + ele.innerHeight();
+	var top   = ele.offset().top + ele.innerHeight() + 3;
 	var left  = ele.offset().left;
 	
 	$('#tooltip-body').html(value);

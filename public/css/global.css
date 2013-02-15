@@ -45,6 +45,14 @@ p,div,span,input {
 	color:#333333;
 }
 
+ul {
+	padding-left: 2em;
+}
+
+.arial {
+	font-family: Arial,Helvetica;
+}
+
 .header {
 	font-family: Arial, Helvetica, sans-serif;
 	font-weight: bold;
@@ -77,7 +85,7 @@ img {
 }
 
 .darkest {
-	color:#333333;
+	color:#444;
 }
 
 .lightest {
@@ -134,6 +142,10 @@ img {
 	line-height: 1.2em;
 }
 
+.no-bold {
+	font-weight:normal;
+}
+
 .capitalize {
 	text-transform: capitalize;
 }
@@ -142,8 +154,16 @@ img {
 	cursor:pointer;
 }
 
+.defailt {
+	cursor: default;
+}
+
 .clear {
 	clear:both;
+}
+
+div.no-clear,span.no-clear,p.no-clear {
+	clear:none;
 }
 
 #body-white-back {
@@ -201,10 +221,22 @@ img {
 .narrow-column-header-selected {
 	background:#C6C6C6;
 }
-/*
-.narrow-column-header:hover {
-	background:#D2D2D2;
+
+.narrow-column-body {
+	border: 1px #E0E0E0 solid;
+	float:left;
+	width: 94.7%;
+	padding: .1em .25em;
+	display:none;
 }
+
+.animate-hidden-container {
+	width:100%;
+	overflow:hidden;
+	float:left;
+	clear:both;
+}
+
 
 /* end body declarations */
 
@@ -529,6 +561,24 @@ div#password-container {
 	max-width: 18em;
 	background:#EEE;
 	color:#8d8d8d;
+}
+
+/* end tooltip */
+
+/* general page definitions */
+
+.section-header-finish {
+	float:left;
+}
+
+.green-alert-box {
+	width: 95%;
+	padding: 1em 2%;
+	float:left;
+	clear:both;
+	text-align:center;
+	background:#E6FFE6;
+	border:2px dashed #58bf12;
 }
 	
 	

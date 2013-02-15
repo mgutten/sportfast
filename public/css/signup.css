@@ -13,20 +13,35 @@
 	float:left;
 	clear:both;
 	width:100%;
-	height:1.6em;
-	border-bottom: solid 2px #58bf12;
+	height:1.9em;
+	border-bottom: solid 2px #444;
 	margin-bottom: 1em;
 }
 
 .signup-section-title {
 	float:left;
 	font-size:1.5em;
+	background: #444;
+	padding: .1em .4em 0 .4em;
 }
 
 .signup-section-steps {
 	float:right;
 	font-size:1.2em;
-	margin-top:.2em;
+	margin-top:.3em;
+}
+
+.signup-step {
+	float:left;
+	clear:none;
+	font-size: .8em;
+	margin: .25em .2em 0 .2em;
+	font-family: Arial, Helvetica, sans-serif;
+	
+}
+
+.signup-step-bold {
+	float:left;
 }
 
 /* end signup section overlay */
@@ -52,14 +67,14 @@ input.short-input {
 }
 
 #heightFeet-container {
-	margin-left: 5.4em;
+	margin-left: 4.5em;
 }
 
 .signup-sex-img {
 	float:left;
 	width:30px;
 	height:30px;
-	margin: -.7em 0 0 .5em;
+	margin: 0em 0 0 .5em;
 	background:#8d8d8d;
 }
 
@@ -68,7 +83,24 @@ input.short-input {
 }
 
 .signup-sex-img#signup-sex-male {
-	margin-left: 2em;
+	margin-left: 0em;
+	clear:both;
+}
+
+#signup-sex-container {
+	margin: -1.6em 0 0 2em;
+	float:left;
+	text-align:center;
+}
+
+#signup-sex-container > p {
+	float:left;
+	font-size:.8em;
+}
+	
+
+.signup-sex-selected {
+	background: #58bf12;
 }
 
 .signup-clear-large {
@@ -80,11 +112,84 @@ input.short-input {
 	margin: .6em 0 0 .2em;
 }
 
+.signup-dimension-indicator {
+	opacity: 0;
+}
+
+#weight-indicator {
+	margin-top: .7em;
+}
+
+
 #dobDay-container, #dobYear-container {
 	margin-left:.2em;
 }
 
+.signup-question-mark {
+	float:left;
+	margin: 1.2em 0 0 .2em;
+	font-size: .9em;
+}
+
+input.input-success {
+	background: #E6FFE6;
+	border: 1px solid #58bf12;
+}
+
+input.input-fail {
+	background: #EDA9A9;
+	border: 1px solid #C60000;
+}
+
+#signup-password-reqs {
+	float:left;
+	font-size:.9em;
+	margin:.2em 0 0 1em;
+}
+
+#city-container {
+	width: 20%;
+}
+
+#streetAddress-container {
+	width: 70%;
+}
+
+#streetAddress {
+	width: 98%;
+}
+
+#city {
+	width: 95%;
+}
+
+ul.green {
+	float:left;
+	clear:both;
+	margin: 0 0 0 1em;
+	font-size:.9em;
+}
+
 /* end custom styling of inputs */
+
+/* narrow column */
+
+
+.narrow-column-value {
+	float:left;
+	clear:both;
+}
+
+.narrow-column-fade {
+	display:none;
+}
+
+#account-info-first-name {
+	margin-right: .25em;
+}
+
+
+/* end narrow column */
 
 
 /* narrow column definitions */

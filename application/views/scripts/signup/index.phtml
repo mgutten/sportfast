@@ -6,7 +6,10 @@
 $this->headTitle('Signup');
 $this->headLink()->prependStylesheet($this->baseUrl() . '/css/signup.css');
 $this->headScript()->prependFile($this->baseUrl() . '/js/signup.js');
+?>
 
+<div class='green-alert-box green'>Organize and find your own pickup games based on your ability.  Sign up in just 4 steps!</div>
+<?php
 $totalSteps = 4;
 $currentStep = 1;
 
@@ -18,8 +21,11 @@ echo $this->form->firstName;
 echo $this->form->lastName;
 echo $this->form->sex;
 ?>
-<img src='/images/signup/sex/male.png' class='signup-sex-img pointer' id='signup-sex-male' tooltip='Male'/>
-<img src='/images/signup/sex/female.png' class='signup-sex-img pointer' id='signup-sex-female' tooltip='Female'/>
+<div id='signup-sex-container'>
+	<p class='medium center'> Please choose:</p>
+    <img src='/images/signup/sex/male.png' class='signup-sex-img pointer' id='signup-sex-male' tooltip='Male'/>
+    <img src='/images/signup/sex/female.png' class='signup-sex-img pointer' id='signup-sex-female' tooltip='Female'/>
+</div>
 <?php
 echo "<div class='clear'></div>";
 echo $this->form->dobMonth;
@@ -28,18 +34,31 @@ echo $this->form->dobDay;
 echo "<span class='signup-dob-slash'>/</span>";
 echo $this->form->dobYear;
 echo $this->form->heightFeet;
+echo "<span class='signup-dob-slash signup-dimension-indicator' id='heightFeet-indicator'>'</span>";
 echo $this->form->heightInches;
+echo "<span class='signup-dob-slash signup-dimension-indicator' id='heightInches-indicator'>\"</span>";
 echo $this->form->weight;
+echo "<span class='signup-dob-slash signup-dimension-indicator' id='weight-indicator'>lb</span>";
+
 echo "<div class='clear signup-clear-large'></div>";
 echo $this->form->email;
 echo "<div class='clear'></div>";
 echo $this->form->signupPassword;
-echo $this->form->signupPassword->setLabel('Re-enter Password');
-
-
-
+echo $this->form->signupPassword->setLabel('Re-enter Password')->setAttribs(array('id'=>'signupReenterPassword','name'=>'signupReenterPassword'))->addDecorator('Errors');
 ?>
+<div id='signup-password-reqs' class='medium'>Password must be: <ul><li>8-12 characters long</li></ul></div>
 </div>
+
+<?php
+echo "<div class='clear signup-clear-large'></div>";
+echo $this->form->streetAddress;
+echo $this->form->city;
+?>
+<div class='clear'></div>
+<ul class='green'>
+	<li>This address will be used to find games, players, and teams closest to you.  It will never be displayed.</li>
+</ul>
+
 
 <?php
 
@@ -81,22 +100,25 @@ $this->placeholder('narrowColumn')->captureStart();
 <div class='narrow-column-picture'>
 </div>
 
-<div id='narrow-column-account-info'>
-    <div class='narrow-column-header' tooltip='testing to see what exactly the correct alignment for tooltips is'> 
-        Account Info
-    </div>
-    
-    <div class='narrow-column-body'>
-        <div id='account-info-name' class='capitalize'>
-        	<span id='account-info-first-name' class='bold'></span>
-            <span id='account-info-last-name' class='bold'></span>
-        </div>
-        <div id='account-info-age' class=''>
-        </div>
-       
-        
- 	</div>
+<?php
+
+echo $this->narrowcolumnsection()->start(array('title' => 'Account Info',
+										  	   'tooltip' => 'testing tooltip'));
+											   ?>
+<div id='account-info-name' class='capitalize narrow-column-value'>
+    <span id='account-info-first-name' class='narrow-column-value bold'></span>
+    <span id='account-info-last-name' class='narrow-column-value bold no-clear'></span>
 </div>
+<div id='account-info-sex' class='narrow-column-fade narrow-column-value'>
+</div>
+<div id='account-info-age' class='narrow-column-fade narrow-column-value'>
+</div>
+<div id='account-info-dimensions' class='narrow-column-value'>
+	<span id='account-info-height' class='narrow-column-fade'></span>
+    <span id='account-info-weight' class='narrow-column-fade no-clear'></span>
+</div>
+       
+<?php echo $this->narrowcolumnsection()->end(); ?>
 
 <div class='narrow-column-header'>
 	Sports
