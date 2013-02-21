@@ -108,21 +108,31 @@ class Application_Form_Signup extends Zend_Form
 				));
 				
 		$this->addElement('text', 'streetAddress', array(
-				'filters'		=> array('StringTrim','StringToLower'),
-				'required'		=> true,
-				'decorators'	=> array('Overlay'),
-				'label'			=> 'Street Address',
-				'class'			=> 'dropshadow',
+				'filters'			=> array('StringTrim','StringToLower'),
+				'required'			=> true,
+				'decorators'		=> array('Overlay'),
+				'label'				=> 'Street Address',
+				'class'				=> 'dropshadow',
 				'containerTooltip'	=> 'Must be a valid street address: <br> <ul><li>e.g. 710 E Blithedale Ave #10</li></ul>'
 				));
 				
-		$this->addElement('text', 'city', array(
-				'filters'		=> array('StringTrim','StringToLower'),
-				'required'		=> true,
-				'decorators'	=> array('Overlay','QuestionMark'),
-				'label'			=> 'City, State',
-				'class'			=> 'dropshadow',
-				'containerTooltip'	=> 'Must be a valid street address: <br> <ul><li>e.g. 710 E Blithedale Ave #10 San Jose, CA</li></ul>'
+		$this->addElement('text', 'zipcode', array(
+				'filters'			=> array('StringTrim','StringToLower'),
+				'required'			=> true,
+				'decorators'		=> array('Overlay','QuestionMark'),
+				'label'				=> 'Zip Code',
+				'class'				=> 'dropshadow',
+				'maxlength'			=> 5,
+				'containerTooltip'	=> 'Must be a valid street address: <br> <ul><li>e.g. 35 Silvertree Dr #10, 95131</li></ul>'
+				));
+				
+		$this->addElement('checkbox', 'noAddress',  array(
+				'required'		=> false,
+				'value'			=> true,
+				'decorators'	=> array('Checkbox'),
+				'checked'		=> false,
+				'text'			=> 'I don\'t trust computers!  I do not wish to enter my street address.  <i>They might find me.</i> <br><span class="light">(Note: The system will not be able to find your best matches)</span>',
+				'class'			=> 'medium'
 				));
 														
 		$this->addElement('image', 'login', array(

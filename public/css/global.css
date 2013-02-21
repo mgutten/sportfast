@@ -58,6 +58,10 @@ ul {
 	font-weight: bold;
 }
 
+.smaller-text {
+	font-size: .75em;
+}
+
 /* make text unselectable */
 /*
 p,div,span {
@@ -93,7 +97,7 @@ img {
 }
 
 .lighter {
-	color:#E0E0E0;
+	color:#E1E1E1;
 }
 
 .light {
@@ -111,6 +115,10 @@ img {
 .green {
 	color:#58bf12;
 	/* 64ce1c */
+}
+
+.red {
+	color:#C60000;
 }
 
 .white {
@@ -152,6 +160,12 @@ img {
 
 .pointer {
 	cursor:pointer;
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
 }
 
 .defailt {
@@ -162,8 +176,12 @@ img {
 	clear:both;
 }
 
-div.no-clear,span.no-clear,p.no-clear {
+div.no-clear,span.no-clear,p.no-clear,img.no-clear {
 	clear:none;
+}
+
+div.selected-green,img.selected-green,p.selected-green {
+	background: #58bf12;
 }
 
 #body-white-back {
@@ -197,7 +215,6 @@ div.no-clear,span.no-clear,p.no-clear {
 
 .body-column-wide {
 	width:74.95%;
-	height: 100em;
 }
 
 .narrow-column-picture {
@@ -235,6 +252,7 @@ div.no-clear,span.no-clear,p.no-clear {
 	overflow:hidden;
 	float:left;
 	clear:both;
+	
 }
 
 
@@ -497,6 +515,9 @@ div#password-container {
 .checkbox-container {
 	cursor: default;
 	float: left;
+}
+
+#checkbox-container-rememberMe {
 	width:10em;
 }
 
@@ -580,5 +601,75 @@ div#password-container {
 	background:#E6FFE6;
 	border:2px dashed #58bf12;
 }
+
+.sport-icon-large {
+	width: 50px;
+	height: 50px;
+	float:left;
+}
+
+/* end general page definitions */
+
+/* slider */
+
+.jscroller
+{
+	position: static;
+	z-index: 998;
+}
+
+.slider
+{
+	position: absolute;
+	z-index: 1000;
+}
+.inner
+{
+	width: 1px;
+	height: 100%;
+	z-index: 999;
+}
+.lgripper
+{
+	position: relative;
+	z-index: 1001;
+	top: 0px;
+	border: none;
+	outline: none;
+	cursor:pointer;
+}
+.ticks
+{
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	float: left;
+	position: absolute;
+	z-index: 997;
+}
+.ticks li
+{
+	display: inline;
+	float: left;
+	font-size: xx-small;
+}
+.slider.style1
+{
+	background-color: #D7D7D7;
+	border: solid 1px #B6B6B6;
+	-moz-box-shadow: 0 1px 2px rgba(0, 0, 0, 0.5) inset;
+	-webkit-box-shadow: 0 1px 2px rgba(0, 0, 0, 0.5) inset;
+}
+.inner.style1
+{
+	background-color: #58bf12;;
+
+}
+.lgripper.style1
+{
+	background: url(/images/global/slider/tracker.png) 0px 0px no-repeat;
+}
+
+/* end slider */
 	
 	

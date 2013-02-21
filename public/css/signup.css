@@ -13,16 +13,23 @@
 	float:left;
 	clear:both;
 	width:100%;
-	height:1.9em;
+	height:3.0em;
 	border-bottom: solid 2px #444;
 	margin-bottom: 1em;
 }
 
 .signup-section-title {
 	float:left;
+	clear:both;
 	font-size:1.5em;
 	background: #444;
 	padding: .1em .4em 0 .4em;
+}
+
+.signup-step-revise {
+	float:left;
+	clear:both;
+	margin-bottom: -.1em;
 }
 
 .signup-section-steps {
@@ -44,6 +51,17 @@
 	float:left;
 }
 
+#checkbox-container-noAddress {
+	font-size: .9em;
+	margin: .2em 0 0 1.9em;
+}
+
+#noAddress-text {
+	position:absolute;
+	z-index: 10;
+	display:none;
+}
+
 /* end signup section overlay */
 
 
@@ -51,7 +69,7 @@
 
 .input-container {
 	margin-left: 1em;
-	margin-top: .3em;
+	margin-top: 0em;
 	font-size: 1.06em;
 	padding-right: .1em;
 }
@@ -67,7 +85,7 @@ input.short-input {
 }
 
 #heightFeet-container {
-	margin-left: 4.5em;
+	margin-left: 4.8em;
 }
 
 .signup-sex-img {
@@ -83,14 +101,18 @@ input.short-input {
 }
 
 .signup-sex-img#signup-sex-male {
-	margin-left: 0em;
+	margin-left: .15em;
 	clear:both;
 }
 
 #signup-sex-container {
-	margin: -1.6em 0 0 2em;
+	margin: 0em 0 0 3.7em;
 	float:left;
 	text-align:center;
+	border-radius: 5px;
+	-moz-border-radius: 5px;
+	border: 1px solid #e0e0e0;
+	padding: .1em .1em;
 }
 
 #signup-sex-container > p {
@@ -109,15 +131,16 @@ input.short-input {
 
 .signup-dob-slash {
 	float:left;
-	margin: .6em 0 0 .2em;
+	margin: .4em 0 0 .2em;
 }
 
 .signup-dimension-indicator {
 	opacity: 0;
+	margin-top: -.2em;
 }
 
 #weight-indicator {
-	margin-top: .7em;
+	margin-top: .4em;
 }
 
 
@@ -127,7 +150,7 @@ input.short-input {
 
 .signup-question-mark {
 	float:left;
-	margin: 1.2em 0 0 .2em;
+	margin: 1em 0 0 .2em;
 	font-size: .9em;
 }
 
@@ -144,10 +167,10 @@ input.input-fail {
 #signup-password-reqs {
 	float:left;
 	font-size:.9em;
-	margin:.2em 0 0 1em;
+	margin:0em 0 0 1em;
 }
 
-#city-container {
+#zipcode-container {
 	width: 20%;
 }
 
@@ -159,7 +182,7 @@ input.input-fail {
 	width: 98%;
 }
 
-#city {
+#zipcode {
 	width: 95%;
 }
 
@@ -192,5 +215,91 @@ ul.green {
 /* end narrow column */
 
 
-/* narrow column definitions */
+/* sports section */
 
+#signup-sports-what {
+	float:left;
+	clear:both;
+	font-size: 1.6em;
+	margin: 0 0 .5em 0;
+	width:100%;
+}
+
+.signup-sport-icon-container {
+	float:left;
+	margin-top: -.5em;
+}
+
+.signup-sport-icon,.signup-sport-icon-narrow-column {
+	float:left;
+	clear:both;
+	margin: 0 0 0 1em;
+	background: #8d8d8d;
+}
+
+.signup-sport-icon-narrow-column{
+	clear:none;
+	margin-left: .4em;
+	display:none;
+	
+}
+
+#signup-sports-icons-container {
+	margin: 0 auto;
+	width: 30em;
+	background:#ccc;
+}
+
+.signup-sports-form {
+	width: 96%;
+	float:left;
+	clear:both;
+	/*border: 1px solid #E0E0E0;*/
+	display:none;
+	padding: .5em .5em;
+	
+}
+
+#signup-sports-hidden {
+	margin-top: .5em;
+}
+
+.signup-sports-form-section {
+	float:left;
+	clear:both;
+	padding: .2em .2em .4em .2em;
+	width: 98%;
+	border-bottom: 1px solid #8d8d8d;
+}
+
+.signup-skill-slider {
+	position:relative;
+	z-index:1;
+	width:40em;
+	height: 1em;
+	margin: .3em 0 0em 0;
+}
+
+.signup-sports-selectable {
+	font-size: 1.3em;
+	float:left;
+	margin: .25em 2em 0 0;
+}
+
+.signup-sports-title {
+	font-size: 1.5em;
+}
+
+.signup-sports-remove {
+	float:right;
+	position:relative;
+	z-index:2;
+	margin: 0 0 -.1em 0;
+	padding: .1em .27em 0em .3em;
+	background:#BF0000;
+	-moz-border-radius: 3px;
+	font-size:.8em;
+	border-radius: 3px;
+	opacity: 0;
+
+}

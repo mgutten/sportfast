@@ -3,6 +3,7 @@ var date = new Date();
 
 $(function()
 {
+
 	
 	/* update narrow column name value onkeyup */
 	$('#firstName,#lastName').keyup(function()
@@ -128,6 +129,7 @@ $(function()
 		
 	})
 	
+	/* check email validation */
 	$('#email').keyup(function()
 	{
 		var value   = $(this).val();
@@ -138,7 +140,7 @@ $(function()
 	});
 	
 	
-	/* keyup for signup password and reenter password */
+	/* validate signup password and reenter password */
 	$('#signupPassword,#signupReenterPassword').keyup(function()
 	{
 		var value   = $.trim($(this).val());
@@ -148,27 +150,178 @@ $(function()
 		
 		if (($.trim($('#signupReenterPassword').val()).length > 0) &&
 			($('#signupPassword').val() !== $('#signupReenterPassword').val())) {
+			// Passwords do not match
 			isValid = false;			
 		}  else if($.trim($('#signupReenterPassword').val()).length < 1) {
+			// There is no value for reenter password, do not turn red
 			return;
 		}
 		
-		changeInputBackground($('#signupReenterPassword'), isValid);
+		changeInputBackground($('#signupReenterPassword'), isValid);	
 		
+	})
+	
+	
+	/* validate street address */
+	$('#streetAddress').keyup(function()
+	{
+		var value   = $(this).val();
+		var regex	= /\w+/;
+		var isValid = $(this).isValid({regex: regex, minLength: 1});
 		
+		changeInputBackground($(this), isValid);
+	})
+	
+	
+	/* validate zipcode */
+	$('#zipcode').keyup(function()
+	{
+		var value   = $(this).val();
+		var regex	= 'num';
+		var isValid = $(this).isValid({regex: regex, minLength: 5, maxLength: 5});
+		
+		changeInputBackground($(this), isValid);
+	})
+	
+	
+	/* user checkbox to allow no street address */
+	$('#noAddress').change(function()
+	{
+		var checked = $(this).prop('checked');
+		
+		if (checked) {
+			$('#noAddress-text').css({top  : $('#streetAddress').offset().top + 4,
+									  left : $('#streetAddress').offset().left + 10})
+								.show();
+			$('#streetAddress-container').css({opacity:0,
+											   position: 'relative',
+											   zIndex:-2})
+		} else {
+			$('#streetAddress-container').css({opacity:1,
+											   position: 'static'})
+			$('#noAddress-text').hide();
+		}
+	});
+	
+	
+	/* change color of sex icon onclick */
+	$('.sport-icon-large').click(function() 
+	{
+		var sport = $(this).attr('tooltip').toLowerCase();
+		if(!$(this).is('.selected-green')) {
+			removeOld = false;
+			toggleGreenBackground($(this), removeOld);
+			$(this).parent().children('.signup-sports-remove').css('opacity',1);
+			
+			toggleNarrowColumnSport(sport);
+			testDrop($(this));
+		} else {
+			return;
+		}
+		
+		// Hide any old dropdowns
+		// Uncomment to only allow one form at a time (remove else from above)
+		//$('.animate-hidden-selected.signup-sports-form').hide();
+		
+		var hiddenEle = $('#signup-sports-form-' + sport);
+		var down      = false;
+		animateNotShow(hiddenEle, down);
+		
+	})
+	
+	
+	/* remove sport on remove click */
+	$('.signup-sports-remove').click(function()
+	{
+		var sportIcon = $(this).next('img');
+		if (sportIcon.is('.selected-green')) {
+			// sportIcon is currently selected, must remove
+			// Change image to grey
+			toggleGreenBackground(sportIcon, false);
+			// Hide "x"
+			$(this).css('opacity',0);
+			// Animate form to hidden
+			var hiddenEle = $('#signup-sports-form-' + sportIcon.attr('tooltip').toLowerCase())
+			animateNotShow(hiddenEle, true);
+			// Hide narrow column img
+			var sport = sportIcon.attr('tooltip').toLowerCase();
+			toggleNarrowColumnSport(sport);
+		}
+
+		
+	})
+	
+	
+	/* slider */
+	var width = $('.signup-skill-slider').width();
+	// strackbar requires element to not be hidden (offset().left)
+	$('.signup-sports-form').show();
+	$('.signup-skill-slider').strackbar({callback: populateSliderText, 
+									   defaultValue: 2,
+									   minValue: 0,
+									   maxValue: 6,
+									   sliderHeight: 4,
+									   sliderWidth: width,
+									   style: 'style1', 
+									   animate: false, 
+									   ticks: false, 
+									   labels: false, 
+									   trackerHeight: 20, 
+									   trackerWidth: 19 })
+	// Hide element again
+	$('.signup-sports-form').hide();
+												 
+	
+	/* handle onclick for sports-form elements */
+	$('.signup-sports-position').children('.signup-sports-selectable').click(function() 
+	{
+		var greenEles  = $(this).parent().children('.signup-sports-selectable.green');
+		var countGreen = greenEles.length;
+		if (countGreen > 2) {
+			// Limit "Position" selection to 2
+			$(this).removeClass('green');
+		}
+	})
+	
+	$('.signup-sports-often').children('.signup-sports-selectable').click(function() 
+	{
+		var greenEles  = $(this).parent().children('.signup-sports-selectable.green');
+		var countGreen = greenEles.length;
+		if (countGreen > 1) {
+			greenEles.removeClass('green');
+			// Limit "Position" selection to 2
+			$(this).addClass('green');
+		}
+		
+		var sectionEle = $(this).parent();
+		updateSportHiddenInput(sectionEle);
 	})
 	
 	
 	$('input[type=text],input[type=password]').blur(function()
 	{
+		// When focusout of input, check its value
 		$(this).trigger('keyup');
+	})
+	
+		
+	/* test all inputs onload */
+	$('.input-container').children('input').each(function()
+	{
+		if( $(this).val() !== '') {
+			// Input has value, run test
+			$(this).trigger('keyup');
+		}
 	})
 	
 	
 });
 
 
-
+/**
+ * animate dropdown of narrow column signup vals
+ * @params(ele => #firstName,#lastName)
+ */
 function testDrop(ele)
 {
 		var id = $.trim(ele.parents('.signup-section-container').find('.signup-section-title').text().toLowerCase()).replace(/ /g,'-');
@@ -237,29 +390,11 @@ function findAge(month, day, year)
 
 }
 
-/**
- * update narrow column age
- * @params(month => mm,
- *		   day 	 => dd,
- *		   year  => yy)
- */
-function updateNarrowColumnAge(month, day, year)
-{
-	var ageEle = $('#account-info-age');
-	var age  = findAge(month,day,year);
-	var str  = age + ' years old';
-	var sexEle = ageEle.children();
-	var sex    = sexEle.text();
-	
-	ageEle.text(str)
-		  .fadeIn('fast');
-						  
-}
-
 
 /**
- * update narrow column sex
- * @params(sex => male or female)
+ * update narrow column generic for Account Info
+ * @params(section => what section (str)
+ 		   str	   => value to input)
  */
 function updateNarrowColumnGeneric(section, str)
 {
@@ -274,9 +409,22 @@ function updateNarrowColumnGeneric(section, str)
 	} else {
 		ele.show();
 	}
-
 						  		 
 }
+
+
+/**
+ * update narrow column sex
+ * @params(sport => name of sport)
+ */
+function toggleNarrowColumnSport(sport)
+{
+	var ele 	    = $('#signup-narrow-column-sport-' + sport);
+	
+	ele.toggle();
+						  		 
+}
+
 
 /**
  * animate body div down before fading values in
@@ -303,19 +451,6 @@ function animateNarrowColumnBody(ele)
 }
 
 
-/**
- * update narrow column sex
- * @params(sex => male or female)
- */
-function updateNarrowColumnHeight(feet, inches)
-{
-	
-	var str = feet + "' " + inches + "\"";
-	
-	$('#account-info-height').text(str)
-						     .fadeIn('fast');
-}
-
 
 /**
  * change input background color based on validity
@@ -333,5 +468,35 @@ function changeInputBackground(ele, isValid)
 	}
 
 }
+
+/**
+ * update hidden element for each sport
+ * @params(sectionEle => parent container ele for values that have been changed)
+ */
+function updateSportHiddenInput(sectionEle)
+{
+	var values = new Array();
+	var selectedChildren = sectionEle.children('.signup-sports-selectable.green');
+	
+	selectedChildren.each(function()
+	{
+		values.push($(this).text());
+	})
+	
+	var idStart            = sectionEle.attr('id').replace(/signup-sports-/,'');
+	var hiddenInputSport   = idStart.replace(/\w+-/,'');
+	var hiddenInputSection = idStart.replace(/-\w+/,'');
+
+	hiddenInputSection	   = hiddenInputSection.replace(/(\b)([a-zA-Z])/, function(firstLetter) {
+																						return firstLetter.toUpperCase()
+																						});
+	var combinedId		   = hiddenInputSport + hiddenInputSection;
+	var hiddenInput        = $('#' + combinedId);
+
+	hiddenInput.val(values);	
+	
+
+}
+
 
 

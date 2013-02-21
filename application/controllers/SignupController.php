@@ -13,6 +13,8 @@ class SignupController extends Zend_Controller_Action
 		$this->view->narrowColumn = 'right';
 		$form = new Application_Form_Signup();
         $this->view->form = $form;
+		$sportForm = new Application_Form_SignupSportForm();
+		$this->view->signupSportForm = $sportForm;
     }
 
 

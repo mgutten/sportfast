@@ -3,13 +3,26 @@ var mouseoverDropdown = false; /* fix issue when input is focus, then not focus 
 var fadeRunning = false;
 var tooltipTimer;
 var tooltipEle = null;
+var sliderSkillValues = [];
+sliderSkillValues[0] = {level:'Beginner',
+						description: 'I have rarely (if ever) played.'};
+sliderSkillValues[1] = {level:'Decent',
+						description: 'I play infrequently, or have difficulty keeping up when I do play.'};
+sliderSkillValues[2] = {level:'Good',
+						description: 'I am an average player.  Nothing fancy, just good fundamentals.'};
+sliderSkillValues[3] = {level:'Great',
+						description: 'I have better than average skills.  I am typically one of the better players.'};
+sliderSkillValues[4] = {level:'Talented',
+						description: 'I am very skilled.  I am typically the best player in the game.'};
+sliderSkillValues[5] = {level:'Unstoppable',
+						description: 'I played (or should play) on a professional level.'};
 
 
 $(function()
 {
 	
 	/* jquery plugin to limit value of input */
-	(function( $ ) {
+	(function($) {
 	  $.fn.limitVal = function(lower, upper) {
 	  		
 			if(this.val().length == 0) {
@@ -28,7 +41,7 @@ $(function()
 	})( jQuery );
 	
 	/* jquery plugin to verify based on parameters passed in */
-	(function( $ ) {
+	(function($) {
 	  $.fn.isValid = function(options) {
 		  // Create some defaults, extending them with any options that were provided
 			var settings = $.extend( {
@@ -232,6 +245,12 @@ $(function()
 	})
 	
 	
+	/* change color of selectable text */
+	$('.selectable-text').click(function() {
+		$(this).toggleClass('green');
+	})	
+	
+	
 	/* test all elements for tooltip onhover */
 	$('*').hover(function()
 	{
@@ -263,26 +282,91 @@ $(function()
 
 
 
+function populateSliderText(sliderEle, value)
+{
+
+	var textEle = sliderEle.next('.slider-text');
+	value = sliderSkillValues[value]['level'] + '<br>' +sliderSkillValues[value]['description'];
+	textEle.html(value);
+}
+
+
+
+/**
+* change background of element to green or grey
+* @params (ele  	 => element to change,
+		   removeOld => should we remove old selected values? (boolean))
+*/
+function toggleGreenBackground(ele, removeOld)
+{
+	if (removeOld) {
+		// Remove old green value from other ele
+		$('.selected-green').removeClass('selected-green');
+	}
+	
+	
+	ele.toggleClass('selected-green');
+	/*
+	if (ele.is('.selected-green')) {
+		// Already green, revert to original color
+		ele.removeClass('selected-green');
+	} else {
+		// Not green, make it green!
+		ele.addClass('selected-green');
+	}
+	*/
+}
+
+
+
 /**
 * function to animate div down or up, not display
-* @params (ele  => element to animate,
-		   down => is ele already down? (boolean))
+* @params (ele    => element to animate,
+		   down   => is ele already down? (boolean),
+		   fadeIn => should we fade animation in? (boolean))
 */
-function animateNotShow(ele, down)
+function animateNotShow(ele, down, fadeIn)
 {
-	var height = ele.outerHeight() ;
+	/*
+	var innerEle = ele.children();
+	var height   = innerEle.outerHeight();
 	
-	if (down) {
+	if (ele.height() > 0) {
+		ele.stop().animate({height: 0},400);
+		return;
+	} 
+	
+	ele.stop().animate({height: height},400);
+	*/
+	
+var height = ele.outerHeight();
+	if (down) {	
+		// Hidden element is down, animate it up
 		ele.stop().animate({marginTop: -height}, {duration:400, complete: function() {
 																			$(this).hide()
 																			}
 		});
 	} else {
-		ele.css('margin-top', -height + 'px');
-		ele.stop().show()
-				  .animate({marginTop: 0}, 400);
+		// Hidden element is up, animate it down
+		ele.css({marginTop: -height + 'px',
+				 opacity: 0})
+		   .show();
+		
+		if (!fadeIn) {
+			// Do not fade in
+			ele.stop().css('opacity', 1)
+					  .animate({marginTop: 0}, 400);
+		} else {
+			// Fade in after animation is complete
+			ele.stop().animate({marginTop: 0}, {duration:400, complete: function() {
+																			$(this).animate({opacity: 1}, 400)
+																		}
+			});
+		}
+		
 		ele.addClass('animate-hidden-selected');
 	}
+	
 
 }
 
