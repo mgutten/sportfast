@@ -13,7 +13,6 @@ class Application_View_Helper_Tooltip
 		$output = "<div id='tooltip'>
 						<img src='/images/global/tooltip/tip.png' class='tooltip-tip'/>
 						<div id='tooltip-body' class='dropshadow white-back'>
-						
 						</div>
 					</div>";
 					

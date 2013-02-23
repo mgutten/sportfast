@@ -32,6 +32,12 @@ $currentStep++;
 echo $this->form->firstName;
 echo $this->form->lastName;
 echo $this->form->sex;
+?>
+<div id='signup-sex-container' class='dropshadow'>
+    <img src='/images/signup/sex/male.png' class='signup-sex-img pointer' id='signup-sex-male' tooltip='Male'/>
+    <img src='/images/signup/sex/female.png' class='signup-sex-img pointer' id='signup-sex-female' tooltip='Female'/>
+</div>
+<?php
 echo "<div class='clear'></div>";
 echo $this->form->dobMonth;
 echo "<span class='signup-dob-slash'>/</span>";
@@ -44,13 +50,7 @@ echo $this->form->heightInches;
 echo "<span class='signup-dob-slash signup-dimension-indicator' id='heightInches-indicator'>\"</span>";
 echo $this->form->weight;
 echo "<span class='signup-dob-slash signup-dimension-indicator' id='weight-indicator'>lb</span>";
-?>
-<div id='signup-sex-container' class='dropshadow'>
-	<p class='medium center'> Please choose:</p>
-    <img src='/images/signup/sex/male.png' class='signup-sex-img pointer' id='signup-sex-male' tooltip='Male'/>
-    <img src='/images/signup/sex/female.png' class='signup-sex-img pointer' id='signup-sex-female' tooltip='Female'/>
-</div>
-<?php
+
 
 echo "<div class='clear signup-clear-large'></div>";
 echo $this->form->email;
@@ -88,58 +88,23 @@ $currentStep++;
 <p class='medium center' id='signup-sports-what'>What sports are you interested in playing?</p>
 <div id='signup-sports-icons-container'>
 <?php
-	$sports = array('basketball' => array('sport'    => 'basketball',
-										  'position' => array('Guard',
-															  'Forward',
-															  'Center')
-										 ),
-					'football'   => array('sport'    => 'football',
-										  'position' => array('Quarter Back',
-															  'Running Back',
-															  'Wide Receiver')
-										 ),
-					'soccer'     => array('sport'    => 'soccer',
-										  'position' => array('Quarter Back',
-															  'Running Back',
-															  'Wide Receiver')
-										 ),
-					'tennis'     => array('sport'    => 'tennis',
-										  'position' => array('Quarter Back',
-															  'Running Back',
-															  'Wide Receiver')
-										 ),
-					'ultimate'   => array('sport'    => 'ultimate',
-										  'position' => array('Quarter Back',
-															  'Running Back',
-															  'Wide Receiver')
-										 ),
-					'volleyball' => array('sport'    => 'volleyball',
-										  'position' => array('Quarter Back',
-															  'Running Back',
-															  'Wide Receiver')
-										 ),
-					'baseball'   => array('sport'    => 'baseball',
-										  'position' => array('Quarter Back',
-															  'Running Back',
-															  'Wide Receiver')
-										 )
-					);
+	$sports = $this->sports;
 
-foreach ($sports as $sport => $values) { 
+foreach ($sports as $sport => $values) {
 	echo $this->partial('partials/signup/sportIcon.phtml',array('sport' =>$sport));
 }
 
 ?>
 </div>
 
-<div id='signup-sports-hidden' class='animate-hidden-container'>
+
 	<?php
-									
+	// create sportForms							
     echo $this->signupsportform()->loop($sports);
 
 	?>
 
-</div>
+
 
 
 </div>

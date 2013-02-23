@@ -10,12 +10,14 @@ sliderSkillValues[1] = {level:'Decent',
 						description: 'I play infrequently, or have difficulty keeping up when I do play.'};
 sliderSkillValues[2] = {level:'Good',
 						description: 'I am an average player.  Nothing fancy, just good fundamentals.'};
-sliderSkillValues[3] = {level:'Great',
-						description: 'I have better than average skills.  I am typically one of the better players.'};
+sliderSkillValues[3] = {level:'Skilled',
+						description: 'I am skilled.  I am better than the average player.'};
 sliderSkillValues[4] = {level:'Talented',
 						description: 'I am very skilled.  I am typically the best player in the game.'};
 sliderSkillValues[5] = {level:'Unstoppable',
 						description: 'I played (or should play) on a professional level.'};
+						
+var mouseoverColor;
 
 
 $(function()
@@ -24,7 +26,7 @@ $(function()
 	/* jquery plugin to limit value of input */
 	(function($) {
 	  $.fn.limitVal = function(lower, upper) {
-	  		
+		
 			if(this.val().length == 0) {
 				// Empty string
 				return;
@@ -77,7 +79,6 @@ $(function()
 	})( jQuery );
 	
 	
-	
 	/* animate hover effect for navigation */
 	$('.nav-back').hover(function() 
 	{
@@ -120,13 +121,15 @@ $(function()
 	/* change background color of narrow-column onhover */
 	$('.narrow-column-header').hover(function()
 	{
-		$(this).stop().animate({backgroundColor: '#C6C6C6'},200);
+		mouseoverColor  = $(this).css('background-color');
+		var darkerColor = getDarkerColor(mouseoverColor);
+		$(this).stop().animate({backgroundColor: darkerColor},200);
 	},
 	function()
 	{
-		$(this).stop().animate({backgroundColor: '#E0E0E0'},200);
+		$(this).stop().animate({backgroundColor: mouseoverColor},200);
 	})
-	
+		
 	
 	/* animate narrow-column sections onclick */
 	$('.narrow-column-header').click(function()
@@ -247,7 +250,7 @@ $(function()
 	
 	/* change color of selectable text */
 	$('.selectable-text').click(function() {
-		$(this).toggleClass('green');
+		$(this).toggleClass('green-bold');
 	})	
 	
 	
@@ -272,22 +275,38 @@ $(function()
 		
 		endTooltipTimer();
 		
-			$('#tooltip').stop().animate({opacity:0},{duration:100, complete: function() {
+			$('#tooltip').stop().animate({opacity:0},{duration:50, complete: function() {
 																				$(this).hide()
-			}});
+														}}
+										);
 		
 	});	
 		
 })
 
 
-
+/** 
+ * callback function from smart slider plugin to handle slider's values
+ * @params(sliderEle => slider element that is being acted upon,
+ 		   value	 => numeric value returned from slider plugin)
+ */
 function populateSliderText(sliderEle, value)
 {
-
-	var textEle = sliderEle.next('.slider-text');
-	value = sliderSkillValues[value]['level'] + '<br>' +sliderSkillValues[value]['description'];
-	textEle.html(value);
+	
+	var containerEle   = sliderEle.parents('.slider-container');
+	var valueEle 	   = containerEle.children('.slider-text-value');
+	var descriptionEle = containerEle.children('.slider-text-description');
+	var textValue	   = sliderSkillValues[value]['level'];
+	
+	valueEle.html(textValue);
+	
+	if (descriptionEle.length > 0) {
+		// Description ele exists, populate
+		var descriptionValue = sliderSkillValues[value]['description'];
+		descriptionEle.html(descriptionValue);
+	}
+	
+	return;
 }
 
 
@@ -559,6 +578,62 @@ function showTooltip(ele)
 					   left:left})
 				 .animate({opacity: 1},200);
 	
+}
+
+/** capitalize first letter of text
+ * @params(text => text to capitalize)
+ */
+function capitalize(text) 
+{
+	 
+		  text = text.replace(/(\b)([a-zA-Z])/, function(firstLetter) {
+												return firstLetter.toUpperCase()
+																}
+					  		  );
+		  return text;
+}
+
+
+function getRGB(color) 
+{
+
+	var matchColors = /rgb\((\d{1,3}), (\d{1,3}), (\d{1,3})\)/;
+	var match = matchColors.exec(color);
+	
+	var r = match[1];
+	var g = match[2];
+	var b = match[3];
+	
+	var colors = new Array();
+	colors[0] = r;
+	colors[1] = g;
+	colors[2] = b;
+	
+	return colors;
+}
+
+function componentToHex(c) 
+{
+    var hex = c.toString(16);
+    return hex.length == 1 ? "0" + hex : hex;
+}
+
+function rgbToHex(r, g, b) 
+{
+    return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);
+}
+
+function getDarkerColor(color)
+{
+	var rgb = getRGB(color);
+	
+	for (i = 0; i < 3; i++) {
+		rgb[i] -= 25;
+	}
+	
+	var hex = rgbToHex(rgb[0], rgb[1], rgb[2]);
+	
+	return hex;
 }
 	
 

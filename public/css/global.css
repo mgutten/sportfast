@@ -108,13 +108,21 @@ img {
 	color:#8d8d8d;
 }
 
+.medium-background {
+	background: #8d8d8d;
+}
+
 .dark {
 	color:#777;
 }
 
-.green {
+.green,.green-bold {
 	color:#58bf12;
 	/* 64ce1c */
+}
+
+.green-bold {
+	font-family: 'Futura-Heavy';
 }
 
 .red {
@@ -368,8 +376,14 @@ div.nav-back:hover {
 }
 
 .header-dropdown-arrow {
-	width:1em;
-	height:.625em;
+	float:left;
+	margin: .2em 0 0 .1em;
+}
+
+.header-dropdown-text {
+	float:left;
+	color: inherit;
+	font-family: inherit;
 }
 
 .dropdown-back-outer {
@@ -582,6 +596,7 @@ div#password-container {
 	max-width: 18em;
 	background:#EEE;
 	color:#8d8d8d;
+	cursor:default;
 }
 
 /* end tooltip */
@@ -671,5 +686,157 @@ div#password-container {
 }
 
 /* end slider */
+
+/* availability calendar */
+
+.availabilty-calendar-container {
+	float:left;
+	clear:both;
+	width: 98%;
+}
+
+.availability-calendar-day-container {
+	width: 13.1%;
+	float:left;
+	text-align:center;
+}
+
+.availability { 
+	float:left;
+	clear:both;
+	width:100%;
+	height: 1em;
+	margin: 2px 0em 0;
+	background:#D8D8D8;
+}
+
+.availability-first {
+	margin-top: 0;
+}
+
+.availability-light-background {
+	background: #e0e0e0;
+}
+
+.availability-calendar-section {
+	float:left;
+	clear:both;
+	width: 98%;
+	border-top: solid .1em #8d8d8d;
+	padding-right: 2%;
+}
+
+.availability-calendar-section-last {
+	padding-right:0;
+}
+
+.availability-calendar-section-bottom {
+	border-bottom: solid .1em #8d8d8d;
+}
+
+.availability-calendar-label-container {
+	float:left;
+	padding-right: .1em;
+}
+
+.availability-calendar-label-hour,.availability-calendar-label-time {
+	float:right;
+	clear:both;
+	text-align:center;
+	margin-top: 1.05em;
+}
+
+.availability-calendar-label-hour:first-child {
+	margin-top: .5em;
+}
+
+.availability-calendar-copyable {
+	float:left;
+	margin-left: .1em;
+	background: #e0e0e0;
+	border-radius: 3px;
+	-moz-border-radius: 3px;
+	border: 1px solid #ddd;
+	padding: 0 .1em;
+}
+
+.availability-calendar-copyable:hover {
+	background:#C6C6C6;
+}
+	
+/* end availability calendar */
+
+/* dropdown menus*/
+.dropdown-menu-container {
+	float:left;
+	cursor:default;
+	width:8em;
+}
+	
+
+.dropdown-menu-selected {
+	float:left;
+	background: #fff;
+	border-radius: 5px;
+	-moz-border-radius: 5px;
+	border:1px solid #E0E0E0;
+	padding: 0 .1em 0 .2em;
+	width: 93%;
+	
+}
+
+.dropdown-menu-selected:hover {
+	background: #f9f9f9;
+}
+
+.dropdown-menu-hidden-container {
+	float:left;
+	clear:both;
+	width:100%;
+}
+
+.dropdown-menu-tip {
+	float:right;
+	clear:both;
+	position:relative;
+	z-index: 10;
+	margin: 0 .4em -1px 0;
+	
+}
+
+.dropdown-menu-options-container {
+	float:left;
+	clear:both;
+	background: #fff;
+	border-radius: 5px;
+	-moz-border-radius: 5px;
+	border:1px solid #E0E0E0;
+	padding: 0 .1em 0 .2em;
+	width: 93%;
+
+}
+
+.dropdown-menu-option-container {
+	float:left;
+	clear:both;
+	width:100%;
+	background:#ffffff;
+	padding: .2em 0;
+	border-top: 1px dotted #e0e0e0;
+}
+
+.dropdown-menu-option-text {
+	float:left;
+}
+
+.dropdown-menu-option-img {
+	float:right;
+	clear:none;
+	margin-right: .2em;
+}
+
+#dropdown-menu-arrow {
+	margin-top: .25em;
+}
 	
 	

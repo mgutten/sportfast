@@ -92,7 +92,7 @@ input.short-input {
 	float:left;
 	width:30px;
 	height:30px;
-	margin: 0em 0 0 .5em;
+	margin: 0em 0 0 .2em;
 	background:#8d8d8d;
 }
 
@@ -101,17 +101,17 @@ input.short-input {
 }
 
 .signup-sex-img#signup-sex-male {
-	margin-left: .15em;
+	margin-left: .1em;
 	clear:both;
 }
 
 #signup-sex-container {
-	margin: 0em 0 0 3.7em;
+	margin: 0em 0 0 1.2em;
 	float:left;
 	text-align:center;
 	border-radius: 5px;
 	-moz-border-radius: 5px;
-	border: 1px solid #e0e0e0;
+	border:1px solid #E0E0E0;
 	padding: .1em .1em;
 }
 
@@ -267,9 +267,13 @@ ul.green {
 .signup-sports-form-section {
 	float:left;
 	clear:both;
-	padding: .2em .2em .4em .2em;
+	padding: .2em 0em .4em .7em;
 	width: 98%;
-	border-bottom: 1px solid #8d8d8d;
+	border-bottom: 1px solid #e0e0e0;
+}
+
+.signup-sports-form-section-title {
+	float:left;
 }
 
 .signup-skill-slider {
@@ -287,7 +291,7 @@ ul.green {
 }
 
 .signup-sports-title {
-	font-size: 1.5em;
+	font-size: 1.7em;
 }
 
 .signup-sports-remove {
@@ -301,5 +305,25 @@ ul.green {
 	font-size:.8em;
 	border-radius: 3px;
 	opacity: 0;
+}
 
+.signup-sports-availability {
+	border-bottom: none;
+}
+
+.signup-sports-availability-copy-container {
+	float:right;
+}
+
+.signup-sports-availability-copy-container > p,.signup-sports-availability-copy-option-container  {
+	margin-top: .15em;
+	float:left;
+}
+
+.signup-sports-availability-copy-option-container {
+	margin-left: .1em;
+}
+
+.availabilty-calendar-container {
+	margin-top: .3em;
 }

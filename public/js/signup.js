@@ -1,9 +1,10 @@
 // signup.js
 var date = new Date();
+// array to store usable, copyable availability-calendars from other sports
+var copyAvailability = new Array();
 
 $(function()
 {
-
 	
 	/* update narrow column name value onkeyup */
 	$('#firstName,#lastName').keyup(function()
@@ -208,17 +209,25 @@ $(function()
 	$('.sport-icon-large').click(function() 
 	{
 		var sport = $(this).attr('tooltip').toLowerCase();
-		if(!$(this).is('.selected-green')) {
-			removeOld = false;
-			toggleGreenBackground($(this), removeOld);
-			$(this).parent().children('.signup-sports-remove').css('opacity',1);
-			
-			toggleNarrowColumnSport(sport);
-			testDrop($(this));
-		} else {
+		if($(this).is('.selected-green')) {
+			// Already selected, return
 			return;
 		}
 		
+		// Not currently selected
+		removeOld = false;
+		// Make background green
+		toggleGreenBackground($(this), removeOld);
+		// Show "X"
+		$(this).parent().children('.signup-sports-remove').css('opacity',1);
+		// Remove/add narrow column sport
+		toggleNarrowColumnSport(sport);
+		// Should narrow column be expanded?
+		testDrop($(this));
+		
+		// Change hidden input for this sport to active
+		$('#' + sport + 'Active').val(true);
+
 		// Hide any old dropdowns
 		// Uncomment to only allow one form at a time (remove else from above)
 		//$('.animate-hidden-selected.signup-sports-form').hide();
@@ -234,19 +243,23 @@ $(function()
 	$('.signup-sports-remove').click(function()
 	{
 		var sportIcon = $(this).next('img');
-		if (sportIcon.is('.selected-green')) {
-			// sportIcon is currently selected, must remove
-			// Change image to grey
-			toggleGreenBackground(sportIcon, false);
-			// Hide "x"
-			$(this).css('opacity',0);
-			// Animate form to hidden
-			var hiddenEle = $('#signup-sports-form-' + sportIcon.attr('tooltip').toLowerCase())
-			animateNotShow(hiddenEle, true);
-			// Hide narrow column img
-			var sport = sportIcon.attr('tooltip').toLowerCase();
-			toggleNarrowColumnSport(sport);
+		if (!sportIcon.is('.selected-green')) {
+			// sportIcon is not selected, return
+			return;
 		}
+		// Change image to grey
+		toggleGreenBackground(sportIcon, false);
+		// Hide "x"
+		$(this).css('opacity',0);
+		var sport = sportIcon.attr('tooltip').toLowerCase();
+		// Animate form to hidden
+		var hiddenEle = $('#signup-sports-form-' + sport)
+		animateNotShow(hiddenEle, true);
+		// Hide narrow column img
+		toggleNarrowColumnSport(sport);
+		// Change hidden input for this sport to active
+		$('#' + sport + 'Active').val(false);
+		
 
 		
 	})
@@ -256,7 +269,7 @@ $(function()
 	var width = $('.signup-skill-slider').width();
 	// strackbar requires element to not be hidden (offset().left)
 	$('.signup-sports-form').show();
-	$('.signup-skill-slider').strackbar({callback: populateSliderText, 
+	$('.signup-skill-slider').strackbar({callback: updateSkillHiddenInput, 
 									   defaultValue: 2,
 									   minValue: 0,
 									   maxValue: 6,
@@ -273,28 +286,42 @@ $(function()
 												 
 	
 	/* handle onclick for sports-form elements */
-	$('.signup-sports-position').children('.signup-sports-selectable').click(function() 
+	$('.signup-sports-position,.signup-sports-often,.signup-sports-what,.signup-sports-type').children('.signup-sports-selectable').click(function() 
 	{
-		var greenEles  = $(this).parent().children('.signup-sports-selectable.green');
+		var greenEles  = $(this).parent().children('.signup-sports-selectable.green-bold');
 		var countGreen = greenEles.length;
-		if (countGreen > 2) {
-			// Limit "Position" selection to 2
-			$(this).removeClass('green');
+		var limit      = 20;
+		var removeOld  = false;
+		if ($(this).parent().is('.signup-sports-position')) {
+			// Position selectable was clicked
+			limit = 2;
+		} else if ($(this).parent().is('.signup-sports-often')) {
+			limit = 1;
+			removeOld = true;
+			
 		}
-	})
-	
-	$('.signup-sports-often').children('.signup-sports-selectable').click(function() 
-	{
-		var greenEles  = $(this).parent().children('.signup-sports-selectable.green');
-		var countGreen = greenEles.length;
-		if (countGreen > 1) {
-			greenEles.removeClass('green');
-			// Limit "Position" selection to 2
-			$(this).addClass('green');
+		
+		if (countGreen > limit) {
+			// With added selection we are over the limit
+			$(this).removeClass('green-bold');
+			if (removeOld) {
+				greenEles.removeClass('green-bold');
+				$(this).addClass('green-bold');
+			}
 		}
 		
 		var sectionEle = $(this).parent();
-		updateSportHiddenInput(sectionEle);
+		updateSportHiddenInputSelectable(sectionEle);
+	})
+	
+	
+	/* availability calendar section */
+	$('.availability').click(function()
+	{
+		toggleGreenBackground($(this), false);
+		
+		var dayEle = $(this).parents('.availabilty-calendar-container');
+		updateAvailabilityHiddenInput(dayEle);
 	})
 	
 	
@@ -316,6 +343,7 @@ $(function()
 	
 	
 });
+
 
 
 /**
@@ -414,13 +442,12 @@ function updateNarrowColumnGeneric(section, str)
 
 
 /**
- * update narrow column sex
+ * toggle sport icon in narrow column shown and not
  * @params(sport => name of sport)
  */
 function toggleNarrowColumnSport(sport)
 {
 	var ele 	    = $('#signup-narrow-column-sport-' + sport);
-	
 	ele.toggle();
 						  		 
 }
@@ -473,30 +500,130 @@ function changeInputBackground(ele, isValid)
  * update hidden element for each sport
  * @params(sectionEle => parent container ele for values that have been changed)
  */
-function updateSportHiddenInput(sectionEle)
+function updateSportHiddenInputSelectable(sectionEle)
 {
 	var values = new Array();
-	var selectedChildren = sectionEle.children('.signup-sports-selectable.green');
+	var selectedChildren = sectionEle.children('.signup-sports-selectable.green-bold');
+	var value;
 	
 	selectedChildren.each(function()
 	{
-		values.push($(this).text());
+		// Replace any internal tags and their content with blank
+		value = $.trim($(this).html().replace(/[<]+.*[\/>]/, ''))
+		values.push(value);
 	})
-	
+
 	var idStart            = sectionEle.attr('id').replace(/signup-sports-/,'');
-	var hiddenInputSport   = idStart.replace(/\w+-/,'');
+	var sport   = getSportName(sectionEle);
 	var hiddenInputSection = idStart.replace(/-\w+/,'');
 
-	hiddenInputSection	   = hiddenInputSection.replace(/(\b)([a-zA-Z])/, function(firstLetter) {
-																						return firstLetter.toUpperCase()
-																						});
-	var combinedId		   = hiddenInputSport + hiddenInputSection;
-	var hiddenInput        = $('#' + combinedId);
-
-	hiddenInput.val(values);	
+	hiddenInputSection	   = capitalize(hiddenInputSection)
 	
-
+	var combinedId		   = sport + hiddenInputSection;
+	var hiddenInput        = $('#' + combinedId);
+	
+	
+	hiddenInput.val(values);
+	
 }
 
+
+
+/**
+ * custom callback function from slider to update hidden input skill
+ * @params(sliderEle => slider element
+ *		   value     => new value of slider)
+ */
+function updateSkillHiddenInput(sliderEle, value) 
+{
+	
+	var sport		   = getSportName(sliderEle);
+	var hiddenEle 	   = $('#' + sport + 'Rating');
+	
+	hiddenEle.val(value);
+		
+	populateSliderText (sliderEle, value);
+}
+
+
+
+/**
+ * custom callback function from slider to update hidden input skill
+ * @params(dayEle => day container element)
+ */
+function updateAvailabilityHiddenInput(dayEle) 
+{
+	
+	var values = new Array();
+	var selectedChildren = dayEle.find('.availability.selected-green');
+	var value;
+	var sport  = getSportName(dayEle);
+	
+	if (selectedChildren.length > 0) {
+		// Timeslots are selected
+		selectedChildren.each(function()
+		{
+			// Replace any internal tags and their content with blank
+			value = $(this).attr('hour');
+			values.push(value);
+		})
+
+		if ($.inArray(sport, copyAvailability) == -1) {
+			copyAvailability.push(sport);
+			showCopyableAvailabilityCalendars();
+		}
+		
+	} else {
+		// No timeslots selected
+		var index = $.inArray(sport, copyAvailability);
+		if (index > -1) {
+			delete copyAvailability[index];
+			showCopyableAvailabilityCalendars();
+		}
+	}
+		
+	
+	var day	   = dayEle.attr('day');
+	var id     = sport + 'Availability' + day;
+	var hiddenInput = $('#' + id);
+	
+	hiddenInput.val(values);
+
+	
+}
+
+
+/** display all copyable availability calendars which have values
+ */
+function showCopyableAvailabilityCalendars()
+{
+	var output = '';
+	var sport;
+	var limit = Object.keys(copyAvailability).length;
+	output += '<select class="availability-calendar-copyable medium pointer">\
+			   <option>Choose</option>';
+	for (i = 0; i < limit; i++) {
+		
+		sport   = copyAvailability[i];
+		output += '<option>' + capitalize(sport) + '</option>';
+			   
+	}
+	
+	output += '</select>';
+	
+	$('.signup-sports-availability-copy-option-container').html(output);
+}
+
+/** return sport name for element within step2(Sports)
+ * @params (ele => any element that is within step2(Sports) form
+ */
+function getSportName(ele) 
+{
+	var sportFormEle = $(ele).parents('.signup-sports-form');
+	var sportTitle   = sportFormEle.find('.signup-sports-title');
+	var sport        = sportTitle.text().toLowerCase();
+	
+	return sport;
+}
 
 
