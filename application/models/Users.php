@@ -54,7 +54,7 @@ class Application_Model_Users extends Application_Model_ModelAbstract
      * @return string The hash string of the password
      */
     public function hashPassword($password) {
-        return $this->hasher()->HashPassword($password);
+        return $this->getMapper()->hashPassword($password);
     }
  
     /**
@@ -66,52 +66,10 @@ class Application_Model_Users extends Application_Model_ModelAbstract
      * @return bool True if match, false if no match.
      */
     public function checkPassword($password, $hash, $user_id = '') {
-        // Check if we are still using regular MD5 (32 chars)
 		
-        if (strlen($hash) <= 32) {
-            $check = ($hash == md5($password));
-            if ($check && $user_id) {
-                // Rehash using new PHPass-generated hash
-                $this->setPassword($password, $user_id);
-                $hash = $this->hashPassword($password);
-            }
-        }
- 
-        $check = $this->hasher()->CheckPassword($password, $hash);
- 
-        return $check;
+       return $this->getMapper()->checkPassword($password, $hash, $user_id);
     }
  
-    /**
-     * Set password for specified user ID.
-     *
-     * @param string $password The user's password (plain text).
-     * @param int $user_id The user row ID.
-     * @return void
-     */
-    public function setPassword($password, $user_id) {
-        $hash = $this->hashPassword($password);
- 
-        $this->update(
-            array('password' => $hash),
-            array('userID' => $user_id)
-        );
-    }
- 
-    /**
-     * Checks for Webjawns_PasswordHash in registry. If not present, creates PHPass object.
-     *
-     * @uses Zend_Registry
-     * @uses Webjawns_PasswordHash
-     *
-     * @return Webjawns_PasswordHash PHPass
-     */
-    public function hasher() {
-        if (!Zend_Registry::isRegistered('my_hasher')) {
-            Zend_Registry::set('my_hasher', new My_Auth_PasswordHash(8, false));
-        }
-        return Zend_Registry::get('my_hasher');
-    }
 
 }
 

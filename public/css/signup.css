@@ -125,6 +125,10 @@ input.short-input {
 	background: #58bf12;
 }
 
+#signup-sex-container.signup-sex-container-fail {
+	border-color: #BF0404;
+}
+
 .signup-clear-large {
 	height: 3em;
 }
@@ -154,12 +158,12 @@ input.short-input {
 	font-size: .9em;
 }
 
-input.input-success {
+input.input-success, div.input-success {
 	background: #E6FFE6;
 	border: 1px solid #58bf12;
 }
 
-input.input-fail {
+input.input-fail, div.input-fail {
 	background: #EDA9A9;
 	border: 1px solid #C60000;
 }
@@ -197,6 +201,15 @@ ul.green {
 
 /* narrow column */
 
+.narrow-column-picture {
+	border:none;
+	width: auto;
+	height: auto;
+}
+
+div.signup-narrow-column-img-container {
+	margin: 0;
+}
 
 .narrow-column-value {
 	float:left;
@@ -316,14 +329,158 @@ ul.green {
 }
 
 .signup-sports-availability-copy-container > p,.signup-sports-availability-copy-option-container  {
-	margin-top: .15em;
+	margin: .15em 0 0 .5em;
 	float:left;
-}
-
-.signup-sports-availability-copy-option-container {
-	margin-left: .1em;
 }
 
 .availabilty-calendar-container {
 	margin-top: .3em;
+}
+
+/* upload pic alert */
+
+#signup-import-alert-container {
+	width: 44em;
+	height: 26em;
+	margin: -13em 0 0 -22em;
+}
+
+.signup-import-alert-img {
+	float:left;
+	width: 450px;
+	height: 360px;
+}
+
+#signup-import-alert-img-holder {
+	display:none;
+}
+
+.signup-import-alert-text-container {
+	float:right;
+	width: 33.3%;
+}
+
+#signup-import-alert-button {
+	float:left;
+	clear:both;
+	margin: 4em 0 0 3em;
+	width: 7em;
+}
+
+#signup-import-alert-guidelines {
+	float:left;
+	clear:both;
+	margin: 0 0 0 3em;
+	padding:0;
+	font-size: .9em;
+}
+
+#signup-import-alert-guidelines-header {
+	float:left;
+	margin: 2em 0 0 1em;
+}
+
+#signup-import-alert-warning {
+	float:left;
+	clear:both;
+	margin: 4em 0 0 1em;
+}
+
+#signup-import-alert-accept {
+	float:right;
+	clear:both;
+	margin: 2em 3em 0 0;	
+}
+
+
+/* end upload pic alert */
+
+/* import section */
+
+.signup-import-main-img-container {
+	float:left;
+	clear:both;
+	overflow:hidden;
+	width: 199px;
+	height: 160px;
+	border: 1px solid #444;
+	margin-left: 1.5em;
+}
+
+.signup-import-main-img {
+	float:left;
+	clear:both;
+	margin: 0 0 0 0;
+}
+
+.signup-import-main-current-text {
+	float:left;
+	margin-left: 1.5em;
+	width: 100%;
+}
+
+.signup-import-main-text-container {
+	float:left;
+	margin: 0 0 0 2em;
+	width: 60%;
+}
+
+#signup-import-main-upload-button-container {
+	float:left;
+	clear:both;
+	width: 100%;
+	height: 5em;
+}
+
+#signup-import-main-upload-button {
+	float: none;
+	margin: 1.5em auto;
+	width: 4em;
+}
+
+/* end signup import */
+
+/* signup agree section */
+.signup-agree-pledges-container {
+	float:left;
+	clear:both;
+	width: 90%;
+	margin: 1em 0 0 10%;
+}
+
+.signup-agree-pledge-container {
+	float:left;
+	clear:both;
+	width: 100%;
+	margin-top: 1em;
+}
+
+.signup-agree-pledge-short {
+	float:left;
+	font-size: 1.5em;
+}
+
+.signup-agree-pledge-description {
+	float:left;
+	clear:none;
+	width: auto;
+	margin: .5em 0 0 .5em;
+}
+
+#checkbox-container-agree {
+	margin: 2em 0 0 1.5em;
+}
+
+#checkbox-text-agree {
+	margin-top: -.15em;
+}
+
+/* finish button */
+
+#signup-finish {
+	float:left;
+	clear:both;
+	width: 93%;
+	font-size: 2em;
+	margin-top: 1.5em;
 }

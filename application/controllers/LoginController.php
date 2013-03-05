@@ -59,7 +59,7 @@ class LoginController extends Zend_Controller_Action
 		
 		$form = $this->getForm();
         if (!$form->isValid($request->getPost())) {
-            // Did not pass validation...
+            // Invalid form
             $error = $form->getMessages();
 			if ($error['username']) {
 				// Username was empty
@@ -69,6 +69,7 @@ class LoginController extends Zend_Controller_Action
 				$error = array('Incorrect password.');
 			}
             $this->_helper->FlashMessenger->addMessage($error, 'error');
+			
 			return $this->_helper->redirector('index');
         }
  		
@@ -81,20 +82,27 @@ class LoginController extends Zend_Controller_Action
             // Invalid username/password, display errors
             $error = $result->getMessages();
 			$this->_helper->FlashMessenger->addMessage($error, 'error');
-            return $this->_helper->redirector->goToUrl('/login');
+            //return $this->_helper->redirector->goToUrl('/login');
         } else {
 			// Authentication success, unset login session, set user cookie
 			Zend_Session::namespaceUnset('login');
 			
 			if ($request->getPost('rememberMe')) {
 				// Set cookie if user wants to be remembered
-				setcookie('user', $auth->getIdentity(), time() + (60*60*336), '/');
+				setcookie('user', $auth->getIdentity()->userID, time() + (60*60*336), '/');
 			} else {
 				// Unset cookie (if existing from previous visit)
 				setcookie('user', '', time() - 1, '/');
 			}
 			
-			$this->_helper->redirector->goToUrl('/');
+			// Store user info in user session
+			$auth->getIdentity()->getUserSportsInfo();
+			$userSession = new Zend_Session_Namespace('user');
+			$userSession = $auth->getIdentity();
+			$userSession->password = '';
+			
+			
+			return $this->_helper->redirector->goToUrl('/');
 		}
         
 	}

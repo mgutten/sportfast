@@ -33,7 +33,7 @@ class Application_View_Helper_AvailabilityCalendar
 		$outerCounter = 1;
 		foreach ($days as $day) {
 			$counter = $startHour;
-			$output .= "<div class='availability-calendar-day-container' day='" . $day . "'>";
+			$output .= "<div class='availability-calendar-day-container' day='" . $day . "' id='" . $sport . "-availability-calendar-day-container-" . $day . "' >";
 			$output .= "<p class=' medium'>" . $day . "</p>";
 			
 			for ($i = 0; $i < 4; $i++) {
@@ -65,7 +65,7 @@ class Application_View_Helper_AvailabilityCalendar
 					$tooltipHourEnd   = $this->convertTime($counter+1);
 					$tooltip = '<p class="center bold medium">' . $daysLong[$day] . '</p>' . $tooltipHourStart . ' - ' . $tooltipHourEnd;
 					
-					$output .= "<div class='" . $class . "' tooltip = '" . $tooltip . "' hour='" . $counter . "'></div>";
+					$output .= "<div class='" . $class . "' tooltip = '" . $tooltip . "' hour='" . $counter . "' id='" . $sport . "-" . $day . "-" . $counter . "'></div>";
 					$counter++;
 				}
 				$output .= "</div>";

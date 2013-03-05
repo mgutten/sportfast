@@ -88,7 +88,7 @@ class Application_View_Helper_SignupSportForm
 			$what    = array('Pickup' 				=> array('tooltip' => 'Pickup games can be found at most parks and rec centers.  They are non-competitive and inspire exercise.'),
 							 'League' 				=> array('subtext' => 'w/ refs',
 							 				   				 'tooltip' => 'League teams play against one another in competitive, scheduled games with referees.'),
-							 'Weekend Tournaments'  => array('tooltip' => 'Weekend tournaments give you a taste of league play without the long-term commitment.  It is a reffed tournament that happens on a Saturday and Sunday.')
+							 'Weekend Tournament'   => array('tooltip' => 'Weekend tournaments give you a taste of league play without the long-term commitment.  It is a reffed tournament that happens on a Saturday and Sunday.')
 							 );
 			$output .= $this->selectableText($what);
 			$output .= '</div>';
@@ -107,7 +107,7 @@ class Application_View_Helper_SignupSportForm
 			// Availability
 			$output .= "<div class='signup-sports-availability signup-sports-form-section'>
 						<p class='signup-sports-form-section-title'>When would you want to play?</p>
-						<div class='signup-sports-availability-copy-container smaller-text'>
+						<div class='signup-sports-availability-copy-container'>
 							<p class='medium'>Copy availability from:</p>
 							<div class='signup-sports-availability-copy-option-container'>
 								N/A

@@ -47,4 +47,9 @@ class Application_Model_Sports extends Application_Model_ModelAbstract
 		return $this->getMapper()->getAllSportsInfo();
 	}
 	
+	public function getUserSportsInfo($userID)
+	{
+		return $this->getMapper()->getUserSportsInfo($userID,$this);
+	}
+	
 }

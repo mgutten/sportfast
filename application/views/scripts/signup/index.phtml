@@ -5,9 +5,19 @@
 */
 $this->headTitle('Signup');
 $this->headLink()->prependStylesheet($this->baseUrl() . '/css/signup.css');
+$this->headLink()->prependStylesheet($this->baseUrl() . '/css/plugins/jcrop.min.css');
 $this->headScript()->prependFile($this->baseUrl() . '/js/signup.js');
 $this->headScript()->prependFile($this->baseUrl() . '/js/plugins/smartslider.js');
+$this->headScript()->prependFile($this->baseUrl() . '/js/plugins/jcrop.min.js');
+$this->headScript()->prependFile($this->baseUrl() . '/js/plugins/jform.js');
+
 ?>
+
+<form action="<?php echo $this->form->getAction() ?>"
+      enctype="<?php echo $this->form->getEnctype() ?>"
+      method="<?php echo $this->form->getMethod() ?>"
+      id="<?php echo $this->form->getId() ?>"
+      class="<?php echo $this->form->getAttrib('class') ?>" >
 <?php
 
 $this->placeholder('absolute')->captureStart();
@@ -17,10 +27,56 @@ $this->placeholder('absolute')->captureStart();
 </p>
 
 <?php
-$this->placeholder('absolute')->captureEnd();
+echo $this->partial('partials/global/alertBack.phtml');
+echo $this->alert()->start('signup-import','Upload and crop your image.');
 ?>
-<div class='green-alert-box green'>Organize and find your own pickup games based on your ability.  Sign up in just 4 steps!</div>
+<img class='signup-import-alert-img' id='signup-import-alert-img' src='/images/global/profile/xl/no_profile_male.png' />
+<div class='signup-import-alert-text-container'>
+	<p class='medium clear' id='signup-import-alert-guidelines-header'>Profile pictures should be:</p>
+	<ul class='green heavy' id='signup-import-alert-guidelines'>
+    	
+    	<li>easily recognizable</li>
+        <li>a clear shot of your face</li>
+    </ul>
+	<div class='button import-button' id='signup-import-alert-button'>
+    	Choose photo
+        <form action="/ajax/upload-temp-picture" enctype="multipart/form-data" name='file_upload' id='upload-profile-pic'>
+    		<input type='file' name='profilePic' id='profilePic' />
+        </form>
+    </div>
+	<p class='medium' id='signup-import-alert-warning'>
+    	If players cannot recognize you by your picture, you <span class='heavy medium'>will not receive any ratings.</span>
+    </p>
+    <div class='button green-button larger-text' id='signup-import-alert-accept'>
+        Accept
+    </div>
+   	
+</div>
+    
+    	
+
 <?php
+echo $this->alert()->end();
+$this->placeholder('absolute')->captureEnd();
+
+if (!empty($this->errors)) {
+	// There were errors
+	echo "<div class='red-alert-box red'>";
+	echo "Please fix the following:";
+	echo "<ul>";
+	foreach ($this->errors as $key => $val) {
+		echo "<li style='float:left;clear:both'>" . $val . "</li>";
+	}
+	echo "</ul>";
+	echo "</div>";
+} else {
+	// No errors, display normally
+	echo "<div class='green-alert-box green'>
+				Organize and find your own pickup games based on your ability.  Sign up in just 4 steps!
+			</div>";
+}
+
+
 $totalSteps = 4;
 $currentStep = 1;
 
@@ -44,9 +100,11 @@ echo "<span class='signup-dob-slash'>/</span>";
 echo $this->form->dobDay;
 echo "<span class='signup-dob-slash'>/</span>";
 echo $this->form->dobYear;
+echo $this->form->age; // hidden
 echo $this->form->heightFeet;
 echo "<span class='signup-dob-slash signup-dimension-indicator' id='heightFeet-indicator'>'</span>";
 echo $this->form->heightInches;
+echo $this->form->height;
 echo "<span class='signup-dob-slash signup-dimension-indicator' id='heightInches-indicator'>\"</span>";
 echo $this->form->weight;
 echo "<span class='signup-dob-slash signup-dimension-indicator' id='weight-indicator'>lb</span>";
@@ -57,7 +115,7 @@ echo $this->form->email;
 echo "<div class='clear'></div>";
 echo $this->form->signupPassword;
 // use same setup as signup password, but change ID bits
-echo $this->form->signupPassword->setLabel('Re-enter Password')->setAttribs(array('id'=>'signupReenterPassword','name'=>'signupReenterPassword'))->addDecorator('Errors');
+echo $this->form->signupPassword->setLabel('Re-enter Password')->setAttribs(array('id'=>'signupReenterPassword','name'=>'signupReenterPassword'));
 ?>
 <div id='signup-password-reqs' class='medium'>Password must be: <ul><li>8-12 characters long</li></ul></div>
 </div>
@@ -109,15 +167,41 @@ foreach ($sports as $sport => $values) {
 
 </div>
 <?php
-
+/* STEP 3 IMPORT PHOTO */
 echo $this->partial('partials/signup/stepContainer.phtml',array('title'		  =>'Import Picture',
 																'currentStep' =>$currentStep,
 																'totalSteps'  =>$totalSteps));
+															
 $currentStep++;
-echo $this->form->firstName;
-echo $this->form->lastName;
+
 
 ?>
+<p class='clear medium signup-import-main-current-text'> Current picture:</p>
+<div class='signup-import-main-img-container'>
+    <img src='/images/global/profile/no_profile_male.png' class='signup-import-main-img' id='signup-import-main-img'/>
+</div>
+<div class='signup-import-main-text-container'>
+	<p class='center green larger-text'>
+    	Players without a profile picture will <span class='green-bold'>not be able to join any games.</span>
+    </p>
+    <div id='signup-import-main-upload-button-container'>
+        <div class='button larger-text' id='signup-import-main-upload-button'>
+            Upload
+        </div>
+    </div>
+    <p class='center light clear'>
+    	You can add/edit your profile picture under Account Settings later.
+    </p>
+</div>
+<?php
+// Hidden inputs for picture info
+echo $this->form->fileName;
+echo $this->form->fileWidth;
+echo $this->form->fileHeight;
+echo $this->form->fileX;
+echo $this->form->fileY;
+?>    	
+
 </div>
 <?php
 
@@ -125,16 +209,43 @@ echo $this->partial('partials/signup/stepContainer.phtml',array('title'		  =>'Ag
 																'currentStep' =>$currentStep,
 																'totalSteps'  =>$totalSteps));
 $currentStep++;
-echo $this->form->firstName;
-echo $this->form->lastName;
 
 ?>
+<p class='signup-agree-header center'>
+We are not a dating site.  We are not a site for funny videos.  We play sports.  As athletes, we adhere to a general code of conduct.  That conduct is laid out below:
+</p>
+<div class='signup-agree-pledges-container'>
+	<?php
+		echo $this->partial('partials/signup/agreePledge.phtml', array('pledge'      => 'My word is golden.',
+																	   'description' => "If I say I will be there, then that's where I'll be."));
+																	   
+		echo $this->partial('partials/signup/agreePledge.phtml', array('pledge'      => 'No man left behind.',
+																	   'description' => "Everyone gets to play.  No exceptions."));
+
+		echo $this->partial('partials/signup/agreePledge.phtml', array('pledge'      => 'No whining.  Kids whine.',
+																	   'description' => "We are here to play sports."));
+
+	
+	?>
 </div>
 <?php
+echo $this->form->agree;
+?>
+</div>
 
+<div class='button green-button header' id='signup-finish'>
+	FINISH
+</div>
+
+</form>
+
+
+<?php
+/* NARROW COLUMN */
 $this->placeholder('narrowColumn')->captureStart();
 ?>
-<div class='narrow-column-picture'>
+<div class='signup-import-main-img-container signup-narrow-column-img-container'>
+    <img src='/images/global/profile/no_profile_male.png' class='narrow-column-picture' />
 </div>
 
 <?php

@@ -12,7 +12,8 @@ class IndexController extends Zend_Controller_Action
     {
        	/* fixed in bootstrap //$this->_helper->layout->setLayout('global/logout');*/
 		//cancel standard white back
-		$this->view->whiteBacking = false;
+		$this->view->whiteBacking = false;	
+		
 				
     }
 

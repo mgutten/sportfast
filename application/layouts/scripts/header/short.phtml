@@ -1,37 +1,35 @@
-<div class='header-bar dropshadow' id='header-bar-tall'>
+<div class='header-bar dropshadow' id='header-bar-short'>
 </div>
 	
     <div class='centered-body body-wrapper'>
-    	<a href='<?php echo $this->url(array('controller' => 'index',
-                                              'action'	  => 'index'));?>'><img src="" id='logo-large' /></a>
-    	<div class='header-nav-container'>
-            <div class='nav-back nav-dropdown' id='nav-back-how'>
-                <a href='<?php echo $this->url(array('controller' => 'how',
-                                                 'action'	  => 'index'));?>' class='nav nav-out lightest' id='nav-how'>HOW DOES IT WORK</a>
+    	<div class='header-nav-container-short'>
+        	<a href='/'><img src='/images/global/logo/small.png' id='logo-small'/> </a>
+            <a href='/'><img src='/images/global/header/home_icon.png' id='header-home-icon' /></a>
+            <div class='nav-back-short nav-dropdown' id='nav-back-find'>
+                <a href='<?php echo $this->url(array('controller' => 'find',
+                                                 	 'action'	  => 'index'));?>' class='nav nav-out-short lightest' id='nav-find'>
+                <p class='header-dropdown-text'>FIND</p>
+                <img src='/images/global/dropdown/dropdown_arrow.png' class='header-dropdown-arrow' />
+                </a>
+                
                 <div class='dropdown-back-outer' id='nav-dropdown-outer-login'>
                     <div class='dropdown-back-inner' id='nav-dropdown-inner-login'>
                         <?php echo $this->dropdownLoginForm;?>
                     </div>
                 </div>
             </div>
-            <div class='nav-back nav-dropdown' id='nav-back-signup'>
-                <a href='<?php echo $this->url(array('controller' => 'signup',
-                                                 'action'	  => 'index'));?>' class='nav nav-out lightest' id='nav-signup'>SIGNUP NOW</a>
+            <div class='nav-back-short nav-dropdown' id='nav-back-create'>
+                <a href='<?php echo $this->url(array('controller' => 'create',
+                                                 	 'action'	  => 'index'));?>' class='nav nav-out-short lightest' id='nav-create'>
+                	<p class='header-dropdown-text'>CREATE</p>
+                    <img src='/images/global/dropdown/dropdown_arrow.png' class='header-dropdown-arrow' />  
+                </a>
+                                                
                 <div class='dropdown-back-outer'>
                     <div class='dropdown-back-inner'>
                         cats Cradel
                     </div>
                 </div>
             </div>
-            <div class='nav-back nav-dropdown' id='nav-back-login'>
-                <a href='<?php echo $this->url(array('controller' => 'login',
-                                                     'action'	  => 'index'));?>' class='nav nav-out lightest' id='nav-login'>LOGIN 
-                    <img src='/images/global/dropdown_arrow.png' width='10' height='6' class='header-dropdown-arrow' />
-                </a>
-                <div class='dropdown-back-outer' id='nav-dropdown-outer-login'>
-                    <div class='dropdown-back-inner' id='nav-dropdown-inner-login'>
-                        <?php echo $this->dropdownLoginForm;?>
-                    </div>
-                </div>
-            </div>
+            
         </div>

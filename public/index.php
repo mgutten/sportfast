@@ -8,11 +8,17 @@ defined('APPLICATION_PATH')
 defined('APPLICATION_ENV')
     || define('APPLICATION_ENV', (getenv('APPLICATION_ENV') ? getenv('APPLICATION_ENV') : 'production'));
 
+// ADDED: define path to temporary file directory
+define('PUBLIC_PATH', "X:/Program Files (x86)/wamp/www/Local_site/sportup.com/public");
+
 // Ensure library/ is on include_path
 set_include_path(implode(PATH_SEPARATOR, array(
     realpath(APPLICATION_PATH . '/../library'),
     get_include_path(),
 )));
+
+// Set timezone to westcoast
+date_default_timezone_set('America/Los_Angeles');
 
 /** Zend_Application */
 require_once 'Zend/Application.php';
@@ -22,5 +28,8 @@ $application = new Zend_Application(
     APPLICATION_ENV,
     APPLICATION_PATH . '/configs/application.ini'
 );
+
+
 $application->bootstrap()
             ->run();
+			

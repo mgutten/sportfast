@@ -4,6 +4,7 @@ class Application_Model_SportsMapper extends Application_Model_MapperAbstract
 {
 	protected $_dbTableClass = 'Application_Model_DbTable_Sports';
 	
+	
 	public function getAllSportsInfo()
 	{
 		$table   = $this->getDbTable();
@@ -45,39 +46,49 @@ class Application_Model_SportsMapper extends Application_Model_MapperAbstract
 		return $sports;
 	}
 	
-	public function getUserBy($column, $value)
+	
+	public function getUserSportsInfo($userID, $modelClass)
 	{
 		$table   = $this->getDbTable();
 		$select  = $table->select();
-		$select->where($column . ' = ' . '?', $value)
-			   ->limit(1);
+		
+		$select->setIntegrityCheck(false);
+		$select->from(array('s'  => 'sports'))
+			   ->join(array('sp' => 'sport_positions'),
+			   		  's.sportID = sp.sportID')
+			   ->join(array('usp' => 'user_sport_positions'),
+			   		  'usp.positionID = sp.positionID')
+		       ->where('usp.userID = ?', $userID);
+			   
 		$results = $table->fetchAll($select);
-		//$result = $result->current();
-		$user = $this->createUserClasses($results);
-			
-		return $user;	
-		//return $result;
-	}
-	
-	public function createUserClasses($results) 
-	{
-		$users = array();
 		
 		foreach ($results as $result) {
-			$user = new Application_Model_User();
-			$user->setUsername($result->username)
-				 ->setUserID($result->userID)
-				 ->setPassword($result->password);
+			
+		}
+			
+		return $modelClass;
+
+	}
+	
+	
+	/*
+	public function createClasses($results, $modelClass) 
+	{
+		$classes = array();
+		
+		foreach ($results as $result) {
+			$class = new $modelClass->_singleClass();
 			
 			if(count($results) <= 1) {
-				$users = $user;
+				$classes = $class;
 				break;
 			}
 			
-			$users[] = $user;
+			$classes[] = $class;
 		}
 		
-		return $users;
+		return $classes;
 	}
+	*/
 	
 }

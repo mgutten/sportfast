@@ -19,6 +19,8 @@ sliderSkillValues[5] = {level:'Unstoppable',
 						
 var mouseoverColor;
 
+var dropdownMenuDown = false;
+
 
 $(function()
 {
@@ -40,33 +42,42 @@ $(function()
 			return;
 	
 	  };
-	})( jQuery );
-	
-	/* jquery plugin to verify based on parameters passed in */
-	(function($) {
+
+
+	  /* jquery plugin to verify based on parameters passed in */	  
 	  $.fn.isValid = function(options) {
 		  // Create some defaults, extending them with any options that were provided
 			var settings = $.extend( {
 			  'maxLength'     : 500,
 			  'minLength'	  : 0,
-			  'regex'		  : /.*/g
+			  'regex'		  : /.*/g,
+			  'number'		  : false
 			}, options);
 			
 			var value 		     = this.val();
-			var regexPatterns    = new Array();
-			regexPatterns['num'] = /\d+/g;			
+			var regexPatterns    = new Array();	
 
 			if (typeof settings.regex == 'string') {
 				settings.regex = regexPatterns[settings.regex];
 			}
+			
 			if (value.length > settings.maxLength) {
 				// Value is longer than max allowed length
 				return false;
 			}
+
 			if (value.length < settings.minLength) {
 				// Value is shorter than min allowed length
 	  			return false;
 			}
+			
+			if (settings.number) {
+				// Test if number
+				if (!isNumber(value)) {
+					return false;
+				}
+			}
+			
 			if (!settings.regex.test(value)) {
 				// Did not pass regex test
 				return false;
@@ -75,8 +86,76 @@ $(function()
 			return true;
 			
 	
-	  };
+	  }
+	  
+	  
+	  /* animate element background darker */
+	  $.fn.animateDarker = function() {
+		 
+		 	if(!this.attr('color')) {
+				// Color attribute is not saved, save it
+				this.attr('color', this.css('background-color'))
+			}
+			
+			mouseoverColor  = this.attr('color');
+			var darkerColor = getDarkerColor(mouseoverColor);
+			var ele         = this;
+			
+			this.stop().animate({backgroundColor: darkerColor},200);
+			
+	  }
+	  
+	  /* animate element background darker */
+	  $.fn.animateLighter = function() {
+		 	this.stop().animate({backgroundColor: this.attr('color')},200);		 
+	  }
+	  
+	  /* unset height and width restrictions, let image show naturally */
+	  $.fn.maintainRatio = function() {
+		  	var containerHeight = this.height();
+			var containerWidth  = this.width();
+			
+			this.css({height: 'auto',
+					  width: 'auto'});
+			
+			var imgHeight = this.height();
+			var imgWidth  = this.width();
+			
+			return this;
+		 		 
+	  }
+			  
 	})( jQuery );
+	
+	
+	$(document).on('click','.dropdown-menu-selected',function(e)
+	{
+		e.stopPropagation();
+		if (dropdownMenuDown) {
+			if (dropdownMenuDown.attr('id') !== $(this).parent().attr('id')) {
+				// Different dropdown is already down
+				dropdownMenu(dropdownMenuDown);
+			}
+		}
+		dropdownMenu($(this).parent('.dropdown-menu-container'));
+		
+		$(this).addClass('dropdown-menu-container-reverse');
+	})
+	
+	$(document).on('mouseenter','.dropdown-menu-option-container',function()
+	{
+		$(this).animateDarker();
+	})
+	.on('mouseleave','.dropdown-menu-option-container',function()
+	{
+		$(this).animateLighter();
+	})
+	.on('click','.dropdown-menu-option-container',function()
+	{
+		//Option has been clicked
+		var value = $(this).children('p').text();
+		$(this).parents('.dropdown-menu-container').children('.dropdown-menu-selected').children('p').text(value);
+	})
 	
 	
 	/* animate hover effect for navigation */
@@ -119,16 +198,13 @@ $(function()
 	
 	
 	/* change background color of narrow-column onhover */
-	$('.narrow-column-header').hover(function()
+	$('.narrow-column-header').mouseenter(function()
 	{
-		mouseoverColor  = $(this).css('background-color');
-		var darkerColor = getDarkerColor(mouseoverColor);
-		$(this).stop().animate({backgroundColor: darkerColor},200);
-	},
-	function()
+		$(this).animateDarker();
+	}).mouseleave(function()
 	{
-		$(this).stop().animate({backgroundColor: mouseoverColor},200);
-	})
+		$(this).animateLighter();
+	});
 		
 	
 	/* animate narrow-column sections onclick */
@@ -254,10 +330,22 @@ $(function()
 	})	
 	
 	
-	/* test all elements for tooltip onhover */
-	$('*').hover(function()
+	/* set behavior for all alert boxes (close them onclick) */
+	$('.alert-black-back,.alert-x').click(function()
 	{
-
+		$('.alert-container').hide();
+		$('.alert').animate({'opacity':0},{duration: 200, complete: function() {
+																		$('.alert').hide()
+																				   .css('opacity',1)
+																	}
+		})
+	})
+	
+	
+	/* test all elements for tooltip onhover */
+	$('*').bind('mouseenter.tooltip',function()
+	{
+		
 		if($(this).parents('.input-container').attr('tooltip')) {
 			return;
 		}
@@ -267,7 +355,7 @@ $(function()
 			var ele = $(this);
 			startTooltipTimer(ele);
 		}
-	}, function()
+	}).bind('mouseleave.tooltip', function()
 	{
 		if(tooltipEle.is('.input-container')) {
 			return;
@@ -275,14 +363,96 @@ $(function()
 		
 		endTooltipTimer();
 		
-			$('#tooltip').stop().animate({opacity:0},{duration:50, complete: function() {
+		$('#tooltip').stop().animate({opacity:0},{duration:50, complete: function() {
 																				$(this).hide()
-														}}
-										);
+																		}
+									});
 		
 	});	
+	
+	
+	$(document).click(function()
+	{
+		if (dropdownMenuDown) {
+			// Dropdown menu is down
+			dropdownMenuDown.children('.dropdown-menu-selected').removeClass('dropdown-menu-container-reverse');
+
+			dropdownMenu(dropdownMenuDown);
+		}
+
+	});
 		
 })
+
+
+/**
+ * Ajax upload and retrieve picture from input[type=file]
+ * @params (action   => where to submit picture to,
+ *			inputEle => input[type=file] element with file)
+ */
+function uploadTempPicture(action, inputEle)
+{
+	$('#upload-profile-pic').ajaxForm({success: function(){ alert()}});
+	/*$.ajax({
+		url: action,
+		method: 'POST',
+		data: {file: inputEle.val()},
+		success: function(data) {
+			alert(data);
+			$('#signup-import-alert-img').attr('src',data);
+		}
+	})
+	*/
+}
+
+
+/** 
+ * test dropdown menu for animation up or down
+ * @params(dropdownEle => outer dropdown container that is being acted upon)
+ */
+function dropdownMenu(dropdownEle)
+{
+	
+		var dropdown = dropdownEle;
+		var selected   = dropdown.children('.dropdown-menu-selected');
+		var holder   = dropdown.prev('.dropdown-menu-holder');
+		var options  = dropdown.children('.dropdown-menu-hidden-container');
+		
+		if (dropdownMenuDown) {
+			if (dropdownMenuDown.attr('id') == dropdown.attr('id')) {
+				// Dropdown is already down
+				options.animate({opacity: 0}, {duration: 200, complete: function() {
+																			options.hide();
+																			dropdown.css({position: 'static',
+																						  top     : 0,
+																						  left    : 0});
+																			holder.hide()
+																			}
+											  }
+								);
+								
+				dropdownMenuDown = false;
+				return;
+			}
+		}
+			
+		dropdown.css({top: 		selected.position().top,
+					  left: 	selected.position().left,
+					  position: 'absolute'});
+					  
+					  
+		holder.css({width:  dropdown.outerWidth(true),
+					height: selected.outerHeight(true)})
+			  .show();
+			  
+		options.css('display', 'block')
+			   .animate({opacity: 1}, 200);
+			      
+		
+		dropdownMenuDown = dropdownEle;
+
+}
+
 
 
 /** 
@@ -634,6 +804,49 @@ function getDarkerColor(color)
 	var hex = rgbToHex(rgb[0], rgb[1], rgb[2]);
 	
 	return hex;
+}
+
+function feetToInches(feet, inches) 
+{
+	return ((feet * 12) + parseFloat(inches));
+}
+
+function inchesToFeet(inches) 
+{
+	var feet = Math.floor(parseFloat(inches)/12);
+	var inchesNew = parseFloat(inches) - (feet * 12);
+	return {feet: feet, inches: inchesNew};
+}
+
+function isNumber(n) 
+{
+  return !isNaN(parseFloat(n)) && isFinite(n);
+}
+
+/**
+ * makes all things on page selectable or unselectable
+ * @params(selectable => should text be selectable? (boolean))
+ */
+function makeTextSelectable(selectable)
+{
+	var css;
+	if (!selectable) {
+		css = {'-webkit-touch-callout': 'none',
+				'-webkit-user-select': 'none',
+				'-khtml-user-select': 'none',
+				'-moz-user-select': 'none',
+				'-ms-user-select': 'none',
+				'user-select': 'none'};
+	} else {
+		css = {'-webkit-touch-callout': 'text',
+				'-webkit-user-select': 'text',
+				'-khtml-user-select': 'text',
+				'-moz-user-select': 'text',
+				'-ms-user-select': 'text',
+				'user-select': 'text'};
+	}
+	
+	$('*').css(css);
 }
 	
 
