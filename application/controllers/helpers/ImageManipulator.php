@@ -27,7 +27,8 @@ class Application_Controller_Helper_ImageManipulator extends Zend_Controller_Act
 		$filename = str_replace(array('.gif','.png'), '.jpg', $filename);
 		
 		if( $image_type == IMAGETYPE_JPEG ) { 
-			imagejpeg($this->image,$filename,$compression); 
+			imagejpeg($this->image,$filename,$compression);
+			$this->load($filename); 
 		} elseif( $image_type == IMAGETYPE_GIF ) {   
 			imagegif($this->image,$filename); 
 		} elseif( $image_type == IMAGETYPE_PNG ) { 			

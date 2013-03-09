@@ -1,0 +1,9 @@
+<div class='header-section-title-container'>
+            <p class='header-section-title header white'><?php echo strtoupper($this->title);?></p>
+            <img src='/images/global/section_header_finish.png' class='header-section-finish' />
+            <?php
+				if (!empty($this->content)) {
+					echo $this->content;
+				}
+			?>
+</div>

@@ -5,17 +5,19 @@
 */
 //change title of homepage to Sportup - Compete Everywhere
 $this->headTitle()->exchangeArray(array('Sportup','Compete Everywhere'));
-$this->headLink()->prependStylesheet($this->baseUrl() . '/css/homepage.css');
-$this->headScript()->prependFile($this->baseUrl() . '/js/homepage.js');
 
-/* to be filled with controller test against login cookie */
-$loginTest = false;
-if (!$loginTest) {
-	/* if not logged in, show homepage from view helper */
+
+if (!$this->loggedIn) {
+	// Not logged in, display non-member homepage
+	$this->headLink()->prependStylesheet($this->baseUrl() . '/css/homepage.css');
+	$this->headScript()->prependFile($this->baseUrl() . '/js/homepage.js');
 	echo $this->homepage(); //$this->getHelper('homepage')->testFunction();
 } else {
-	/* else show memberHomepage from view helper*/
+	// Logged in, display member homepage
+	$this->headLink()->prependStylesheet($this->baseUrl() . '/css/member.css');
+	$this->headScript()->prependFile($this->baseUrl() . '/js/member.js');
 	echo $this->memberHomepage();
 }
+
 
 ?>

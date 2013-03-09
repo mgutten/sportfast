@@ -84,7 +84,7 @@ class SignupController extends Zend_Controller_Action
 		if ($request->isPost()) {
 			$post = $request->getPost();
 
-			if (!$form->isValid($post)) {
+			if ($form->isValid($post)) {
 				// Form failed validation, redirect back with error
 				Zend_Session::namespaceUnset('signup');
 				$signupSession = new Zend_Session_Namespace('signup');
@@ -117,7 +117,7 @@ class SignupController extends Zend_Controller_Action
 				$user->verifyHash = md5($_POST['email']);
 				
 				// Set lastRead to curdate
-				$user->setLastRead();
+				$user->setLastReadCurrent();
 				
 				// Convert dob inputs to db format
 				$post['dobYear'] = ($post['dobYear'] < date('y') ? '20' : '19') . $post['dobYear'];
@@ -261,21 +261,31 @@ class SignupController extends Zend_Controller_Action
 			}
 		}
 		
+		
 		if (!empty($post['fileName'])) {
 			// User has uploaded an image
 			
 			$userID = $user->userID;
+			
 			// Save profile pic to permanent location
 			$src = PUBLIC_PATH . $_POST['fileName'];
 			$image = Zend_Controller_Action_HelperBroker::getStaticHelper('ImageManipulator');
 			$image->load($src);
-			$image->resize($_POST['fileWidth'],$_POST['fileHeight'], array('x' => $_POST['fileX'],
+			/* Base profile img size is 199 x 160 */
+			$image->resize('199','160', array('x' => $_POST['fileX'],
 																		   'y' => $_POST['fileY'],
 																		   'fileHeight' => $_POST['fileHeight'],
 																		   'fileWidth'  => $_POST['fileWidth']));
-																		   
+			
+			// Large img															   
 			$image->save(PUBLIC_PATH . '/images/users/profile/pic/large/' . $userID . '.jpg');
 			unlink($src); // Delete tmp img
+			$image->scale(60); // Medium img
+			$image->save(PUBLIC_PATH . '/images/users/profile/pic/medium/' . $userID . '.jpg');
+			$image->scale(47); // Small img
+			$image->save(PUBLIC_PATH . '/images/users/profile/pic/small/' . $userID . '.jpg');
+			$image->scale(53); // Tiny img
+			$image->save(PUBLIC_PATH . '/images/users/profile/pic/tiny/' . $userID . '.jpg');
 		}
 		
 	}

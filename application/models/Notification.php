@@ -1,0 +1,171 @@
+<?php
+
+class Application_Model_Notification extends Application_Model_ModelAbstract
+{
+	protected $_mapperClass = 'Application_Model_NotificationsMapper';
+	protected $_dbTable		= 'Application_Model_DbTable_NotificationLog';	
+	
+	protected $_attribs     = array('notificationLogID' => '',
+									'actingUserID'		=> '',
+									'receivingUserID'   => '',
+									'notificationID'	=> '',
+									'cityID'			=> '',
+									'gameID'			=> '',
+									'teamID'			=> '',
+									'groupID'			=> '',
+									'ratingID'			=> '',
+									'parkID'			=> '',
+									'textData'			=> array(),
+									'text'				=> '',
+									'firstName'			=> '',
+									'lastName'			=> '',
+									'sport'				=> '',
+									'date'				=> '',
+									'parkName'			=> '',
+									'picture'			=> '',
+									'url'				=> '',
+									'action'			=> '',
+									'type'				=> '',
+									'newsfeed'			=> false,
+									'read'				=> false,
+									'dateHappened'      => ''
+									);
+	protected $_primaryKey = 'notificationLogID';	
+	
+	
+	public function __construct($resultRow = false)
+	{
+		
+		if ($resultRow) {
+			$this->setAttribs($resultRow);
+		}
+				
+	}
+	
+	public function getTimeFromNow()
+	{
+		$date = strtotime($this->dateHappened);
+		$now  = time();
+		$diff = $now - $date;
+		
+		if (($seconds = $diff) < 60) {
+			$time = $seconds;
+			$post = ($time == 1 ? 'second ago' : 'seconds ago');
+		} elseif (($minutes = floor($seconds/60)) < 60) {
+			// Under 60 minutes
+			$time = $minutes;
+			$post = ($time == 1 ? 'minute ago' : 'minutes ago');
+		} elseif (($hours = floor($minutes/60)) < 24) {
+			// > 60 minutes, under 24 hours
+			$time = $hours;
+			$post = ($time == 1 ? 'hour ago' : 'hours ago');
+		} elseif (($days = floor($hours/24)) < 7) {
+			// > 24 hours, 6 days
+			$time = $days;
+			$post = ($time == 1 ? 'day ago' : 'days ago');
+		}  else {
+			// > 6 days, show date
+			$time = date ('l, M j',$date);
+			$post = '';
+		}
+		
+		return $time . ' ' . $post;
+		
+	}
+	
+	public function getPicture()
+	{
+		if (!empty($this->_attribs['actingUserID'])) {
+			// Some user did this
+			$picturePath = $this->getProfilePic('small', $this->actingUserID);
+		} else {
+			// Non user (system, team, group, etc)
+			
+		}
+		
+		return $picturePath;
+	}
+	
+	public function getFormattedUrl()
+	{
+		preg_match_all('/(?:%)[a-zA-Z]+/', $this->url, $matches);
+		
+		$replace = array();
+		foreach ($matches[0] as $match) {
+			$match = ltrim($match,'%');
+			$replaceVal = $this->_attribs[$match];
+			$replace[] = $replaceVal;
+		}
+		
+		return str_replace($matches[0],$replace,$this->url);
+	}
+	
+	public function getFormattedText()
+	{
+		// match %sign holders in text (eg %name has joined the %sport game)
+		preg_match_all('/(?:%)[a-zA-Z]+/', $this->text, $matches);
+
+		$replace = array();
+		foreach ($matches[0] as $match) {
+			$match = ltrim($match,'%');
+			
+			$pre   = '';
+			$post  = '';
+			$class = 'dark bold text-width';
+			$replaceVal = (isset($this->_attribs[$match]) ? $this->_attribs[$match] : '');
+			
+			if ($this->newsfeed) {
+				// This notification is meant for newsfeed, give different class
+				$class = 'green';
+			
+				if ($match == 'userName') {
+					// Format link for user's name
+					$pre 		= "<a href='/users/" . $this->actingUserID . "' class='" . $class . "'>";
+					$replaceVal = $this->firstName . " " . $this->lastName[0];
+					$post		= "</a>";
+				} elseif ($match == 'parkName') {
+					// Format link for park
+					$pre  = "<a href='/parks/" . $this->parkID . "' class='" . $class . "'>";
+					$post = "</a>";
+				} elseif ($match == 'sport') {
+					$pre =  "<span class='" . $class . "'>";
+					$post = "</span>";
+				}
+			} else {
+				// Notification, not newsfeed
+				if ($match == 'userName') {
+					$pre  = "<span class='" . $class . "'>";
+					$replaceVal = $this->firstName . " " . $this->lastName[0];
+					$post = "</span>";
+				} elseif ($match == 'parkName' || $match == 'sport') {
+					$pre  = "<span class='" . $class . "'>";
+					$post = "</span>";
+				} elseif ($match == 'date') {
+					$time = strtotime($match);
+					$replaceVal = date('l, M j', $time) . ' at ' . date('ga', $time);
+				}
+			}
+			
+			$replace[] = $pre . $replaceVal . $post;
+		}
+		
+		return str_replace($matches[0],$replace, $this->text);
+		
+	}
+		
+			
+	
+	public function save()
+	{
+		if (empty($this->positionID)) {
+			// Fill foreign key before save
+			$this->positionID = $this->getMapper()
+									 ->getForeignID('Application_Model_DbTable_SportPositions', 'positionID',array('sportID'    		  => $this->sportID,
+																												   'positionAbbreviation' => $this->positionAbbreviation));
+		}
+		
+		parent::save($this);
+	}
+	
+	
+}

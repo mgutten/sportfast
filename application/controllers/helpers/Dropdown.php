@@ -17,7 +17,7 @@ class Application_Controller_Helper_Dropdown extends Zend_Controller_Action_Help
 		$output  = "<div id = '" . $id . "-holder' class='dropdown-menu-holder'></div>";
 		$output .= "<div id='" . $id . "' class='dropdown-menu-container'>
 					<div  class='dropdown-menu-selected dropshadow'>
-				   <p class='dropdown-menu-option-text medium'>" . ucwords($selected) . "</p>
+				   <p class='dropdown-menu-option-text medium'>" . $selected . "</p>
 				   <img src='/images/global/dropdown/dropdown_arrow_medium.png' class='dropdown-menu-option-img' id='dropdown-menu-arrow'/>
 				   </div>";
 		
@@ -26,19 +26,28 @@ class Application_Controller_Helper_Dropdown extends Zend_Controller_Action_Help
 				    <div dropdown-menu='" . $id . "' id='dropdown-menu-" . $id . "' class='dropdown-menu-options-container dropshadow'>";
 					
 		foreach ($options as $option) {
-			$output .= "<div class='dropdown-menu-option-container medium'>";
-			$img     = '';
-			$text    = $option;
+			$output   .= "<div class='dropdown-menu-option-container medium'>";
+			$img       = '';
+			$textClass = 'medium';
+			
 			if (is_array($option)) {
 				// Option is given as array with sub-values
-				$text = $option['text'];
+				
+				if (isset($option['color'])) {
+					$textClass = $option['color'];
+				}
 				if (isset($option['image'])) {
 					$class = 'dropdown-menu-option-img';
 					// Image to be shown
-					$img = "<img src='" . $option['image'] . "' class='dropdown-menu-option-img medium-background' />";
+					$img = "<img src='" . $option['image'] . "' class='dropdown-menu-option-img " . $textClass . "-background' />";
 				}
-			} 
-			$text    = "<p class='dropdown-menu-option-text'>" . ucwords($text) . "</p>";
+				
+				
+				$text = '<p class="dropdown-menu-option-text ' . $textClass . '">' . ucwords($option['text']) . '</p>';
+			} else {
+				// Simple text
+				$text      = '<p class="dropdown-menu-option-text ' . $textClass . '">' . ucwords($option) . '</p>';
+			}
 			$output .= $text . $img;
 			$output .= "</div>";
 		}

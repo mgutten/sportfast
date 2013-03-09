@@ -1,0 +1,49 @@
+/* member.css for member homepage */
+
+/* schedule section */
+
+.member-schedule-day-container {
+	float: right;
+	padding: 0 .2em;
+	height: inherit;
+	font-size: 1.2em;
+	margin-left: .8em;
+}
+
+.member-schedule-day-subtext {
+	float:left;
+	font-size: .6em;
+}
+
+.member-schedule-day {
+	float:left;
+	clear:both;
+	margin-top: -.25em;
+	padding: 0 .35em;
+}
+
+
+
+/* end schedule section */
+
+
+
+/* find section */
+
+.member-find-looking-container {
+	float:right;
+	margin: .5em .1em 0 0 ;
+}
+
+#member-find-looking {
+	float:left;
+	margin: .1em .4em 0 0 ;
+}
+
+#member-looking-sports {
+	margin-right: .5em;
+}
+
+#member-looking-sports>.dropdown-menu-selected>.dropdown-menu-option-text, #member-looking-types>.dropdown-menu-selected>.dropdown-menu-option-text {
+	color: #bbb;
+}

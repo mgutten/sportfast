@@ -3,7 +3,7 @@ class Application_Model_CitiesMapper extends Application_Model_MapperAbstract
 {
 	protected $_dbTableClass = 'Application_Model_DbTable_Cities';
 
-	public function save($savingClass)
+	public function save($savingClass, $loopSave = true)
 	{
 		return $savingClass;
 	}

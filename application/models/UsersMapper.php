@@ -5,30 +5,40 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 	protected $_dbTableClass = 'Application_Model_DbTable_Users';
 
 	
-	public function getUserBy($column, $value)
+	public function getUserBy($column, $value, $savingClass = false)
 	{
 		$table   = $this->getDbTable();
 		$select  = $table->select();
+		$select->setIntegrityCheck(false);
 		$select->where($column . ' = ' . '?', $value)
 			   ->limit(1);
+		$select->from(array('u' => 'users'))
+               ->join(array('c' => 'cities'),
+                    	    'u.cityID = c.cityID')
+			   ->where($column . ' = ' . '?', $value)
+			   ->limit(1);   
+		
 		$results = $table->fetchAll($select);
-
-		$user = $this->createUserClasses($results);
+		
+		$user = $this->createUserClasses($results, $savingClass);
 		
 		return $user;	
 	}
 	
-	public function createUserClasses($results) 
+	public function createUserClasses($results, $savingClass = false) 
 	{
 		$users = array();
 		
 		foreach ($results as $result) {
-			$user = new Application_Model_User();
-			/*foreach ($user->getAttribs() as $attribute => $val) {
-				$user->$attribute = $result->$attribute;
-			}*/
-				$user->setAttribs($result);
-					 
+			if (!$savingClass) {
+				// No saving class submitted, create new user
+				$user = new Application_Model_User();
+			} else {
+				$user = $savingClass;
+			}
+			
+			$user->getCity()->setAttribs($result);
+			$user->setAttribs($result);
 			
 			if(count($results) <= 1) {
 				$users = $user;
@@ -86,7 +96,89 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 		return $modelClass;
 
 	}
+	
+	
+	/**
+	 * get notifications for user given in $savingClass
+	 * @params ($userID 	 => userClass model,
+	 			$savingClass => where to save the information (Notifications object),
+				$onlyNew	 => only select new notifications )
+	 */
+	public function getUserNotifications($userClass, $savingClass, $onlyNew = false)
+	{
+		/*
+		$this->setDbTable('Application_Model_DbTable_NotificationLog');
+		$table  = $this->getDbTable();
+		$select = $table->select();
+		
+		$select->setIntegrityCheck(false);
+		$select->from(array('nl'  => 'notification_log'))
+			   ->join(array('n' => 'notifications'),
+			   		  'n.notificationID = nl.notificationID')
+			   ->joinLeft(array('u' => 'users'),
+			   		  'u.userID = nl.actingUserID')
+			   ->joinLeft(array('ga' => 'games'),
+			   		  'ga.gameID = nl.gameID')
+			   ->joinLeft(array('t' => 'teams'),
+			   		  't.teamID = nl.teamID')
+			   ->joinLeft(array('gr' => 'groups'),
+			   		  'gr.groupID = nl.groupID')
+			   ->joinLeft(array('ur' => 'user_ratings'),
+			   		  'ur.userRatingID = nl.ratingID')
+			   ->where('u.userID = ?', $userID);
+		*/
+		
+		/* MUST RETRIEVE GAMEIDS, TEAMIDS, AND GROUPIDS FOR ALL GAMES, TEAMS, GROUPS THAT USER ($userClass) is currently in */
+		$db = Zend_Db_Table::getDefaultAdapter();   
+		
+		$lastRead = $userClass->lastRead;
+		
+		$select = "SELECT `nl`.*, 
+						  `n`.*, 
+						  `u`.firstName as firstName, 
+						  `u`.lastName as lastName, 
+						  `u`.userID as userID,
+						  COALESCE(`ga`.sport,`t`.sport,`ur`.sport) as sport,
+						  COALESCE(`ga`.date,`ur`.date) as date, 
+						  ga.parkName, 
+						  ga.parkID, 
+						  ga.date, 
+						  t.teamName, 
+						  gr.groupName
+					 FROM `notification_log` AS `nl`
+					 INNER JOIN `notifications` AS `n` ON n.notificationID = nl.notificationID
+					 LEFT JOIN `users` AS `u` ON u.userID = nl.actingUserID
+					 LEFT JOIN `games` AS `ga` ON ga.gameID = nl.gameID
+					 LEFT JOIN `teams` AS `t` ON t.teamID = nl.teamID
+					 LEFT JOIN `groups` AS `gr` ON gr.groupID = nl.groupID
+					 LEFT JOIN `user_ratings` AS `ur` ON ur.userRatingID = nl.ratingID 
+					 WHERE ((nl.receivingUserID = " . $userClass->userID . ") 
+					 		OR ((nl.gameID IN (1,2,3) 
+								OR nl.teamID IN (1,2,3) 
+								OR nl.groupID IN (1,2,3))
+								AND n.action != 'create')) ";
+		if ($onlyNew) {
+			// Select only notifications since last read
+			$select .= "AND nl.dateHappened > '" . $lastRead . "' ";
+		} else {
+			// Select old notifications
+			$select .= "AND nl.dateHappened <= '" . $lastRead . "' ";
+		}
+		$select .= "ORDER BY nl.dateHappened DESC";
+		
+		if (!$onlyNew) {
+			$select .= " LIMIT 10";
+		}
+		 			 
+					  
+		$results = $db->fetchAll($select);
 
+		foreach ($results as $result) {
+			
+			$savingClass->addNotification($result);
+		}
+
+	}
 	
 	/**
      * Create a hash (encrypt) of a plain text password.

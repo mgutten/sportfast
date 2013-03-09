@@ -28,6 +28,20 @@ class AjaxController extends Zend_Controller_Action
         // action body
     }
 	
+	public function resetNotificationsAction()
+	{
+		
+		$user = $this->view->user;
+		
+		$user->setLastReadCurrent()
+			 ->save(false);
+			 
+		$user->notifications->moveUnreadToRead();
+		
+		
+	}
+		
+	
 	public function createBasicDropdownAction()
 	{
 		

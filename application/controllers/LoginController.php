@@ -47,7 +47,7 @@ class LoginController extends Zend_Controller_Action
 	{
 		
 		$request = $this->getRequest();
-		
+
 		// Check if POST data exists
 		if (!$request->isPost()) {
 			return $this->_helper->redirector('index');
@@ -96,11 +96,9 @@ class LoginController extends Zend_Controller_Action
 			}
 			
 			// Store user info in user session
-			$auth->getIdentity()->getUserSportsInfo();
-			$userSession = new Zend_Session_Namespace('user');
-			$userSession = $auth->getIdentity();
-			$userSession->password = '';
-			
+			$user = $auth->getIdentity();
+			$user->getUserSportsInfo();
+			$user->password = '';	
 			
 			return $this->_helper->redirector->goToUrl('/');
 		}

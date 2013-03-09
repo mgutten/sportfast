@@ -6,12 +6,11 @@ abstract class Application_Model_MapperAbstract
 	protected $_dbTable;
 	protected $_dbTableClass;	
 	
-	public function save($savingClass)
+	public function save($savingClass, $loopSave = true)
 	{			
 		
 		if ($savingClass->getDbTable()) {
 			// dbTable is set
-		
 			$this->setDbTable($savingClass->getDbTable());
 		}
 		
@@ -59,6 +58,7 @@ abstract class Application_Model_MapperAbstract
 				continue;
 			}
 			$data[$column] = $savingClass->$column;
+			
 		}
 		
 		
@@ -79,20 +79,23 @@ abstract class Application_Model_MapperAbstract
 			$this->getDbTable()->update($data, array($primaryColumn . ' = ?' => $primaryKey));
 		}
 		
-		foreach ($models as $key => $model) {
-			$modelAttribs = $model->getAttribs();
-			
-			foreach ($attribs as $attrib => $val) {
+		if ($loopSave) {
+			// Loop through children objects and save as well
+			foreach ($models as $key => $model) {
+				$modelAttribs = $model->getAttribs();
 				
-				if (array_key_exists($attrib, $modelAttribs)) {
-					// Both parent class ($savingClass) and child class have same columns, set child to parents
-					$model->$attrib = $savingClass->$attrib;
+				foreach ($attribs as $attrib => $val) {
+					
+					if (array_key_exists($attrib, $modelAttribs)) {
+						// Both parent class ($savingClass) and child class have same columns, set child to parents
+						$model->$attrib = $savingClass->$attrib;
+					}
+					
 				}
 				
+	
+				$model->save();
 			}
-			
-
-			$model->save();
 		}
 		
 

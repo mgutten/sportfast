@@ -1,25 +1,27 @@
 // global.js
 var mouseoverDropdown = false; /* fix issue when input is focus, then not focus and mouse is not over */
-var fadeRunning = false;
+var dropdownClickDown = false;
+var fadeRunning 	  = false;
 var tooltipTimer;
-var tooltipEle = null;
+var tooltipEle 		  = null;
 var sliderSkillValues = [];
-sliderSkillValues[0] = {level:'Beginner',
+sliderSkillValues[0]  = {level:'Beginner',
 						description: 'I have rarely (if ever) played.'};
-sliderSkillValues[1] = {level:'Decent',
+sliderSkillValues[1]  = {level:'Decent',
 						description: 'I play infrequently, or have difficulty keeping up when I do play.'};
-sliderSkillValues[2] = {level:'Good',
+sliderSkillValues[2]  = {level:'Good',
 						description: 'I am an average player.  Nothing fancy, just good fundamentals.'};
-sliderSkillValues[3] = {level:'Skilled',
+sliderSkillValues[3]  = {level:'Skilled',
 						description: 'I am skilled.  I am better than the average player.'};
-sliderSkillValues[4] = {level:'Talented',
+sliderSkillValues[4]  = {level:'Talented',
 						description: 'I am very skilled.  I am typically the best player in the game.'};
-sliderSkillValues[5] = {level:'Unstoppable',
+sliderSkillValues[5]  = {level:'Unstoppable',
 						description: 'I played (or should play) on a professional level.'};
 						
 var mouseoverColor;
-
-var dropdownMenuDown = false;
+var dropdownMenuDown     = false;
+var notificationDropdown = false;
+var preloadImageArray    = new Array('/images/global/header/notification_shield_reverse.png');
 
 
 $(function()
@@ -139,7 +141,7 @@ $(function()
 		}
 		dropdownMenu($(this).parent('.dropdown-menu-container'));
 		
-		$(this).addClass('dropdown-menu-container-reverse');
+		$(this).toggleClass('dropdown-menu-container-reverse');
 	})
 	
 	$(document).on('mouseenter','.dropdown-menu-option-container',function()
@@ -182,18 +184,14 @@ $(function()
 		$(this).stop().animate({'background-color':'transparent'},200);
 	});
 	
-	/* align each dropdown with appropriate navigation */
-	$('.dropdown-back-outer').each(function()
-	{
-		alignDropdownContainer($(this));
-	})
 	
 	$(window).resize(function()
 	{
-			$('.dropdown-back-outer').each(function()
-			{
-				alignDropdownContainer($(this));
-			})
+		$('.dropdown-back-outer').each(function()
+		{
+			alignDropdownContainer($(this));
+		})
+		
 	})
 	
 	
@@ -235,37 +233,132 @@ $(function()
 		alignAbsolute($(this));
 	})
 			
-						 
+	
+	/* dropdown animation onclick */
+	$('.nav-click-dropdown').click(function(e)
+	{
+		if (notificationDropdown) {
+			// Notification dropdown is down, stopPropagation prevents document.click, manual override
+			$('#nav-back-notification-reverse').trigger('click');
+		}
+		if (dropdownMenuDown) {
+			// Dropdown menu is down
+			dropdownMenuDown.children('.dropdown-menu-selected').removeClass('dropdown-menu-container-reverse');
+
+			dropdownMenu(dropdownMenuDown);
+		}
+		
+		e.stopPropagation();
+		var dropdown = $(this).children('.dropdown-back-outer');
+		var down     = false;
+		if (dropdown.attr('down') == 'true') {
+			// Dropdown is currently down, bring it up
+			down = true;
+			// Swap dropdown indicator
+			dropdown.attr('down','false');
+			dropdownClickDown = false;
+		} else {
+			// Dropdown is currently up, bring it down
+			dropdown.attr('down','true');
+			dropdownClickDown = $(this);
+		}
+		
+		animateNavDropdown($(this), down);
+		
+	})
+	
+	/* change color of nav-cog onclick */
+	$('#nav-back-cog').click(function()
+	{
+		$(this).find('.nav-cog-background').toggleClass('nav-cog-selected');
+	})
+	
+	/* change background img of nav-notification  onclick */
+	$('#nav-back-notification-reverse').click(function(e)
+	{
+		if (dropdownClickDown) {
+			// Nav dropdown is down, stopPropagation prevents document.click, must do manually
+			dropdownClickDown.trigger('click');
+		}
+		if (dropdownMenuDown) {
+			// Dropdown menu is down
+			dropdownMenuDown.children('.dropdown-menu-selected').removeClass('dropdown-menu-container-reverse');
+
+			dropdownMenu(dropdownMenuDown);
+		}
+		
+		e.stopPropagation();
+		
+		var dropdown = $('#notifications-container');
+		
+		if ($(this).css('opacity') == 0) {
+			// Reverse is hidden, show it and show dropdown
+			$(this).stop().animate({opacity: 1}, 200);
+			notificationDropdown = true;
+
+			dropdown.show()
+			alignDropdown(dropdown, $(this), 'center');
+			resetNotifications();
+			
+		} else {
+			// Dropdown is already down, bring it up
+			$(this).stop().animate({opacity: 0}, 200);
+			notificationDropdown = false;
+			
+			dropdown.hide();
+		}
+		
+		$('#nav-notification-indicator-container').hide();
+		
+		
+	})
+	
+	/* cannot nest anchor tags, force redirect of notification-container.click */
+	$('.notification-container').click(function()
+	{
+		window.location.href = $(this).attr('href');
+	})
+	
+	$('.notification-container.light-green-back').mouseenter(function()
+	{
+		$(this).removeClass('light-green-back');
+	});
+	
+	/* preload any images that require preloading */
+	preloadImages(preloadImageArray);		
+	
+	
 	/* dropdown animation onhover */
 	$('.nav-dropdown').hover(function()
 	{
 		mouseoverDropdown = true;
-		var outerEle = $(this).children('.dropdown-back-outer');
-		var innerEle = outerEle.children();
-		outerEle.show()
-			    .css('z-index', 100);
-		innerEle.stop().animate({marginTop : 0}, 300);
+		
+		animateNavDropdown($(this), false);
 		
 	},
 	function()
 	{
 		mouseoverDropdown = false;
-		var outerEle = $(this).children('.dropdown-back-outer');
-		var innerEle = outerEle.children();
-		var height = innerEle.height();
 		
-		//if input boxes within this dropdown are focused, do not animate		
-		if (innerEle.find('input[type=text],input[type=password]').is(':focus')) {
-			return;
-		}
+		animateNavDropdown($(this), true);
+		
+	})
 	
-		innerEle.stop().animate({marginTop : -height},{duration : 300,
-												complete : function()
-													{
-														outerEle.hide();
-													}
-												});
+	
+	/* animate opaque text lighter */
+	$('.animate-opacity').hover(function()
+	{
+		if (!$(this).attr('opacity')) {
+			// Opacity attribute has not been set before, set it
+			$(this).attr('opacity', $(this).css('opacity'));
+		}
 		
+		$(this).stop().animate({opacity: 1}, 200);
+	},
+	function()
+	{
+		var originalOpacity = $(this).attr('opacity');
+		$(this).stop().animate({opacity: originalOpacity}, 200);
 	})
 	
 	
@@ -341,7 +434,6 @@ $(function()
 		})
 	})
 	
-	
 	/* test all elements for tooltip onhover */
 	$('*').bind('mouseenter.tooltip',function()
 	{
@@ -371,8 +463,25 @@ $(function()
 	});	
 	
 	
-	$(document).click(function()
+	$(document).click(function(e)
 	{
+		// ANY IF STATEMENTS MUST BE ADDED TO THE OTHER IF STATEMENT'S HANDLERS TO AVOID STOPPROPAGATION BUG
+		if (dropdownClickDown) {
+			// Nav dropdown is down
+			dropdownClickDown.trigger('click');
+		}
+		
+		if (notificationDropdown) {
+			// Notification dropdown is down
+			
+			if ($(e.target).is('#notifications-container') ||
+				$(e.target).parents('#notifications-container').length > 0) {
+				// Clicked notification box, return
+				return;
+			}
+			$('#nav-back-notification-reverse').trigger('click');
+		}
+		
 		if (dropdownMenuDown) {
 			// Dropdown menu is down
 			dropdownMenuDown.children('.dropdown-menu-selected').removeClass('dropdown-menu-container-reverse');
@@ -386,25 +495,17 @@ $(function()
 
 
 /**
- * Ajax upload and retrieve picture from input[type=file]
- * @params (action   => where to submit picture to,
- *			inputEle => input[type=file] element with file)
+ * Ajax call to set user's lastRead to current time
  */
-function uploadTempPicture(action, inputEle)
+function resetNotifications()
 {
-	$('#upload-profile-pic').ajaxForm({success: function(){ alert()}});
-	/*$.ajax({
-		url: action,
-		method: 'POST',
-		data: {file: inputEle.val()},
-		success: function(data) {
-			alert(data);
-			$('#signup-import-alert-img').attr('src',data);
+	$.ajax({
+		url: '/ajax/reset-notifications',
+		success: function() {
+			
 		}
-	})
-	*/
+	});
 }
-
 
 /** 
  * test dropdown menu for animation up or down
@@ -414,7 +515,7 @@ function dropdownMenu(dropdownEle)
 {
 	
 		var dropdown = dropdownEle;
-		var selected   = dropdown.children('.dropdown-menu-selected');
+		var selected = dropdown.children('.dropdown-menu-selected');
 		var holder   = dropdown.prev('.dropdown-menu-holder');
 		var options  = dropdown.children('.dropdown-menu-hidden-container');
 		
@@ -439,7 +540,7 @@ function dropdownMenu(dropdownEle)
 		dropdown.css({top: 		selected.position().top,
 					  left: 	selected.position().left,
 					  position: 'absolute'});
-					  
+					  					  
 					  
 		holder.css({width:  dropdown.outerWidth(true),
 					height: selected.outerHeight(true)})
@@ -516,17 +617,6 @@ function toggleGreenBackground(ele, removeOld)
 */
 function animateNotShow(ele, down, fadeIn)
 {
-	/*
-	var innerEle = ele.children();
-	var height   = innerEle.outerHeight();
-	
-	if (ele.height() > 0) {
-		ele.stop().animate({height: 0},400);
-		return;
-	} 
-	
-	ele.stop().animate({height: height},400);
-	*/
 	
 var height = ele.outerHeight();
 	if (down) {	
@@ -633,6 +723,49 @@ function fadeOutInputOverlay(inputEle, focusIn)
 	}
 }
 
+
+/**
+ * Ajax upload and retrieve picture from input[type=file]
+ * @params (navEle => container element of dropdown (ie nav-back),
+ 			down   => is it down? (boolean))
+ */
+function animateNavDropdown(navEle, down)
+{
+		var outerEle = navEle.children('.dropdown-back-outer');
+		var innerEle = outerEle.children();
+		
+		// Align dropdown with navigation
+		if (navEle.attr('aligned') !== 'true') {
+			alignDropdownContainer(outerEle);
+		}
+
+		
+		if (!down) {
+			// Dropdown is up, animate it down
+			outerEle.show()
+					.css('z-index', '100');
+			innerEle.stop().animate({marginTop : 0}, 300);
+		} else {
+			// Dropdown is down, animate it up
+			var height = innerEle.height();
+		
+			//if input boxes within this dropdown are focused, do not animate		
+			if (innerEle.find('input[type=text],input[type=password]').is(':focus')) {
+				return;
+			}
+		
+			innerEle.stop().animate({marginTop : -height},{duration : 300,
+													complete : function()
+														{
+															outerEle.hide();
+														}
+													});
+		}
+
+			
+}
+
+
 /**
 * align dropdown containers with corresponding nav button
 * @params (ele => dropdown-back-outer element)
@@ -640,14 +773,20 @@ function fadeOutInputOverlay(inputEle, focusIn)
 function alignDropdownContainer(ele)
 {
 		var parent = ele.parent();
+
 		//var top  = parent.offset().top + parent.height();
 		var windowWidth = $(window).width();
 		var bodyWidth   = $('.centered-body').width();
-		var top    = $('.header-bar').height();
-		var left   = parseInt(parent.offset().left,10) - ((windowWidth - bodyWidth)/2);
+		var parentWidth = parseInt(parent.offset().left,10) - (parent.outerWidth(true) - parent.innerWidth()) - parseInt(ele.css('padding-left'),10);
+		var top    		= $('.header-bar').height();
+		var difference  = (windowWidth - bodyWidth)/2;
+		if (windowWidth < bodyWidth) {
+			difference  = 0;
+		}
+		var left   		= parentWidth - difference;
 		
-		if (parent.css('float') == 'right') {
-			var parentWidth = parent.width();
+		if (parent.css('float') == 'right' && parent.attr('id') !== 'nav-back-cog') {
+			var parentWidth = parent.outerWidth(true);
 			var dropdownWidth = ele.width();
 			var widthDiff = parentWidth - dropdownWidth;
 			left = left + widthDiff;
@@ -655,7 +794,45 @@ function alignDropdownContainer(ele)
 		
 		ele.css({top : top,
 				 left: left});
+				 
+		parent.attr('aligned', 'true');
 }
+
+
+/**
+ * align any dropdown to alignEle on left, center, or right
+ * @params (alignEle  => element to align to,
+ *			moveEle   => element to align,
+ *			alignment => how to align (center, right, left)
+ */
+ function alignDropdown(moveEle, alignEle, alignment)
+ {
+	  
+	 var alignedWidth = alignEle.outerWidth(true);
+	 var alignedPos   = alignEle.offset().left;
+	
+	 var windowWidth  = $(window).width();
+	 var bodyWidth    = $('.centered-body').width();
+	  
+	 var bodyWindDiff = (bodyWidth > windowWidth) ? 0 : (windowWidth - bodyWidth)/2;
+
+	 var left = alignedPos;
+	
+	 if (alignment == 'right') {
+		 left -= alignedWidth;
+	 } else if (alignment == 'center') {
+		 var moveWidth = moveEle.width();
+		 left -= moveWidth/2;
+	 }
+	 
+	 moveEle.css('left',left);
+	 
+	 return;
+ }
+		 
+
+
+
 
 /**
 * align absolutely positioned elements with holder
@@ -664,6 +841,10 @@ function alignDropdownContainer(ele)
 function alignAbsolute(ele)
 {
 	var holder = $('#' + ele.attr('holder'));
+	if (holder.length < 0) {
+		// No holder element existing
+		return;
+	}
 	var top = holder.offset().top;
 	
 	ele.css('top',top);
@@ -847,6 +1028,17 @@ function makeTextSelectable(selectable)
 	}
 	
 	$('*').css(css);
+}
+
+/**
+ * preload images in array (useful for changed background image and image src)
+ * @params (imageArray => array of image src)
+ */
+function preloadImages(imageArray)
+{
+	$(imageArray).each(function () {
+        $('<img />').attr('src',this).appendTo('body').hide();
+    });
 }
 	
 

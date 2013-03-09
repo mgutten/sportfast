@@ -39,7 +39,7 @@ class Application_Model_Sport extends Application_Model_ModelAbstract
 								  ->getForeignID('Application_Model_DbTable_Sports', 'sportID',array('sport' => $this->sport));
 		}
 		
-		parent::save($this);
+		parent::save();
 	}
 
 

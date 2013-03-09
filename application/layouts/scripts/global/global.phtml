@@ -1,6 +1,9 @@
 <?php
 $this->headTitle()->setSeparator(' - ');
-$this->headTitle()->append('Sportup');
+if (!$this->noDefaultHeadTitle) {
+	// Allow override of appended Sportup with $this->noDefaultHeadTitle = true
+	$this->headTitle()->append('Sportup');
+}
 $this->setEncoding('UTF-8');
 echo $this->doctype('XHTML1_TRANSITIONAL') . PHP_EOL; ?>
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
@@ -14,7 +17,7 @@ echo $this->doctype('XHTML1_TRANSITIONAL') . PHP_EOL; ?>
 								
  ?>
 </head>
-<body>
+<body onunload=''>
 <?php
 //placeholder for all absolutely placed elements
 echo $this->placeholder('absolute');

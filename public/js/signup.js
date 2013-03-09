@@ -519,6 +519,8 @@ $(function()
 			// All inputs are clear and ready, submit the form!
 			$('#signupForm').submit();
 		}
+		
+		$('#signupForm').submit();
 			
 	})
  
