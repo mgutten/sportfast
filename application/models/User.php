@@ -22,7 +22,7 @@ class Application_Model_User extends Application_Model_ModelAbstract
 									'dob'			=> '',
 									'city'			=> '',
 									'sports'		=> array(),
-									'photo'			=> '',
+									'picture'		=> '',
 									'notifications' => ''
 									);
 
@@ -33,8 +33,14 @@ class Application_Model_User extends Application_Model_ModelAbstract
 	public function save($loopSave = true)
 	{
 		$this->getMapper()->save($this, $loopSave);
+		return $this;
 	}
-	
+
+	public function getUserGames()
+	{
+		return $this->getMapper()->getUserGames($this);
+	}
+
 	public function getNotifications()
 	{
 		if (empty($this->_attribs['notifications'])) {

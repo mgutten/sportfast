@@ -37,7 +37,6 @@ class Application_Controller_Helper_Dropdown extends Zend_Controller_Action_Help
 					$textClass = $option['color'];
 				}
 				if (isset($option['image'])) {
-					$class = 'dropdown-menu-option-img';
 					// Image to be shown
 					$img = "<img src='" . $option['image'] . "' class='dropdown-menu-option-img " . $textClass . "-background' />";
 				}

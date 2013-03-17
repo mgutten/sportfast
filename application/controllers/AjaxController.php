@@ -28,6 +28,9 @@ class AjaxController extends Zend_Controller_Action
         // action body
     }
 	
+	/**
+	 * reset user's lastRead column of db to current time (ie after click on notifications button)
+	 */
 	public function resetNotificationsAction()
 	{
 		
@@ -41,7 +44,13 @@ class AjaxController extends Zend_Controller_Action
 		
 	}
 		
-	
+	/** 
+	 * create and return full html of dropdown
+	 * @params(id 		=> what is the id of the dropdown,
+	 *		   selected => which option is selected first,
+	 *		   options  => array of options)
+	 * @return html version of dropdown
+	 */
 	public function createBasicDropdownAction()
 	{
 		
@@ -55,6 +64,11 @@ class AjaxController extends Zend_Controller_Action
 		
 	}
 	
+	/**
+	 * upload temp picture for use in previews, etc
+	 * @params (profilePic => input type file)
+	 * @return (type of error if error OR path to temp img (str))
+	 */
 	public function uploadTempPictureAction()
 	{
 		$targetPath   = PUBLIC_PATH . "/images/tmp/profile/pic/";
@@ -99,6 +113,74 @@ class AjaxController extends Zend_Controller_Action
 		
 	}
 
+	
+	/**
+	 * get and return matches based on user's request/info
+	 * @params (profilePic => input type file)
+	 * @return (type of error if error OR path to temp img (str))
+	 */
+	public function getMatchesAction()
+	{
+		$post = $this->getRequest()->getPost();
+		$matches = new Application_Model_Matches();
+		
+		if (in_array('games',$post['types'])) {
+			// Games are selected
+			$options = array();
+			if (!empty($post['sports'])) {
+				// Sports is not empty
+				$sportStr  = implode("','",$post['sports']);
+				$options[] = "g.sport IN ('" . $sportStr  . "')";
+			}
+			$games = new Application_Model_Games();
+			$games->findUserGames($this->view->user, $options);
+			$matches->addMatches($games->games);
+		}
+		if (in_array('teams',$post['types'])) {
+			// Teams are selected
+			$options = array();
+			if (!empty($post['sports'])) {
+				// Sports is not empty
+				$sportStr  = implode("','",$post['sports']);
+				$options[] = "t.sport IN ('" . $sportStr  . "')";
+			}
+			$teams = new Application_Model_Teams();
+			$teams->findUserTeams($this->view->user, $options);
+			$matches->addMatches($teams->teams);
+		}
+		
+		$matches->sortByMatch();
+		$this->view->matches = $matches->matches;
+		
+		$output = array();
+		$memberHomepage = $this->view->getHelper('memberHomepage');
+		$output[0] = $memberHomepage->buildFindBody();
+		
+		foreach ($matches->matches as $match) {
+			if (get_class($match) == 'Application_Model_Game') {
+				// Get latitude and longitude
+				$location = $match->getPark()->getLocation();
+				$output[1][] = array($location->getLatitude(), $location->getLongitude());
+			}
+			
+		}
+		
+		echo json_encode($output);
+		
+		return;
+		$jsonArray = array();
+		
+		foreach ($matches->matches as $match) {
+			if (get_class($match) == 'Application_Model_Game') {
+				// Get latitude and longitude
+				$match->getPark()->getLocation()->parseLocation();
+			}
+			$jsonArray[] = $match->jsonSerialize();
+		}
+		
+		echo json_encode($jsonArray);
+		
+	}
 
 
 }

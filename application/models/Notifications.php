@@ -7,25 +7,32 @@ class Application_Model_Notifications extends Application_Model_ModelAbstract
 	
 	protected $_attribs     = array('read'     => array(),
 									'unread'   => array(),
-									'lastRead' => ''
+									'lastRead' => '',
+									'isNewsfeed' => false
 									);
 	protected $_parent	   = '';
 	protected $_primaryKey = 'notificationLogID';	
 	
 	
 	
-	public function __construct ($parent)
+	public function __construct ($parent = false)
 	{
 		if ($parent) {
 			$this->_parent = $parent;
 		}
 	}
 	
+	public function getNewsfeed($cityID, $limit = 10)
+	{
+		$this->setMapper('Application_Model_NotificationsMapper');
+		return $this->getMapper()->getNewsfeed($cityID, $this, $limit);
+	}
+	
 	public function addNotification($resultRow)
 	{
 		// Result row from getOldUserNotifications and getNewUserNotifications is array, not object
 
-		if ($time = strtotime($resultRow['dateHappened']) > strtotime($this->lastRead)) {
+		if (($time = strtotime($resultRow['dateHappened']) > strtotime($this->lastRead)) && !$this->isNewsfeed) {
 			// New notification
 			$notification = $this->_attribs['unread'][] = new Application_Model_Notification($resultRow);
 			$notification->read = false;
@@ -34,7 +41,7 @@ class Application_Model_Notifications extends Application_Model_ModelAbstract
 			$notification = $this->_attribs['read'][] = new Application_Model_Notification($resultRow);
 			$notification->read = true;
 		}
-		return $this;
+		return $notification;
 	}
 	
 	public function countUnread()

@@ -22,11 +22,11 @@ var mouseoverColor;
 var dropdownMenuDown     = false;
 var notificationDropdown = false;
 var preloadImageArray    = new Array('/images/global/header/notification_shield_reverse.png');
+var gmapMarkers;
 
 
 $(function()
 {
-	
 	/* jquery plugin to limit value of input */
 	(function($) {
 	  $.fn.limitVal = function(lower, upper) {
@@ -141,7 +141,10 @@ $(function()
 		}
 		dropdownMenu($(this).parent('.dropdown-menu-container'));
 		
+		// Remove old class for case when click one dropdown then click another
+		$('.dropdown-menu-container-reverse').removeClass('dropdown-menu-container-reverse');
 		$(this).toggleClass('dropdown-menu-container-reverse');
+		
 	})
 	
 	$(document).on('mouseenter','.dropdown-menu-option-container',function()
@@ -931,6 +934,45 @@ function showTooltip(ele)
 	
 }
 
+
+/**
+ * initialize googleMap w/ lon, lat, and zoom
+ * @params (lon  => longitude,
+ *			lat  => latitude,
+ *			zoom => zoom (higher is more zoomed))
+ *			callback => callback function
+ */
+function initializeMap(lat, lon, zoom, callback) 
+{
+        var mapOptions = {
+          //center: new google.maps.LatLng(lat, lon),
+          zoom: zoom,
+          mapTypeId: google.maps.MapTypeId.ROADMAP
+        };
+        gmap = new google.maps.Map(document.getElementById("gmap"),
+            mapOptions);
+		
+		
+		callback();
+		
+}
+
+// Function for adding a marker to the page.
+    function addMarker(location) {
+        marker = new google.maps.Marker({
+            position: location,
+            map: map
+        });
+    }
+
+    // Testing the addMarker function
+    function TestMarker() {
+           var CentralPark = new google.maps.LatLng(37.98, -122.5);
+           addMarker(CentralPark);
+		   alert();
+    }
+
+
 /** capitalize first letter of text
  * @params(text => text to capitalize)
  */
@@ -1040,5 +1082,13 @@ function preloadImages(imageArray)
         $('<img />').attr('src',this).appendTo('body').hide();
     });
 }
+
+
+function clearMarkers() {
+    for(var i=0; i < markers.length; i++){
+        markers[i].setMap(null);
+    }
+    markers = new Array();
+};
 	
 

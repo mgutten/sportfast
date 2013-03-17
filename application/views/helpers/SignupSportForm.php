@@ -126,9 +126,10 @@ class Application_View_Helper_SignupSportForm
 			$output .= $this->_view->signupSportForm->sport->setName($sport['sport'] . 'What')        ->setAttrib('id',$sport['sport'] . 'What');
 			$output .= $this->_view->signupSportForm->sport->setName($sport['sport'] . 'Often')       ->setAttrib('id',$sport['sport'] . 'Often');
 			
-			$days    = array('Su','M','T','W','Th','F','Sa');
-			foreach ($days as $day) {
-				$output .= $this->_view->signupSportForm->sport->setName($sport['sport'] . 'Availability' . $day)->setAttrib('id',$sport['sport'] . 'Availability' . $day);
+			/*$days    = array('Su','M','T','W','Th','F','Sa');
+			foreach ($days as $day) {*/
+			for ($i = 0; $i < 7; $i++) {
+				$output .= $this->_view->signupSportForm->sport->setName($sport['sport'] . 'Availability' . $i)->setAttrib('id',$sport['sport'] . 'Availability' . $i);
 			}
 			$output .= "</div></div>";
 			

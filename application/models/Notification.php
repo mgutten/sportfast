@@ -73,11 +73,11 @@ class Application_Model_Notification extends Application_Model_ModelAbstract
 		
 	}
 	
-	public function getPicture()
+	public function getPicture($size = 'small')
 	{
 		if (!empty($this->_attribs['actingUserID'])) {
 			// Some user did this
-			$picturePath = $this->getProfilePic('small', $this->actingUserID);
+			$picturePath = $this->getProfilePic($size, $this->actingUserID);
 		} else {
 			// Non user (system, team, group, etc)
 			
@@ -102,6 +102,7 @@ class Application_Model_Notification extends Application_Model_ModelAbstract
 	
 	public function getFormattedText()
 	{
+		
 		// match %sign holders in text (eg %name has joined the %sport game)
 		preg_match_all('/(?:%)[a-zA-Z]+/', $this->text, $matches);
 
@@ -117,34 +118,42 @@ class Application_Model_Notification extends Application_Model_ModelAbstract
 			if ($this->newsfeed) {
 				// This notification is meant for newsfeed, give different class
 				$class = 'green';
+			}
 			
-				if ($match == 'userName') {
-					// Format link for user's name
-					$pre 		= "<a href='/users/" . $this->actingUserID . "' class='" . $class . "'>";
-					$replaceVal = $this->firstName . " " . $this->lastName[0];
-					$post		= "</a>";
-				} elseif ($match == 'parkName') {
-					// Format link for park
+			if ($match == 'userName') {
+				$replaceVal = $this->firstName . " " . $this->lastName[0];
+				if ($this->newsfeed) {
+					// Is newsfeed, add link
+					$pre  = "<a href='/users/" . $this->actingUserID . "' class='" . $class . "'>";
+					$post = "</a>";
+				} else {
+					$pre  = "<span class='" . $class . "'>";
+					$post = "</span>";
+				}
+			} elseif ($match == 'parkName') {
+				if ($this->newsfeed) {
+					// Is newsfeed, add link
 					$pre  = "<a href='/parks/" . $this->parkID . "' class='" . $class . "'>";
 					$post = "</a>";
-				} elseif ($match == 'sport') {
-					$pre =  "<span class='" . $class . "'>";
-					$post = "</span>";
-				}
-			} else {
-				// Notification, not newsfeed
-				if ($match == 'userName') {
-					$pre  = "<span class='" . $class . "'>";
-					$replaceVal = $this->firstName . " " . $this->lastName[0];
-					$post = "</span>";
-				} elseif ($match == 'parkName' || $match == 'sport') {
+				} else {
+					// Is notification
 					$pre  = "<span class='" . $class . "'>";
 					$post = "</span>";
-				} elseif ($match == 'date') {
-					$time = strtotime($match);
-					$replaceVal = date('l, M j', $time) . ' at ' . date('ga', $time);
 				}
+			} elseif ($match == 'sport') {
+				if ($this->newsfeed) {
+					// Is newsfeed, add link
+					$pre  = "<a href='" . $this->getFormattedUrl() . "' class='" . $class . "'>";
+					$post = "</a>";
+				} else {
+					$pre  = "<span class='" . $class . "'>";
+					$post = "</span>";
+				}
+			} elseif ($match == 'date') {
+				$time = strtotime($match);
+				$replaceVal = date('l, M j', $time) . ' at ' . date('ga', $time);
 			}
+			
 			
 			$replace[] = $pre . $replaceVal . $post;
 		}

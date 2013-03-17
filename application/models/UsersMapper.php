@@ -10,12 +10,13 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 		$table   = $this->getDbTable();
 		$select  = $table->select();
 		$select->setIntegrityCheck(false);
-		$select->where($column . ' = ' . '?', $value)
+		/*$select->where($column . ' = ' . '?', $value)
 			   ->limit(1);
+			   */
 		$select->from(array('u' => 'users'))
                ->join(array('c' => 'cities'),
                     	    'u.cityID = c.cityID')
-			   ->where($column . ' = ' . '?', $value)
+			   ->where($column . ' = ?', $value)
 			   ->limit(1);   
 		
 		$results = $table->fetchAll($select);
@@ -96,7 +97,6 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 		return $modelClass;
 
 	}
-	
 	
 	/**
 	 * get notifications for user given in $savingClass

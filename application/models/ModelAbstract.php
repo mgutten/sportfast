@@ -6,7 +6,35 @@ abstract class Application_Model_ModelAbstract
 	protected $_mapperClass;	
 	protected $_mapper;
 	
+	public function getLimitedName($attrib, $limit)
+	{
+		$name = $this->_attribs[$attrib];
+		
+		if (strlen($name) > $limit) {
+			$name = '';
+			for ($i = 0; $i < $limit - 2; $i++) {
+				$name .= $this->_attribs[$attrib][$i];
+			}
+			$name .= '...';
+		}
+		
+		return $name;
+	}
 	
+		
+	public function jsonSerialize()
+	{
+		$jsonArray = array();
+		foreach ($this->_attribs as $attrib => $val) {
+			if (is_object($val)) {
+				$val = $val->jsonSerialize();
+			}
+			$jsonArray[$attrib] = $val;
+		}
+				
+		return $jsonArray;
+	}
+
 	public function __set($name, $value)
 	{
 		//return $this->__call('set' . $name, $value);
@@ -21,7 +49,7 @@ abstract class Application_Model_ModelAbstract
 				$noUcWords = array('text');
 				if (!in_array($name, $noUcWords)) {
 					// Uppercase value
-					$value = ucwords($value);
+					//$value = ucwords($value);
 				}
 				
 				$this->_attribs[$name] = $value;

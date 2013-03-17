@@ -45,6 +45,9 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 			$user		   = $auth->getIdentity();
 			$user->resetNewNotifications()
 				 ->getNewUserNotifications();
+				 
+			// Renew user cookie
+			setcookie('user', $user->userID, time() + (60*60*24*14), '/');
 
 			
 			if (!file_exists(PUBLIC_PATH . '/images/users/profile/pic/large/' . $user->userID . '.jpg')) {

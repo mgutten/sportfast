@@ -109,5 +109,5 @@
         	<p class='darker arial header-nav-location-text'>
             	You are in: &nbsp;
             </p>
-            <p class='lighter arial header-nav-location-text'><?php echo $this->user->getCity()->city . ', ' . strtoupper($this->user->getCity()->state);?></p>
+            <p class='lighter arial header-nav-location-text location'><?php echo ucwords($this->user->getCity()->city) . ', ' . strtoupper($this->user->getCity()->state);?></p>
         </div>

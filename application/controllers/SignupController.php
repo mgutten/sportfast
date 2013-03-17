@@ -84,7 +84,7 @@ class SignupController extends Zend_Controller_Action
 		if ($request->isPost()) {
 			$post = $request->getPost();
 
-			if ($form->isValid($post)) {
+			if (!$form->isValid($post)) {
 				// Form failed validation, redirect back with error
 				Zend_Session::namespaceUnset('signup');
 				$signupSession = new Zend_Session_Namespace('signup');
@@ -218,18 +218,17 @@ class SignupController extends Zend_Controller_Action
 						$positionModel = $sportModel->getPosition('null');
 					}
 					
-					$days = array('Su','M','T','W','Th','F','Sa');
 					
-					foreach ($days as $day) {
-						if (empty($post[$sport . 'Availability' . $day])) {
+					for ($i = 0; $i < 6; $i++) {
+						if (empty($post[$sport . 'Availability' . $i])) {
 							// Day has no availabilities saved
 							continue;
 						}
-						$hours = explode(',', $post[$sport . 'Availability' . $day]);
+						$hours = explode(',', $post[$sport . 'Availability' . $i]);
 												
 						foreach ($hours as $hour) {
-							$availabilityModel = $sportModel->setAvailability($day, $hour);
-							$availabilityModel->day  = $day;
+							$availabilityModel = $sportModel->setAvailability($i, $hour);
+							$availabilityModel->day  = $i;
 							$availabilityModel->hour = $hour;
 						}
 						

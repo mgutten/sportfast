@@ -3,7 +3,7 @@ var date = new Date();
 // array to store usable, copyable availability-calendars from other sports
 var copyAvailability = new Array();
 var jcropAPI;
-var days = new Array('M','T','W','Th','F','Sa','Su');
+var days = new Array('Su','M','T','W','Th','F','Sa');
 var oftenConversion = new Array('30','7','2','0');
 
 $(function()
@@ -498,7 +498,7 @@ $(function()
 				scrollToEle.push($('.signup-sex-img').parents('.signup-section-container'));	
 			}
 		}
-
+		
 		var submitFormSectionEle;
 		// Test all the sports sections for completeness
 		if (submitFormSectionEle = submitFormTestSports()) {
@@ -511,7 +511,7 @@ $(function()
 			$('#agree').siblings('.checkbox-text').addClass('red');
 			scrollToEle.push($('#agree'))
 		}
-				
+		
 		if (scrollToEle.length > 0) {
 			// Something failed along the way, scroll to the first failed element
 			$('html, body').animate({scrollTop: scrollToEle[0].offset().top - 20}, 1000);
@@ -520,7 +520,6 @@ $(function()
 			$('#signupForm').submit();
 		}
 		
-		$('#signupForm').submit();
 			
 	})
  
@@ -610,8 +609,8 @@ function testIfValues(section, sport)
 	if (sectionTitle == 'Availability') {
 		// Special case for availability section
 		fail = true;
-		for (i = 0; i < days.length; i++) {
-			hiddenInput = $('#' + id + days[i]) // e.g. basketballAvailabilitySu
+		for (i = 0; i < 6; i++) {
+			hiddenInput = $('#' + id + i) // e.g. basketballAvailabilitySu
 			if (hiddenInput.val().length > 0) {
 				// At least one availability has value
 				fail = false;
@@ -934,7 +933,7 @@ function updateAvailabilityHiddenInput(dayEle)
 	}
 		
 	
-	var day	   = dayEle.attr('day');
+	var day	   = $.inArray(dayEle.attr('day'), days);
 	var id     = sport + 'Availability' + day;
 	var hiddenInput = $('#' + id);
 
@@ -968,7 +967,7 @@ function createSportsCopyableDropdown()
 	}
 	var options  = copyAvailability;
 	var id       = 'sports-copyable';
-	var selected = options[0];
+	var selected = capitalize(options[0]);
 	
 	$.ajax({
 		type: 'POST',

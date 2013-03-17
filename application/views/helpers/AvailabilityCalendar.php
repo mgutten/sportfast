@@ -22,6 +22,7 @@ class Application_View_Helper_AvailabilityCalendar
 		
 		$output  .= $this->createLabels();
 		
+		
 		$days     = array('Su','M','T','W','Th','F','Sa');
 		$daysLong = array('Su' => 'Sunday',
 						  'M'  => 'Monday',
@@ -73,6 +74,7 @@ class Application_View_Helper_AvailabilityCalendar
 			$output .= "</div>";
 			$outerCounter++;
 		}
+		
 		
 		$output .= $this->createLabels('right');
 		
