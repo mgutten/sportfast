@@ -141,7 +141,6 @@ class Application_View_Helper_MemberHomepage
 	 */
 	public function buildFindBody()
 	{
-		/* ANY CHANGES HERE MUST BE MIMICKED IN MEMBER.JS populateFindBody function */
 		$output = "<div class='member-find-lower-outer-container'><div class='member-find-lower-outer-inner-container'>";
 		$matches  = $this->_view->matches;
 		
@@ -151,6 +150,13 @@ class Application_View_Helper_MemberHomepage
 		$totalGames = 0;
 		$matchesPerPage = 4;
 		$numberOfPages  = 3;
+		if (empty($matches)) {
+			// No matches 
+			$output  = "<p class='medium larger-text member-find-none center'>No matches could be found.</p>";
+			$output .= "<a href='/find' class='light center member-find-none-search'> Search more</a>";
+			return $output;
+		}
+			
 		foreach ($matches as $match) {
 			if ($totalMatches > ($matchesPerPage * $numberOfPages)) {
 				// Met limit of number of pages
@@ -214,49 +220,7 @@ class Application_View_Helper_MemberHomepage
 		
 		// End game section
 		$output .= "</div></div></div>";
-		/*$games  = $this->_view->games->games;
 		
-		$counter    = 0;
-		$totalGames = 1;
-		$totalPages = 1;
-		foreach ($games as $game) {
-			if ($counter == 0) {
-				// Counter was reset/first round, create inner container
-				$output .= "<div class='member-find-lower-inner-container'>";
-			} 
-			if ($counter == 4) {
-				// Number of games/teams per "page" is met, start new
-				$output .= "</div><div class='member-find-lower-inner-container'>";
-				$counter = 0;
-				$totalPages++;
-			}
-			$dateTime = DateTime::createFromFormat('Y-m-d H:i:s', $game->date);
-			$newDate  = $dateTime->format('m n');
-			
-			
-			$output .= "<a class='member-find-game-container' href='/games/" . $game->gameID . "'>";
-			$output .= "<p class='member-find-game-number green-back white arial bold'>" . $totalGames . "</p>";
-			$output .= "<p class='member-find-game-sport darkest bold'>" . $game->sport . "</p>";
-			$output .= "<p class='member-find-game-type darkest bold'>Game</p>";
-			$output .= "<div class='member-find-game-date medium' tooltip='" . date('M j', strtotime($game->date)) . "'>
-							<div class='member-find-game-date-day'>" . $game->getDay() . "</div>&nbsp; 
-							<div class='member-find-game-date-hour'>" . $game->getHour() . "</div>
-						</div>";
-			$output .= "<p class='member-find-game-players darkest bold'>" . $game->totalPlayers . "/" . $game->rosterLimit . "</p>";
-			$output .= "<img src='" . $game->getMatchImage() . "' class='member-find-game-match' tooltip='" . $game->getMatchDescription() . "'/>";
-			$output .= "<p class='member-find-game-park medium'>" . $game->getLimitedParkName(25) . "</p>";
-			$output .= "<img src='/images/global/body/double_arrows.png' class='member-find-game-arrow'/>";
-			
-			$output .= "</a>";
-			
-			$counter++;
-			$totalGames++;
-			
-		}
-		
-		// End game section
-		$output .= "</div></div></div>";
-		*/
 		// Num pages
 		$output .= "<div class='pagination-pages-outer-container'><div class='pagination-pages-inner-container'>";
 		for ($i = 1; $i <= $totalPages; $i++) {
@@ -282,16 +246,29 @@ class Application_View_Helper_MemberHomepage
 	public function buildNewsfeed()
 	{
 		$newsfeed = $this->_view->newsfeed;
-		$output   = '';
+		$output   = '<div class="notifications-container">';
 		foreach ($newsfeed->read as $notification) {
-			$output .= "<div class='newsfeed-notification-container'>";
-			$output .= "<img src='" . $notification->getPicture('tiny') . "' class='newsfeed-notification-img' />";
-			$output .= "<div class='newsfeed-notification-text-container'>";
-			$output .= $notification->getFormattedText();
-			$output .= "</div></div>";
+			$output .= $this->createNotification($notification);
 		}
-		
+		$output .= "</div>";
 		return $output;
 	}
+	
+	/**
+	 * create html for notification
+	 * @params(notification => notification ele)
+	 */
+	 public function createNotification($notification)
+	 {
+		  $output = '';
+		  $output .= "<div class='newsfeed-notification-container'>";
+		  $output .= "<img src='" . $notification->getPicture('tiny') . "' class='newsfeed-notification-img' />";
+		  $output .= "<div class='newsfeed-notification-text-container'>";
+		  $output .= $notification->getFormattedText();
+		  $output .= "</div><span class='newsfeed-notification-time light'>" . $notification->getTimeFromNow() . "</span>
+					  </div>";
+					  
+		  return $output;
+	 }
 			
 }

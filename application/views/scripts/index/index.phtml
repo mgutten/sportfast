@@ -20,16 +20,22 @@ if (!$this->loggedIn) {
 	echo $this->memberHomepage();
 	?>
     <script type='text/javascript'>
-		gmapMarkers = [<?php 
-							
-							 foreach ($this->matches as $match) {
-								 if (get_class($match) == 'Application_Model_Game') {
-									 // Is game, create marker on map
-									 $location = $match->getPark()->getLocation();
-									 echo '[' . $location->latitude . ',' . $location->longitude . '],';
-								 }
-							 }
-					?>]
+	<?php 
+	   if (!empty($this->matches)) {
+		   // Matches exist
+		   ?>
+		gmapMarkers = [		<?php
+								 foreach ($this->matches as $match) {
+									 if (get_class($match) == 'Application_Model_Game') {
+										 // Is game, create marker on map
+										 $location = $match->getPark()->getLocation();
+										 echo '[' . $location->latitude . ',' . $location->longitude . '],';
+									 }
+								 }?>
+					  ]
+	<?php } ?>
+					
+		userLocation = [<?php echo '"' . $this->user->getLocation()->latitude . '","' . $this->user->getLocation()->longitude . '"';?>];
 	</script> 
     <?php
 }

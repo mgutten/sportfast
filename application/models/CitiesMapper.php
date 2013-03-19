@@ -8,7 +8,7 @@ class Application_Model_CitiesMapper extends Application_Model_MapperAbstract
 		return $savingClass;
 	}
 	
-	public function getCityFromZipcode($zipcode, $modelClass)
+	public function getCityFromZipcode($zipcode, $savingClass)
 	{
 		$table   = $this->getDbTable();
 		$select  = $table->select();
@@ -21,9 +21,9 @@ class Application_Model_CitiesMapper extends Application_Model_MapperAbstract
 		$results = $table->fetchAll($select);
 		$result = $results->current();
 
-		$modelClass->setAttribs($result);
+		$savingClass->setAttribs($result);
 			
-		return $modelClass;
+		return $savingClass;
 	}
 	
 }

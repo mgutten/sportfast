@@ -1,6 +1,7 @@
 /* member.js */
 var markers = new Array(); 
 var gamesPerPage = 4;
+var newsfeedTimeout;
 
 $(function() {
 	
@@ -75,8 +76,16 @@ $(function() {
 
 	});
 	
-	initializeMap(37.98, -122.5, 12, createMarkers);
+	$(document).on('click', '.header-section-title',function()
+	{
+		getNewsfeed('old');
+	})
 	
+	
+	initializeMap(37.98, -122.5, 12, createMarkers);
+
+	// Update newsfeed every 2 minutes (if update, must change ajax call in notificationsMapper
+	newsfeedTimeout = setInterval(function() { getNewsfeed('new') }, 120000);
 
 })
 
@@ -106,6 +115,10 @@ function createMarkers()
 	});
 	
 	gmap.initialZoom = true;
+
+	if (gmapMarkers.length == 0) {
+		return false;
+	}
 	
 	for (i = 0; i < gmapMarkers.length; i++) {
 		// Create markers here
@@ -262,6 +275,58 @@ function loadFind()
 			//populateFindBody(matches);
 		}
 	})
+}
+
+
+/**
+ * Ajax call to get new newsfeed notifications
+ * @params (oldOrNew => retrieve old or new notifications (str 'old' or 'new'))
+ */
+function getNewsfeed(oldOrNew)
+{
+	var numNewsfeeds;
+	if (oldOrNew == 'old') {
+		// Old notifications, find where to count from
+		numNewsfeeds = $('.newsfeed-notification-container').length
+	}
+	$.ajax({
+		url: '/ajax/get-new-newsfeed',
+		type: 'POST',
+		data: {oldOrNew: oldOrNew,
+			   numNewsfeeds: numNewsfeeds},
+		success: function(data) {
+			data = JSON.parse(data);
+			if (oldOrNew == 'new') {
+				// Prepend data
+				populateNewsfeed(data, 'prepend');
+			} else {
+				// Append data (old)
+				populateNewsfeed(data, 'append');
+			}
+		}
+	})
+}
+
+/**
+ * populate newsfeed with ajax data for new/old notifications
+ * @params (data => returned array of html for notifications,
+ *			position => 'append' or 'prepend')
+ */
+function populateNewsfeed(data, position)
+{
+	var output = '';
+	
+	for (i = 0; i < data.length; i++) {
+		output += data[i];
+	}
+	
+	if (position == 'prepend') {
+		// Prepend data to newsfeed
+		$('.notifications-container').prepend(output);
+	} else {
+		// Append data
+		$('.notifications-container').append(output);
+	}
 }
 
 /**

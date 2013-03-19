@@ -187,10 +187,21 @@ $(function()
 	$('#streetAddress').keyup(function()
 	{
 		var value   = $(this).val();
+		if (value == $(this).attr('oldVal')) {
+			// Value has not changed
+			return false;
+		} else {
+			$(this).attr('oldVal', value);
+		}
+
 		var regex	= /\w+/;
 		var isValid = $(this).isValid({regex: regex, minLength: 1});
 		
 		changeInputBackground($(this), isValid);
+		
+		if (isValid) {
+			testGeocode();
+		}
 	})
 	
 	
@@ -198,11 +209,23 @@ $(function()
 	$('#zipcode').keyup(function()
 	{
 		var value   = $(this).val();
+		if (value == $(this).attr('oldVal')) {
+			// Value has not changed
+			return false;
+		} else {
+			$(this).attr('oldVal', value);
+		}
 		
 		var isValid = $(this).isValid({number: true, minLength: 5, maxLength: 5});
 			
 		
 		changeInputBackground($(this), isValid);
+		
+		if (isValid) {
+			// Get city and state
+			getCity($(this).val(), populateCity);
+			
+		}
 	})
 	
 	
@@ -476,11 +499,14 @@ $(function()
 			}
 			if ($(this).is('.input-fail')) {
 				// This input failed, scroll to show
+				if ($(this).is('#streetAddress') && $('#noAddress').prop('checked') == true) {
+					// Failed input is street address and no address is checked, skip
+					return true;
+				}
 				scrollToEle.push($(this).parents('.signup-section-container'))
 				fail = true;
 			}
 		})
-		
 		fail = true;
 		// Test that sex is selected
 		$('.signup-sex-img').each(function()
@@ -496,9 +522,10 @@ $(function()
 			if (scrollToEle.length < 1) {
 				// Same scroll spot for sex and inputs, only push if not already in array
 				scrollToEle.push($('.signup-sex-img').parents('.signup-section-container'));	
+			
 			}
 		}
-		
+	
 		var submitFormSectionEle;
 		// Test all the sports sections for completeness
 		if (submitFormSectionEle = submitFormTestSports()) {
@@ -511,7 +538,7 @@ $(function()
 			$('#agree').siblings('.checkbox-text').addClass('red');
 			scrollToEle.push($('#agree'))
 		}
-		
+
 		if (scrollToEle.length > 0) {
 			// Something failed along the way, scroll to the first failed element
 			$('html, body').animate({scrollTop: scrollToEle[0].offset().top - 20}, 1000);
@@ -526,8 +553,43 @@ $(function()
 	
 });
 
+/**
+ * test if geocode should be run, run it if so
+ */
+function testGeocode()
+{
+	if ($('#zipcode').is('.input-success') && $('#streetAddress').is('.input-success') && $('#signup-account-zipcode-city').text() !== '') {
+		// Valid street address and zipcode
+		var address = $('#streetAddress').val() + ',' + $('#signup-account-zipcode-city').text() + ',' + $('#zipcode').val();
+		getCoordinatesFromAddress(address, setUserLocation, function() {
+																		changeInputBackground($('#zipcode'), false);
+																		changeInputBackground($('#streetAddress'), false);
+																		alert('This address could not be located.');
+		})
+	}
+}
+		
+/**
+ * populate city name with return value of getCity
+ * @params (city => returned city name)
+ */
+function populateCity(city)
+{
+	if (city.length < 100) {
+		// if city length seems to be error (long message), do not display
+		$('#signup-account-zipcode-city').text(city);
+	} else {
+		$('#signup-account-zipcode-city').text('Not found');
+	}
+	testGeocode();
+}
 
 
+function setUserLocation()
+{
+	var value = 'POINT(' + userLocation[0] + ' ' + userLocation[1] + ')';
+	$('#userLocation').val(value);
+}
 
 /**
  * form is being submitted, test all selected sports for completeness

@@ -22,11 +22,12 @@ class Application_Model_Notifications extends Application_Model_ModelAbstract
 		}
 	}
 	
-	public function getNewsfeed($cityID, $limit = 10)
+	public function getNewsfeed($cityID, $onlyNew = false, $limit = 10)
 	{
 		$this->setMapper('Application_Model_NotificationsMapper');
-		return $this->getMapper()->getNewsfeed($cityID, $this, $limit);
+		return $this->getMapper()->getNewsfeed($cityID, $this, $onlyNew, $limit);
 	}
+	
 	
 	public function addNotification($resultRow)
 	{

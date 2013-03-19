@@ -156,13 +156,18 @@ class AjaxController extends Zend_Controller_Action
 		$memberHomepage = $this->view->getHelper('memberHomepage');
 		$output[0] = $memberHomepage->buildFindBody();
 		
-		foreach ($matches->matches as $match) {
-			if (get_class($match) == 'Application_Model_Game') {
-				// Get latitude and longitude
-				$location = $match->getPark()->getLocation();
-				$output[1][] = array($location->getLatitude(), $location->getLongitude());
+		if (isset($matches->matches[0])) {
+			// Matches exist
+			foreach ($matches->matches as $match) {
+				if (get_class($match) == 'Application_Model_Game') {
+					// Get latitude and longitude
+					$location = $match->getPark()->getLocation();
+					$output[1][] = array($location->getLatitude(), $location->getLongitude());
+				}
+				
 			}
-			
+		} else {
+			$output[1][] = '';
 		}
 		
 		echo json_encode($output);
@@ -180,6 +185,44 @@ class AjaxController extends Zend_Controller_Action
 		
 		echo json_encode($jsonArray);
 		
+	}
+	
+	/**
+	 * get either new or old newsfeed data depending on $_POST['oldOrNew'] var
+	 */
+	public function getNewNewsfeedAction()
+	{
+		$newsfeed = new Application_Model_Notifications();
+		$memberHomepage = $this->view->getHelper('memberHomepage');
+		
+		$request = $this->getRequest();
+		if ($request->getPost('oldOrNew') == 'new') {
+			// Get new notifications
+			$newsfeed->getNewsfeed($this->view->user->city->cityID, true);
+		} else {
+			// Get old notifications
+			$numNewsfeeds = $request->getPost('numNewsfeeds');
+			$newsfeed->getNewsfeed($this->view->user->city->cityID, false, $numNewsfeeds . ',10'); 
+		}
+		$jsonArray = array();
+		foreach ($newsfeed->read as $notification) {
+			$jsonArray[] = $memberHomepage->createNotification($notification);
+		}
+		
+		echo json_encode($jsonArray);
+	}
+	
+	/**
+	 * get city and state from db
+	 */
+	public function getCityStateAction()
+	{
+		$zipcode = $this->getRequest()->getPost('zipcode');
+		
+		$city = new Application_Model_City();
+		$city->getCityFromZipcode($zipcode);
+		
+		echo ucwords($city->city) . ', ' . strtoupper($city->state);
 	}
 
 

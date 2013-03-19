@@ -10,7 +10,7 @@ $this->headScript()->prependFile($this->baseUrl() . '/js/signup.js');
 $this->headScript()->prependFile($this->baseUrl() . '/js/plugins/smartslider.js');
 $this->headScript()->prependFile($this->baseUrl() . '/js/plugins/jcrop.min.js');
 $this->headScript()->prependFile($this->baseUrl() . '/js/plugins/jform.js');
-
+$this->headScript()->prependFile('https://maps.googleapis.com/maps/api/js?key=AIzaSyAhxSMQ-WQux2nzTW4dBoKmpfGHVQOk7r8&sensor=false');
 ?>
 
 <form action="<?php echo $this->form->getAction() ?>"
@@ -122,9 +122,14 @@ echo $this->form->signupPassword->setLabel('Re-enter Password')->setAttribs(arra
 
 <?php
 echo "<div class='clear signup-clear-large'></div>";
+?>
+<p id='signup-account-zipcode-city' class='medium smaller-text'></p>
+<?php
 echo $this->form->streetAddress;
 echo $this->form->zipcode;
+echo $this->form->userLocation;
 ?>
+
 <div class='clear'></div>
 <ul class='green'>
 	<li>This address will be used to find games, players, and teams closest to you.  It will never be displayed.</li>

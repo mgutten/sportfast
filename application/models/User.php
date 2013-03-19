@@ -23,7 +23,8 @@ class Application_Model_User extends Application_Model_ModelAbstract
 									'city'			=> '',
 									'sports'		=> array(),
 									'picture'		=> '',
-									'notifications' => ''
+									'notifications' => '',
+									'userLocation'	=> ''
 									);
 
 	protected $_primaryKey = 'userID';	
@@ -110,6 +111,21 @@ class Application_Model_User extends Application_Model_ModelAbstract
 			$this->_attribs['city'] = new Application_Model_City();
 		}
 		return $this->_attribs['city'];
+	}
+	
+	public function getLocation()
+	{
+		if (empty($this->_attribs['userLocation'])) {
+			
+			$this->_attribs['userLocation'] = new Application_Model_Location();
+		}
+		return $this->_attribs['userLocation'];
+	}
+	
+	public function setLocation($location) {
+		$this->_attribs['userLocation'] = $location;
+		
+		return $this;
 	}
 	
 	public function getUserSportsInfo()

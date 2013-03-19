@@ -1,0 +1,78 @@
+<?php
+$this->headScript()->prependFile('https://maps.googleapis.com/maps/api/js?key=AIzaSyAhxSMQ-WQux2nzTW4dBoKmpfGHVQOk7r8&sensor=false');
+
+/* Copy post data from validate to new form on geocode for submittal back to validate */
+echo "<form method='POST' action='/signup/validate' id='signupForm' style='display:none'>";
+echo $this->signupForm;
+$output = '';
+
+$keysOuter    = array_keys($this->sports);
+$counterOuter = 0;
+foreach ($this->sports as $sport) {
+	$sport['sport'] = $keysOuter[$counterOuter];
+	$output .= $this->signupSportForm->sport->setName($sport['sport'])      		   ->setAttrib('id',$sport['sport'] . 'Active')  ->setValue($_POST[$sport['sport']]);
+	$output .= $this->signupSportForm->sport->setName($sport['sport'] . 'Rating')      ->setAttrib('id',$sport['sport'] . 'Rating')	 ->setValue($_POST[$sport['sport'] . 'Rating']);
+	$output .= $this->signupSportForm->sport->setName($sport['sport'] . 'Type')        ->setAttrib('id',$sport['sport'] . 'Type')	 ->setValue($_POST[$sport['sport'] . 'Type']);
+	$output .= $this->signupSportForm->sport->setName($sport['sport'] . 'Position')    ->setAttrib('id',$sport['sport'] . 'Position')->setValue($_POST[$sport['sport'] . 'Position']);
+	$output .= $this->signupSportForm->sport->setName($sport['sport'] . 'What')        ->setAttrib('id',$sport['sport'] . 'What')	 ->setValue($_POST[$sport['sport'] . 'What']);
+	$output .= $this->signupSportForm->sport->setName($sport['sport'] . 'Often')       ->setAttrib('id',$sport['sport'] . 'Often')   ->setValue($_POST[$sport['sport'] . 'Often']);
+
+
+			
+/*$days    = array('Su','M','T','W','Th','F','Sa');
+foreach ($days as $day) {*/
+for ($i = 0; $i < 7; $i++) {
+	$output .= $this->signupSportForm->sport->setName($sport['sport'] . 'Availability' . $i)->setAttrib('id',$sport['sport'] . 'Availability' . $i)->setValue($_POST[$sport['sport'] . 'Availability' . $i]);;
+}
+$counterOuter++;
+}
+
+echo $output;
+
+echo "<input type='hidden' name='userLocation' id='location'/>";
+
+echo "</form>";
+?>
+<script type='text/javascript'>
+	$(function()
+	{
+		
+		initialize('<?php echo $this->streetAddress;?>');
+		
+	})
+
+	var latitude;
+	var longitude;
+	/**
+	 * get google maps api latitude and longitude for user's address
+	 */
+	function initialize(address) 
+	{
+			//calling initial within success function fails to produce proper
+			//address[count] and so second run through fails
+			
+			var tempArray = new Array();
+            var gcReq = {address: address};
+			var geocoder = new google.maps.Geocoder();
+            geocoder.geocode(gcReq, function(results,status){
+			if (status == google.maps.GeocoderStatus.OK) {
+                latitude  = results[0].geometry.location.lat();
+                longitude = results[0].geometry.location.lng();
+				setHidden();
+			}
+				
+           });
+		  
+	}
+	
+	
+	function setHidden() 
+	{
+		$('#location').val('POINT(' + latitude + ' ' + longitude + ')');
+		$('#signupForm').submit();
+	}
+
+
+
+
+</script>

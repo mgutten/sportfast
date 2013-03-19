@@ -136,7 +136,7 @@ class Application_Form_Signup extends Zend_Form
 				
 		$this->addElement('text', 'streetAddress', array(
 				'filters'			=> array('StringTrim','StringToLower'),
-				'required'			=> true,
+				'required'			=> false,
 				'decorators'		=> array('Overlay'),
 				'label'				=> 'Street Address <span class="medium smaller-text">number and street name</span>',
 				'class'				=> 'dropshadow',
@@ -153,6 +153,11 @@ class Application_Form_Signup extends Zend_Form
 				'class'				=> 'dropshadow',
 				'maxlength'			=> 5,
 				'containerTooltip'	=> 'Must be a valid street address: <br> <ul><li>e.g. 35 Silvertree Dr #10, 95131</li></ul>'
+				));
+				
+		$this->addElement('hidden', 'userLocation',  array(
+				'required'		=> true,
+				'decorators'    => array('Hidden')
 				));
 				
 		$this->addElement('checkbox', 'noAddress',  array(

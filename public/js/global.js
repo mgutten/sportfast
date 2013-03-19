@@ -23,6 +23,7 @@ var dropdownMenuDown     = false;
 var notificationDropdown = false;
 var preloadImageArray    = new Array('/images/global/header/notification_shield_reverse.png');
 var gmapMarkers;
+var userLocation = new Array();;
 
 
 $(function()
@@ -141,9 +142,14 @@ $(function()
 		}
 		dropdownMenu($(this).parent('.dropdown-menu-container'));
 		
-		// Remove old class for case when click one dropdown then click another
-		$('.dropdown-menu-container-reverse').removeClass('dropdown-menu-container-reverse');
-		$(this).toggleClass('dropdown-menu-container-reverse');
+		
+		if ($(this).is('.dropdown-menu-container-reverse')) {
+			$(this).removeClass('dropdown-menu-container-reverse');
+		} else {
+			// Remove old class for case when click one dropdown then click another
+			$('.dropdown-menu-container-reverse').removeClass('dropdown-menu-container-reverse');
+			$(this).addClass('dropdown-menu-container-reverse');
+		}
 		
 	})
 	
@@ -498,15 +504,29 @@ $(function()
 
 
 /**
+ * Ajax call to get city name from zipcode
+ * @params(zipcode => 5 digit zipcode)
+ */
+function getCity(zipcode, callback)
+{
+	
+	$.ajax({
+		url: '/ajax/get-city-state',
+		type: 'POST',
+		data: {zipcode: zipcode},
+		success: function(data) {
+			callback(data);
+		}
+	})
+}
+
+/**
  * Ajax call to set user's lastRead to current time
  */
 function resetNotifications()
 {
 	$.ajax({
-		url: '/ajax/reset-notifications',
-		success: function() {
-			
-		}
+		url: '/ajax/reset-notifications'
 	});
 }
 
@@ -944,6 +964,7 @@ function showTooltip(ele)
  */
 function initializeMap(lat, lon, zoom, callback) 
 {
+	
         var mapOptions = {
           //center: new google.maps.LatLng(lat, lon),
           zoom: zoom,
@@ -951,26 +972,54 @@ function initializeMap(lat, lon, zoom, callback)
         };
         gmap = new google.maps.Map(document.getElementById("gmap"),
             mapOptions);
+			
 		
+			
+		if (userLocation.length > 0) {
+			// User location is set, center on it initially
+			lat = userLocation[0];
+			lon = userLocation[1];
+		}
+		
+		var latLon = new google.maps.LatLng(lat, lon);
+		gmap.setCenter(latLon);
 		
 		callback();
 		
 }
 
-// Function for adding a marker to the page.
-    function addMarker(location) {
-        marker = new google.maps.Marker({
-            position: location,
-            map: map
-        });
-    }
 
-    // Testing the addMarker function
-    function TestMarker() {
-           var CentralPark = new google.maps.LatLng(37.98, -122.5);
-           addMarker(CentralPark);
-		   alert();
-    }
+/**
+ * Initialize google geocode for address 
+ * @params(address => street address + city + zipcode,
+ *		   callbackSuccess => callback for successful retrieval
+ *		   callbackFailure => callback for no address found)
+ */
+function getCoordinatesFromAddress(address, callbackSuccess, callbackFailure)
+{
+		//calling initial within success function fails to produce proper
+		//address[count] and so second run through fails
+		var tempArray = new Array();
+		var gcReq = {address: address};
+		var geocoder = new google.maps.Geocoder();
+		geocoder.geocode(gcReq, function(results,status){
+		if (status == google.maps.GeocoderStatus.OK) {
+			// Results were found
+			userLocation[0]  = results[0].geometry.location.lat();
+			userLocation[1]  = results[0].geometry.location.lng();
+			callbackSuccess();
+		} else {
+			// No results found
+			callbackFailure();
+		}
+			
+	   });
+	   		   
+				
+		   
+
+}
+
 
 
 /** capitalize first letter of text

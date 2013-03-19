@@ -8,16 +8,26 @@ class Application_Model_Matches extends Application_Model_ModelAbstract
 	
 	public function addMatches($matches)
 	{
-		foreach ($matches as $match) {
-			$this->_attribs['matches'][] = $match;
+		if ($matches) {
+			// Matches exist
+			foreach ($matches as $match) {
+				$this->_attribs['matches'][] = $match;
+			}
 		}
+		
 		return $this;
 	}
 	
 	public function sortByMatch()
 	{
-		usort($this->_attribs['matches'], array('Application_Model_Matches','matchSort'));
-		return $this->_attribs['matches'];
+		
+		if (!empty($this->_attribs['matches'])) {
+			// There are matches stored, sort them
+			usort($this->_attribs['matches'], array('Application_Model_Matches','matchSort'));
+			return $this->_attribs['matches'];
+		} else {
+			return false;
+		}
 	}
 	
 	private static function matchSort($a,$b) 

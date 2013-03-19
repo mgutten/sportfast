@@ -31,6 +31,7 @@ class IndexController extends Zend_Controller_Action
 				$sportArray = array('text'  => $sport,
 									'image' => $sportIconPath . strtolower($sport) . '.png',
 									'color' => 'light');
+									
 				array_push($lookingDropdownSportArray, $sportArray);
 				
 				$sportsParen .= '"' . $sport . '"';

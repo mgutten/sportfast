@@ -9,19 +9,8 @@ class Application_Model_NotificationsMapper extends Application_Model_MapperAbst
 	 * @params ($cityID => id of city that we are searching in)
 	 * @return $savingClass
 	 */
-	public function getNewsfeed($cityID, $savingClass, $limit = 10)
+	public function getNewsfeed($cityID, $savingClass, $onlyNew = false, $limit = 10)
 	{
-		/*
-		$table   = $this->getDbTable();
-		$select  = $table->select();
-		$select->setIntegrityCheck(false);
-		$select->from(array('nl' => 'notification_log'))
-			   ->join(array('n' => 'notifications'),
-							  	   'n.notificationID = nl.notificationID')
-			   ->where('nl.cityID = ?', $cityID);
-		   
-		$results = $table->fetchAll($select);
-		*/
 		
 		$db = Zend_Db_Table::getDefaultAdapter();   
 		
@@ -45,9 +34,15 @@ class Application_Model_NotificationsMapper extends Application_Model_MapperAbst
 					 LEFT JOIN `groups` AS `gr` ON gr.groupID = nl.groupID
 					 LEFT JOIN `user_ratings` AS `ur` ON ur.userRatingID = nl.ratingID 
 					 WHERE (nl.cityID = " . $cityID . ") 
-						AND n.public = '1' 
-					 LIMIT " . $limit;
+						AND n.public = '1' ";
 						
+		if ($onlyNew) {
+			// Select only notifications that are newer than a minute
+			$select .= "AND dateHappened > (NOW() - INTERVAL 2 MINUTE)";
+		}
+		$select .=	 "ORDER BY nl.dateHappened DESC
+					 LIMIT " . $limit;
+		
 		$results = $db->fetchAll($select);
 		
 		$savingClass->isNewsfeed = true;

@@ -178,6 +178,12 @@ input.input-fail, div.input-fail {
 	width: 95%;
 }
 
+#signup-account-zipcode-city {
+	float:left;
+	clear:both;
+	margin: -.5em 0em 0 76%;
+}
+
 ul.green {
 	float:left;
 	clear:both;

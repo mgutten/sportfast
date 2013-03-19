@@ -56,6 +56,10 @@ abstract class Application_Model_MapperAbstract
 				continue;
 			} elseif (!in_array($column, $columns)) {
 				continue;
+			} elseif ((strpos($value, 'POINT(') !== false) && (get_class($savingClass) == 'Application_Model_Location')) {
+				// This attrib is a location 
+				$data[$column] = new Zend_Db_Expr("GeomFromText('" . $value . "')");
+				continue;
 			}
 			$data[$column] = $savingClass->$column;
 			
@@ -69,7 +73,6 @@ abstract class Application_Model_MapperAbstract
 
 		if (empty($primaryKey)) {
 			// No primary key set, create row
-
 			$primaryVal = $this->getDbTable()->insert($data);
 			// Update savingClass primary key
 			$savingClass->$primaryColumn = $primaryVal;

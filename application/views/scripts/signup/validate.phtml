@@ -1,0 +1,8 @@
+<?php
+if ($this->geocode) {
+	// Geocode is required
+	$this->headScript()->prependFile('https://maps.googleapis.com/maps/api/js?key=AIzaSyAhxSMQ-WQux2nzTW4dBoKmpfGHVQOk7r8&sensor=false');
+	$this->headScript()->prependFile($this->baseUrl() . '/js/signupValidate.js');
+}
+
+?>

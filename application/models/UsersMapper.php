@@ -15,7 +15,10 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 			   */
 		$select->from(array('u' => 'users'))
                ->join(array('c' => 'cities'),
-                    	    'u.cityID = c.cityID')
+                      'u.cityID = c.cityID')
+			   ->join(array('ul' => 'user_locations'),
+			   		  'ul.userID = u.userID',
+					   array('AsText(location) as location'))
 			   ->where($column . ' = ?', $value)
 			   ->limit(1);   
 		
@@ -39,6 +42,7 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 			}
 			
 			$user->getCity()->setAttribs($result);
+			$user->getLocation()->setAttribs($result);
 			$user->setAttribs($result);
 			
 			if(count($results) <= 1) {

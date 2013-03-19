@@ -36,7 +36,7 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 			if (!$auth->hasIdentity()) {
 				// User object not saved, retrieve
 				$user = new Application_Model_User();
-				$user->getUserBy('userID',$_COOKIE['user']);
+				$user->getUserBy('u.userID',$_COOKIE['user']);
 				$user->getUserSportsInfo();
 				$user->getOldUserNotifications();
 				$auth->getStorage()->write($user);
