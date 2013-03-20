@@ -57,13 +57,15 @@ class Application_Model_Notifications extends Application_Model_ModelAbstract
 	
 	public function moveUnreadToRead()
 	{
-		foreach ($this->_attribs['unread'] as $notification) {
-			$notification->read = true;
+		if (count($this->_attribs['unread']) > 0) {
+			// Unread notifications
+			foreach ($this->_attribs['unread'] as $notification) {
+				$notification->read = true;
+			}
+		
+			array_unshift($this->_attribs['read'],$this->_attribs['unread']);
+			$this->resetNewNotifications();
 		}
-		
-		array_unshift($this->_attribs['read'],$this->_attribs['unread']);
-		
-		$this->resetNewNotifications();
 		return $this;
 	}
 	

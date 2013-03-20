@@ -571,15 +571,18 @@ function testGeocode()
 		
 /**
  * populate city name with return value of getCity
- * @params (city => returned city name)
+ * @params (city => returned city json object)
  */
 function populateCity(city)
 {
-	if (city.length < 100) {
+	city = JSON.parse(city);
+	if (city.length > 150) {
 		// if city length seems to be error (long message), do not display
-		$('#signup-account-zipcode-city').text(city);
-	} else {
 		$('#signup-account-zipcode-city').text('Not found');
+	} else {
+		var cityName = city[0]['city'] + ', ' + city[0]['state'];
+		$('#signup-account-zipcode-city').text(cityName);
+		
 	}
 	testGeocode();
 }

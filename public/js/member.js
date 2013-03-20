@@ -51,6 +51,10 @@ $(function() {
 		newEle.addClass('light-back');
 		newEleTextChild.text(newEleTextChild.attr('fullDay'));
 		
+		var index = $(this).index();
+		$('.member-schedule-day-body-container').hide();
+		$('.member-schedule-day-body-container:eq(' + index + ')').show();
+		
 	})
 	
 	$(document).on('mouseenter','.member-game',function()
@@ -66,12 +70,12 @@ $(function() {
 	})
 	
 	
-	$(document).on('click', '.pagination-page',function()
+	$(document).on('click', '.member-find-pagination',function()
 	{
 		var page = $(this).text();
 		animateFindContainer(page);
 		
-		$('.pagination-page.light-back').removeClass('light-back');
+		$('.member-find-pagination.light-back').removeClass('light-back');
 		$(this).addClass('light-back');
 
 	});
@@ -79,6 +83,29 @@ $(function() {
 	$(document).on('click', '.header-section-title',function()
 	{
 		getNewsfeed('old');
+	})
+	
+	$('.member-schedule-pagination').click(function()
+	{
+		var page = $(this).text();
+		animateScheduleContainer(page);
+		
+		$('.member-schedule-pagination.light-back').removeClass('light-back');
+		$(this).addClass('light-back');
+	})
+	
+	$('.member-schedule-in,.member-schedule-out').click(function(e)
+	{
+		e.preventDefault();
+		
+		if ($(this).is('.member-schedule-button-selected')) {
+			// Is already selected 
+			return;
+		}
+		
+		$(this).parent().children('.member-schedule-button-selected').removeClass('member-schedule-button-selected inner-shadow');
+		
+		$(this).addClass('member-schedule-button-selected inner-shadow');
 	})
 	
 	
@@ -165,6 +192,16 @@ function createMarkers()
 }
 
 
+function animateScheduleContainer(page)
+{
+	/* Animate left/right (must change member-find-lower-outer-inner-container css)*/
+	var marginLeft = -1 * ($('.member-schedule-day-body-game-container').width() * (page - 1));
+	
+	$('.member-schedule-day-body-inner-container').stop().animate({marginLeft: marginLeft}, 400);
+}
+	
+
+
 /**
  * animate find game, team, tourney container to reflect which page was clicked
  * @params (page => page # that was clicked)
@@ -184,7 +221,7 @@ function animateFindContainer(page)
 		return;
 	}
 	
-	$('.member-find-lower-outer-inner-container').animate({marginTop: marginTop}, 400);
+	$('.member-find-lower-outer-inner-container').stop().animate({marginTop: marginTop}, 400);
 	
 	hideShowMarkers(page);
 }

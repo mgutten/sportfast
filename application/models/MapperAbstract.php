@@ -60,6 +60,9 @@ abstract class Application_Model_MapperAbstract
 				// This attrib is a location 
 				$data[$column] = new Zend_Db_Expr("GeomFromText('" . $value . "')");
 				continue;
+			} elseif (empty($value)) {
+				// Skip empty columns
+				continue;
 			}
 			$data[$column] = $savingClass->$column;
 			

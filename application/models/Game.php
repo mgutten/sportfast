@@ -22,7 +22,9 @@ class Application_Model_Game extends Application_Model_ModelAbstract
 									'averageSporstmanship' => '',
 									'skillDifference'	   => '',
 									'totalPlayers' 	=> '',
-									'match'			=> ''
+									'match'			=> '',
+									'confirmed'		=> '',
+									'confirmedPlayers' => ''
 									);
 
 

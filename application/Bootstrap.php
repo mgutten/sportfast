@@ -14,9 +14,16 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 		$this->bootstrap('view');
 		$view = $this->getResource('view');
 		/* default to white back for page */
-		$view->whiteBacking = true;
+		//$this->view->whiteBacking = true;
 		
-		/* all available sports array with options for each */
+		
+		$auth = Zend_Auth::getInstance();
+		
+		if (!empty($_COOKIE['user']) || $auth->hasIdentity()) {
+			// User is logged in, instantiate change city form
+			$this->view->changeCityForm = new Application_Form_ChangeCity();
+		}
+		
 		
 		return $view;
 	}
@@ -30,7 +37,7 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 		$view   = $this->getResource('view');
 		
 		$auth = Zend_Auth::getInstance();
-		$auth->clearIdentity();
+		//$auth->clearIdentity();
 		if (!empty($_COOKIE['user']) || $auth->hasIdentity()) {
 			// User is logged in 
 			if (!$auth->hasIdentity()) {
@@ -39,10 +46,13 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 				$user->getUserBy('u.userID',$_COOKIE['user']);
 				$user->getUserSportsInfo();
 				$user->getOldUserNotifications();
+				$user->getUserGames();
 				$auth->getStorage()->write($user);
 			}
+			
 			$headerLayout  = 'header/short';
 			$user		   = $auth->getIdentity();
+			
 			$user->resetNewNotifications()
 				 ->getNewUserNotifications();
 				 
@@ -63,6 +73,7 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 			$this->view->headerSearchForm = new Application_Form_HeaderSearch();
 			$this->view->loggedIn 		  = true;
 
+
 		} else {
 			// User is not logged in
 			$headerLayout = 'header/tall';
@@ -74,6 +85,8 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 		
 		// Set header layout for login vs logout
 		$view->headerLayout = $headerLayout;
+		
+		return $view;
 		
 	}
 	

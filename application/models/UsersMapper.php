@@ -3,7 +3,6 @@
 class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 {
 	protected $_dbTableClass = 'Application_Model_DbTable_Users';
-
 	
 	public function getUserBy($column, $value, $savingClass = false)
 	{
@@ -57,10 +56,44 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 	}
 	
 	/**
+     * Find all events that user is scheduled for
+     *
+     * @params ($savingClass => where to save)
+     */
+	public function getUserGames($savingClass)
+	{
+		$table   = $this->getDbTable();
+		$select  = $table->select();
+		
+		$select->setIntegrityCheck(false);
+		$select->from(array('ug' => 'user_games'))
+			   ->join(array('g' => 'games'),
+			   		  'ug.gameID = g.gameID')
+			   ->join(array('ug2' => 'user_games'),
+			   		  'ug2.gameID = ug.gameID',
+					  array('COUNT(ug2.userID) as totalPlayers',
+					  		'(SELECT COUNT(userID) FROM user_games WHERE gameID = ug.gameID AND confirmed = "1") AS confirmedPlayers'))
+			   ->where('ug.userID = ?', $savingClass->userID)
+			   ->where('g.date > CURDATE()')
+			   ->group('ug.gameID');
+		
+		$results = $table->fetchAll($select);
+		
+		foreach ($results as $result) {
+			$savingClass->games->addGame($result, true);
+		}
+
+		return $savingClass;
+		
+	}
+	
+	
+	/**
      * Find all of sports info for user (ie sports, types, positions, and availability
      *
-     * @param string $password Plain text user password to hash
-     * @return string The hash string of the password
+     * @param ($userID => userID,
+	 *		   $modelClass => userClass to save to)
+     * 
      */
 	public function getUserSportsInfo($userID, $modelClass)
 	{

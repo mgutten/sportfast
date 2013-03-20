@@ -11,6 +11,7 @@ class IndexController extends Zend_Controller_Action
     public function indexAction()
     {
 		$this->view->noDefaultHeadTitle = true;
+		
 		$auth = Zend_Auth::getInstance();
 		
 		if (!$auth->hasIdentity()) {
@@ -59,7 +60,10 @@ class IndexController extends Zend_Controller_Action
 			// Newsfeed
 			$newsfeed = new Application_Model_Notifications();
 			$this->view->newsfeed = $newsfeed->getNewsfeed($this->view->user->city->cityID);
-						
+			
+			// Schedule section
+			$this->view->userSchedule = $this->view->user->getScheduledGames();
+					
 			
 			// Find section matches
 			$matches = new Application_Model_Matches();
@@ -67,12 +71,10 @@ class IndexController extends Zend_Controller_Action
 			$games   = new Application_Model_Games();
 			$options = array('`g`.`sport` IN ' . $sportsParen);
 			$games->findUserGames($this->view->user, $options);
-			//$this->view->games = $games;
 			
 			$teams  = new Application_Model_Teams();
 			$options = array('`t`.`sport` IN ' . $sportsParen);
 			$teams->findUserTeams($this->view->user);
-			//$this->view->teams = $teams;
 			
 			
 			$matches->addMatches($games->games)

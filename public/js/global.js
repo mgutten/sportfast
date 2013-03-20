@@ -19,11 +19,11 @@ sliderSkillValues[5]  = {level:'Unstoppable',
 						description: 'I played (or should play) on a professional level.'};
 						
 var mouseoverColor;
-var dropdownMenuDown     = false;
+var dropdowns = new Array();
 var notificationDropdown = false;
 var preloadImageArray    = new Array('/images/global/header/notification_shield_reverse.png');
 var gmapMarkers;
-var userLocation = new Array();;
+var userLocation = new Array();
 
 
 $(function()
@@ -134,10 +134,10 @@ $(function()
 	$(document).on('click','.dropdown-menu-selected',function(e)
 	{
 		e.stopPropagation();
-		if (dropdownMenuDown) {
-			if (dropdownMenuDown.attr('id') !== $(this).parent().attr('id')) {
+		if (dropdowns.dropdownMenuDown) {
+			if (dropdowns.dropdownMenuDown.attr('id') !== $(this).parent().attr('id')) {
 				// Different dropdown is already down
-				dropdownMenu(dropdownMenuDown);
+				dropdownMenu(dropdowns.dropdownMenuDown);
 			}
 		}
 		dropdownMenu($(this).parent('.dropdown-menu-container'));
@@ -191,6 +191,22 @@ $(function()
 			return;
 		}
 		$(this).stop().animate({'background-color':'transparent'},200);
+	});
+	
+	/* dropdown for change city in header */
+	$('#header-city').click(function(e)
+	{
+		e.stopPropagation();
+		var dropdown = $('#city-change-container');
+		alignDropdown(dropdown, $(this), 'left');
+		dropdown.toggle();
+	});
+	
+	/* action to change city for user when click city on dropdown */
+	
+	$('#changeCity,#changeZipcode').keyup(function()
+	{
+		getCity($(this).val(), populateCityResults);
 	});
 	
 	
@@ -250,11 +266,11 @@ $(function()
 			// Notification dropdown is down, stopPropagation prevents document.click, manual override
 			$('#nav-back-notification-reverse').trigger('click');
 		}
-		if (dropdownMenuDown) {
+		if (dropdowns.dropdownMenuDown) {
 			// Dropdown menu is down
-			dropdownMenuDown.children('.dropdown-menu-selected').removeClass('dropdown-menu-container-reverse');
+			dropdowns.dropdownMenuDown.children('.dropdown-menu-selected').removeClass('dropdown-menu-container-reverse');
 
-			dropdownMenu(dropdownMenuDown);
+			dropdownMenu(dropdowns.dropdownMenuDown);
 		}
 		
 		e.stopPropagation();
@@ -289,11 +305,11 @@ $(function()
 			// Nav dropdown is down, stopPropagation prevents document.click, must do manually
 			dropdownClickDown.trigger('click');
 		}
-		if (dropdownMenuDown) {
+		if (dropdowns.dropdownMenuDown) {
 			// Dropdown menu is down
-			dropdownMenuDown.children('.dropdown-menu-selected').removeClass('dropdown-menu-container-reverse');
+			dropdowns.dropdownMenuDown.children('.dropdown-menu-selected').removeClass('dropdown-menu-container-reverse');
 
-			dropdownMenu(dropdownMenuDown);
+			dropdownMenu(dropdowns.dropdownMenuDown);
 		}
 		
 		e.stopPropagation();
@@ -475,6 +491,16 @@ $(function()
 	$(document).click(function(e)
 	{
 		// ANY IF STATEMENTS MUST BE ADDED TO THE OTHER IF STATEMENT'S HANDLERS TO AVOID STOPPROPAGATION BUG
+		if ($('#city-change-container').css('display') !== 'none') {
+			// Change city dropdown is down and user clicked on something that isn't it
+			if ($(e.target).is('#header-city')) {
+				return;
+			} else if ($(e.target).is ('#city-change-container') || $(e.target).parents('#city-change-container').length > 0) {
+				return;
+			}
+			$('#header-city').trigger('click');
+		}
+		
 		if (dropdownClickDown) {
 			// Nav dropdown is down
 			dropdownClickDown.trigger('click');
@@ -491,12 +517,14 @@ $(function()
 			$('#nav-back-notification-reverse').trigger('click');
 		}
 		
-		if (dropdownMenuDown) {
+		if (dropdowns.dropdownMenuDown) {
 			// Dropdown menu is down
-			dropdownMenuDown.children('.dropdown-menu-selected').removeClass('dropdown-menu-container-reverse');
+			dropdowns.dropdownMenuDown.children('.dropdown-menu-selected').removeClass('dropdown-menu-container-reverse');
 
-			dropdownMenu(dropdownMenuDown);
+			dropdownMenu(dropdowns.dropdownMenuDown);
 		}
+		
+		
 
 	});
 		
@@ -507,13 +535,13 @@ $(function()
  * Ajax call to get city name from zipcode
  * @params(zipcode => 5 digit zipcode)
  */
-function getCity(zipcode, callback)
+function getCity(zipcodeOrCity, callback)
 {
-	
+
 	$.ajax({
 		url: '/ajax/get-city-state',
 		type: 'POST',
-		data: {zipcode: zipcode},
+		data: {zipcodeOrCity: zipcodeOrCity},
 		success: function(data) {
 			callback(data);
 		}
@@ -542,8 +570,8 @@ function dropdownMenu(dropdownEle)
 		var holder   = dropdown.prev('.dropdown-menu-holder');
 		var options  = dropdown.children('.dropdown-menu-hidden-container');
 		
-		if (dropdownMenuDown) {
-			if (dropdownMenuDown.attr('id') == dropdown.attr('id')) {
+		if (dropdowns.dropdownMenuDown) {
+			if (dropdowns.dropdownMenuDown.attr('id') == dropdown.attr('id')) {
 				// Dropdown is already down
 				options.animate({opacity: 0}, {duration: 200, complete: function() {
 																			options.hide();
@@ -555,7 +583,7 @@ function dropdownMenu(dropdownEle)
 											  }
 								);
 								
-				dropdownMenuDown = false;
+				dropdowns.dropdownMenuDown = false;
 				return;
 			}
 		}
@@ -573,7 +601,7 @@ function dropdownMenu(dropdownEle)
 			   .animate({opacity: 1}, 200);
 			      
 		
-		dropdownMenuDown = dropdownEle;
+		dropdowns.dropdownMenuDown = dropdownEle;
 
 }
 
@@ -602,6 +630,24 @@ function populateSliderText(sliderEle, value)
 	
 	return;
 }
+
+
+/**
+ * populate change city container with results from ajax call
+ * @params (cities => returned cities)
+ */
+function populateCityResults(cities) 
+{
+	cities = JSON.parse(cities);
+	var output = '';
+	
+	for (i = 0; i < cities.length; i++) {
+		output += "<p class='city-change-result lighter bold smaller-text pointer'>" + cities[i]['city'] + ", " + cities[i]['state'] + "</p>";
+	}
+	
+	$('#city-change-results-container').html(output);
+}
+
 
 
 
@@ -830,7 +876,6 @@ function alignDropdownContainer(ele)
  */
  function alignDropdown(moveEle, alignEle, alignment)
  {
-	  
 	 var alignedWidth = alignEle.outerWidth(true);
 	 var alignedPos   = alignEle.offset().left;
 	

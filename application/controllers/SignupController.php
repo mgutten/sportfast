@@ -84,7 +84,7 @@ class SignupController extends Zend_Controller_Action
 		if ($request->isPost()) {
 			$post = $request->getPost();
 
-			if ($form->isValid($post)) {
+			if (!$form->isValid($post)) {
 				// Form failed validation, redirect back with error
 				Zend_Session::namespaceUnset('signup');
 				$signupSession = new Zend_Session_Namespace('signup');
@@ -114,9 +114,6 @@ class SignupController extends Zend_Controller_Action
 					$location = new Application_Model_Location();
 					$location->getLocationByZipcode($post['zipcode']);
 					$user->userLocation = $location;
-				} elseif (empty($post['userLocation'])) {
-					// RUN GOOGLE GEOCODE HERE
-					$this->_forward('geocode');
 				} else {
 					// userLocation is set, user latitude and longitude is stored in userLocation
 					$location = new Application_Model_Location();
@@ -257,6 +254,7 @@ class SignupController extends Zend_Controller_Action
 					}
 					
 				}
+				
 				$user->save();
 				
 				$subject  = 'Sportup Account Verification';
@@ -308,27 +306,6 @@ class SignupController extends Zend_Controller_Action
 			$image->save(PUBLIC_PATH . '/images/users/profile/pic/tiny/' . $userID . '.jpg');
 		}
 		
-	}
-	
-	public function geocodeAction()
-	{
-		$form = new Application_Form_Signup();
-		$form->setDecorators(array('FormElements'));
-		$form->signupPassword->renderPassword = true;
-		
-		foreach($_POST as $key => $val) {
-				$form->populate(array($key => $val));
-		}
-		
-		$this->view->signupForm = $form;
-		
-		$form = new Application_Form_SignupSportForm();
-		$this->view->signupSportForm = $form;
-		
-		$sports = new Application_Model_Sports();
-		$this->view->sports = $sports->getAllSportsInfo();
-		
-		$this->view->streetAddress = $_POST['streetAddress'] . ',' . $_POST['zipcode'];
 	}
 	
 

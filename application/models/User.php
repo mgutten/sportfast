@@ -24,7 +24,9 @@ class Application_Model_User extends Application_Model_ModelAbstract
 									'sports'		=> array(),
 									'picture'		=> '',
 									'notifications' => '',
-									'userLocation'	=> ''
+									'userLocation'	=> '',
+									'games'			=> '',
+									'changedLocation' => false
 									);
 
 	protected $_primaryKey = 'userID';	
@@ -37,9 +39,29 @@ class Application_Model_User extends Application_Model_ModelAbstract
 		return $this;
 	}
 
+	public function getScheduledGames()
+	{
+		if (is_object($this->games)) {
+			// User has games scheduled
+			return $this->games->games;
+		} else {
+			// No games scheduled
+			return false;
+		}
+	}
+
 	public function getUserGames()
 	{
 		return $this->getMapper()->getUserGames($this);
+	}
+	
+	public function getGames()
+	{
+		if (empty($this->_attribs['games'])) {
+			// No notifications object set
+			$this->_attribs['games'] = new Application_Model_Games();
+		}
+		return $this->_attribs['games'];
 	}
 
 	public function getNotifications()

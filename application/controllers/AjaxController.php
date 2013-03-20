@@ -217,12 +217,35 @@ class AjaxController extends Zend_Controller_Action
 	 */
 	public function getCityStateAction()
 	{
-		$zipcode = $this->getRequest()->getPost('zipcode');
+		$zipcodeOrCity = $this->getRequest()->getPost('zipcodeOrCity');
 		
-		$city = new Application_Model_City();
-		$city->getCityFromZipcode($zipcode);
-		
-		echo ucwords($city->city) . ', ' . strtoupper($city->state);
+		$cities = new Application_Model_Cities();
+		//$city   = new Application_Model_City();
+		//if (preg_match('/^[0-9]+$/', $zipcodeOrCity)) {
+			// Zipcode (all nums)
+			/*
+			$city->getCityFromZipcode($zipcodeOrCity);
+			echo ucwords($city->city) . ', ' . strtoupper($city->state);
+			*/
+			//$cities->getCitiesLikeZipcode($zipcodeOrCity);
+		//} else {
+			// City or State
+			$cityParts = explode(',', $zipcodeOrCity);
+			$firstPart = trim($cityParts[0]);
+			if (isset($cityParts[1]) &&
+				(strlen(trim($cityParts[1])) >= 2)) {
+				// State was input
+				$cityParts[1] = trim($cityParts[1]);
+				$state = substr($cityParts[1],0,2);
+			} else {
+				// default to california
+				$state = 'CA';
+			}
+			$cities->getCitiesLike($firstPart, $state);
+			//$cities->getCitiesLikeName($cityName, $state);
+			echo $cities->jsonEncodeChildren('cities');
+		//}
+			
 	}
 
 

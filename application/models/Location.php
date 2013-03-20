@@ -8,7 +8,8 @@ class Application_Model_Location extends Application_Model_ModelAbstract
 									'userID'	=> '',
 									'location'	=> '',
 									'latitude'  => '',
-									'longitude' => ''
+									'longitude' => '',
+									'changedLocation' => false
 									);
 	
 	protected $_primaryKey  = 'userSportTypeID';	
@@ -16,6 +17,10 @@ class Application_Model_Location extends Application_Model_ModelAbstract
 	
 	public function save($mapper = 'Application_Model_LocationsMapper')
 	{
+		if ($this->_attribs['changedLocation']) {
+			return;
+		}
+		
 		$this->setMapper($mapper);
 		
 		return $this->getMapper()->save($this);

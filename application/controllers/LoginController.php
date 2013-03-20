@@ -76,13 +76,13 @@ class LoginController extends Zend_Controller_Action
 		// Get authentication adapter and check credentials
         $authAdapter = $this->_getAuthAdapter($request->getPost());														  					
 		$auth = Zend_Auth::getInstance();
-											  
+											
         $result = $auth->authenticate($authAdapter);
         if (!$result->isValid()) {
             // Invalid username/password, display errors
             $error = $result->getMessages();
 			$this->_helper->FlashMessenger->addMessage($error, 'error');
-            //return $this->_helper->redirector->goToUrl('/login');
+            return $this->_helper->redirector->goToUrl('/login');
         } else {
 			// Authentication success, unset login session, set user cookie
 			Zend_Session::namespaceUnset('login');
@@ -96,9 +96,9 @@ class LoginController extends Zend_Controller_Action
 			}
 			
 			// Store user info in user session
+			$auth->getIdentity()->password = '';
 			$user = $auth->getIdentity();
 			$user->getUserSportsInfo();
-			$user->password = '';	
 			
 			return $this->_helper->redirector->goToUrl('/');
 		}

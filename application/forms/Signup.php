@@ -156,7 +156,7 @@ class Application_Form_Signup extends Zend_Form
 				));
 				
 		$this->addElement('hidden', 'userLocation',  array(
-				'required'		=> true,
+				'required'		=> false,
 				'decorators'    => array('Hidden')
 				));
 				

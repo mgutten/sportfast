@@ -27,6 +27,108 @@
 	padding: 0 .35em;
 }
 
+#member-schedule-body-container {
+	float:left;
+	clear:both;
+	width: 100%;
+	overflow:hidden;
+}
+
+.member-schedule-day-body-container {
+	float:left;
+	clear:both;
+	display:none;
+	padding: 0 3%;
+	width: 94%;
+}
+
+
+.member-schedule-day-body-pagination-container {
+	float:left;
+	clear:both;
+	width: 100%;
+	height: 1.6em;
+	margin: .5em 0 0 0;
+}
+
+.member-schedule-day-body-outer-container {
+	float:left;
+	width: 100%;
+	overflow:hidden;
+}
+
+.member-schedule-day-body-inner-container {
+	width: 600%;
+	float:left;
+}
+
+.member-schedule-day-body-game-container {
+	float:left;
+	clear:none;
+	width: 16.65%;
+	padding: .3em .1em;
+}
+
+.member-schedule-day-body-game-container:hover {
+	background: #E6FFE6;
+}
+
+.member-schedule-day-body-game-left-container {
+	float:left;
+}
+
+.member-schedule-day-body-game-right-container {
+	float:right;
+	width: 28%;
+}
+
+.member-schedule-day-body-players-container {
+	float:left;
+	width: 6em;
+	margin: .1em 0 0 2em;
+}
+
+.member-schedule-day-body-players-confirmed {
+	width:100%;
+}
+
+.member-schedule-in,.member-schedule-out {
+	margin-top: .2em;
+}
+
+.member-schedule-in {
+	float:left;
+	margin-left: 1.5em;
+}
+
+.member-schedule-out {
+	float:right;
+	margin-right: 1.5em;
+}
+
+.member-schedule-button-selected {
+	background: #e9e9e9;
+	padding-top: .1em;
+	padding-bottom: -.05em;
+}
+
+.member-schedule-day-body-players {
+	float:left;
+	width: 100%;
+	color:inherit;
+	font-family: inherit;
+}
+
+.member-schedule-day-none {
+	margin: 3em 0 2em 0;
+}
+
+.member-schedule-day-body-container:first-child {
+	display:block;
+}
+
+
+
 
 
 /* end schedule section */

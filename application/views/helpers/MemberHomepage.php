@@ -67,12 +67,15 @@ class Application_View_Helper_MemberHomepage
 	public function buildScheduleHeader()
 	{
 		$output = '<div id="member-schedule-days-container">';
+		$schedule = $this->_view->userSchedule;
+		
 		
 		for ($i = 0; $i < 7; $i++) {
 			// Create the days in reverse order (float:right)
 			$curDay  = strtotime('+' . $i . ' days');
 			$day  	 = date('l', $curDay);
 			$date 	 = date('d', $curDay);
+			$dayOfWeek = date('w', $curDay);
 			if ($day == 'Sunday' ||
 				$day == 'Saturday' ||
 				$day == 'Thursday') {
@@ -92,10 +95,15 @@ class Application_View_Helper_MemberHomepage
 				// Not today, show abbreviated names
 				$displayDay = $dayShort;
 			}
+			$subClass = ''; // Class for inner paragraphs
+			if (isset($schedule[$dayOfWeek])) {
+				// Day has event
+				$subClass .= 'bold darkest';
+			}
 			
 			$output .= "<div class='member-schedule-day-container pointer " . $class . "'>
-							<p class='member-schedule-day-subtext medium smaller-text'>" . $date . "</p>
-							<p class='member-schedule-day medium center' fullDay='" . $day . "' shortDay='" . $dayShort . "'>" . $displayDay . "</p>
+							<p class='member-schedule-day-subtext medium smaller-text " . $subClass . "'>" . $date . "</p>
+							<p class='member-schedule-day medium center " . $subClass . "' fullDay='" . $day . "' shortDay='" . $dayShort . "'>" . $displayDay . "</p>
 						</div>";
 		}
 		
@@ -110,7 +118,79 @@ class Application_View_Helper_MemberHomepage
 	 */
 	public function buildScheduleBody()
 	{
-		$output  = "<div id='member-schedule-body-container'>";
+		$output   = "<div id='member-schedule-body-container'>";
+		$curDay   = date('w');
+		$schedule = $this->_view->userSchedule; 
+		
+		for ($i = $curDay; $i < ($curDay + 7);$i++) {
+			if ($i > 6) {
+				// 7 days in week, maintain order of days as well as count
+				$b = $i - 7;
+			} else {
+				$b = $i;
+			}
+			
+			$date  	 = date('l', strtotime('+' . ($i - $curDay) . ' days'));
+			if ($i - $curDay == 0) {
+				// Today
+				$dateCombo = 'today';
+			} elseif ($i - $curDay == 1) {
+				// Tomorrow
+				$dateCombo = 'tomorrow';
+			} else {
+				$dateCombo = 'this ' . $date;
+			}
+			
+			if (isset($schedule[$b])) {
+				// Event for today
+				$games   = $schedule[$b];
+				$output .= "<div class='member-schedule-day-body-container'>";
+				$output .= "<div class='member-schedule-day-body-pagination-container'>";
+				if (count($games) > 1) {
+					// More than one game
+					for ($c = 1; $c <= count($games); $c++) {
+						$class = 'pagination-page pointer medium member-schedule-pagination';
+						if ($c == 1) {
+							$class .= ' light-back';
+						}
+						$output .= "<p class='" . $class . "'>" . $c . "</p>";
+					}
+				}
+				$output .= "</div>";
+				$output .= "<div class='member-schedule-day-body-outer-container'>
+							<div class='member-schedule-day-body-inner-container'>";
+				foreach ($games as $game) {
+					$class = '';
+					if ($game->confirmed == '1') {
+						// User is confirmed, change class of in button
+						$class = 'inner-shadow member-schedule-button-selected';
+					}
+					$output .= "<a href='/games/" . $game->gameID . "' class='member-schedule-day-body-game-container'>";
+					$output .= "<div class='member-schedule-day-body-game-left-container'>";
+					$output .= "<p class='bold darkest larger-text'>" . ucwords($game->sport) . ' Game';
+					$output .= "<p class='clear'>" . ucwords($dateCombo) . "</p>";
+					$output .= "<p class='clear'>" . date('ga',strtotime($game->date)) . "</p>";
+					$output .= "<p class='clear medium'>" . $game->getPark()->parkName . "</p>";
+					$output .= "</div>";
+					$output .= "<div class='member-schedule-day-body-players-container darkest bold'>";
+					$output .= "<p class='member-schedule-day-body-players larger-text center'>" . $game->totalPlayers . "/" . $game->rosterLimit . "</p>";
+					$output .= "<p class='member-schedule-day-body-players center clear'>players</p>";
+					$output .= "<p class='center clear green smaller-text member-schedule-day-body-players-confirmed'>" . $game->confirmedPlayers . " confirmed</p>";
+					$output .= "</div>";
+					$output .= "<div class='member-schedule-day-body-game-right-container'>";
+					$output .= "<p class='darkest center'>Are you in, or are you out?</p>";
+					$output .= "<p class='button larger-text member-schedule-in " . $class . "'>in</p>";
+					$output .= "<p class='button larger-text member-schedule-out'>out</p>";
+					$output .= "</div>";
+					$output .= "</a>";
+				}
+				$output .= "</div></div></div>";
+				
+			} else {
+				$output .= "<p class='member-schedule-day-none member-schedule-day-body-container medium larger-text center'>You have no games scheduled for " . $dateCombo . ".</p>";
+			}
+			
+		}
 		$output .= '</div>';
 		
 		
@@ -224,7 +304,7 @@ class Application_View_Helper_MemberHomepage
 		// Num pages
 		$output .= "<div class='pagination-pages-outer-container'><div class='pagination-pages-inner-container'>";
 		for ($i = 1; $i <= $totalPages; $i++) {
-			$class = 'pagination-page pointer medium';
+			$class = 'pagination-page pointer medium member-find-pagination';
 			if ($i == 1) {
 				$class .= ' light-back';
 			}

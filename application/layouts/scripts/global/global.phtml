@@ -4,12 +4,14 @@ if (!$this->noDefaultHeadTitle) {
 	// Allow override of appended Sportup with $this->noDefaultHeadTitle = true
 	$this->headTitle()->append('Sportup');
 }
-$this->setEncoding('UTF-8');
-echo $this->doctype('XHTML1_TRANSITIONAL') . PHP_EOL; ?>
+//$this->setEncoding('UTF-8');
+//echo $this->doctype('XHTML1_TRANSITIONAL') . PHP_EOL; ?>
+<!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
+<meta charset='utf-8' />
 <?php
-		echo $this->headMeta() . PHP_EOL;
+		//echo $this->headMeta() . PHP_EOL;
  		echo $this->headTitle() . PHP_EOL;
  		echo $this->headLink()->prependStylesheet($this->baseUrl() . '/css/global.css') . PHP_EOL;
 		echo $this->headScript()->prependFile($this->baseUrl() . '/js/global.js')

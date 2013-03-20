@@ -21,6 +21,21 @@ abstract class Application_Model_ModelAbstract
 		return $name;
 	}
 	
+	public function jsonEncodeChildren($attrib)
+	{
+		$jsonArray = array();
+		if (is_array($array = $this->_attribs[$attrib])) {
+			// Values are stored
+			foreach ($array as $obj) {
+				if (is_object($obj)) {
+					// Is object
+					$jsonArray[] = $obj->jsonSerialize();
+				}
+			}
+		}
+		
+		return json_encode($jsonArray);
+	}
 		
 	public function jsonSerialize()
 	{

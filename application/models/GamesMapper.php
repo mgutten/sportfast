@@ -13,10 +13,14 @@ class Application_Model_GamesMapper extends Application_Model_MapperAbstract
 	
 	public function findUserGames($userClass, $savingClass, $options = false)
 	{
-		$table   = $this->getDbTable();
-		$select  = $table->select();
-		$userID  = $userClass->userID;
-		$cityID  = $userClass->getCity()->cityID;
+		$table    = $this->getDbTable();
+		$select   = $table->select();
+		$userID   = $userClass->userID;
+		$cityID   = $userClass->getCity()->cityID;
+		$distance = 2; // in miles 
+		$rad	  = $distance/69; // (1 degree about = 69 mi) could incorporate haversine formula later for more accurate distance calculation
+		$upperPoint = 'POINT(' . ($userClass->location->latitude + $rad) . ',' . ($userClass->location->longitude + $rad) . ')';
+		$lowerPoint = 'POINT(' . ($userClass->location->latitude - $rad) . ',' . ($userClass->location->longitude - $rad) . ')';
 		
 		$select->setIntegrityCheck(false);
 		$select->from(array('g'  => 'games'))
@@ -38,11 +42,18 @@ class Application_Model_GamesMapper extends Application_Model_MapperAbstract
 						   'avg(us.skillCurrent) - (SELECT skillCurrent FROM user_sports WHERE userID = "' . $userID . '" AND sportID = t.sportID) as skillDifference',
 						   'COUNT(us.userID) as totalPlayers'
 						   ))
-			   ->where('g.cityID = ?', $cityID)
+			   //->where('g.cityID = ?', $cityID)
 			   ->where('usa.userID = ?', $userID)
 			   ->where('DATE_FORMAT(g.date,"%w") = usa.day')
 			   ->where('HOUR(g.date) = usa.hour')
-			   ->where('g.public = "1"');
+			   ->where('g.public = "1"')
+			   ->where('MBRContains(
+								LINESTRING(
+								' . $upperPoint . ' , ' . $lowerPoint . '
+								), pl.location
+								)')
+			   ->where('g.date > NOW()');
+								
 		
 		if ($options) {
 			// Additional options are set

@@ -21,7 +21,14 @@
 	}
 ?>
 </div>
-	
+<div id='city-change-container' class='medium-background dropshadow'>
+	<?php echo $this->changeCityForm->changeCity;?>
+    <p class='lighter smaller-text center width-100 clear' id='city-change-or'>or</p>
+    <?php echo $this->changeCityForm->changeZipcode;?>
+    <div id='city-change-results-container'>
+    </div>
+</div>
+
     <div class='centered-body body-wrapper'>
     	<div class='header-nav-container-short'>
         	<a href='/'><img src='/images/global/logo/small.png' id='logo-small'/> </a>
@@ -106,8 +113,8 @@
         </div>
         
         <div class='header-nav-container-location'>
-        	<p class='darker arial header-nav-location-text'>
+        	<p class='darker arial header-nav-location-text pointer'>
             	You are in: &nbsp;
             </p>
-            <p class='lighter arial header-nav-location-text location'><?php echo ucwords($this->user->getCity()->city) . ', ' . strtoupper($this->user->getCity()->state);?></p>
+            <p class='lighter arial header-nav-location-text location pointer' id='header-city'><?php echo ucwords($this->user->getCity()->city) . ', ' . strtoupper($this->user->getCity()->state);?></p>
         </div>
