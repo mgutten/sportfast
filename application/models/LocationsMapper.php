@@ -23,6 +23,26 @@ class Application_Model_LocationsMapper extends Application_Model_MapperAbstract
 					  
 	}
 	
+	public function getLocationByCityID($cityID, $savingClass) 
+	{
+		$table   = $this->getDbTable();
+		$select  = $table->select();
+		
+		$select->from(array('z'  => 'zipcodes'), 
+					  array('AsText(location) as location'))
+			   ->where('z.cityID = ?', $cityID)
+			   ->where('z.zipcodeType = "STANDARD"')
+			   ->order('z.main DESC')
+			   ->limit(1);
+					  
+		$results = $table->fetchRow($select);
+		
+		$savingClass->setAttribs($results);
+		
+		return $savingClass;
+					  
+	}
+	
 }
 					  
 

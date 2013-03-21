@@ -202,11 +202,23 @@ $(function()
 		dropdown.toggle();
 	});
 	
-	/* action to change city for user when click city on dropdown */
+	/* change city for user when click city on dropdown */
+	$('#city-change-results-container').on('click','.city-change-result',function() {
+		setUserLocation($(this).attr('cityID'));
+	});
 	
 	$('#changeCity,#changeZipcode').keyup(function()
 	{
+		if ($(this).val() == '') {
+			// Blank box, do not run check
+			return;
+		}
 		getCity($(this).val(), populateCityResults);
+	});
+	
+	$('#city-change-reset').click(function()
+	{
+		setUserLocation('home');
 	});
 	
 	
@@ -558,6 +570,22 @@ function resetNotifications()
 	});
 }
 
+/**
+ * Ajax call to set user's location to new city
+ */
+function setUserLocation(cityID)
+{
+	$.ajax({
+		url: '/ajax/change-user-city',
+		type: 'POST',
+		data: {cityID: cityID},
+		success: function(data) {
+			location.reload();
+		}
+	});
+}
+
+
 /** 
  * test dropdown menu for animation up or down
  * @params(dropdownEle => outer dropdown container that is being acted upon)
@@ -642,7 +670,7 @@ function populateCityResults(cities)
 	var output = '';
 	
 	for (i = 0; i < cities.length; i++) {
-		output += "<p class='city-change-result lighter bold smaller-text pointer'>" + cities[i]['city'] + ", " + cities[i]['state'] + "</p>";
+		output += "<p class='city-change-result lighter bold smaller-text pointer' cityID='" + cities[i]['cityID'] + "'>" + cities[i]['city'] + ", " + cities[i]['state'] + "</p>";
 	}
 	
 	$('#city-change-results-container').html(output);

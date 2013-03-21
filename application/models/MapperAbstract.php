@@ -63,6 +63,10 @@ abstract class Application_Model_MapperAbstract
 			} elseif (empty($value)) {
 				// Skip empty columns
 				continue;
+			} elseif ($savingClass instanceof Application_Model_User && $column == 'cityID' && !empty($savingClass->changedLocation)) {
+				// Is user class and location has been changed temporarily, do not change cityID for user row, skip
+				echo $column;
+				continue;
 			}
 			$data[$column] = $savingClass->$column;
 			
@@ -103,37 +107,6 @@ abstract class Application_Model_MapperAbstract
 				$model->save();
 			}
 		}
-		
-
-		/*
-		$data    = array();
-		$table   = $this->getDbTable();
-		$columns = $table->info(Zend_Db_Table_Abstract::COLS);
-		$attribs = $savingClass->getAttribs();
-
-		foreach ($attribs as $column => $value) {	
-			if (is_object($value)) {
-				//$value->save();
-				continue;
-			} elseif (!array_key_exists($value, $columns)) {
-				continue;
-			}
-			$data[$value] = $savingClass->$value;
-		}
-		
-		
-		$primaryColumn = $savingClass->primaryKey;
-		$primaryKey = $data[$primaryColumn];
-		if (empty($primaryKey)) {
-			// No primary key set, create row
-			$primaryVal = $this->getDbTable()->insert($data);
-			// Update savingClass primary key
-			$savingClass->$primaryColumn = $primaryVal;
-		} else {
-			// Primary key is already set, row exists, update it
-			$this->getDbTable()->update($data, array($primaryColumn . ' = ?' => $primaryKey));
-		}
-		*/
 
 	}
 	
@@ -163,25 +136,32 @@ abstract class Application_Model_MapperAbstract
 	
 	public function getColumnValue($column, $value)
 	{
-		$table = $this->getDbTable();
-		$select  = $table->select($column);
-		$select->where($column . ' = ' . '?', $value)
+		$table  = $this->getDbTable();
+		$select = $table->select($column);
+		$select->where($column . ' = ?', $value)
 			   ->limit(1);
-		$results = $table->fetchAll($select);
+		$result = $table->fetchRow($select);
+		
+		return $result;
 		
 	}
 	
-	public function find($id, Application_Model_ModelAbstract $modelClass)
+	public function find($id, $column, Application_Model_ModelAbstract $modelClass)
 	{
-		$result = $this->getDbTable()->find($id);
+		$table  = $this->getDbTable();
+		$select = $table->select()
+						->where($column . ' = ?', $id)
+						->limit(1);
+				
+		$result = $table->fetchRow($select);
 		
 		if (count($result) == 0) {
 			return;
 		}
 		
-		$row = $result->current();
+		//$modelClass->setUsername($row->username);
+		$modelClass->setAttribs($result);
 		
-		$modelClass->setUsername($row->username);
 		return $modelClass;
 		
 	}

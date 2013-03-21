@@ -26,7 +26,8 @@ class Application_Model_Game extends Application_Model_ModelAbstract
 									'confirmed'		=> '',
 									'confirmedPlayers' => ''
 									);
-
+									
+	protected $_primaryKey = 'gameID';
 
 
 	public function __construct($resultRow = false)

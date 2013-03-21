@@ -11,16 +11,25 @@ class Application_Model_GamesMapper extends Application_Model_MapperAbstract
 	 *		   $options		=> additional sql "where" constraints)
 	 */
 	
-	public function findUserGames($userClass, $savingClass, $options = false)
+	public function findUserGames($userClass, $savingClass, $options = false, $points = false)
 	{
 		$table    = $this->getDbTable();
 		$select   = $table->select();
 		$userID   = $userClass->userID;
 		$cityID   = $userClass->getCity()->cityID;
-		$distance = 2; // in miles 
-		$rad	  = $distance/69; // (1 degree about = 69 mi) could incorporate haversine formula later for more accurate distance calculation
-		$upperPoint = 'POINT(' . ($userClass->location->latitude + $rad) . ',' . ($userClass->location->longitude + $rad) . ')';
-		$lowerPoint = 'POINT(' . ($userClass->location->latitude - $rad) . ',' . ($userClass->location->longitude - $rad) . ')';
+		
+		if ($points) {
+			// Map was moved or points have been set to not be around user location
+			$upperPoint = $points[0];
+			$lowerPoint = $points[1];
+		} else {
+			// Default location to search near is user's home location, look for games within $distance of user's home location
+			$distance = 10; // in miles 
+			$rad	  = $distance/69; // (1 degree about = 69 mi) could incorporate haversine formula later for more accurate distance calculation
+			$upperPoint = 'POINT(' . ($userClass->location->latitude + $rad) . ',' . ($userClass->location->longitude + $rad) . ')';
+			$lowerPoint = 'POINT(' . ($userClass->location->latitude - $rad) . ',' . ($userClass->location->longitude - $rad) . ')';
+		}
+		
 		
 		$select->setIntegrityCheck(false);
 		$select->from(array('g'  => 'games'))

@@ -220,32 +220,49 @@ class AjaxController extends Zend_Controller_Action
 		$zipcodeOrCity = $this->getRequest()->getPost('zipcodeOrCity');
 		
 		$cities = new Application_Model_Cities();
-		//$city   = new Application_Model_City();
-		//if (preg_match('/^[0-9]+$/', $zipcodeOrCity)) {
-			// Zipcode (all nums)
-			/*
-			$city->getCityFromZipcode($zipcodeOrCity);
-			echo ucwords($city->city) . ', ' . strtoupper($city->state);
-			*/
-			//$cities->getCitiesLikeZipcode($zipcodeOrCity);
-		//} else {
-			// City or State
-			$cityParts = explode(',', $zipcodeOrCity);
-			$firstPart = trim($cityParts[0]);
-			if (isset($cityParts[1]) &&
-				(strlen(trim($cityParts[1])) >= 2)) {
-				// State was input
-				$cityParts[1] = trim($cityParts[1]);
-				$state = substr($cityParts[1],0,2);
-			} else {
-				// default to california
-				$state = 'CA';
-			}
-			$cities->getCitiesLike($firstPart, $state);
-			//$cities->getCitiesLikeName($cityName, $state);
-			echo $cities->jsonEncodeChildren('cities');
-		//}
+		$cityParts = explode(',', $zipcodeOrCity);
+		$firstPart = trim($cityParts[0]);
+		if (isset($cityParts[1]) &&
+			(strlen(trim($cityParts[1])) >= 2)) {
+			// State was input
+			$cityParts[1] = trim($cityParts[1]);
+			$state = substr($cityParts[1],0,2);
+		} else {
+			// default to california
+			$state = 'CA';
+		}
+		$cities->getCitiesLike($firstPart, $state);
+		echo $cities->jsonEncodeChildren('cities');
 			
+	}
+	
+	/**
+	 * get city and state from db
+	 */
+	public function changeUserCityAction()
+	{
+
+		$cityID = $this->getRequest()->getPost('cityID');
+		
+		if ($cityID == 'home') {
+			// Reset user location to home
+			/* OR CREATE FUNCTION FOR USER MODEL TO FIND CITY INFO AND THEN USER_LOCATION (save db queries) */
+			$this->view->user->resetHomeLocation();
+			//$auth = Zend_Auth::getInstance();
+			//$auth->clearIdentity();
+			return;
+		}
+		
+		$city = new Application_Model_City();
+		$city->find($cityID, 'cityID');
+		
+		$location = new Application_Model_Location();
+		$location->getLocationByCityID($cityID);
+		
+		$this->view->user->changedLocation = true;
+		$this->view->user->city = $city;
+		$this->view->user->location = $location;
+				
 	}
 
 

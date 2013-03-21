@@ -87,18 +87,24 @@ class LoginController extends Zend_Controller_Action
 			// Authentication success, unset login session, set user cookie
 			Zend_Session::namespaceUnset('login');
 			
+			$user = $auth->getIdentity();
+			
 			if ($request->getPost('rememberMe')) {
 				// Set cookie if user wants to be remembered
-				setcookie('user', $auth->getIdentity()->userID, time() + (60*60*24*14), '/');
+				setcookie('user', $user->userID, time() + (60*60*24*14), '/');
 			} else {
 				// Unset cookie (if existing from previous visit)
 				setcookie('user', '', time() - 1, '/');
 			}
 			
 			// Store user info in user session
-			$auth->getIdentity()->password = '';
-			$user = $auth->getIdentity();
+			/* ANY FUNCTIONS RUN ON USER HERE SHOULD BE MIMICKED IN BOOTSTRAP InitLayoutSetup*/
+			$user->password = '';
 			$user->getUserSportsInfo();
+			$user->getUserGames();
+			$user->getOldUserNotifications();
+			//$user = $auth->getIdentity();
+			//$user->getUserSportsInfo();
 			
 			return $this->_helper->redirector->goToUrl('/');
 		}

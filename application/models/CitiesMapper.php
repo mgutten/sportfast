@@ -16,7 +16,8 @@ class Application_Model_CitiesMapper extends Application_Model_MapperAbstract
 		$select->from(array('c'  => 'cities'))
 			   ->join(array('z' => 'zipcodes'),
 			   		  'c.cityID = z.cityID')
-		       ->where('z.zipcode = ?', $zipcode);
+		       ->where('z.zipcode = ?', $zipcode)
+			   ->where('z.zipcodeType = "STANDARD"');
 			   
 		$results = $table->fetchAll($select);
 		$result = $results->current();
@@ -57,18 +58,21 @@ class Application_Model_CitiesMapper extends Application_Model_MapperAbstract
 	{
 		$table   = $this->getDbTable();
 		$select  = $table->select();
-		
+		$select->setIntegrityCheck(false);	
+			
 		if (preg_match('/^[0-9]+$/', $zipcodeOrCity)) {
 			// Zipcode
-			$select->setIntegrityCheck(false);
 			$select->from(array('z' => 'zipcodes'))
 				   ->join(array('c' => 'cities'),
 				   		  'z.cityID = c.cityID')
 				   ->where('z.zipcode LIKE "' . $zipcodeOrCity . '%"');
 		} else {
 			// City name
-			$select->from(array('c'  => 'cities'))
-				   ->where('c.city LIKE "' . $zipcodeOrCity . '%"');
+			$select->from(array('z' => 'zipcodes'))
+				   ->join(array('c' => 'cities'),
+				   		  'z.cityID = c.cityID')
+				   ->where('c.city LIKE "' . $zipcodeOrCity . '%"')
+				   ->where('z.zipcodeType = "STANDARD"');
 		}
 		
 		if ($state) {

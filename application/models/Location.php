@@ -9,7 +9,7 @@ class Application_Model_Location extends Application_Model_ModelAbstract
 									'location'	=> '',
 									'latitude'  => '',
 									'longitude' => '',
-									'changedLocation' => false
+									'changedLocation' => ''
 									);
 	
 	protected $_primaryKey  = 'userSportTypeID';	
@@ -17,7 +17,8 @@ class Application_Model_Location extends Application_Model_ModelAbstract
 	
 	public function save($mapper = 'Application_Model_LocationsMapper')
 	{
-		if ($this->_attribs['changedLocation']) {
+		if (!empty($this->_attribs['changedLocation'])) {
+			// Location was changed temporarily
 			return;
 		}
 		
@@ -59,6 +60,12 @@ class Application_Model_Location extends Application_Model_ModelAbstract
 		$this->setMapper('Application_Model_LocationsMapper');
 		
 		$this->getMapper()->getLocationByZipcode($zipcode, $this);
+	}
+	
+	public function getLocationByCityID($cityID) {
+		$this->setMapper('Application_Model_LocationsMapper');
+		
+		$this->getMapper()->getLocationByCityID($cityID, $this);
 	}
 		
 									

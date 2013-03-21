@@ -1407,7 +1407,11 @@ input.city-change-input {
 	color: #fff;
 }
 	
-
+#city-change-reset {
+	float:right;
+	clear:both;
+	margin: 0 .3em .15em 0;
+}
 	
 
 	

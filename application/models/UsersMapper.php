@@ -142,33 +142,14 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 				$onlyNew	 => only select new notifications )
 	 */
 	public function getUserNotifications($userClass, $savingClass, $onlyNew = false)
-	{
-		/*
-		$this->setDbTable('Application_Model_DbTable_NotificationLog');
-		$table  = $this->getDbTable();
-		$select = $table->select();
-		
-		$select->setIntegrityCheck(false);
-		$select->from(array('nl'  => 'notification_log'))
-			   ->join(array('n' => 'notifications'),
-			   		  'n.notificationID = nl.notificationID')
-			   ->joinLeft(array('u' => 'users'),
-			   		  'u.userID = nl.actingUserID')
-			   ->joinLeft(array('ga' => 'games'),
-			   		  'ga.gameID = nl.gameID')
-			   ->joinLeft(array('t' => 'teams'),
-			   		  't.teamID = nl.teamID')
-			   ->joinLeft(array('gr' => 'groups'),
-			   		  'gr.groupID = nl.groupID')
-			   ->joinLeft(array('ur' => 'user_ratings'),
-			   		  'ur.userRatingID = nl.ratingID')
-			   ->where('u.userID = ?', $userID);
-		*/
-		
+	{		
 		/* MUST RETRIEVE GAMEIDS, TEAMIDS, AND GROUPIDS FOR ALL GAMES, TEAMS, GROUPS THAT USER ($userClass) is currently in */
 		$db = Zend_Db_Table::getDefaultAdapter();   
 		
 		$lastRead = $userClass->lastRead;
+		$gameIDs  = (is_object($userClass->_attribs['games']) ? $userClass->games->implodeIDs('games') : '');
+		$teamIDs  = (is_object($userClass->_attribs['teams']) ? $userClass->teams->implodeIDs('teams') : '');
+		$names	  = array('game','team','group');
 		
 		$select = "SELECT `nl`.*, 
 						  `n`.*, 
@@ -189,11 +170,31 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 					 LEFT JOIN `teams` AS `t` ON t.teamID = nl.teamID
 					 LEFT JOIN `groups` AS `gr` ON gr.groupID = nl.groupID
 					 LEFT JOIN `user_ratings` AS `ur` ON ur.userRatingID = nl.ratingID 
-					 WHERE ((nl.receivingUserID = " . $userClass->userID . ") 
-					 		OR ((nl.gameID IN (1,2,3) 
-								OR nl.teamID IN (1,2,3) 
-								OR nl.groupID IN (1,2,3))
-								AND n.action != 'create')) ";
+					 WHERE ((nl.receivingUserID = " . $userClass->userID . ") ";
+		
+		$counter = 0;
+		$success = false;
+		foreach ($names as $name) {
+			$nameCombo = $name . 'IDs';
+			if (!empty($$nameCombo)) {
+				if ($counter == 0) {
+					// First successful group
+					$select .= "OR ((";
+				} else {
+					$select .= " OR ";
+				}
+				$select .= "nl." . $name . "ID IN (" . $$nameCombo . ")";
+				if (!$success) {
+					$success = true;
+				}
+			}
+		}
+		
+		if ($success) {
+			// One of $names had a value
+			$select .= ") AND n.action != 'create')) ";
+		}
+		
 		if ($onlyNew) {
 			// Select only notifications since last read
 			$select .= "AND nl.dateHappened > '" . $lastRead . "' ";
@@ -201,12 +202,12 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 			// Select old notifications
 			$select .= "AND nl.dateHappened <= '" . $lastRead . "' ";
 		}
+		
 		$select .= "ORDER BY nl.dateHappened DESC";
 		
 		if (!$onlyNew) {
 			$select .= " LIMIT 10";
 		}
-		 			 
 					  
 		$results = $db->fetchAll($select);
 
@@ -216,6 +217,38 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 		}
 
 	}
+	
+	/**
+     * Reset user class to home location
+     *
+     * @params ($savingClass => where to save)
+     */
+	public function resetHomeLocation($savingClass)
+	{
+		$table   = $this->getDbTable();
+		$select  = $table->select();
+		
+		$select->setIntegrityCheck(false);
+		$select->from(array('ul'  => 'user_locations'),
+					  array('AsText(ul.location) as location'))
+				->join(array('u' => 'users'),
+			   		  'u.userID = ul.userID')
+			    ->join(array('c' => 'cities'),
+			   		  'c.cityID = u.cityID')
+				->limit(1);
+		
+		$result = $table->fetchRow($select);
+		
+		$city = new Application_Model_City($result);
+		$location = new Application_Model_Location($result);
+		$savingClass->city = $city;
+		$savingClass->location = $location;
+		
+		return $savingClass;
+	}
+
+		
+		
 	
 	/**
      * Create a hash (encrypt) of a plain text password.

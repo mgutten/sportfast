@@ -6,6 +6,43 @@ abstract class Application_Model_ModelAbstract
 	protected $_mapperClass;	
 	protected $_mapper;
 	
+	public function __construct($resultRow = false) 
+	{
+		if ($resultRow) {
+			$this->setAttribs($resultRow);
+		}
+	}
+	
+	public function getIDs($attrib)
+	{
+
+		if (is_array($this->_attribs[$attrib])) {
+			// Is array, return as array
+			$ids = array();
+			foreach ($this->_attribs[$attrib] as $obj) {
+				if (is_array($obj)) {
+					// Sub-array
+					foreach($obj as $object) {
+						$ids[] = $object->_attribs[$object->_primaryKey];
+					}
+					continue;
+				} else {
+					$ids[] = $obj->_attribs[$obj->_primaryKey];
+				}
+			}
+			return $ids;
+		}
+	}
+	
+	public function implodeIDs($attrib)
+	{
+		$ids = $this->getIDs($attrib);
+		if (is_array($ids)) {
+			$str = implode(',', $ids);
+			return $str;
+		}
+	}
+	
 	public function getLimitedName($attrib, $limit)
 	{
 		$name = $this->_attribs[$attrib];
@@ -192,9 +229,9 @@ abstract class Application_Model_ModelAbstract
 		return $this->_mapper;
 	}
 	
-	public function find($id) 
+	public function find($id, $column) 
 	{
-		$this->getMapper()->find($id, $this);
+		$this->getMapper()->find($id, $column, $this);
 		return $this;
 	}
 	

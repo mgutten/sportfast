@@ -26,11 +26,11 @@ class Application_Model_User extends Application_Model_ModelAbstract
 									'notifications' => '',
 									'userLocation'	=> '',
 									'games'			=> '',
-									'changedLocation' => false
+									'teams'			=> '',
+									'changedLocation' => ''
 									);
 
 	protected $_primaryKey = 'userID';	
-	
 	
 	
 	public function save($loopSave = true)
@@ -169,6 +169,20 @@ class Application_Model_User extends Application_Model_ModelAbstract
 	public function getProfilePic($size, $userID = false) 
 	{
 		return parent::getProfilePic($size, $this->userID);
+	}
+	
+	public function setChangedLocation($value) 
+	{
+		$this->_attribs['changedLocation'] = $value;
+		return $this;
+	}
+	
+	/**
+	 * reset stored user's location and city to home
+	 */
+	public function resetHomeLocation()
+	{
+		$this->getMapper()->resetHomeLocation($this);
 	}
 
 

@@ -114,10 +114,12 @@ class Application_Model_Notification extends Application_Model_ModelAbstract
 			$post  = '';
 			$class = 'dark bold text-width';
 			$replaceVal = (isset($this->_attribs[$match]) ? $this->_attribs[$match] : '');
+			$possession = 'your';
 			
 			if ($this->newsfeed) {
 				// This notification is meant for newsfeed, give different class
 				$class = 'green';
+				$possession = 'a';
 			}
 			
 			if ($match == 'userName') {
@@ -158,7 +160,10 @@ class Application_Model_Notification extends Application_Model_ModelAbstract
 			$replace[] = $pre . $replaceVal . $post;
 		}
 		
-		return str_replace($matches[0],$replace, $this->text);
+		$str = str_replace($matches[0],$replace, $this->text);
+		
+		// Replace possession holder with possession var (ie a game, your game)
+		return str_replace('&possession', $possession, $str);
 		
 	}
 		

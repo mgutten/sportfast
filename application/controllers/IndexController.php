@@ -19,6 +19,7 @@ class IndexController extends Zend_Controller_Action
 			$this->view->whiteBacking = false;
 		} else {
 			// Member homepage
+
 			$this->view->narrowColumn = 'right';
 			
 			$userSports = $this->view->userSports = $this->view->user->getSportNames();
@@ -27,6 +28,7 @@ class IndexController extends Zend_Controller_Action
 			$lookingDropdownSportArray = array();
 			$sportIconPath = '/images/global/sports/icons/small/outline/';
 			$sportsParen   = '('; // For use in options with games model below
+			
 			foreach ($userSports as $sport) {
 				// Loop through sports and create properly formatted array for dropdown
 				$sportArray = array('text'  => $sport,
@@ -63,7 +65,9 @@ class IndexController extends Zend_Controller_Action
 			
 			// Schedule section
 			$this->view->userSchedule = $this->view->user->getScheduledGames();
-					
+			
+			$array = array();
+			$array[5] = 'cat';
 			
 			// Find section matches
 			$matches = new Application_Model_Matches();

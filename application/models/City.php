@@ -7,21 +7,15 @@ class Application_Model_City extends Application_Model_ModelAbstract
 									'city' 	 => '',
 									'state'  => '',
 									'active' => '',
-									'changedLocation' => false
+									'changedLocation' => ''
 									);
 	protected $_primaryKey = 'cityID';
 		
-	
-	public function __construct($resultRow = false) 
-	{
-		if ($resultRow) {
-			$this->setAttribs($resultRow);
-		}
-	}
-	
+		
 	public function save()
 	{
-		if ($this->_attribs['changedLocation']) {
+		if (!empty($this->_attribs['changedLocation'])) {
+			// Location changed temporarily, do not save
 			return;
 		}
 		return $this->getMapper()->save($this);

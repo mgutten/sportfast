@@ -18,7 +18,8 @@ class Application_Model_Team extends Application_Model_ModelAbstract
 									'averageSporstmanship' => '',
 									'match'		   => ''
 									);
-
+									
+	protected $_primaryKey = 'teamID';
 
 
 	public function __construct($resultRow = false)

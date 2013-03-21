@@ -5,7 +5,7 @@ class Application_Model_TeamsMapper extends Application_Model_MapperAbstract
 	protected $_dbTableClass = 'Application_Model_DbTable_Teams';
 	
 	/**
-	 * Get all teams that are happening during user's availability
+	 * Get all teams that meet user needs
 	 * @params($userClass   => user object,
 	 *		   $savingClass => games object,
 	 *		   $options		=> additional sql "where" constraints)
@@ -37,7 +37,8 @@ class Application_Model_TeamsMapper extends Application_Model_MapperAbstract
 						   'COUNT(us.userID) as totalPlayers'
 						   ))
 			   ->where('t.public = "1"')
-			   ->where('uus.skillCurrent >= l.minSkill AND uus.skillCurrent <= maxSkill');
+			   ->where('uus.skillCurrent >= l.minSkill AND uus.skillCurrent <= maxSkill')
+			   ->where('l.cityID = ?', $userClass->city->cityID);
 		
 		if ($options) {
 			// Additional options are set
