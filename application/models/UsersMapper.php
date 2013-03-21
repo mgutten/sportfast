@@ -111,7 +111,7 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 			   ->join(array('ust' => 'user_sport_types'),
 			   		  'ust.typeID = st.typeID')
 			   ->join(array('us' => 'user_sports'),
-			   		  'us.sportID = s.sportID') 
+			   		  'us.sportID = s.sportID AND us.userID = usp.userID') 
 			   ->join(array('usa' => 'user_sport_availabilities'),
 			   		  'usa.sportID = s.sportID') 
 			   ->where('usp.userID = ?', $userID);
@@ -126,8 +126,7 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 			$sportModel->setAttribs($result);
 			$sportModel->getType($result->typeName)->setAttribs($result);
 			$sportModel->getPosition($result->positionName)->setAttribs($result);
-			$sportModel->setAvailability($result->day, $result->hour)->setAttribs($result);
-			
+			$sportModel->setAvailability($result->day, $result->hour)->setAttribs($result);			
 			
 		}
 			

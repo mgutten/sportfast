@@ -13,6 +13,17 @@ abstract class Application_Model_ModelAbstract
 		}
 	}
 	
+	public function hasValue($attrib) {
+		$attrib = $this->_attribs[$attrib];
+		
+		if (is_object($attrib) || $attrib) {
+			// Attrib is an object or has a value
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
 	public function getIDs($attrib)
 	{
 
@@ -126,15 +137,23 @@ abstract class Application_Model_ModelAbstract
 
 		$method	= 'get' . $name;
 		
-		if (!method_exists($this, $method)) {
-			// Method does not exist
-			if (!array_key_exists($name, $this->_attribs)) {
+		if (method_exists($this, $method)) {
+			// Method exists
+			return $this->$method();
+			
+		} elseif (!array_key_exists($name, $this->_attribs)) {
 				// Key is not part of attribs, look at rest of class properties
-				return $this->$name;
-			}
-			return $this->_attribs[$name];
+				if (!array_key_exists($name,$this->getVars())) {
+					return false;
+				} else {
+					return $this->$name;
+				}
 		}
-		return $this->$method();
+		
+		// Key exists in attribs, return it
+		return $this->_attribs[$name];
+		
+		
 		
 	}
 	

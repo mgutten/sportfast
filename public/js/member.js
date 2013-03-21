@@ -2,9 +2,9 @@
 var markers = new Array(); 
 var gamesPerPage = 4;
 var newsfeedTimeout;
+var zoomChanged;
 
 $(function() {
-	
 	$(document).on('click','.dropdown-menu-option-container', function(e)
 	{
 		// Option has been clicked
@@ -20,7 +20,7 @@ $(function() {
 			childImg.toggleClass('green-back');
 		}
 		
-		loadFind();
+		loadFind(false);
 		
 		
 		
@@ -38,6 +38,9 @@ $(function() {
 		}
 		
 	})
+	
+	// Do not swap value of dropdown selected when choose option
+	$(document).unbind('click.swapValue');
 	
 	$('.member-schedule-day-container').click(function()
 	{
@@ -80,7 +83,7 @@ $(function() {
 
 	});
 	
-	$(document).on('click', '.header-section-title',function()
+	$(document).on('click', '#notifications-load',function()
 	{
 		getNewsfeed('old');
 	})
@@ -94,6 +97,7 @@ $(function() {
 		$(this).addClass('light-back');
 	})
 	
+	/* schedule "in" and "out" on click */
 	$('.member-schedule-in,.member-schedule-out').click(function(e)
 	{
 		e.preventDefault();
@@ -108,6 +112,16 @@ $(function() {
 		$(this).addClass('member-schedule-button-selected inner-shadow');
 	})
 	
+	/* narrow column ratings click icon */
+	$('.member-narrow-rating-icon').click(function()
+	{
+		var index = $(this).index();
+		$('.member-narrow-rating-container').hide();
+		$('.member-narrow-rating-container:eq(' + index + ')').show();
+	});
+	
+	preloadImageArray.push('/images/global/gmap/markers/green.png');
+	preloadImageArray.push('/images/global/gmap/markers/green_reverse.png');
 	
 	initializeMap(37.98, -122.5, 12, createMarkers);
 
@@ -122,6 +136,7 @@ $(function() {
  */
 function createMarkers()
 {	
+
 	// Clear prior markers
 	clearMarkers();
 	
@@ -129,6 +144,7 @@ function createMarkers()
 	var bounds  = new google.maps.LatLngBounds();
 	
 	// Zoom constraint
+	/*
 	google.maps.event.addListener(gmap, 'zoom_changed', function() {
 			zoomChangeBoundsListener = 
 				google.maps.event.addListener(gmap, 'bounds_changed', function(event) {
@@ -141,15 +157,34 @@ function createMarkers()
 			});
 	});
 	
+	
 	gmap.initialZoom = true;
+	*/
 
+	
+	//google.maps.event.removeListener(dragListener);
+	google.maps.event.addListenerOnce(gmap, 'zoom_changed', function(event) {
+		// Set timeout to prevent event from triggering more than once
+			clearTimeout(zoomChanged);
+			zoomChanged = setTimeout(mapMoved, 50);
+
+	})
+	
+	google.maps.event.addListenerOnce(gmap, 'dragend', function(event) {
+		// Set timeout to prevent event from triggering more than once
+			clearTimeout(zoomChanged);
+			zoomChanged = setTimeout(mapMoved, 50);
+	})
+	
+	
 	if (gmapMarkers.length == 0) {
 		return false;
 	}
 	
+	
+	
 	for (i = 0; i < gmapMarkers.length; i++) {
 		// Create markers here
-		
 		
 		latLon = new google.maps.LatLng(gmapMarkers[i][0], gmapMarkers[i][1]);
 		marker = new google.maps.Marker({
@@ -181,14 +216,27 @@ function createMarkers()
 		if (i > ($('.member-find-lower-inner-container').first().children('.member-game').length) - 1) {
 			marker.setVisible(false);
 		} else {
-			bounds.extend(latLon);
+			/*bounds.extend(latLon);
 			gmap.setCenter(bounds.getCenter());
 			gmap.fitBounds(bounds);
+			*/
 		}
 		
 
 	}
 	
+}
+
+/**
+ * load matches given new map boundaries
+ */
+function mapMoved()
+{
+	var points = new Array();
+	var bounds = gmap.getBounds();
+	points[0] = 'POINT(' + bounds.getNorthEast().lat() + ',' + bounds.getNorthEast().lng() + ')';
+	points[1] = 'POINT(' + bounds.getSouthWest().lat() + ',' + bounds.getSouthWest().lng() + ')';
+	loadFind(points);
 }
 
 
@@ -269,8 +317,9 @@ function hideShowMarkers(page)
 /**
  * Ajax call to retrieve games/teams onchange of "looking for"
  */
-function loadFind()
+function loadFind(points)
 {
+
 	var sports = new Array();
 	var types  = new Array();
 	
@@ -287,14 +336,17 @@ function loadFind()
 			}
 		}
 	})
+
 	
 	$('.member-find-loading').show();
 	$('#member-find-body').hide();
-	
+
 	$.ajax({
 		url: '/ajax/get-matches',
 		type: 'POST',
-		data: {sports: sports, types:types},
+		data: {sports: sports, 
+			   types: types,
+			   points: points},
 		success: function(matches) {
 			matches = JSON.parse(matches);
 			$('#member-find-body').html(matches[0]);
@@ -304,9 +356,12 @@ function loadFind()
 			
 			// Clear any prior markers
 			gmapMarkers = new Array();
-			for (i = 0; i < matches[1].length; i++) {
-				gmapMarkers.push([matches[1][i][0],matches[1][i][1]]);
+			if (typeof matches[1] != 'undefined') {
+				for (i = 0; i < matches[1].length; i++) {
+					gmapMarkers.push([matches[1][i][0],matches[1][i][1]]);
+				}
 			}
+
 			createMarkers();
 			
 			//populateFindBody(matches);

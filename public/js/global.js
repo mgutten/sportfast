@@ -137,6 +137,7 @@ $(function()
 		if (dropdowns.dropdownMenuDown) {
 			if (dropdowns.dropdownMenuDown.attr('id') !== $(this).parent().attr('id')) {
 				// Different dropdown is already down
+				dropdowns.dropdownMenuDown.children('.dropdown-menu-selected').children('p').removeClass('dropdown-menu-container-reverse-text');
 				dropdownMenu(dropdowns.dropdownMenuDown);
 			}
 		}
@@ -145,10 +146,12 @@ $(function()
 		
 		if ($(this).is('.dropdown-menu-container-reverse')) {
 			$(this).removeClass('dropdown-menu-container-reverse');
+			$(this).children('p').removeClass('dropdown-menu-container-reverse-text');
 		} else {
 			// Remove old class for case when click one dropdown then click another
 			$('.dropdown-menu-container-reverse').removeClass('dropdown-menu-container-reverse');
 			$(this).addClass('dropdown-menu-container-reverse');
+			$(this).children('p').addClass('dropdown-menu-container-reverse-text');
 		}
 		
 	})
@@ -161,7 +164,7 @@ $(function()
 	{
 		$(this).animateLighter();
 	})
-	.on('click','.dropdown-menu-option-container',function()
+	.on('click.swapValue','.dropdown-menu-option-container',function()
 	{
 		//Option has been clicked
 		var value = $(this).children('p').text();
@@ -281,6 +284,7 @@ $(function()
 		if (dropdowns.dropdownMenuDown) {
 			// Dropdown menu is down
 			dropdowns.dropdownMenuDown.children('.dropdown-menu-selected').removeClass('dropdown-menu-container-reverse');
+			dropdowns.dropdownMenuDown.children('.dropdown-menu-selected').children('p').removeClass('dropdown-menu-container-reverse-text');
 
 			dropdownMenu(dropdowns.dropdownMenuDown);
 		}
@@ -320,6 +324,7 @@ $(function()
 		if (dropdowns.dropdownMenuDown) {
 			// Dropdown menu is down
 			dropdowns.dropdownMenuDown.children('.dropdown-menu-selected').removeClass('dropdown-menu-container-reverse');
+			dropdowns.dropdownMenuDown.children('.dropdown-menu-selected').children('p').removeClass('dropdown-menu-container-reverse-text');
 
 			dropdownMenu(dropdowns.dropdownMenuDown);
 		}
@@ -532,6 +537,7 @@ $(function()
 		if (dropdowns.dropdownMenuDown) {
 			// Dropdown menu is down
 			dropdowns.dropdownMenuDown.children('.dropdown-menu-selected').removeClass('dropdown-menu-container-reverse');
+			dropdowns.dropdownMenuDown.children('.dropdown-menu-selected').children('p').removeClass('dropdown-menu-container-reverse-text');
 
 			dropdownMenu(dropdowns.dropdownMenuDown);
 		}
@@ -1208,6 +1214,7 @@ function preloadImages(imageArray)
 
 function clearMarkers() {
     for(var i=0; i < markers.length; i++){
+		
         markers[i].setMap(null);
     }
     markers = new Array();

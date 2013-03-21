@@ -27,6 +27,7 @@ class Application_Model_User extends Application_Model_ModelAbstract
 									'userLocation'	=> '',
 									'games'			=> '',
 									'teams'			=> '',
+									'groups'		=> '',
 									'changedLocation' => ''
 									);
 
@@ -36,6 +37,19 @@ class Application_Model_User extends Application_Model_ModelAbstract
 	public function save($loopSave = true)
 	{
 		$this->getMapper()->save($this, $loopSave);
+		return $this;
+	}
+	
+	/** 
+	 * actions to take to log user in and store all necessary info
+	 */
+	public function login()
+	{
+		$this->password = '';
+		$this->getUserSportsInfo();
+		$this->getUserGames();
+		$this->getOldUserNotifications();
+		
 		return $this;
 	}
 

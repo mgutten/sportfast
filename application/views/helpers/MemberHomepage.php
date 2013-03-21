@@ -23,13 +23,21 @@ class Application_View_Helper_MemberHomepage
 			
         	echo "<a href='" . $href . "'><img src='" . $user->getProfilePic('large') . "' class='narrow-column-picture dropshadow' id='narrow-column-user-picture'/></a>";
            	echo $this->_view->narrowcolumnsection()->start(array('title' => 'My Ratings'));
-				echo "Rating information will go here";
+				echo $this->buildUserRatings();
 			echo $this->_view->narrowcolumnsection()->end();
 			echo $this->_view->narrowcolumnsection()->start(array('title' => 'My Teams'));
-				echo "Team information will go here";
+				if ($this->_view->user->hasValue('teams')) {
+					echo 'teams!';
+				} else {
+					echo '<p class="medium clear-left">You have no teams.</p><a href="find/teams" class="medium smaller-text clear-right">Find a team</a>';
+				}
 			echo $this->_view->narrowcolumnsection()->end();
 			echo $this->_view->narrowcolumnsection()->start(array('title' => 'My Groups'));
-				echo "Group information will go here";
+				if ($this->_view->user->hasValue('groups')) {
+					echo 'groups!';
+				} else {
+					echo '<p class="medium clear-left">You have no groups.</p><a href="find/groups" class="medium smaller-text clear-right">Find a group</a>';
+				}
 			echo $this->_view->narrowcolumnsection()->end();
 			echo $this->_view->narrowcolumnsection()->start(array('title' => 'My Schedule'));
 				echo "Schedule information will go here";
@@ -253,9 +261,10 @@ class Application_View_Helper_MemberHomepage
 				$totalPages++;
 			}
 			
-			if (get_class($match) == 'Application_Model_Game') {
+			if ($match instanceof Application_Model_Game) {
 				// Match is a game
 				$type     = 'Game';
+				$typeClass= 'bold';
 				$dateTime = DateTime::createFromFormat('Y-m-d H:i:s', $match->date);
 				$newDate  = $dateTime->format('m n');
 				$day      = $match->getDay();
@@ -264,27 +273,26 @@ class Application_View_Helper_MemberHomepage
 				$id		  = $match->gameID;
 				$location = $match->getLimitedParkName(25);
 				$gameIndex= $totalGames;
+				$dateHTML = "<div class='member-find-game-date-day'>" . $day . "</div>&nbsp; 
+								<div class='member-find-game-date-hour'>" . $hour . "</div>";
 				$totalGames++;
-			} elseif (get_class($match) == 'Application_Model_Team') {
+			} elseif ($match instanceof Application_Model_Team) {
 				// Match is a team
 				$type	  = 'Team';
-				$day      = '';
-				$hour	  = '';
+				$dateHTML = $match->getLimitedName('city', 8);
 				$location = $match->getLimitedName('teamName',25);
 				$id		  = $match->teamID;
-				$dateDesc = '';
+				$dateDesc = $match->city;
 				$marker   = '';
 				$gameIndex= '';
+				$typeClass= '';
 			}
 				
 			$output .= "<a class='member-find-game-container member-" . strtolower($type) . "' href='/" . strtolower($type) . "s/" . $id . "' gameIndex='" . $gameIndex . "'>";
 			$output .= "<p class='member-find-game-number green-back white arial bold'>" . $totalMatches . "</p>";
 			$output .= "<p class='member-find-game-sport darkest bold'>" . $match->sport . "</p>";
-			$output .= "<p class='member-find-game-type darkest bold'>" . $type . "</p>";
-			$output .= "<div class='member-find-game-date medium' tooltip='" . $dateDesc . "'>
-								<div class='member-find-game-date-day'>" . $day . "</div>&nbsp; 
-								<div class='member-find-game-date-hour'>" . $hour . "</div>
-							</div>";
+			$output .= "<p class='member-find-game-type darkest " . $typeClass . "'>" . $type . "</p>";
+			$output .= "<div class='member-find-game-date medium' tooltip='" . $dateDesc . "'>" . $dateHTML . "</div>";
 			$output .= "<p class='member-find-game-players darkest bold'>" . $match->totalPlayers . "/" . $match->rosterLimit . "</p>";
 			$output .= "<img src='" . $match->getMatchImage() . "' class='member-find-game-match' tooltip='" . $match->getMatchDescription() . "'/>";
 			$output .= "<p class='member-find-game-park medium'>" . $location . "</p>";
@@ -331,6 +339,7 @@ class Application_View_Helper_MemberHomepage
 			$output .= $this->createNotification($notification);
 		}
 		$output .= "</div>";
+		$output .= "<p class='button' id='notifications-load'>Load more</p>";
 		return $output;
 	}
 	
@@ -350,5 +359,56 @@ class Application_View_Helper_MemberHomepage
 					  
 		  return $output;
 	 }
+	 
+	 /**
+	 * build right narrow column ratings dropdown
+	 * @return $output
+	 */
+	public function buildUserRatings()
+	{
+		$output = '';
+		$iconsOutput    = '';
+		$ratingsOutput = '<div id="member-narrow-rating-lower-container">';
+		$sports = $this->_view->user->sports;
+		
+		$ratingOrder = array('skillCurrent' => 'skill',
+							 'sportsmanship' => 'sprtmn',
+							 'attendance'	 => 'attnd');
+		$counter = 0;
+		foreach ($sports as $sport) {
+			$class = '';
+			if ($counter == 0) {
+				// First sport is selected initially
+				$class = 'green-back';
+			}
+			$iconsOutput   .= "<img src='" . $sport->getIcon($sport->sport, 'small', 'outline') . "' class='medium-background member-narrow-rating-icon pointer " . $class . "' />";
+			$ratingsOutput .= "<div class='member-narrow-rating-container'>";
+			$ratingsOutput .= "<p class='width-100 clear center'>" . ucwords($sport->sport) . "</p>";
+			$ratingsOutput .= "<p class='width-100 clear center green bold largest-text'>" . $sport->getOverall() . "</p>";
+			$ratingsOutput .= "<div class='width-100 clear'>";
+			
+			foreach ($ratingOrder as $rating => $label) {
+				// Create individual rating breakdown
+				$ratingsOutput .= "<div class='rating-individual-container'>";
+				$ratingsOutput .= "<p class='green smaller-text width-100 center clear rating-label'>" . $label . "</p>";
+				$ratingsOutput .= "<p class='green bold larger-text width-100 center clear'>" . $sport->$rating . "</p>";
+				$ratingsOutput .= "</div>";
+			}
+			
+			$ratingsOutput .= "<div class='rating-individual-container'>";
+			$ratingsOutput .= "<p class='green smaller-text width-100 center clear'>skill</p>";
+			$ratingsOutput .= "<p class='green bold larger-text width-100 center clear'>" . $sport->skillCurrent . "</p>";
+			$ratingsOutput .= "</div>";
+			$ratingsOutput .= "</div></div>";
+			
+			$counter++;
+		}
+		
+		$ratingsOutput .= "</div>";
+		
+		$output .= $iconsOutput . $ratingsOutput;
+		
+		return $output;
+	}
 			
 }

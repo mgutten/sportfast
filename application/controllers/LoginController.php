@@ -99,12 +99,7 @@ class LoginController extends Zend_Controller_Action
 			
 			// Store user info in user session
 			/* ANY FUNCTIONS RUN ON USER HERE SHOULD BE MIMICKED IN BOOTSTRAP InitLayoutSetup*/
-			$user->password = '';
-			$user->getUserSportsInfo();
-			$user->getUserGames();
-			$user->getOldUserNotifications();
-			//$user = $auth->getIdentity();
-			//$user->getUserSportsInfo();
+			$user->login();
 			
 			return $this->_helper->redirector->goToUrl('/');
 		}

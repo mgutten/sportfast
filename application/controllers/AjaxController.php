@@ -132,8 +132,10 @@ class AjaxController extends Zend_Controller_Action
 				$sportStr  = implode("','",$post['sports']);
 				$options[] = "g.sport IN ('" . $sportStr  . "')";
 			}
+
+			$points = ($post['points'] != 'false' ? $post['points'] : false);
 			$games = new Application_Model_Games();
-			$games->findUserGames($this->view->user, $options);
+			$games->findUserGames($this->view->user, $options, $points);
 			$matches->addMatches($games->games);
 		}
 		if (in_array('teams',$post['types'])) {

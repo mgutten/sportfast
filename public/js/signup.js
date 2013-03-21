@@ -970,6 +970,7 @@ function updateAvailabilityHiddenInput(dayEle)
 	var selectedChildren = dayEle.find('.availability.selected-green');
 	var value;
 	var sport  = getSportName(dayEle);
+	var capitalizedSport = capitalize(sport);
 		
 	if (selectedChildren.length > 0) {
 		// Timeslots are selected
@@ -979,15 +980,15 @@ function updateAvailabilityHiddenInput(dayEle)
 			value = $(this).attr('hour');
 			values.push(value);
 		})
-
-		if ($.inArray(sport, copyAvailability) == -1) {
-			copyAvailability.push(sport);
+		
+		if ($.inArray(capitalizedSport, copyAvailability) == -1) {
+			copyAvailability.push(capitalizedSport);
 			createSportsCopyableDropdown();
 		}
 		
 	} else {
 		// No timeslots selected
-		var index = $.inArray(sport, copyAvailability);
+		var index = $.inArray(capitalizedSport, copyAvailability);
 		
 		if (index > -1) {
 			

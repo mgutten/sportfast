@@ -19,7 +19,8 @@ class Application_Model_Sport extends Application_Model_ModelAbstract
 									'userSportID'	  => '',
 									'sportsmanship'	  => '',
 									'attendance'	  => '',
-									'formats'		  => ''
+									'formats'		  => '',
+									'overall'		  => ''
 									);
 	protected $_primaryKey = 'userSportID';	
 	protected $_overwriteKeys = array('userID');
@@ -41,7 +42,39 @@ class Application_Model_Sport extends Application_Model_ModelAbstract
 		
 		parent::save();
 	}
-
+	
+	/**
+	 * calculate overall rating for user
+	 */
+	public function getOverall()
+	{
+		if (!empty($this->_attribs['overall'])) {
+			// Overall has been set before
+			return $this->_attribs['overall'];
+		}
+		
+		$weight = array('sportsmanship' => .1,
+						'attendance'	=> .1,
+						'skillCurrent'	=> .8);
+		
+		$sportsmanship = $weight['sportsmanship'] * $this->sportsmanship;
+		$attendance    = $weight['attendance'] * $this->attendance;
+		$skill		   = $weight['skillCurrent'] * $this->skillCurrent;
+		
+		$overall = $sportsmanship + $attendance + $skill;
+		
+		return ceil($overall);
+	}
+	
+	
+	/**
+	 * get and return href for sport icon
+	 */
+	public function getIcon($sport, $size = 'medium', $color = 'outline')
+	{
+		return '/images/global/sports/icons/' . strtolower($size) . '/' . strtolower($color) . '/' . $sport . '.png';
+	}
+		
 
 	public function getAvailability($day) 
 	{	

@@ -16,7 +16,8 @@ class Application_Model_Team extends Application_Model_ModelAbstract
 									'averageSkill' => '',
 									'averageAttendance'    => '',
 									'averageSporstmanship' => '',
-									'match'		   => ''
+									'match'		   => '',
+									'city'		   => ''
 									);
 									
 	protected $_primaryKey = 'teamID';

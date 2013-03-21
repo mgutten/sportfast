@@ -46,7 +46,7 @@ class Application_Model_SportsMapper extends Application_Model_MapperAbstract
 		return $sports;
 	}
 	
-	
+	/* used in usersMapper
 	public function getUserSportsInfo($userID, $modelClass)
 	{
 		$table   = $this->getDbTable();
@@ -58,6 +58,9 @@ class Application_Model_SportsMapper extends Application_Model_MapperAbstract
 			   		  's.sportID = sp.sportID')
 			   ->join(array('usp' => 'user_sport_positions'),
 			   		  'usp.positionID = sp.positionID')
+			   ->join(array('us' => 'user_sports'),
+			   		  'sp.sportID = us.sportID',
+					  array('skillCurrent', 'sportsmanship', 'attendance'))
 		       ->where('usp.userID = ?', $userID);
 			   
 		$results = $table->fetchAll($select);
@@ -69,6 +72,7 @@ class Application_Model_SportsMapper extends Application_Model_MapperAbstract
 		return $modelClass;
 
 	}
+	*/
 	
 	
 	/*

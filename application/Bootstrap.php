@@ -45,10 +45,8 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 				/* any call to $user here should be mimicked on login/auth controller/action */
 				$user = new Application_Model_User();
 				$user->getUserBy('u.userID',$_COOKIE['user']);
-				$user->password = '';
-				$user->getUserSportsInfo();
-				$user->getUserGames();
-				$user->getOldUserNotifications(); // Must be after get games, teams, and groups call
+				$user->login();
+				// Must be after get games, teams, and groups call
 				$auth->getStorage()->write($user);
 				
 			}

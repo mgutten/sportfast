@@ -30,8 +30,8 @@ class Application_Model_Sports extends Application_Model_ModelAbstract
 			$this->setOptions($options);
 		}
 	}
-	
-	public function find($id) 
+	/*
+	public function find($id, $column) 
 	{
 		$result = $this->getMapper()->find($id, new $this->_singleClass());
 		return $result;
@@ -41,7 +41,7 @@ class Application_Model_Sports extends Application_Model_ModelAbstract
 	{
 		return $this->getMapper()->fetchAll($this->_singleClass);
 	}
-	
+	*/
 	public function getAllSportsInfo()
 	{
 		return $this->getMapper()->getAllSportsInfo();

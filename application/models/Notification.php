@@ -152,8 +152,9 @@ class Application_Model_Notification extends Application_Model_ModelAbstract
 					$post = "</span>";
 				}
 			} elseif ($match == 'date') {
-				$time = strtotime($match);
-				$replaceVal = date('l, M j', $time) . ' at ' . date('ga', $time);
+				$time = strtotime($replaceVal);
+				// Format date (Wednesday, Dec 31 at 4pm)
+				$replaceVal = date('l', $time) . ' <span class="light">' . date('M j', $time) . '</span> at ' . date('ga', $time);
 			}
 			
 			

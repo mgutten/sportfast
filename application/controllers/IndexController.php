@@ -22,22 +22,22 @@ class IndexController extends Zend_Controller_Action
 
 			$this->view->narrowColumn = 'right';
 			
-			$userSports = $this->view->userSports = $this->view->user->getSportNames();
+			$this->view->userSports = $this->view->user->getSportNames();
 			
+			$userSports = $this->view->user->sports;
 			$dropdown = Zend_Controller_Action_HelperBroker::getStaticHelper('Dropdown');
 			$lookingDropdownSportArray = array();
-			$sportIconPath = '/images/global/sports/icons/small/outline/';
 			$sportsParen   = '('; // For use in options with games model below
 			
 			foreach ($userSports as $sport) {
 				// Loop through sports and create properly formatted array for dropdown
-				$sportArray = array('text'  => $sport,
-									'image' => $sportIconPath . strtolower($sport) . '.png',
+				$sportArray = array('text'  => $sport->sport,
+									'image' => $sport->getIcon($sport->sport, 'tiny', 'outline'),
 									'color' => 'light');
 									
 				array_push($lookingDropdownSportArray, $sportArray);
 				
-				$sportsParen .= '"' . $sport . '"';
+				$sportsParen .= '"' . $sport->sport . '"';
 				
 				if ($sport == end($userSports)) {
 					// Last sport

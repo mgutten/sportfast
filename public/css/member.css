@@ -152,7 +152,11 @@
 }
 
 #member-looking-sports>.dropdown-menu-selected>.dropdown-menu-option-text, #member-looking-types>.dropdown-menu-selected>.dropdown-menu-option-text {
-	color: #bbb;
+	color: #bbb; /* overwrite normal dropdown color */
+}
+
+#member-looking-sports>.dropdown-menu-selected>.dropdown-menu-container-reverse-text, #member-looking-types>.dropdown-menu-selected>.dropdown-menu-container-reverse-text{
+	color: #fff;
 }
 
 #gmap {
@@ -302,3 +306,38 @@ div.member-find-game-date-hour {
 	font-size: .75em;
 	margin: .2em 0 0 1em;
 }
+
+#notifications-load {
+	position:relative;
+	left:50%;
+	margin:.5em 0 0 -3.2em;
+}
+
+
+/* narrow column ratings */
+
+.member-narrow-rating-icon {
+	float:left;
+	margin-right: .4em;
+}
+
+#member-narrow-rating-lower-container {
+	float:left;
+	clear:both;
+	width: 100%;
+	height: 6em;
+	overflow: hidden;
+}
+
+.member-narrow-rating-container {
+	float:left;
+	width: 100%;
+	display:none;
+	border-top: solid 1px #e9e9e9;
+	margin-top: .4em;
+}
+
+.member-narrow-rating-container:first-child {
+	display:block;
+}
+
