@@ -29,9 +29,9 @@ class Application_Model_SportPosition extends Application_Model_ModelAbstract
 		parent::save($this);
 	}
 	
-	public function testDelete()
+	public function getPositionName()
 	{
-		return $this->getMapper()->testDelete($this);
+		return ucwords($this->_attribs['positionName']);
 	}
 	
 }

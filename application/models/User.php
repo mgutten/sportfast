@@ -8,8 +8,6 @@ class Application_Model_User extends Application_Model_ModelAbstract
 								    'password' 		=> '',
 								    'firstName' 	=> '',
 								    'lastName' 		=> '',
-									'shortName'		=> '',
-									'fullName'		=> '',
 								    'age' 			=> '',
 									'streetAddress' => '',
 									'cityID'		=> '',
@@ -18,6 +16,7 @@ class Application_Model_User extends Application_Model_ModelAbstract
 									'sex' 			=> '',
 									'lastRead' 		=> '',
 									'active'		=> '',
+									'lastActive'    => '',
 									'verifyHash' 	=> '',
 									'dob'			=> '',
 									'city'			=> '',
@@ -28,7 +27,10 @@ class Application_Model_User extends Application_Model_ModelAbstract
 									'games'			=> '',
 									'teams'			=> '',
 									'groups'		=> '',
-									'changedLocation' => ''
+									'friends'		=> '',
+									'changedLocation' => '',
+									'messages'		=> '',
+									'friends'		=> ''
 									);
 
 	protected $_primaryKey = 'userID';	
@@ -47,10 +49,37 @@ class Application_Model_User extends Application_Model_ModelAbstract
 	{
 		$this->password = '';
 		$this->getUserSportsInfo();
-		$this->getUserGames();
 		$this->getOldUserNotifications();
+		$this->getUserInfo();
 		
 		return $this;
+	}
+	
+	public function getUserInfo()
+	{
+		$this->_attribs['teams'] = '';
+		$this->_attribs['groups'] = '';
+		$this->_attribs['games'] = '';
+		$this->_attribs['friends'] = '';
+		
+		$this->getUserTeams();
+		$this->getUserFriends();
+		$this->getUserGroups();
+		$this->getUserGames();
+		return $this;
+	}
+	
+	/**
+	 * get shorthand (name and id) for user's friends, groups, and teams
+	 */
+	public function getUserFriendsGroupsTeams()
+	{
+		return $this->getMapper()->getUserFriendsGroupsTeams($this);
+	}
+	
+	public function getUserRatings()
+	{
+		return $this->getMapper()->getUserRatings($this);
 	}
 
 	public function getScheduledGames()
@@ -64,11 +93,51 @@ class Application_Model_User extends Application_Model_ModelAbstract
 		}
 	}
 
+	public function getMessages()
+	{
+		if (empty($this->_attribs['message'])) {
+			// No notifications object set
+			$this->_attribs['message'] = new Application_Model_Messages();
+		}
+		return $this->_attribs['messages'];
+	}
+	
+	/**
+	 * get all of user's scheduled games from db
+	 */
 	public function getUserGames()
 	{
 		return $this->getMapper()->getUserGames($this);
 	}
 	
+	/**
+	 * get all of user's teams from db
+	 */
+	public function getUserTeams()
+	{
+		return $this->getMapper()->getUserTypes('teams',$this);
+	}
+	
+	/**
+	 * get all of user's groups from db
+	 */
+	public function getUserGroups()
+	{
+		return $this->getMapper()->getUserTypes('groups',$this);
+	}
+	
+	/**
+	 * get all of user's groups from db
+	 */
+	public function getUserFriends()
+	{
+		return $this->getMapper()->getUserFriends($this);
+	}
+	
+	/**
+	 * Get games model
+	 * @return games model
+	 */
 	public function getGames()
 	{
 		if (empty($this->_attribs['games'])) {
@@ -76,6 +145,45 @@ class Application_Model_User extends Application_Model_ModelAbstract
 			$this->_attribs['games'] = new Application_Model_Games();
 		}
 		return $this->_attribs['games'];
+	}
+	
+	/**
+	 * Get teams model
+	 * @return teams model
+	 */
+	public function getTeams()
+	{
+		if (empty($this->_attribs['teams'])) {
+			// No notifications object set
+			$this->_attribs['teams'] = new Application_Model_Teams();
+		}
+		return $this->_attribs['teams'];
+	}
+	
+	/**
+	 * Get groups model
+	 * @return groups model
+	 */
+	public function getGroups()
+	{
+		if (empty($this->_attribs['groups'])) {
+			// No notifications object set
+			$this->_attribs['groups'] = new Application_Model_Groups();
+		}
+		return $this->_attribs['groups'];
+	}
+	
+	/**
+	 * Get friends 
+	 * @return users model
+	 */
+	public function getFriends()
+	{
+		if (empty($this->_attribs['friends'])) {
+			// No notifications object set
+			$this->_attribs['friends'] = new Application_Model_Users();
+		}
+		return $this->_attribs['friends'];
 	}
 
 	public function getNotifications()
@@ -104,7 +212,7 @@ class Application_Model_User extends Application_Model_ModelAbstract
 		$this->notifications->resetNewNotifications();
 		return $this;
 	}
-		
+	
 	
 	public function getShortName()
 	{
@@ -114,6 +222,39 @@ class Application_Model_User extends Application_Model_ModelAbstract
 	public function getFullName()
 	{
 		return $this->firstName . ' ' . $this->lastName;
+	}
+	
+	public function getHeightInFeet()
+	{
+		$heightInches = $this->height;
+		$feet = floor($heightInches/12);
+		$inches = ($heightInches - ($feet * 12));
+		
+		return $feet . "' " . $inches . "\"";
+	}
+	
+	public function getSexFull()
+	{
+		$sex = $this->_attribs['sex'];
+		if ($sex == 'm') {
+			$sex = 'Male';
+		} else {
+			$sex = 'Female';
+		}
+		
+		return $sex;
+	}
+	
+	public function setFirstName($firstName)
+	{
+		$this->_attribs['firstName'] = ucwords($firstName);
+		return $this;
+	}
+	
+	public function setLastName($lastName)
+	{
+		$this->_attribs['lastName'] = ucwords($lastName);
+		return $this;
 	}
 	
 	public function setPhoto($photo)
@@ -138,6 +279,17 @@ class Application_Model_User extends Application_Model_ModelAbstract
 		}
 		
 		return $sports;
+	}
+	
+	public function sortSportsByOverall()
+	{
+		if ($this->hasValue('sports')) {
+			// There are matches stored, sort them
+			uasort($this->_attribs['sports'], array('Application_Model_Sports','overallSort'));
+			return $this->_attribs['sports'];
+		} else {
+			return false;
+		}
 	}
 	
 	public function getCity()
@@ -180,9 +332,15 @@ class Application_Model_User extends Application_Model_ModelAbstract
 		return $this;
 	}
 	
-	public function getProfilePic($size, $userID = false) 
+	public function setLastActiveCurrent()
 	{
-		return parent::getProfilePic($size, $this->userID);
+		$this->_attribs['lastActive'] = date("Y-m-d H:i:s", time());
+		return $this;
+	}
+	
+	public function getProfilePic($size, $userID = false, $type = 'users') 
+	{
+		return parent::getProfilePic($size, $this->userID, $type);
 	}
 	
 	public function setChangedLocation($value) 
@@ -192,12 +350,45 @@ class Application_Model_User extends Application_Model_ModelAbstract
 	}
 	
 	/**
+	 * get time that user was last active in a str
+	 */
+	public function getLastActiveFromNow()
+	{
+		$date = $this->_attribs['lastActive'];
+		return parent::getTimeFromNow($date, 14);
+	}
+	
+	/**
 	 * reset stored user's location and city to home
 	 */
 	public function resetHomeLocation()
 	{
 		$this->getMapper()->resetHomeLocation($this);
 	}
+	
+		/**
+     * Create a hash (encrypt) of a plain text password.
+     *
+     * @param string $password Plain text user password to hash
+     * @return string The hash string of the password
+     */
+    public function hashPassword($password) {
+        return $this->getMapper()->hashPassword($password);
+    }
+ 
+    /**
+     * Compare the plain text password with the $hashed password.
+     *
+     * @params ($password => password to check
+     * 			$hash => the hashed password
+     * 	 		$user_id => the user row ID)
+     * @return bool True if match, false if no match.
+     */
+    public function checkPassword($password, $hash, $user_id = '') {
+		
+       return $this->getMapper()->checkPassword($password, $hash, $user_id);
+    }
+
 
 
 }

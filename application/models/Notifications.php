@@ -45,6 +45,12 @@ class Application_Model_Notifications extends Application_Model_ModelAbstract
 		return $notification;
 	}
 	
+	public function getUserActivities($userClass, $limit = 15)
+	{
+		$this->setMapper('Application_Model_NotificationsMapper');
+		return $this->getMapper()->getUserActivities($userClass, $this, $limit);
+	}
+	
 	public function countUnread()
 	{
 		if (($count = count($this->unread)) > 0) {

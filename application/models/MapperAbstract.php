@@ -65,10 +65,10 @@ abstract class Application_Model_MapperAbstract
 				continue;
 			} elseif ($savingClass instanceof Application_Model_User && $column == 'cityID' && !empty($savingClass->changedLocation)) {
 				// Is user class and location has been changed temporarily, do not change cityID for user row, skip
-				echo $column;
 				continue;
 			}
-			$data[$column] = $savingClass->$column;
+			
+			$data[$column] = strtolower(trim($savingClass->$column));
 			
 		}
 		

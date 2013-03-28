@@ -19,6 +19,10 @@ class Application_Model_Notification extends Application_Model_ModelAbstract
 									'text'				=> '',
 									'firstName'			=> '',
 									'lastName'			=> '',
+									'actingFirstName'	=> '',
+									'actingLastName'	=> '',
+									'receivingFirstName'=> '',
+									'receivingLastName'	=> '',
 									'sport'				=> '',
 									'date'				=> '',
 									'parkName'			=> '',
@@ -42,48 +46,42 @@ class Application_Model_Notification extends Application_Model_ModelAbstract
 				
 	}
 	
-	public function getTimeFromNow()
+	public function getTimeFromNow($date = false, $maxDays = 7)
 	{
-		$date = strtotime($this->dateHappened);
-		$now  = time();
-		$diff = $now - $date;
-		
-		if (($seconds = $diff) < 60) {
-			$time = $seconds;
-			$post = ($time == 1 ? 'second ago' : 'seconds ago');
-		} elseif (($minutes = floor($seconds/60)) < 60) {
-			// Under 60 minutes
-			$time = $minutes;
-			$post = ($time == 1 ? 'minute ago' : 'minutes ago');
-		} elseif (($hours = floor($minutes/60)) < 24) {
-			// > 60 minutes, under 24 hours
-			$time = $hours;
-			$post = ($time == 1 ? 'hour ago' : 'hours ago');
-		} elseif (($days = floor($hours/24)) < 7) {
-			// > 24 hours, 6 days
-			$time = $days;
-			$post = ($time == 1 ? 'day ago' : 'days ago');
-		}  else {
-			// > 6 days, show date
-			$time = date ('l, M j',$date);
-			$post = '';
-		}
-		
-		return $time . ' ' . $post;
-		
+		return parent::getTimeFromNow($this->dateHappened, $maxDays);	
 	}
 	
 	public function getPicture($size = 'small')
 	{
-		if (!empty($this->_attribs['actingUserID'])) {
+		$picture = $this->_attribs['picture'];
+		
+		if ($picture == 'users') {
+			// User pic
+			$path = $this->getProfilePic($size, $this->actingUserID, 'users');
+		} elseif ($picture == 'parks') {
+			// Park pic
+			$path = $this->getProfilePic($size, $this->parkID, 'parks');
+		} elseif ($picture == 'sports') {
+			// Sports pic
+			$path = $this->getSportIcon($this->sport, $size, 'solid', 'medium');
+		} elseif ($picture == 'teams') {
+			// Team pic
+			$path = $this->getProfilePic($size, $this->teamID, 'teams');
+		} elseif ($picture == 'teams') {
+			// Group pic
+			$path = $this->getProfilePic($size, $this->groupID, 'groups');
+		}  
+		
+		/*if (!empty($this->_attribs['actingUserID'])) {
 			// Some user did this
 			$picturePath = $this->getProfilePic($size, $this->actingUserID);
 		} else {
 			// Non user (system, team, group, etc)
 			
 		}
+		*/
 		
-		return $picturePath;
+		return $path;
 	}
 	
 	public function getFormattedUrl()
@@ -122,11 +120,20 @@ class Application_Model_Notification extends Application_Model_ModelAbstract
 				$possession = 'a';
 			}
 			
-			if ($match == 'userName') {
-				$replaceVal = $this->firstName . " " . $this->lastName[0];
+			if ($match == 'userName' || $match == 'receivingUserName') {
+				// Username replace
+				if ($match == 'userName') {
+					// Refers to acting user
+					$id = $this->actingUserID;
+					$replaceVal = ucwords($this->actingFirstName) . " " . ucwords($this->actingLastName[0]);
+				} else {
+					// Refers to receiving user
+					$id = $this->receivingUserID;
+					$replaceVal = ucwords($this->receivingFirstName) . " " . ucwords($this->receivingLastName[0]);
+				}
 				if ($this->newsfeed) {
 					// Is newsfeed, add link
-					$pre  = "<a href='/users/" . $this->actingUserID . "' class='" . $class . "'>";
+					$pre  = "<a href='/users/" . $id . "' class='" . $class . "'>";
 					$post = "</a>";
 				} else {
 					$pre  = "<span class='" . $class . "'>";

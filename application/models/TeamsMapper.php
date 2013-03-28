@@ -19,9 +19,8 @@ class Application_Model_TeamsMapper extends Application_Model_MapperAbstract
 		
 		$select->setIntegrityCheck(false);
 		$select->from(array('t'  => 'teams'))
-			   ->join(array('l' => 'leagues'),
-			   		 'l.leagueID = t.leagueID',
-					 array('l.leagueName'))
+			   ->join(array('ll' => 'league_levels'),
+			   		 'll.leagueLevelID = t.leagueLevelID')
 			   ->join(array('uus' => 'user_sports'),
 			   		 'uus.sportID = t.sportID AND uus.userID = "' . $userID . '"',
 					 array('skillCurrent as userSkill'))
@@ -37,8 +36,8 @@ class Application_Model_TeamsMapper extends Application_Model_MapperAbstract
 						   'COUNT(us.userID) as totalPlayers'
 						   ))
 			   ->where('t.public = "1"')
-			   ->where('uus.skillCurrent >= l.minSkill AND uus.skillCurrent <= maxSkill')
-			   ->where('l.cityID = ?', $userClass->city->cityID);
+			   ->where('uus.skillCurrent >= ll.minSkill AND uus.skillCurrent <= ll.maxSkill')
+			   ->where('ll.cityID = ?', $userClass->city->cityID);
 		
 		if ($options) {
 			// Additional options are set

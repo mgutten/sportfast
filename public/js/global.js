@@ -219,6 +219,24 @@ $(function()
 		getCity($(this).val(), populateCityResults);
 	});
 	
+	
+	/* Search bar ajax call */
+	$('#headerSearchBar').keyup(function()
+	{
+		
+		if ($(this).val().length < 3) {
+			// Blank box (or too short), do not run check
+			$('#header-search-results-container').hide();
+			return;
+		}
+		searchDatabase($(this).val(), populateSearchResults);
+		
+	})
+	.focus(function()
+	{
+		$(this).trigger('keyup');
+	});
+	
 	$('#city-change-reset').click(function()
 	{
 		setUserLocation('home');
@@ -288,6 +306,10 @@ $(function()
 
 			dropdownMenu(dropdowns.dropdownMenuDown);
 		}
+		if (!$(e.target).is('.header-search-result') && !$(e.target).parents('#headerSearchForm').length > 0) {
+			// Hide results container for search
+			$('#header-search-results-container').hide();
+		}
 		
 		e.stopPropagation();
 		var dropdown = $(this).children('.dropdown-back-outer');
@@ -327,6 +349,10 @@ $(function()
 			dropdowns.dropdownMenuDown.children('.dropdown-menu-selected').children('p').removeClass('dropdown-menu-container-reverse-text');
 
 			dropdownMenu(dropdowns.dropdownMenuDown);
+		}
+		if (!$(e.target).is('.header-search-result') && !$(e.target).parents('#headerSearchForm').length > 0) {
+			// Hide results container for search
+			$('#header-search-results-container').hide();
 		}
 		
 		e.stopPropagation();
@@ -542,6 +568,11 @@ $(function()
 			dropdownMenu(dropdowns.dropdownMenuDown);
 		}
 		
+		if (!$(e.target).is('.header-search-result') && !$(e.target).parents('#headerSearchForm').length > 0) {
+			// Hide results container for search
+			$('#header-search-results-container').hide();
+		}
+		
 		
 
 	});
@@ -561,6 +592,23 @@ function getCity(zipcodeOrCity, callback)
 		type: 'POST',
 		data: {zipcodeOrCity: zipcodeOrCity},
 		success: function(data) {
+			callback(data);
+		}
+	})
+}
+
+/**
+ * Ajax call to search database for username, park, league, game, team, or group
+ * @params (search => search term to look for)
+ */
+function searchDatabase(searchTerm, callback)
+{
+	$.ajax({
+		url: '/ajax/search-db',
+		type: 'POST',
+		data: {search: searchTerm},
+		success: function(data) {
+			data = JSON.parse(data);
 			callback(data);
 		}
 	})
@@ -683,6 +731,65 @@ function populateCityResults(cities)
 }
 
 
+/**
+ * populate header search results
+ * @params (results => returned results from ajax)
+ */
+function populateSearchResults(results) 
+{
+	// Align search results with search input
+	var searchBar = $('.header-search-bar');
+	var left	  = searchBar.offset().left;
+	var top	  	  = searchBar.offset().top + searchBar.innerHeight();
+	var width	  = searchBar.outerWidth();
+	var searchVal = searchBar.val();
+		
+	$('#header-search-results-container').css({'left':  left,
+											   'top':   top,
+											   'width': width});
+	
+	var output = '';
+	
+	if (results.length < 1) {
+		// No results
+		output += "<div class='header-search-result dark-back medium'>No results found</div>";
+	} else {
+		// Results found
+	
+		for (i = 0; i < results.length; i++) {
+			
+			if (i >= 2) {
+				// Limit to 5 results, display more results afterwards
+				output += "<a href='/find/search/" + encodeURIComponent(searchVal).replace(/%20/g, '+').toLowerCase() + "' class='header-search-result dark-back medium pointer'>" + (results.length - i) + " more results</a>";
+				break;
+			}
+			if (results[i]['name'].length > 21) {
+				// Limit any name to 20 characters
+				results[i]['name'] = results[i]['name'].substring(0,20) + '..';
+			}
+			
+			output += "<a href='/" + results[i]['prefix'] + "/" + results[i]['id'] + "' class='header-search-result dark-back lighter pointer'>\
+						<p class='clear header-search-result-name'> " + results[i]['name'] + "</p>";
+						
+			if (results[i]['prefix'] !== 'users') {
+				// Not users, show what "type" result is
+				output += "<p class='clear-right medium smaller-text header-search-result-subtext'>" + capitalize(results[i]['prefix'].slice(0,-1)) + "</p>";
+			}
+			
+			output += "</a>";
+		}
+	}
+	
+	$('#header-search-results-container').html(output);
+	
+	if ($('#headerSearchBar').is(':focus') && $('#headerSearchBar').val().length >= 3) {
+		// Search bar has focus and val is greater than 2 (protect against accidently overfire due to ajax delay
+		$('#header-search-results-container') .show();
+	}
+	
+	$('.header-search-result').highlight(searchVal);
+	
+}
 
 
 /**

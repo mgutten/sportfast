@@ -1,0 +1,173 @@
+/* user profile css */
+#body-white-back {
+	padding-top: 2em;
+}
+
+/* top user info section */
+.user-name {
+	font-size: 3em;
+	line-height: .9em;
+}
+
+#user-buttons-container {
+	float:right;
+	width: 60%;
+	margin-top: .2em;
+}
+
+#user-buttons-container>p,#user-buttons-container>div {
+	float:right;
+	margin-right: 1em;
+}
+
+#user-buttons-container>.dropdown-menu-holder {
+	margin-right: 0;
+}
+
+#user-already-friend {
+	width: 8em;
+	margin-top: .1em;
+	line-height: 1.1em;
+}
+
+.user-city-container {
+	margin: .2em 0 0 .5em;
+}
+
+
+/* sports section */
+#user-sports-container {
+	margin-top: 2.5em;
+	height: 3.9em;
+	width: 100%;
+}
+
+.user-sport-tab-container {
+	float:left;
+	margin-right: 1.8em;
+}
+
+.user-sport-tab-back {
+	float:left;
+	margin-top: .4em;
+	background: #ccc;
+}
+
+.user-sport-tab-selected-container {
+	float:left;
+	display:none;
+	width: 10em;
+}
+
+.user-sport-tab-large-container,.user-sport-container {
+	border: 1px solid #ddd;
+}
+
+.user-sport-tab-large-container {
+	background: #eee;
+	padding: .2em .5em 1.2em .4em;
+	width: auto;
+	height: auto;
+	float:left;
+	border-bottom: none;
+}
+
+.user-sport-tab-selected {
+	float:left;
+}
+
+.user-sport-tab-text {
+	margin: .5em 0 0 .2em;
+	font-size: 1.25em;
+}
+
+.user-sport-container {
+	float:left;
+	clear:both;
+	width:92%;
+	padding: 1.5em 4% .5em 4%;
+	margin-top: -.8em;
+	display:none;
+	border-top:none;
+}
+
+
+.user-sport-container-selected {
+	display: block;
+}
+
+.user-sport-left-container {
+	float:left;
+	width: 50%;
+}
+
+.user-sport-right-container {
+	float:right;
+	width: 45%;
+}
+
+.user-sport-tab-container:first-child > .user-sport-tab-back {
+	display:none;
+}
+
+.user-sport-tab-container:first-child > .user-sport-tab-selected-container {
+	display:block;
+}
+
+/* sport rating section */
+.user-sport-rating-container {
+	float:right;
+	width: 100%;
+}
+
+.user-sport-rating-overall-outer {
+	width: 98%;
+	height: 1.3em;
+	float:right;
+}
+
+.user-sport-rating-other-outer {
+	width: 80%;
+	float:right;
+	height: 1em;
+}
+
+.user-sport-rating-other-outer > div > p {
+	margin-top: -.1em;
+}
+
+.user-sport-rating-percent {
+	display:none;
+}
+
+.user-sport-num-ratings {
+	margin-top: .4em
+}
+
+.user-sport-want-outer-container {
+	margin-top: 2em;
+}
+
+.user-sport-want-looking {
+	margin-right: .5em;
+}
+	
+/* user narrow column */
+.user-narrow-info-container {
+	margin: 0 0 .4em .4em;
+}
+
+/* user recent activities */
+
+.newsfeed-notification-text-container {
+	width: 85%;
+}
+
+#user-activities-container {
+	float:left;
+	clear:both;
+	margin: 2.5em 0 0 0;
+	width: 100%;
+}
+	
+

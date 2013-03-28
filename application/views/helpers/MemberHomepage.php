@@ -21,7 +21,7 @@ class Application_View_Helper_MemberHomepage
 			$href .= '/upload';
 		}
 			
-        	echo "<a href='" . $href . "'><img src='" . $user->getProfilePic('large') . "' class='narrow-column-picture dropshadow' id='narrow-column-user-picture'/></a>";
+        	echo "<a href='" . $href . "'><img src='" . $user->getProfilePic('large') . "' class='narrow-column-picture dropshadow rounded-corners' id='narrow-column-user-picture'/></a>";
            	echo $this->_view->narrowcolumnsection()->start(array('title' => 'My Ratings'));
 				echo $this->buildUserRatings();
 			echo $this->_view->narrowcolumnsection()->end();
@@ -59,8 +59,10 @@ class Application_View_Helper_MemberHomepage
 						<div id='member-find-body'>"
 					 . $this->buildFindBody()
 					 . "</div>";
-																			
-		$output     .= $this->_view->partial('partials/global/sectionHeaderPlain.phtml',array('title'   => 'newsfeed')); 
+		
+		$newsfeedHeader = "<div class='right member-newsfeed-header medium'>" . $this->_view->user->city->city . "</div>";
+		$output     .= $this->_view->partial('partials/global/sectionHeaderPlain.phtml',array('title'   => 'newsfeed',
+																							  'content' => $newsfeedHeader)); 
 		$newsfeed    = $this->buildNewsfeed();
 		$output     .= $newsfeed;																			 
 																		 
@@ -335,11 +337,18 @@ class Application_View_Helper_MemberHomepage
 	{
 		$newsfeed = $this->_view->newsfeed;
 		$output   = '<div class="notifications-container">';
-		foreach ($newsfeed->read as $notification) {
-			$output .= $this->createNotification($notification);
+		if (!$newsfeed->hasValue('read')) {
+			// No newsfeed available
+			$output .= "<p class='medium larger-text center width-100 newsfeed-no-activity left'>No recent activity</p>";
+			$output .= "</div>";
+		} else {
+			foreach ($newsfeed->read as $notification) {
+				$output .= $this->createNotification($notification);
+			}
+			$output .= "</div>";
+			$output .= "<p class='button' id='notifications-load'>Load more</p>";
+			
 		}
-		$output .= "</div>";
-		$output .= "<p class='button' id='notifications-load'>Load more</p>";
 		return $output;
 	}
 	
@@ -347,14 +356,21 @@ class Application_View_Helper_MemberHomepage
 	 * create html for notification
 	 * @params(notification => notification ele)
 	 */
-	 public function createNotification($notification)
+	 public function createNotification($notification, $size = 'tiny')
 	 {
 		  $output = '';
+		  $preWrapper  = "<div class='left'>";
+		  $postWrapper = "</div>";
+		  if ($notification->_attribs['picture'] == 'sports') {
+			  // Sport icon to be shown, wrap in container
+			  $preWrapper  = "<div class='notification-sports-img-container-" . $size . "'>";
+		  }
 		  $output .= "<div class='newsfeed-notification-container'>";
-		  $output .= "<img src='" . $notification->getPicture('tiny') . "' class='newsfeed-notification-img' />";
-		  $output .= "<div class='newsfeed-notification-text-container'>";
-		  $output .= $notification->getFormattedText();
-		  $output .= "</div><span class='newsfeed-notification-time light'>" . $notification->getTimeFromNow() . "</span>
+		  $output .= 	$preWrapper . "<img src='" . $notification->getPicture($size) . "' class='newsfeed-notification-img' />" . $postWrapper;
+		  $output .= 	"<div class='newsfeed-notification-text-container'>";
+		  $output .= 		"<p class='left'>" . $notification->getFormattedText() . "</p>
+		  					 <span class='newsfeed-notification-time light smaller-text'>" . $notification->getTimeFromNow() . "</span>";
+		  $output .= 	"</div>
 					  </div>";
 					  
 		  return $output;
@@ -381,7 +397,7 @@ class Application_View_Helper_MemberHomepage
 				// First sport is selected initially
 				$class = 'green-back';
 			}
-			$iconsOutput   .= "<img src='" . $sport->getIcon($sport->sport, 'small', 'outline') . "' class='medium-background member-narrow-rating-icon pointer " . $class . "' />";
+			$iconsOutput   .= "<img src='" . $sport->getIcon('small', 'outline') . "' class='medium-background member-narrow-rating-icon pointer " . $class . "' />";
 			$ratingsOutput .= "<div class='member-narrow-rating-container'>";
 			$ratingsOutput .= "<p class='width-100 clear center'>" . ucwords($sport->sport) . "</p>";
 			$ratingsOutput .= "<p class='width-100 clear center green bold largest-text'>" . $sport->getOverall() . "</p>";

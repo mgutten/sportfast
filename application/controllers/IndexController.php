@@ -19,32 +19,36 @@ class IndexController extends Zend_Controller_Action
 			$this->view->whiteBacking = false;
 		} else {
 			// Member homepage
-
+			
 			$this->view->narrowColumn = 'right';
 			
 			$this->view->userSports = $this->view->user->getSportNames();
 			
-			$userSports = $this->view->user->sports;
-			$dropdown = Zend_Controller_Action_HelperBroker::getStaticHelper('Dropdown');
+			$userSports  = $this->view->user->sports;
+			$dropdown    = Zend_Controller_Action_HelperBroker::getStaticHelper('Dropdown');
 			$lookingDropdownSportArray = array();
-			$sportsParen   = '('; // For use in options with games model below
-			
+			$sportsParen = '('; // For use in options with games model below
+			$sportKeys   = array_keys($userSports);
+			$counter	 = 0;
+
 			foreach ($userSports as $sport) {
 				// Loop through sports and create properly formatted array for dropdown
 				$sportArray = array('text'  => $sport->sport,
-									'image' => $sport->getIcon($sport->sport, 'tiny', 'outline'),
+									'image' => $sport->getIcon('tiny', 'outline'),
 									'color' => 'light');
 									
 				array_push($lookingDropdownSportArray, $sportArray);
 				
 				$sportsParen .= '"' . $sport->sport . '"';
 				
-				if ($sport == end($userSports)) {
+				
+				if ($sport->sport == $sportKeys[count($sportKeys) - 1]) {
 					// Last sport
 					break;
 				}
-				
+
 				$sportsParen .= ',';
+				$counter++;
 			}
 			
 			$sportsParen .= ')';
@@ -74,6 +78,7 @@ class IndexController extends Zend_Controller_Action
 			
 			$games   = new Application_Model_Games();
 			$options = array('`g`.`sport` IN ' . $sportsParen);
+			
 			$games->findUserGames($this->view->user, $options);
 			
 			$teams  = new Application_Model_Teams();

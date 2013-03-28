@@ -22,17 +22,13 @@ class Application_Model_Team extends Application_Model_ModelAbstract
 									
 	protected $_primaryKey = 'teamID';
 
-
-	public function __construct($resultRow = false)
+	
+	public function getProfilePic($size, $id = false, $type = 'teams') 
 	{
-		
-		if ($resultRow) {
-			$this->setAttribs($resultRow);
-		}
-				
+		return parent::getProfilePic($size, $this->teamID, $type);
 	}
 	
-		public function getMatchName()
+	public function getMatchName()
 	{
 		if (empty($this->match)) {
 			// Match not set

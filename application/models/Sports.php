@@ -30,18 +30,7 @@ class Application_Model_Sports extends Application_Model_ModelAbstract
 			$this->setOptions($options);
 		}
 	}
-	/*
-	public function find($id, $column) 
-	{
-		$result = $this->getMapper()->find($id, new $this->_singleClass());
-		return $result;
-	}
-	
-	public function fetchAll() 
-	{
-		return $this->getMapper()->fetchAll($this->_singleClass);
-	}
-	*/
+
 	public function getAllSportsInfo()
 	{
 		return $this->getMapper()->getAllSportsInfo();
@@ -52,4 +41,17 @@ class Application_Model_Sports extends Application_Model_ModelAbstract
 		return $this->getMapper()->getUserSportsInfo($userID,$this);
 	}
 	
+		
+	public static function overallSort($a,$b) 
+	{
+		// Weight order based on skillDifference and # of players (weight skillDifference more)
+		$a = $a->overall;
+		$b = $b->overall;
+		
+       	if ($a == $b) {
+			return 0;
+		}
+		
+		return ($a > $b ? -1 : 1);
+	}
 }

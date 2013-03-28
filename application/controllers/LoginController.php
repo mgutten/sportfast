@@ -114,6 +114,8 @@ class LoginController extends Zend_Controller_Action
 		$auth = Zend_Auth::getInstance();
 		$auth->clearIdentity();
 		
+		Zend_Session::namespaceUnset('active');
+		
 		$this->_helper->redirector->goToUrl('/');
 	}
 	
@@ -145,7 +147,7 @@ class LoginController extends Zend_Controller_Action
         return new My_Auth_Adapter(
 				$params['username'],
 				$params['password'],
-				new Application_Model_Users()
+				new Application_Model_User()
         );
 
     }

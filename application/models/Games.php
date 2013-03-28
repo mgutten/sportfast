@@ -27,5 +27,6 @@ class Application_Model_Games extends Application_Model_ModelAbstract
 		}
 		return $game;
 	}
+	
 									
 }

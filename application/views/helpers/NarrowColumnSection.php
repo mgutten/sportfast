@@ -20,7 +20,7 @@ class Application_View_Helper_NarrowColumnSection
 		$tooltip = (!empty($array['tooltip']) ? $array['tooltip'] : '');
 		
 		$output = "<div id='narrow-column-" . $id . "'>
-						<div class='narrow-column-header dark' tooltip='" . $tooltip . "'>" 
+						<div class='narrow-column-header darkest' tooltip='" . $tooltip . "'>" 
 						. $title
 						. "</div>
 						<div class='animate-hidden-container'>

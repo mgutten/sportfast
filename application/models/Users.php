@@ -5,46 +5,29 @@ class Application_Model_Users extends Application_Model_ModelAbstract
 	protected $_mapperClass = 'Application_Model_UsersMapper';
 	protected $_singleClass = 'Application_Model_User';
 	
-	/*
-	public function save(Application_Model_DbTable_Users $guestbook)
+	protected $_attribs     = array('users'	=> '');
+	
+	
+	public function addUser($resultRow)
 	{
-		$data = array(
-			'email'		=> $guestbook->getEmail(),
-			'comment'	=> $guestbook->getComment(),
-			'created'	=> date('Y-m-d H:i:s'),
-			);
-			
-		if (($id = $guestbook->getId()) === null) {
-			unset($data['id']);
-			$this->getDbTable()->insert($data);
-		} else {
-			$this->getDbTable->update($data, array('id = ?' => $id));
+		$user = $this->_attribs['users'][] = new Application_Model_User($resultRow);
+		return $user;
+	}
+	
+	
+	/**
+	 * does user with userID exist in array of users
+	 * @returns false if does not exist, true if does
+	 */
+	public function userExists($userID)
+	{
+		foreach ($this->_attribs['users'] as $user) {
+			if ($user->userID == $userID) {
+				return true;
+			}
 		}
-	}
-	*/
-	
-	
-	public function __construct(array $options = null)
-	{
-		if (is_array($options)) {
-			$this->setOptions($options);
-		}
-	}
-	
-	public function find($id) 
-	{
-		$result = $this->getMapper()->find($id, new $this->_singleClass());
-		return $result;
-	}
-	
-	public function fetchAll() 
-	{
-		return $this->getMapper()->fetchAll($this->_singleClass);
-	}
-	
-	public function getUserBy($column, $value)
-	{
-		return $this->getMapper()->getUserBy($column, $value);
+		
+		return false;
 	}
 	
 	/**

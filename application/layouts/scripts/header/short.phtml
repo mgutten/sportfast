@@ -6,8 +6,15 @@
 <?php
 	foreach ($this->user->notifications->unread as $notification) {
 		echo "<div href='" . $notification->getFormattedUrl() . "' class='notification-container light-green-back pointer'>" 
-			 . $notification->getFormattedText() 
+			 . "<div class='notification-text-picture-container'>"
+				 . "<img src='" . $notification->getPicture() . "' class='notification-picture' />"
+				 . "<span class='notification-text'>" . $notification->getFormattedText() . "</span>"
+			 . "</div>"
+			 . "<span class='notification-time-subscript light'>" . $notification->getTimeFromNow() . "</span>"
 			 . "</div>";
+			 /*"<div href='" . $notification->getFormattedUrl() . "' class='notification-container light-green-back pointer'>" 
+			 . $notification->getFormattedText() 
+			 . "</div>";*/
 		
 	}
 	foreach ($this->user->notifications->read as $notification) {
@@ -21,6 +28,7 @@
 	}
 ?>
 </div>
+
 <div id='city-change-container' class='medium-background dropshadow'>
 	<?php echo $this->changeCityForm->changeCity;?>
     <p class='lighter smaller-text center width-100 clear' id='city-change-or'>or</p>
@@ -30,6 +38,9 @@
     </div>
 </div>
 
+<div id='header-search-results-container'>
+</div>
+
     <div class='centered-body body-wrapper'>
     	<div class='header-nav-container-short'>
         	<a href='/'><img src='/images/global/logo/small.png' id='logo-small'/> </a>
@@ -37,8 +48,7 @@
             <a href='/'><img src='/images/global/header/home_icon.png' id='header-home-icon' /></a>
             
             <div class='nav-back-short nav-dropdown' id='nav-back-find'>
-                <a href='<?php echo $this->url(array('controller' => 'find',
-                                                 	 'action'	  => 'index'));?>' class='nav nav-out-short lightest' id='nav-find'>
+                <a href='/find' class='nav nav-out-short lightest' id='nav-find'>
                 <p class='nav-dropdown-text'>FIND</p>
                 
                 </a>
@@ -56,8 +66,7 @@
             </div>
             
             <div class='nav-back-short nav-dropdown' id='nav-back-create'>
-                <a href='<?php echo $this->url(array('controller' => 'create',
-                                                 	 'action'	  => 'index'));?>' class='nav nav-out-short lightest' id='nav-create'>
+                <a href='/create' class='nav nav-out-short lightest' id='nav-create'>
                 	<p class='nav-dropdown-text'>CREATE</p>
                      
                 </a>
@@ -87,17 +96,17 @@
                 </div>
                 <div class='dropdown-back-outer' id='nav-dropdown-outer-cog'>
                         <div class='dropdown-back-inner' id='nav-dropdown-inner-cog'>
-                             <a href="<?php echo $this->url(array('controller' => 'users', 'action' => 'index', 'id' => $this->user->userID))?>" class='header-dropdown-option animate-opacity'>
+                             <a href="/users/<?php echo $this->user->userID;?>" class='header-dropdown-option animate-opacity'>
                                  <img src='<?php echo $this->user->getProfilePic('tiny');?>' class='cog-dropdown-account-pic'/>
                                  <p class='white cog-dropdown-account-text cog-dropdown-account-text animate-opacity'><?php echo $this->user->shortName;?></p>
                              </a>
-                             <a href="<?php echo $this->url(array('controller' => 'users', 'action' => 'inbox', 'id' => $this->user->userID))?>" class='header-dropdown-option animate-opacity white'>
-                                 Inbox (0)
+                             <a href="/users/<?php echo $this->user->userID;?>/inbox" class='header-dropdown-option animate-opacity white'>
+                                 Inbox (<?php echo $this->countNewMessages;?>)
                              </a>
-                             <a href="<?php echo $this->url(array('controller' => 'users', 'action' => 'settings', 'id' => $this->user->userID))?>" class='header-dropdown-option animate-opacity white'>
+                             <a href="/users/<?php echo $this->user->userID;?>/settings" class='header-dropdown-option animate-opacity white'>
                                  Account Settings
                              </a>
-                             <a href="<?php echo $this->url(array('controller' => 'login', 'action' => 'logout'))?>" class='header-dropdown-option animate-opacity white'>
+                             <a href="/login/logout" class='header-dropdown-option animate-opacity white'>
                                  Logout
                              </a>
                         </div>

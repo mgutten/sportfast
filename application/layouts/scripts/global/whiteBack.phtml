@@ -3,7 +3,7 @@
 
 if ($this->narrowColumn == 'left') {
 	echo "<div class='body-column-narrow' style='float:left;'>
-		  <div class='body-column-narrow-inner fixed'>";
+		  <div class='body-column-narrow-inner-left fixed'>";
 	echo $this->placeholder('narrowColumn');
 	echo "</div></div>";
 	echo "<div class='body-column-wide' style='float:right;'>";
@@ -11,7 +11,7 @@ if ($this->narrowColumn == 'left') {
 	echo "</div>";
 } elseif ($this->narrowColumn == 'right') {
 	echo "<div class='body-column-narrow' style='float:right;'>
-			<div class='body-column-narrow-inner fixed'>";
+			<div class='body-column-narrow-inner-right fixed'>";
 	echo $this->placeholder('narrowColumn');
 	echo "</div></div>";
 	echo "<div class='body-column-wide' style='float:left;'>";

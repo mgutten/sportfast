@@ -1,0 +1,220 @@
+<?php
+/** 
+ * controller => users
+ * action => index
+ */
+$this->headTitle($this->currentUser->shortName);
+$this->headLink()->prependStylesheet($this->baseUrl() . '/css/user.css');
+	$this->headScript()->prependFile($this->baseUrl() . '/js/user.js');
+?>
+
+
+<?php
+// Narrow right column
+$this->placeholder('narrowColumn')->captureStart();
+echo "<img src='" . $this->currentUser->getProfilePic('large') . "' class='narrow-column-picture dropshadow rounded-corners'/>";
+
+echo "<div class='user-narrow-info-container clear'>";
+echo 	"<p class='clear darkest'>" . $this->currentUser->age . " years old</p>";
+echo 	"<p class='clear darkest'>" . $this->currentUser->getSexFull() . "</p>";
+echo 	"<p class='clear darkest'>" . $this->currentUser->getHeightInFeet() . " " . $this->currentUser->weight . " lb</p>";
+echo "</div>";
+
+$sections = array('friends', 'teams', 'groups');
+
+foreach ($sections as $section) {
+	// Build narrow column dropdowns
+	echo $this->narrowcolumnsection()->start(array('title' => ucwords($section)));
+	$results = $this->currentUser->$section->getAll();
+		if (!($results)) {
+			// No friends
+			echo "<p class='light clear smaller-text'>No " . $section . " have been added</p>";
+		} else {
+			// Friends exist
+			$counter = 0;
+			if ($section == 'friends') {
+				$url  = '/users';
+				$name = 'shortName';
+				$id   = 'userID';
+			} else {
+				$url  = '/' . $section;
+				$single = rtrim($section,'s');
+				$name = $single . 'Name';
+				$id   = $single . 'ID';
+			}
+				foreach ($results as $result) {
+					if ($counter >= 5) {
+						$diff = count($results) - $counter;
+						echo "<a href='" . $this->currentURL . "/" . $section . "' class='medium smaller-text clear-right'>" . $diff . " other " . $section . "</a>";
+						break;
+					}
+					echo "<a href='" . $url . "/" . $result->$id . "' class='narrow-column-selectable'>";
+					echo 	"<img src='" . $result->getProfilePic('tiny') . "' class='left'/>";
+					echo	"<p class='left dark'>" . $result->$name . "</p>";
+					echo "</a>";
+					$counter++;
+				}
+		}
+	echo $this->narrowcolumnsection()->end();
+}
+
+$this->placeholder('narrowColumn')->captureEnd();
+?>
+
+<header class='clear user-name-container'>
+	<p class='user-name heavy darkest clear'>
+    	<?php echo $this->currentUser->shortName;?>
+	</p>
+    <div class='user-city-container clear'>
+        <p class='light clear'>
+            <?php echo $this->currentUser->city->city . ", " . $this->currentUser->city->state;?>
+        </p>    
+        <p class='light clear'>
+            Last active <?php echo $this->currentUser->getLastActiveFromNow();?>
+        </p> 
+    </div>
+</header>
+
+<div id='user-buttons-container'>
+    <?php echo $this->inviteButton;?>
+    <p class='button'>
+    	Message
+    </p>
+    <?php
+		if (!$this->user->friends->userExists($this->currentUser->userID)) {
+			// user is not already a friend
+			?>
+			<p class='button' id='user-friend-request'>
+				Friend Request
+			</p>
+    <?php } else {?>
+    		<p class='light center' id='user-already-friend'>
+            	You and <?php echo $this->currentUser->firstName;?> are friends.
+            </p>
+    <?php } ?>
+</div>
+
+<div id='user-sports-container' class='clear'>
+	<?php
+		$lowerOutput = '';
+		$count = 0;
+		foreach ($this->currentUser->sports as $sport) {
+			
+			$class = $tabClass = '';
+			if ($count == 0) {
+				// First sport, show box
+				$class = 'user-sport-container-selected';
+				$tabClass = 'user-sport-selected';
+			}
+			
+			echo "<div class='user-sport-tab-container " . $tabClass . "'>
+				  	<img src='" . $sport->getIcon('medium', 'outline') . "' class='user-sport-tab-back pointer'/>
+					<div class='user-sport-tab-selected-container'>
+						<div class='user-sport-tab-large-container rounded-corners'>
+							<img src='" . $sport->getIcon('medium',	'solid', 'medium') . "' class='user-sport-tab-selected' />
+							<p class='medium heavy left user-sport-tab-text'>" . ucwords($sport->sport) . "</p>
+						</div>
+					</div>
+				  </div>";
+			
+			$lowerOutput .= "<div class='user-sport-container rounded-corners light-back " . $class . " dropshadow-bottom'>";
+			$lowerOutput .= 	"<div class='user-sport-left-container'>";
+			$lowerOutput .= 		"<p class='clear medium'>";
+			
+			// Positions
+			$counter = 0;
+			foreach ($sport->positions as $position) {
+				$lowerOutput .= $position->positionName;
+				if ($counter !== count($sport->positions) - 1) {
+					$lowerOutput .= '/';
+				}
+				$counter++;
+			}
+			
+			// Best skill
+			$lowerOutput .= 		"<p class='darkest clear'>";
+			
+			if ($firstSkill = $sport->ratings->getBestSkill(0)) {
+				$lowerOutput .= "<span class='dark largest-text'>" . $firstSkill . "</span>";
+			}
+			if ($secondSkill = $sport->ratings->getBestSkill(1)) { 
+				$lowerOutput .= ", <span class='dark larger-text'>" . $secondSkill . "</span>";
+			}
+			if ($thirdSkill = $sport->ratings->getBestSkill(2)) { 
+				$lowerOutput .= ", <span class='dark'>" . $thirdSkill . "</span>";
+			}
+			
+			if (!$firstSkill) {
+				// No skill was found, display none
+				$lowerOutput .= "<span class='medium larger-text'>No skills have been rated.</span>";
+			}
+			
+			// Wants to play ??
+			$lowerOutput .= 		"<div class='clear user-sport-want-outer-container'>";
+			$lowerOutput .= 			"<p class='clear dark user-sport-want-looking'> Looking for:</p>";
+			$lowerOutput .= 			"<div class='user-sport-want-inner-container left'>";
+			foreach ($sport->formats as $format) {
+				$lowerOutput .=				"<p class='dark '>" . ucwords($format) . "</p>";
+			}
+			$lowerOutput .=				"</div>";
+			$lowerOutput .=			"</div>";
+			$lowerOutput .=		"</div>";	
+			// Ratings
+			$ratings      = array('Overall', 'skill', 'sportsmanship', 'attendance');			
+			$lowerOutput .= 	"<div class='user-sport-right-container'>";
+			$lowerOutput .=			"<div class='user-sport-rating-container'>";
+			
+			foreach ($ratings as $rating) {
+				$class = 'user-sport-rating-other-outer';
+				$hiddenClass = 'user-sport-rating-percent';
+				
+				if ($rating == 'Overall') {
+					$class = 'user-sport-rating-overall-outer';
+					$hiddenClass = '';
+				}
+				
+				$lowerOutput .=				"<div class='" . $class . " rating-outer'>";
+				$lowerOutput .=					"<div class='rating-inner' style='width:" . $sport->$rating . "%'>";
+				$lowerOutput .=						"<p class='white left rating-inner-word'>" . $rating . "</p>";
+				$lowerOutput .=						"<p class='white right rating-inner-percent " . $hiddenClass . " heavy'>" . $sport->$rating . "%</p>";
+				$lowerOutput .=					"</div>";
+				$lowerOutput .=				"</div>";
+			}
+			
+			$numRatings   = (!$sport->ratings->hasValue('ratings') ? 0 : count($sport->ratings->ratings));
+			$str = 'ratings';
+			if ($numRatings == 1) {
+				$str = 'rating';
+			}
+			$lowerOutput .=				"<a href='/users/" . $this->currentUser->userID . "/ratings' class='green clear-right user-sport-num-ratings'>" 
+										. $numRatings . " " . $str
+										. "</a>";
+			$lowerOutput .= 		"</div>";
+			
+			$lowerOutput .= 	"</div>";
+			$lowerOutput .= "</div>";
+			
+			$count++;
+		}
+	?>
+    
+</div>
+
+<?php
+	// Sports section
+	echo $lowerOutput;
+	
+	
+	// Activity section
+	echo "<div id='user-activities-container'>";
+	foreach ($this->activities as $activity) {
+		echo $this->memberHomepage->createNotification($activity, 'small');
+	}
+	echo "</div>";
+?>
+
+
+    
+
+    
+    

@@ -2,6 +2,7 @@
 
 class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 {
+	
     protected function _initMyActionHelpers()
     {
         $this->bootstrap('frontController');
@@ -37,7 +38,7 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 		$view   = $this->getResource('view');
 		
 		$auth = Zend_Auth::getInstance();
-		//$auth->clearIdentity();
+		$auth->clearIdentity();
 		if (!empty($_COOKIE['user']) || $auth->hasIdentity()) {
 			// User is logged in 
 			if (!$auth->hasIdentity()) {
@@ -54,8 +55,26 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 			$headerLayout  = 'header/short';
 			$user		   = $auth->getIdentity();
 			
+			
+			$session = new Zend_Session_Namespace('active');
+			if (!isset($session->active)) {
+				// Only update user "lastActive" attrib once per session (save on db updates)
+				$session->active = true;
+				
+				$user->setLastActiveCurrent()
+				 	 ->save(false);
+			} elseif (time() - strtotime($user->lastActive) > (60*2)) {
+				// Every 2 minutes reload user's info (games, teams, etc) to keep it up to date
+				$user->setLastActiveCurrent();
+				$user->getUserInfo();
+			}
+			
 			$user->resetNewNotifications()
 				 ->getNewUserNotifications();
+			
+			// Count new messages for cog dropdown "inbox" section
+			$messages = new Application_Model_Messages();
+			$this->view->countNewMessages = $messages->countNewUserMessages($user->userID);
 				 
 			// Renew user cookie
 			setcookie('user', $user->userID, time() + (60*60*24*14), '/');
@@ -89,6 +108,27 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 		
 		return $view;
 		
+	}
+	
+	protected function _initRoutes()
+	{
+		$frontController = Zend_Controller_Front::getInstance(); 
+		$router = $frontController->getRouter();
+		$r = new Zend_Controller_Router_Route_Regex(
+				'users(?:/(\d+))?(?:/(\w+))?',
+				array(
+						'action' => 'index',
+						'controller' => 'users',
+						'module' => 'default',
+						'id'	 => '2'
+				),
+				array(
+						1 => 'id',
+						2 => 'action'
+				),
+				'users/%d');
+				
+		$router->addRoute('users', $r);
 	}
 	
 

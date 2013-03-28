@@ -216,6 +216,7 @@ class AjaxController extends Zend_Controller_Action
 	
 	/**
 	 * get city and state from db
+	 * @params (zipcodeOrCity => either zipcode or city name (partial))
 	 */
 	public function getCityStateAction()
 	{
@@ -239,7 +240,8 @@ class AjaxController extends Zend_Controller_Action
 	}
 	
 	/**
-	 * get city and state from db
+	 * change user's city to new city (temporary), redirect to home afterward
+	 * (cityID => new cityID)
 	 */
 	public function changeUserCityAction()
 	{
@@ -250,8 +252,6 @@ class AjaxController extends Zend_Controller_Action
 			// Reset user location to home
 			/* OR CREATE FUNCTION FOR USER MODEL TO FIND CITY INFO AND THEN USER_LOCATION (save db queries) */
 			$this->view->user->resetHomeLocation();
-			//$auth = Zend_Auth::getInstance();
-			//$auth->clearIdentity();
 			return;
 		}
 		
@@ -267,6 +267,22 @@ class AjaxController extends Zend_Controller_Action
 				
 	}
 
+
+	/**
+	 * search entire database for matches to search
+	 * (search => search term)
+	 */
+	public function searchDbAction()
+	{
+		$searchTerm = $this->getRequest()->getPost('search');
+		
+		$cityID  = $this->view->user->city->cityID;
+		
+		$search  = new Application_Model_Search();
+		$results = $search->getSearchResults($searchTerm, $cityID);
+		echo json_encode($results);
+		
+	}
 
 }
 

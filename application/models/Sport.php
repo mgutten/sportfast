@@ -20,8 +20,10 @@ class Application_Model_Sport extends Application_Model_ModelAbstract
 									'sportsmanship'	  => '',
 									'attendance'	  => '',
 									'formats'		  => '',
-									'overall'		  => ''
+									'overall'		  => '',
+									'ratings'		  => ''
 									);
+									
 	protected $_primaryKey = 'userSportID';	
 	protected $_overwriteKeys = array('userID');
 	
@@ -41,6 +43,11 @@ class Application_Model_Sport extends Application_Model_ModelAbstract
 		}
 		
 		parent::save();
+	}
+	
+	public function getSkill()
+	{
+		return $this->_attribs['skillCurrent'];
 	}
 	
 	/**
@@ -70,9 +77,10 @@ class Application_Model_Sport extends Application_Model_ModelAbstract
 	/**
 	 * get and return href for sport icon
 	 */
-	public function getIcon($sport, $size = 'medium', $color = 'outline')
+	public function getIcon($size = 'medium', $type = 'outline', $color = 'medium')
 	{
-		return '/images/global/sports/icons/' . strtolower($size) . '/' . strtolower($color) . '/' . $sport . '.png';
+		$sport = strtolower($this->sport);
+		return parent::getSportIcon($sport, $size, $type, $color);
 	}
 		
 
@@ -102,6 +110,15 @@ class Application_Model_Sport extends Application_Model_ModelAbstract
 		}
 		return $this->_attribs['positions'][$position];
 	}
+	
+	public function getRatings() 
+	{
+		if (!$this->hasValue('ratings')) {
+			$this->_attribs['ratings']= new Application_Model_Ratings();
+		}
+		return $this->_attribs['ratings'];
+	}
+
 	
 	public function getFormat($format) 
 	{

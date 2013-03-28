@@ -26,7 +26,6 @@ abstract class Application_Model_ModelAbstract
 	
 	public function getIDs($attrib)
 	{
-
 		if (is_array($this->_attribs[$attrib])) {
 			// Is array, return as array
 			$ids = array();
@@ -67,6 +66,72 @@ abstract class Application_Model_ModelAbstract
 		}
 		
 		return $name;
+	}
+	
+	/**
+	 * Get difference of time between $date and now
+	 * @params ($date => datetime,
+	 *			$maxDays => max # of days to show "x days ago" before show date)
+	 * @returns str
+	 */
+	public function getTimeFromNow($date, $maxDays)
+	{
+		$date = strtotime($date);
+		$now  = time();
+		$diff = $now - $date;
+		
+		if (($seconds = $diff) < 60) {
+			$time = $seconds;
+			$post = ($time == 1 ? 'second ago' : 'seconds ago');
+		} elseif (($minutes = floor($seconds/60)) < 60) {
+			// Under 60 minutes
+			$time = $minutes;
+			$post = ($time == 1 ? 'minute ago' : 'minutes ago');
+		} elseif (($hours = floor($minutes/60)) < 24) {
+			// > 60 minutes, under 24 hours
+			$time = $hours;
+			$post = ($time == 1 ? 'hour ago' : 'hours ago');
+		} elseif (($days = floor($hours/24)) < $maxDays) {
+			// > 24 hours, under 7 days
+			$time = $days;
+			$post = ($time == 1 ? 'day ago' : 'days ago');
+		}  else {
+			// > 6 days, show date
+			$time = date ('l, M j',$date);
+			$post = '';
+		}
+		
+		return $time . ' ' . $post;
+		
+	}
+	
+	
+	/**
+	 * Get all of main attribs individual models
+	 * @returns one dimension array of models
+	 */
+	public function getAll()
+	{
+		$returnArray = array();
+		$mainAttrib  = strtolower(str_replace('Application_Model_', '', get_class($this)));
+		
+		if (empty($this->_attribs[$mainAttrib])) {
+			return $returnArray;
+		}
+		
+		foreach ($this->_attribs[$mainAttrib] as $outer) {
+			if (is_array($outer)) {
+				// Inner arrays found, loop
+				foreach ($outer as $inner){
+					$returnArray[] = $inner;
+				}
+			} else {
+				// No inner array
+				$returnArray[] = $outer;
+			}
+		}
+		
+		return $returnArray;
 	}
 	
 	public function jsonEncodeChildren($attrib)
@@ -153,8 +218,6 @@ abstract class Application_Model_ModelAbstract
 		// Key exists in attribs, return it
 		return $this->_attribs[$name];
 		
-		
-		
 	}
 	
 	
@@ -202,19 +265,44 @@ abstract class Application_Model_ModelAbstract
 		}
 	}
 	
-	public function getProfilePic($size, $userID)
+	/**
+	 * get profile pic in any size for a given model (team, user, group)
+	 * @params ($size => tiny, small, medium, large
+	 *			$id	  => id to attempt to use to get picture
+	 *			$type => plural type that we are searching for)
+	 * @returns href for picture (str)
+	 */
+	public function getProfilePic($size, $id, $type = 'users')
 	{
-		$directory   = '/images/users/profile/pic/' . strtolower($size) . '/';
-		$absoluteSrc = PUBLIC_PATH . $directory . $userID . '.jpg';
+		$directory   = '/images/' . strtolower($type) . '/profile/pic/' . strtolower($size) . '/';
+		$absoluteSrc = PUBLIC_PATH . $directory . $id . '.jpg';
 		
 		if (!file_exists($absoluteSrc)) {
 			// No profile set, get default
-			$picture = $directory . 'no_profile_male.jpg';
+			$picture = $directory . 'default.jpg';
 		} else {
-			$picture = $directory . $userID . '.jpg';
+			$picture = $directory . $id . '.jpg';
 		}
 		
 		return $picture;
+	}
+	
+	/**
+	 * get sports icon
+	 * @params ($size => tiny, small, medium, large
+	 *			$type => outline, solid,
+	 *			$color => (optional) medium, light, dark)
+	 * @returns path to icon
+	 */
+	public function getSportIcon($sport, $size = 'medium', $type = 'outline', $color = 'medium')
+	{
+		$path = '/images/global/sports/icons/' . strtolower($size) . '/' . strtolower($type);
+		if ($type == 'solid') {
+			$path .= '/' . strtolower($color);
+		}
+		$path .= '/' . strtolower($sport) . '.png';
+		
+		return $path;
 	}
 	
 	public function getAttribs()

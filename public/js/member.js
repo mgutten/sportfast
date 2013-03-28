@@ -118,6 +118,10 @@ $(function() {
 		var index = $(this).index();
 		$('.member-narrow-rating-container').hide();
 		$('.member-narrow-rating-container:eq(' + index + ')').show();
+		
+		// Change color of chosen icon
+		$('.member-narrow-rating-icon.green-back').removeClass('green-back');
+		$(this).addClass('green-back');
 	});
 	
 	preloadImageArray.push('/images/global/gmap/markers/green.png');
