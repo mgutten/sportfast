@@ -66,6 +66,10 @@ abstract class Application_Model_MapperAbstract
 			} elseif ($savingClass instanceof Application_Model_User && $column == 'cityID' && !empty($savingClass->changedLocation)) {
 				// Is user class and location has been changed temporarily, do not change cityID for user row, skip
 				continue;
+			} elseif ($column == 'password') {
+				// Password column, do not strtolower
+				$data[$column] = $savingClass->$column;
+				continue;
 			}
 			
 			$data[$column] = strtolower(trim($savingClass->$column));

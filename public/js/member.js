@@ -392,6 +392,12 @@ function getNewsfeed(oldOrNew)
 			   numNewsfeeds: numNewsfeeds},
 		success: function(data) {
 			data = JSON.parse(data);
+			if (data.length < 1) {
+				// No results left, end of the road, hide load button
+				$('#notifications-load').hide();
+				$('#notifications-none').show();
+			}
+			
 			if (oldOrNew == 'new') {
 				// Prepend data
 				populateNewsfeed(data, 'prepend');

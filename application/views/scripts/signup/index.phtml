@@ -30,7 +30,7 @@ $this->placeholder('absolute')->captureStart();
 echo $this->partial('partials/global/alertBack.phtml');
 echo $this->alert()->start('signup-import','Upload and crop your image.');
 ?>
-<img class='signup-import-alert-img' id='signup-import-alert-img' src='/images/global/profile/xl/default.png' />
+<img class='signup-import-alert-img' id='signup-import-alert-img' src='/images/users/profile/pic/large/default.jpg' />
 <div class='signup-import-alert-text-container'>
 	<p class='medium clear' id='signup-import-alert-guidelines-header'>Profile pictures should be:</p>
 	<ul class='green heavy' id='signup-import-alert-guidelines'>
@@ -183,7 +183,7 @@ $currentStep++;
 ?>
 <p class='clear medium signup-import-main-current-text'> Current picture:</p>
 <div class='signup-import-main-img-container'>
-    <img src='/images/global/profile/default.png' class='signup-import-main-img' id='signup-import-main-img'/>
+    <img src='/images/users/profile/pic/large/default.jpg' class='signup-import-main-img' id='signup-import-main-img'/>
 </div>
 <div class='signup-import-main-text-container'>
 	<p class='center green larger-text'>
@@ -250,7 +250,7 @@ echo $this->form->agree;
 $this->placeholder('narrowColumn')->captureStart();
 ?>
 <div class='signup-import-main-img-container signup-narrow-column-img-container'>
-    <img src='/images/global/profile/default.png' class='narrow-column-picture' />
+    <img src='/images/users/profile/pic/large/default.jpg' class='narrow-column-picture' />
 </div>
 
 <?php

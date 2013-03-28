@@ -282,6 +282,10 @@ div.member-find-game-date-hour {
 	margin: .5em 0 0 .4em;
 }
 
+#notifications-none {
+	display:none;
+}
+
 
 /* narrow column ratings */
 

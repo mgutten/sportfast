@@ -16,7 +16,7 @@ class Application_View_Helper_MemberHomepage
 		$this->_view->placeholder('narrowColumn')->captureStart();
 		
 		$href = '/users/' . $user->userID;
-        if ($user->getProfilePic('large') == '/images/users/profile/pic/large/no_profile_male.jpg') {
+        if ($user->getProfilePic('large') == '/images/users/profile/pic/large/default.jpg') {
 			// No profile pic, send to upload profile pic page
 			$href .= '/upload';
 		}
@@ -25,7 +25,11 @@ class Application_View_Helper_MemberHomepage
            	echo $this->_view->narrowcolumnsection()->start(array('title' => 'My Ratings'));
 				echo $this->buildUserRatings();
 			echo $this->_view->narrowcolumnsection()->end();
-			echo $this->_view->narrowcolumnsection()->start(array('title' => 'My Teams'));
+			
+			$sections = array('my teams', 'my groups');
+			echo $this->_view->narrowteamsection($user, $sections);
+			
+			/*$this->_view->narrowcolumnsection()->start(array('title' => 'My Teams'));
 				if ($this->_view->user->hasValue('teams')) {
 					echo 'teams!';
 				} else {
@@ -39,6 +43,7 @@ class Application_View_Helper_MemberHomepage
 					echo '<p class="medium clear-left">You have no groups.</p><a href="find/groups" class="medium smaller-text clear-right">Find a group</a>';
 				}
 			echo $this->_view->narrowcolumnsection()->end();
+			*/
 			echo $this->_view->narrowcolumnsection()->start(array('title' => 'My Schedule'));
 				echo "Schedule information will go here";
 			echo $this->_view->narrowcolumnsection()->end();
@@ -347,8 +352,9 @@ class Application_View_Helper_MemberHomepage
 			}
 			$output .= "</div>";
 			$output .= "<p class='button' id='notifications-load'>Load more</p>";
-			
+			$output .= "<p class='medium clear width-100 center' id='notifications-none'>No more activities found.</p>";		
 		}
+		
 		return $output;
 	}
 	
@@ -361,14 +367,18 @@ class Application_View_Helper_MemberHomepage
 		  $output = '';
 		  $preWrapper  = "<div class='left'>";
 		  $postWrapper = "</div>";
+		  $class	   = '';
 		  if ($notification->_attribs['picture'] == 'sports') {
 			  // Sport icon to be shown, wrap in container
-			  $preWrapper  = "<div class='notification-sports-img-container-" . $size . "'>";
+			  $preWrapper = "<div class='notification-sports-img-container-" . $size . "'>";
+		  } elseif ($size == 'tiny') {
+			  $preWrapper = "<div class='box-img-container-tiny left'>";
+			  $class = 'box-img-tiny';
 		  }
 		  $output .= "<div class='newsfeed-notification-container'>";
-		  $output .= 	$preWrapper . "<img src='" . $notification->getPicture($size) . "' class='newsfeed-notification-img' />" . $postWrapper;
+		  $output .= 	$preWrapper . "<img src='" . $notification->getPicture($size) . "' class='newsfeed-notification-img " . $class . "' />" . $postWrapper;
 		  $output .= 	"<div class='newsfeed-notification-text-container'>";
-		  $output .= 		"<p class='left'>" . $notification->getFormattedText() . "</p>
+		  $output .= 		"<p class='left newsfeed-notification-text'>" . $notification->getFormattedText() . "</p>
 		  					 <span class='newsfeed-notification-time light smaller-text'>" . $notification->getTimeFromNow() . "</span>";
 		  $output .= 	"</div>
 					  </div>";
@@ -400,7 +410,7 @@ class Application_View_Helper_MemberHomepage
 			$iconsOutput   .= "<img src='" . $sport->getIcon('small', 'outline') . "' class='medium-background member-narrow-rating-icon pointer " . $class . "' />";
 			$ratingsOutput .= "<div class='member-narrow-rating-container'>";
 			$ratingsOutput .= "<p class='width-100 clear center'>" . ucwords($sport->sport) . "</p>";
-			$ratingsOutput .= "<p class='width-100 clear center green bold largest-text'>" . $sport->getOverall() . "</p>";
+			$ratingsOutput .= "<a href='/users/" . $this->_view->user->userID . "/ratings' class='width-100 clear center green bold largest-text'>" . $sport->getOverall() . "</a>";
 			$ratingsOutput .= "<div class='width-100 clear'>";
 			
 			foreach ($ratingOrder as $rating => $label) {

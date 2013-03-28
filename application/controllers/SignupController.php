@@ -141,7 +141,7 @@ class SignupController extends Zend_Controller_Action
 					// Update all of User's attribs with appropriate post data
 					if ($key == 'signupPassword') {
 						// Hash password
-						$user->password = $user->getMapper()->hashPassword($val);
+						$user->password = $user->hashPassword($val);
 						continue;
 					}
 					
@@ -302,7 +302,7 @@ class SignupController extends Zend_Controller_Action
 			$image->save(PUBLIC_PATH . '/images/users/profile/pic/medium/' . $userID . '.jpg');
 			$image->scale(47); // Small img
 			$image->save(PUBLIC_PATH . '/images/users/profile/pic/small/' . $userID . '.jpg');
-			$image->scale(53); // Tiny img
+			$image->scale(65); // Tiny img
 			$image->save(PUBLIC_PATH . '/images/users/profile/pic/tiny/' . $userID . '.jpg');
 		}
 		

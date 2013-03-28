@@ -274,8 +274,17 @@ abstract class Application_Model_ModelAbstract
 	 */
 	public function getProfilePic($size, $id, $type = 'users')
 	{
-		$directory   = '/images/' . strtolower($type) . '/profile/pic/' . strtolower($size) . '/';
-		$absoluteSrc = PUBLIC_PATH . $directory . $id . '.jpg';
+		if ($type == 'logo') {
+			// Show logo
+			$directory   = '/images/global/logo/logo/' . $size . '.png';
+			
+			return $directory;
+			
+		} else {
+			// Other type
+			$directory   = '/images/' . strtolower($type) . '/profile/pic/' . strtolower($size) . '/';
+			$absoluteSrc = PUBLIC_PATH . $directory . $id . '.jpg';
+		}
 		
 		if (!file_exists($absoluteSrc)) {
 			// No profile set, get default

@@ -21,13 +21,16 @@ class Application_Model_Users extends Application_Model_ModelAbstract
 	 */
 	public function userExists($userID)
 	{
-		foreach ($this->_attribs['users'] as $user) {
-			if ($user->userID == $userID) {
-				return true;
+		if ($this->hasValue('users')) {
+			// There are users
+			foreach ($this->_attribs['users'] as $user) {
+				if ($user->userID == $userID) {
+					return true;
+				}
 			}
+		} else {		
+			return false;
 		}
-		
-		return false;
 	}
 	
 	/**

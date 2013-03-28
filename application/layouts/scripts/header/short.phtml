@@ -12,9 +12,6 @@
 			 . "</div>"
 			 . "<span class='notification-time-subscript light'>" . $notification->getTimeFromNow() . "</span>"
 			 . "</div>";
-			 /*"<div href='" . $notification->getFormattedUrl() . "' class='notification-container light-green-back pointer'>" 
-			 . $notification->getFormattedText() 
-			 . "</div>";*/
 		
 	}
 	foreach ($this->user->notifications->read as $notification) {
@@ -96,17 +93,17 @@
                 </div>
                 <div class='dropdown-back-outer' id='nav-dropdown-outer-cog'>
                         <div class='dropdown-back-inner' id='nav-dropdown-inner-cog'>
-                             <a href="/users/<?php echo $this->user->userID;?>" class='header-dropdown-option animate-opacity'>
-                                 <img src='<?php echo $this->user->getProfilePic('tiny');?>' class='cog-dropdown-account-pic'/>
+                             <a href="/users/<?php echo $this->user->userID;?>" class='header-dropdown-option-cog animate-opacity'>
+                                 <div class='box-img-container-tiny left'><img src='<?php echo $this->user->getProfilePic('tiny');?>' class='cog-dropdown-account-pic box-img-tiny'/></div>
                                  <p class='white cog-dropdown-account-text cog-dropdown-account-text animate-opacity'><?php echo $this->user->shortName;?></p>
                              </a>
-                             <a href="/users/<?php echo $this->user->userID;?>/inbox" class='header-dropdown-option animate-opacity white'>
+                             <a href="/users/<?php echo $this->user->userID;?>/inbox" class='header-dropdown-option-cog animate-opacity white'>
                                  Inbox (<?php echo $this->countNewMessages;?>)
                              </a>
-                             <a href="/users/<?php echo $this->user->userID;?>/settings" class='header-dropdown-option animate-opacity white'>
+                             <a href="/users/<?php echo $this->user->userID;?>/settings" class='header-dropdown-option-cog animate-opacity white' id='cog-dropdown-settings'>
                                  Account Settings
                              </a>
-                             <a href="/login/logout" class='header-dropdown-option animate-opacity white'>
+                             <a href="/login/logout" class='header-dropdown-option-cog animate-opacity white'>
                                  Logout
                              </a>
                         </div>

@@ -70,7 +70,10 @@ class Application_Model_Notification extends Application_Model_ModelAbstract
 		} elseif ($picture == 'teams') {
 			// Group pic
 			$path = $this->getProfilePic($size, $this->groupID, 'groups');
-		}  
+		}  else {
+			// Default pic
+			$path = $this->getProfilePic($size, '', 'logo');
+		}
 		
 		/*if (!empty($this->_attribs['actingUserID'])) {
 			// Some user did this
@@ -103,22 +106,25 @@ class Application_Model_Notification extends Application_Model_ModelAbstract
 		
 		// match %sign holders in text (eg %name has joined the %sport game)
 		preg_match_all('/(?:%)[a-zA-Z]+/', $this->text, $matches);
-
+		
+		$possession = 'your';
+		$class = 'dark bold text-width';
+		
+		if ($this->newsfeed) {
+			// This notification is meant for newsfeed, give different class
+			$class = 'green';
+			$possession = 'a';
+		}
+		
 		$replace = array();
 		foreach ($matches[0] as $match) {
 			$match = ltrim($match,'%');
 			
 			$pre   = '';
 			$post  = '';
-			$class = 'dark bold text-width';
-			$replaceVal = (isset($this->_attribs[$match]) ? $this->_attribs[$match] : '');
-			$possession = 'your';
 			
-			if ($this->newsfeed) {
-				// This notification is meant for newsfeed, give different class
-				$class = 'green';
-				$possession = 'a';
-			}
+			$replaceVal = (isset($this->_attribs[$match]) ? $this->_attribs[$match] : '');
+			
 			
 			if ($match == 'userName' || $match == 'receivingUserName') {
 				// Username replace
@@ -162,6 +168,10 @@ class Application_Model_Notification extends Application_Model_ModelAbstract
 				$time = strtotime($replaceVal);
 				// Format date (Wednesday, Dec 31 at 4pm)
 				$replaceVal = date('l', $time) . ' <span class="light">' . date('M j', $time) . '</span> at ' . date('ga', $time);
+			} else {
+				$pre  = "<span class='" . $class . "'>";
+				$replaceVal = $match;
+				$post = "</span>";
 			}
 			
 			

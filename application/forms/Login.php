@@ -40,13 +40,13 @@ class Application_Form_Login extends Zend_Form
 				'class'			=> 'light'
 				));
 						
-		$this->addElement('image', 'login', array(
+		$this->addElement('submit', 'login', array(
 				'src'			=> '',
 				'required' 		=> false,
 				'ignore'   		=> true,
 				'decorators'	=> array('ViewHelper'),
 				'label'   		=> 'Login',
-				'class'			=> 'dropdown-login-submit'
+				'class'			=> 'dropdown-login-submit button'
 
         ));  	
     }

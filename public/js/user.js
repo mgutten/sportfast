@@ -36,4 +36,5 @@ $(function()
 			$(this).children().children('.user-sport-rating-percent').hide();
 		}
 	)
+	
 })

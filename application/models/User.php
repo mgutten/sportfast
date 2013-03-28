@@ -27,10 +27,9 @@ class Application_Model_User extends Application_Model_ModelAbstract
 									'games'			=> '',
 									'teams'			=> '',
 									'groups'		=> '',
-									'friends'		=> '',
+									'players'		=> '',
 									'changedLocation' => '',
-									'messages'		=> '',
-									'friends'		=> ''
+									'messages'		=> ''
 									);
 
 	protected $_primaryKey = 'userID';	
@@ -60,7 +59,7 @@ class Application_Model_User extends Application_Model_ModelAbstract
 		$this->_attribs['teams'] = '';
 		$this->_attribs['groups'] = '';
 		$this->_attribs['games'] = '';
-		$this->_attribs['friends'] = '';
+		$this->_attribs['players'] = '';
 		
 		$this->getUserTeams();
 		$this->getUserFriends();
@@ -177,13 +176,13 @@ class Application_Model_User extends Application_Model_ModelAbstract
 	 * Get friends 
 	 * @return users model
 	 */
-	public function getFriends()
+	public function getPlayers()
 	{
-		if (empty($this->_attribs['friends'])) {
+		if (!$this->hasValue('players')) {
 			// No notifications object set
-			$this->_attribs['friends'] = new Application_Model_Users();
+			$this->_attribs['players'] = new Application_Model_Users();
 		}
-		return $this->_attribs['friends'];
+		return $this->_attribs['players'];
 	}
 
 	public function getNotifications()
@@ -294,8 +293,7 @@ class Application_Model_User extends Application_Model_ModelAbstract
 	
 	public function getCity()
 	{
-		if (empty($this->_attribs['city'])) {
-			
+		if (empty($this->_attribs['city'])) {			
 			$this->_attribs['city'] = new Application_Model_City();
 		}
 		return $this->_attribs['city'];

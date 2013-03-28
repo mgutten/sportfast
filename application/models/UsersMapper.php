@@ -198,7 +198,7 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 		$results = $table->fetchAll($select);
 		
 		foreach ($results as $result) {
-			$savingClass->friends->addUser($result);
+			$savingClass->players->addUser($result);
 		}
 
 		return $savingClass;
@@ -491,7 +491,7 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 				$result['firstName'] = $name[0];
 				$result['lastName']  = $name[1];
 				$result['userID']    = $result['id'];
-				$savingClass->friends->addUser($result);
+				$savingClass->players->addUser($result);
 			} elseif ($type == 'teams') {
 				// Team
 				$result['teamName'] = $result['name'];

@@ -21,11 +21,9 @@ class UsersController extends Zend_Controller_Action
 		$user->getUserRatings();
 		
 		$this->view->currentUser = $user;
-		
-		$this->view->currentURL  = '/users/' . $user->userID;
 
         $dropdown = Zend_Controller_Action_HelperBroker::getStaticHelper('Dropdown');
-		$this->view->inviteButton = $dropdown->dropdownButton('invite', array('Group'), 'Invite to');
+		$this->view->inviteButton = $dropdown->dropdownButton('invite', '', 'Invite to');
 		
 		// Get latest user activity
 		$activities = new Application_Model_Notifications();

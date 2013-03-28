@@ -22,7 +22,7 @@ class Application_Controller_Helper_ImageManipulator extends Zend_Controller_Act
 		} 
 	} 
 	
-	function save($filename, $image_type=IMAGETYPE_JPEG, $compression=75, $permissions=null) 
+	function save($filename, $image_type=IMAGETYPE_JPEG, $compression=90, $permissions=null) 
 	{   
 		$filename = str_replace(array('.gif','.png'), '.jpg', $filename);
 		

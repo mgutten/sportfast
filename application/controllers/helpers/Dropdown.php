@@ -129,9 +129,11 @@ class Application_Controller_Helper_Dropdown extends Zend_Controller_Action_Help
 		$sections = array('games','teams','groups');
 		
 		foreach ($sections as $section) {
+			
+			$output .= "<p class='smaller-text clear white dropdown-menu-invite-section heavy'>My " . ucwords($section) . "</p>";
+			
 			if ($user->hasValue($section)) {
 				// This section has values, display as options for invite
-				$output .= "<p class='smaller-text clear white dropdown-menu-invite-section heavy'>My " . ucwords($section) . "</p>";
 
 				foreach ($user->$section->getAll() as $model) {
 					if (($model->rosterLimit == $model->totalPlayers) && !$model instanceof Application_Model_Group) {
@@ -149,6 +151,8 @@ class Application_Controller_Helper_Dropdown extends Zend_Controller_Action_Help
 						$output .= $pre . $model->getLimitedName('groupName', 23) . $post;
 					}
 				}
+			} else {
+				$output .= "<p class='smaller-text clear light'>You have no " . $section . ".</p>";
 			}
 		}
 		
