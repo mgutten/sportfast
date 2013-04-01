@@ -297,6 +297,24 @@ abstract class Application_Model_ModelAbstract
 	}
 	
 	/**
+	 * get box profile pic in any size for a given model (team, user, group)
+	 * @params ($size => tiny, small, medium, large
+	 *			$id	  => id to attempt to use to get picture
+	 *			$type => plural type that we are searching for)
+	 * @returns href for picture (str)
+	 */
+	public function getBoxProfilePic($size, $id, $type = 'users', $class = '')
+	{
+		$picture = $this->getProfilePic($size, $id, $type);
+		
+		$output  = "<div class='box-img-container-" . $size . "'>";
+		$output .= 		"<img src='" . $picture . "' class='box-img-" . $size . " " . $class . "'/>";
+		$output .= "</div>";
+		
+		return $output;
+	}
+	
+	/**
 	 * get sports icon
 	 * @params ($size => tiny, small, medium, large
 	 *			$type => outline, solid,

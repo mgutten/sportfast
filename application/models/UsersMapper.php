@@ -259,10 +259,10 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 			   		  'st.typeID = ust.typeID')				   
 				   ->where('ust.userID = ?', $userID)
 				   ->where('st.sportID = ?', $sportID);
-				   
+
 			$types = $table->fetchAll($select);
 			foreach ($types as $type) {
-				$sportModel->getType($type->typeName)->setAttribs($type);
+				$sportModel->setType($type->typeName)->setAttribs($type);
 			}
 			
 			// Positions (eg WR,PG)
@@ -443,7 +443,8 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 		$results = $db->fetchAll($select);
 
 		foreach ($results as $result) {
-			$savingClass->addNotification($result);
+			$notification = $savingClass->addNotification($result);
+			$notification->parentUserID = $userClass->userID;
 		}
 
 	}

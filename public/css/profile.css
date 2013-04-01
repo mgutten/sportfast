@@ -1,0 +1,56 @@
+/* overlap declarations for profile pages (team, user, group, etc) */
+#body-white-back {
+	padding-top: 2em;
+}
+
+/* top section */
+.user-name,.profile-name {
+	font-size: 3em;
+	line-height: .9em;
+}
+
+#user-buttons-container,#profile-buttons-container {
+	float:right;
+	margin-top: .2em;
+}
+
+#user-buttons-container>p,#user-buttons-container>div,#profile-buttons-container>p,#profile-buttons-container>div {
+	float:right;
+	margin-right: 1em;
+}
+
+#user-buttons-container > p:first-child,#user-buttons-container > div:first-child {
+	margin-right: 0;
+}
+
+#user-buttons-container > #invite-to {
+	margin-right: 0;
+	clear:right;
+}
+
+.user-city-container,.profile-city-container {
+	margin: .3em 0 0 .5em;
+}
+
+
+/* section definitions */
+.profile-section-bold-subheader {
+	margin: .7em 0 0 .4em;
+}
+
+/* player styling */
+.profile-player-overlay-container {
+	width: 96px;
+	height: 96px;
+	position:relative;
+	z-index: 3;
+	top:0;
+	left:0;
+	opacity: 0;
+	filter: alpha(opacity=0);
+}
+
+.profile-player-overlay {
+	position: absolute;
+	width: 100%;
+}

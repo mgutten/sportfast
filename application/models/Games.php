@@ -18,6 +18,14 @@ class Application_Model_Games extends Application_Model_ModelAbstract
 	 */
 	public function addGame($resultRow, $byDay = false)
 	{
+		if ($this->hasValue('games')) {
+			// Values exist
+			if ($game = $this->gameExists($resultRow->teamGameID)) {
+				// Check if game already exists in game array
+				return $game;
+			}
+		}
+		
 		if ($byDay) {
 			// Order games by day in array
 			$date = date('w', strtotime($resultRow->date));
@@ -25,7 +33,31 @@ class Application_Model_Games extends Application_Model_ModelAbstract
 		} else {
 			$game = $this->_attribs['games'][] = new Application_Model_Game($resultRow);
 		}
+		
 		return $game;
+	}
+	
+	public function gameExists($id) {
+		foreach ($this->_attribs['games'] as $game) {
+			if ($game->gameID == $id || $game->teamGameID == $id) {
+				// Game exists, return it
+				return $game;
+			}
+		}
+		
+		return false;
+	}
+	
+	/**
+	 * get next game (by date), games should be ordered by date
+	 */
+	public function getNextGame()
+	{
+		if (!$this->hasValue('games')) {
+			return false;
+		}
+		
+		return reset($this->_attribs['games']);
 	}
 	
 									

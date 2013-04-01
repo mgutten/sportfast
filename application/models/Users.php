@@ -8,10 +8,23 @@ class Application_Model_Users extends Application_Model_ModelAbstract
 	protected $_attribs     = array('users'	=> '');
 	
 	
+	
 	public function addUser($resultRow)
 	{
+		//$user = $this->_attribs['users'][] = new Application_Model_User($resultRow);
+
 		$user = $this->_attribs['users'][] = new Application_Model_User($resultRow);
 		return $user;
+	}
+	
+	public function getUser($userID)
+	{
+		if ($user = $this->userExists($userID)) {
+			// User exists
+			return $user;
+		} else {
+			return false;
+		}
 	}
 	
 	
@@ -25,7 +38,7 @@ class Application_Model_Users extends Application_Model_ModelAbstract
 			// There are users
 			foreach ($this->_attribs['users'] as $user) {
 				if ($user->userID == $userID) {
-					return true;
+					return $user;
 				}
 			}
 		} else {		

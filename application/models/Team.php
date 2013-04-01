@@ -11,13 +11,18 @@ class Application_Model_Team extends Application_Model_ModelAbstract
 									'teamName' 	   => '',
 									'teamPic' 	   => '',
 									'public'  	   => '',
-									'totalPlayers' => '',
+									'totalPlayers' => '0',
 									'skillDifference' 	   => '',
-									'averageSkill' => '',
 									'averageAttendance'    => '',
-									'averageSporstmanship' => '',
+									'averageSporstmanship' => '',									
+									'averageSkill' => '',
 									'match'		   => '',
-									'city'		   => ''
+									'city'		   => '',
+									'league'	   => '',
+									'players'	   => '',
+									'messages'	   => '',
+									'games'		   => '',
+									'captain'	   => ''
 									);
 									
 	protected $_primaryKey = 'teamID';
@@ -28,6 +33,16 @@ class Application_Model_Team extends Application_Model_ModelAbstract
 		return parent::getProfilePic($size, $this->teamID, $type);
 	}
 	
+	/**
+	 * get team info from db
+	 * @params ($teamID => teamID)
+	 */
+	public function getTeamByID($teamID)
+	{
+		return $this->getMapper()->getTeamByID($teamID, $this);
+	}
+	
+
 	public function getMatchName()
 	{
 		if (empty($this->match)) {
@@ -84,7 +99,156 @@ class Application_Model_Team extends Application_Model_ModelAbstract
 		
 		return $matchDescription;
 	}
+	
+	
+	public function getLeague()
+	{
+		if (!$this->hasValue('league')) {
+			$this->_attribs['league'] = new Application_Model_League();
+		}
+		
+		return $this->_attribs['league'];
+	}
+	
+	public function getPlayers()
+	{
+		if (!$this->hasValue('players')) {
+			$this->_attribs['players'] = new Application_Model_Users();
+		}
+		
+		return $this->_attribs['players'];
+	}
+	
+	public function getGames()
+	{
+		if (!$this->hasValue('games')) {
+			$this->_attribs['games'] = new Application_Model_Games();
+		}
+		
+		return $this->_attribs['games'];
+	}
+	
+	public function getMessages()
+	{
+		if (!$this->hasValue('messages')) {
+			$this->_attribs['messages'] = new Application_Model_Messages();
+		}
+		
+		return $this->_attribs['messages'];
+	}
+	
+	
+	public function addPlayer($resultRow)
+	{
+		$players = $this->getPlayers();
+		return $players->addUser($resultRow);
+		
+	}
+	
+	public function addGame($resultRow)
+	{
+		$games = $this->getGames();
+		return $games->addGame($resultRow);
+		
+	}
+	
+	public function addMessage($resultRow)
+	{
+		return $this->messages->addMessage($resultRow);
+	}
+	
+	
+	/**
+	 * get team's next game
+	 */
+	public function getNextGame()
+	{
+		return $this->games->getNextGame();
+	}
+	
+	/**
+	 * order players by whether they are confirmed or not
+	 */
+	public function sortPlayersByConfirmed()
+	{
+		$nextGame = $this->getNextGame();
+		if ($this->hasValue('players')) {
+			// There are players stored, sort them
+			$players = $this->_attribs['players']->_attribs['users'];
+			
+			$playerArray = $undecided = $notConfirmed = array();
+			
+			foreach ($players as $player) {
+				
+				if ($nextGame->userConfirmed($player->userID)) {
+					// User is confirmed
+					array_unshift($playerArray, $player);
+				} elseif ($nextGame->userNotConfirmed($player->userID)) {
+					// User is not going
+					array_unshift($notConfirmed, $player);
+				} else {
+					array_push($undecided, $player);
+				}
+			}
+			
+			foreach ($undecided as $player) {
+				array_push($playerArray, $player);
+			}
+			
+			foreach ($notConfirmed as $player) {
+				array_push($playerArray, $player);
+			}
+			
+			$players = $this->_attribs['players'];
+			$players->users = $playerArray;
+			
+			return $this->_attribs['players'];
+		} else {
+			return false;
+		}
+	}
+	
+	private static function sortByConfirmed ($a, $b)
+	{
+		
+		
+		if ($nextGame->userConfirmed($a->userID)) {
+			// User is confirmed
+			return 1;
+		} elseif ($nextGame->userNotConfirmed($a->userID)) {
+			return -1;
+		} else {
+			return 0;
+		}
+	}
+	
+	/**
+	 * test $userID to see if user is captain of team
+	 */
+	public function isCaptain($userID)
+	{
+		if ($userID == $this->_attribs['captain']) {
+			// User is captain
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	/**
+	 * test if team has captain
+	 */
+	public function hasCaptain()
+	{
+		if ($this->hasValue('captain')) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+		
 
+		
 		
 	
 }

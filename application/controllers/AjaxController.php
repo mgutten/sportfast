@@ -283,6 +283,41 @@ class AjaxController extends Zend_Controller_Action
 		echo json_encode($results);
 		
 	}
+	
+	
+	/** 
+	 * handle click of "confirm", "deny", or "join" button clicks from user's notification dropdown
+	 */
+	public function notificationActionAction()
+	{
+		$post = $this->getRequest()->getPost();
+		
+		if (isset($post['confirmOrDeny'])) {
+			// Confirm or deny action
+			if ($post['confirmOrDeny'] == 'confirm') {
+				// Confirm action, add to db
+				$type = $post['type'];
+				
+				$mapper = new Application_Model_NotificationsMapper();
+				
+				$mapper->notificationConfirm($post['notificationLogID'], $type);
+				
+			}
+			
+			// Delete notification
+			$db = Zend_Db_Table::getDefaultAdapter();
+			$db->delete('notification_log',array('notificationLogID = ?' => $post['notificationLogID']));
+			
+			/* If cannot maintain integrity of $auth user notifications, clearIdentity and force reload of everything */
+			//$auth = Zend_Auth::getInstance();
+			//$auth->clearIdentity();
+			
+			$this->view->user->notifications->deleteNotificationByID($post['notificationLogID']);
+			
+		}
+			
+
+	}
 
 }
 

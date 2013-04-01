@@ -145,7 +145,9 @@ class Application_View_Helper_MemberHomepage
 				$b = $i;
 			}
 			
+			
 			$date  	 = date('l', strtotime('+' . ($i - $curDay) . ' days'));
+			
 			if ($i - $curDay == 0) {
 				// Today
 				$dateCombo = 'today';
@@ -155,6 +157,7 @@ class Application_View_Helper_MemberHomepage
 			} else {
 				$dateCombo = 'this ' . $date;
 			}
+			
 			
 			if (isset($schedule[$b])) {
 				// Event for today
@@ -183,14 +186,14 @@ class Application_View_Helper_MemberHomepage
 					$output .= "<a href='/games/" . $game->gameID . "' class='member-schedule-day-body-game-container'>";
 					$output .= "<div class='member-schedule-day-body-game-left-container'>";
 					$output .= "<p class='bold darkest larger-text'>" . ucwords($game->sport) . ' Game';
-					$output .= "<p class='clear'>" . ucwords($dateCombo) . "</p>";
-					$output .= "<p class='clear'>" . date('ga',strtotime($game->date)) . "</p>";
+					$output .= "<p class='clear'>" . $game->getDay() . "</p>";
+					$output .= "<p class='clear'>" . $game->getHour() . "</p>";
 					$output .= "<p class='clear medium'>" . $game->getPark()->parkName . "</p>";
 					$output .= "</div>";
 					$output .= "<div class='member-schedule-day-body-players-container darkest bold'>";
 					$output .= "<p class='member-schedule-day-body-players larger-text center'>" . $game->totalPlayers . "/" . $game->rosterLimit . "</p>";
 					$output .= "<p class='member-schedule-day-body-players center clear'>players</p>";
-					$output .= "<p class='center clear green smaller-text member-schedule-day-body-players-confirmed'>" . $game->confirmedPlayers . " confirmed</p>";
+					$output .= "<p class='center clear green smaller-text member-schedule-day-body-players-confirmed'>" . $game->countConfirmedPlayers() . " confirmed</p>";
 					$output .= "</div>";
 					$output .= "<div class='member-schedule-day-body-game-right-container'>";
 					$output .= "<p class='darkest center'>Are you in, or are you out?</p>";
@@ -276,7 +279,7 @@ class Application_View_Helper_MemberHomepage
 				$newDate  = $dateTime->format('m n');
 				$day      = $match->getDay();
 				$hour	  = $match->getHour();
-				$dateDesc = date('M j', strtotime($match->date));
+				$dateDesc = $dateTime->format('M j');
 				$id		  = $match->gameID;
 				$location = $match->getLimitedParkName(25);
 				$gameIndex= $totalGames;
@@ -365,14 +368,16 @@ class Application_View_Helper_MemberHomepage
 	 public function createNotification($notification, $size = 'tiny')
 	 {
 		  $output = '';
-		  $preWrapper  = "<div class='left'>";
-		  $postWrapper = "</div>";
+		  $preWrapper  = "<a href='" . $notification->getFormattedURL() . "' class='left'>";
+		  $postWrapper = "</a>";
 		  $class	   = '';
 		  if ($notification->_attribs['picture'] == 'sports') {
 			  // Sport icon to be shown, wrap in container
-			  $preWrapper = "<div class='notification-sports-img-container-" . $size . "'>";
+			  $preWrapper = "<a href='" . $notification->getFormattedURL() . "' class='notification-sports-img-container-" . $size . "'>";
+			  //$postWrapper = "</a>";
 		  } elseif ($size == 'tiny') {
-			  $preWrapper = "<div class='box-img-container-tiny left'>";
+			  $preWrapper = "<a href='" . $notification->getFormattedURL() . "' class='box-img-container-tiny left'>";
+			   
 			  $class = 'box-img-tiny';
 		  }
 		  $output .= "<div class='newsfeed-notification-container'>";

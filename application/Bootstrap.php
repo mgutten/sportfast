@@ -49,7 +49,6 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 				$user->login();
 				// Must be after get games, teams, and groups call
 				$auth->getStorage()->write($user);
-				
 			}
 			
 			$headerLayout  = 'header/short';
@@ -112,6 +111,8 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 	
 	protected function _initRoutes()
 	{
+		$view   = $this->getResource('view');
+		
 		$frontController = Zend_Controller_Front::getInstance(); 
 		$router = $frontController->getRouter();
 		$r = new Zend_Controller_Router_Route_Regex(
@@ -120,7 +121,7 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 						'action' => 'index',
 						'controller' => 'users',
 						'module' => 'default',
-						'id'	 => '2'
+						'id'	 => $view->user->userID
 				),
 				array(
 						1 => 'id',
@@ -129,6 +130,24 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 				'users/%d');
 				
 		$router->addRoute('users', $r);
+		
+		$r = new Zend_Controller_Router_Route_Regex(
+				'teams(?:/(\d+))?(?:/(\w+))?',
+				array(
+						'action' => 'index',
+						'controller' => 'teams',
+						'module' => 'default',
+						'id'	 => '1'
+				),
+				array(
+						1 => 'id',
+						2 => 'action'
+				),
+				'teams/%d');
+				
+		$router->addRoute('teams', $r);
+		
+		return $view;
 	}
 	
 

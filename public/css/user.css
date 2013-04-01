@@ -1,24 +1,6 @@
 /* user profile css */
-#body-white-back {
-	padding-top: 2em;
-}
 
 /* top user info section */
-.user-name {
-	font-size: 3em;
-	line-height: .9em;
-}
-
-#user-buttons-container {
-	float:right;
-	width: 60%;
-	margin-top: .2em;
-}
-
-#user-buttons-container>p,#user-buttons-container>div {
-	float:right;
-	margin-right: 1em;
-}
 
 #user-buttons-container>.dropdown-menu-holder {
 	margin-right: 0;
@@ -28,10 +10,6 @@
 	width: 8em;
 	margin-top: .1em;
 	line-height: 1.1em;
-}
-
-.user-city-container {
-	margin: .2em 0 0 .5em;
 }
 
 
@@ -91,7 +69,6 @@
 	border-top:none;
 }
 
-
 .user-sport-container-selected {
 	display: block;
 }
@@ -150,6 +127,10 @@
 
 .user-sport-want-looking {
 	margin-right: .5em;
+}
+
+.user-sport-type {
+	margin-left: .8em;
 }
 	
 /* user narrow column */

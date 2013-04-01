@@ -2,26 +2,40 @@
 </div>
 <div class='dropshadow-bottom' id='header-bar-location'>
 </div>
+
 <div class='dropshadow white-back' id='notifications-container'>
+
 <?php
-	foreach ($this->user->notifications->unread as $notification) {
-		echo "<div href='" . $notification->getFormattedUrl() . "' class='notification-container light-green-back pointer'>" 
-			 . "<div class='notification-text-picture-container'>"
-				 . "<img src='" . $notification->getPicture() . "' class='notification-picture' />"
-				 . "<span class='notification-text'>" . $notification->getFormattedText() . "</span>"
-			 . "</div>"
-			 . "<span class='notification-time-subscript light'>" . $notification->getTimeFromNow() . "</span>"
-			 . "</div>";
+
+	$sections = array('unread', 'read');
+	foreach ($sections as $section) {
 		
-	}
-	foreach ($this->user->notifications->read as $notification) {
-		echo "<div href='" . $notification->getFormattedUrl() . "' class='notification-container pointer'>" 
-			 . "<div class='notification-text-picture-container'>"
-				 . "<img src='" . $notification->getPicture() . "' class='notification-picture' />"
-				 . "<span class='notification-text'>" . $notification->getFormattedText() . "</span>"
-			 . "</div>"
-			 . "<span class='notification-time-subscript light'>" . $notification->getTimeFromNow() . "</span>"
-			 . "</div>";
+		$class = '';
+		if ($section == 'unread') {
+			$class = 'light-green-back';
+		}
+		foreach ($this->user->notifications->$section as $notification) {
+			$buttons = '';
+			if (!is_object($notification)) {
+				continue;
+			}
+			if ($notification->hasValue('actionRequired')) {	
+				$buttons = "<div class='notification-button-container clear-right' notificationLogID='" . $notification->notificationLogID . "' type='" . $notification->type . "'>";
+				$buttons .= "<p class='button notification-action-button'>Confirm</p>";
+				$buttons .= "<p class='button notification-action-button notification-action-button-second'>Decline</p>";
+				$buttons .= "</div>";
+			} 
+			
+			echo "<div href='" . $notification->getFormattedUrl() . "' class='notification-container " . $class . " pointer'>" 
+				 . "<div class='notification-text-picture-container'>"
+					 . "<img src='" . $notification->getPicture() . "' class='notification-picture' />"
+					 . "<span class='notification-text'>" . $notification->getFormattedText() . "</span>"
+					 . $buttons
+				 . "</div>"
+				 . "<span class='notification-time-subscript light'>" . $notification->getTimeFromNow() . "</span>"
+				 . "</div>";
+			
+		}
 	}
 ?>
 </div>

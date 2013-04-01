@@ -10,6 +10,7 @@ class UsersController extends Zend_Controller_Action
 
     public function indexAction()
     {
+		
         $this->view->narrowColumn = 'left';
 		
 		$userID = $this->getRequest()->getParam('id');
@@ -23,7 +24,7 @@ class UsersController extends Zend_Controller_Action
 		$this->view->currentUser = $user;
 
         $dropdown = Zend_Controller_Action_HelperBroker::getStaticHelper('Dropdown');
-		$this->view->inviteButton = $dropdown->dropdownButton('invite', '', 'Invite to');
+		$this->view->inviteButton = $dropdown->dropdownButton('invite-to', '', 'Invite to');
 		
 		// Get latest user activity
 		$activities = new Application_Model_Notifications();
@@ -31,6 +32,9 @@ class UsersController extends Zend_Controller_Action
 		$this->view->activities = $activities->read;
 
 		$this->view->memberHomepage = $this->view->getHelper('memberhomepage');
+		
+		//$this->view->user->notifications->deleteNotificationByID('24');
+		//var_dump($this->view->user->notifications->read);
 		
 		
     }

@@ -45,6 +45,34 @@ class Application_Model_Notifications extends Application_Model_ModelAbstract
 		return $notification;
 	}
 	
+	/**
+	 * search through notifications and delete matching one
+	 */
+	public function deleteNotificationByID($notificationLogID)
+	{
+		$sections = array('read', 'unread');
+		foreach ($sections as $section) {
+			
+			if ($this->hasValue($section)) {
+				// Section has values, search for id
+				$array = $this->_attribs[$section];
+				foreach ($array as $key => $notification) {
+					if (!is_object($notification)) {
+						continue;
+					}
+					if ($notification->notificationLogID == $notificationLogID) {
+						// Match, delete
+						unset($this->_attribs[$section][$key]);
+						return true;
+					}
+				}
+			}
+		}
+		
+		return false;
+		
+	}
+	
 	public function getUserActivities($userClass, $limit = 15)
 	{
 		$this->setMapper('Application_Model_NotificationsMapper');
@@ -80,7 +108,6 @@ class Application_Model_Notifications extends Application_Model_ModelAbstract
 	{
 		return $this->getMapper()->getUserNotifications($this->_parent, $this, $onlyNew);
 	}
-	
 	
 	
 	public function resetNewNotifications()

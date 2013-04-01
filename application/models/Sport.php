@@ -27,12 +27,6 @@ class Application_Model_Sport extends Application_Model_ModelAbstract
 	protected $_primaryKey = 'userSportID';	
 	protected $_overwriteKeys = array('userID');
 	
-	public function __construct($resultRow = false) 
-	{
-		if ($resultRow) {
-			$this->setAttribs($resultRow);
-		}
-	}
 
 	public function save()
 	{
@@ -95,10 +89,10 @@ class Application_Model_Sport extends Application_Model_ModelAbstract
 		return $this->_attribs['availabilities'][$day][$hour];
 	}	
 	
-	public function getType($type) 
+	public function setType($type) 
 	{
 		// Remove overwriting of type to accommodate several same typeName models (ie Singles Match, Singles Rally)
-		$newType = $this->_attribs['types'][] = new Application_Model_SportType();
+		$newType = $this->_attribs['types'][$type] = new Application_Model_SportType();
 		
 		return $newType;
 	}

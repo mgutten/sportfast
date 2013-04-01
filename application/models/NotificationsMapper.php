@@ -106,6 +106,41 @@ class Application_Model_NotificationsMapper extends Application_Model_MapperAbst
 		
 		return $savingClass;	
 	}
+	
+	/**
+	 * user confirmed friend, team, or group request so add to db
+	 * @params ($notificationLogID => id from notification_log table, 
+	 *			$type => type from notifications table)
+	 */
+	 public function notificationConfirm($notificationLogID, $type)
+	 {
+		 if ($type == 'friend') {
+			 $query = "INSERT INTO friends (userID1, userID2, userName1, userName2)
+			 			(SELECT nl.actingUserID, 
+								nl.receivingUserID,
+								CONCAT(u1.firstName, ' ', LEFT(u1.lastName,1)), 
+								CONCAT(u2.firstName, ' ', LEFT(u2.lastName,1)) 
+							FROM notification_log as `nl`
+							INNER JOIN users as u1 ON u1.userID = nl.actingUserID
+							INNER JOIN users as u2 ON u2.userID = nl.receivingUserID
+							WHERE nl.notificationLogID = '" . $notificationLogID . "')";
+			
+			 $query2 = "INSERT INTO notification_log (actingUserID, receivingUserID, notificationID, dateHappened)
+			 			 (SELECT nl.actingUserID, 
+						 		 nl.receivingUserID, 
+								 (SELECT notificationID FROM notifications WHERE type IS NULL and action = 'friend'), 
+								 NOW()
+						 	FROM notification_log as `nl`
+							WHERE nl.notificationLogID = '" . $notificationLogID . "')";
+		 }
+		 
+		 
+		 $db = Zend_Db_Table::getDefaultAdapter();
+		 $db->query($query);
+		 
+		 $db->query($query2);
+		 
+	 }
 
 		
 	

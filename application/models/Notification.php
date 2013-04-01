@@ -5,6 +5,7 @@ class Application_Model_Notification extends Application_Model_ModelAbstract
 	protected $_mapperClass = 'Application_Model_NotificationsMapper';
 	protected $_dbTable		= 'Application_Model_DbTable_NotificationLog';	
 	
+	protected $_userID;
 	protected $_attribs     = array('notificationLogID' => '',
 									'actingUserID'		=> '',
 									'receivingUserID'   => '',
@@ -32,8 +33,11 @@ class Application_Model_Notification extends Application_Model_ModelAbstract
 									'type'				=> '',
 									'newsfeed'			=> false,
 									'read'				=> false,
-									'dateHappened'      => ''
+									'dateHappened'      => '',
+									'actionRequired'	=> '',
+									'parentUserID'		=> ''
 									);
+									
 	protected $_primaryKey = 'notificationLogID';	
 	
 	
@@ -43,6 +47,7 @@ class Application_Model_Notification extends Application_Model_ModelAbstract
 		if ($resultRow) {
 			$this->setAttribs($resultRow);
 		}
+		
 				
 	}
 	
@@ -137,6 +142,7 @@ class Application_Model_Notification extends Application_Model_ModelAbstract
 					$id = $this->receivingUserID;
 					$replaceVal = ucwords($this->receivingFirstName) . " " . ucwords($this->receivingLastName[0]);
 				}
+				
 				if ($this->newsfeed) {
 					// Is newsfeed, add link
 					$pre  = "<a href='/users/" . $id . "' class='" . $class . "'>";
@@ -145,6 +151,18 @@ class Application_Model_Notification extends Application_Model_ModelAbstract
 					$pre  = "<span class='" . $class . "'>";
 					$post = "</span>";
 				}
+				
+				if ($id == $this->parentUserID) {
+					// User's name, replace with "you"
+					$pre = '';
+					$replaceVal = 'you';
+					$post = '';
+					if (strpos($this->text, '%' . $match) == 0) {
+						// username is first word in sentence
+						$replaceVal = 'You';
+					}
+				}
+				
 			} elseif ($match == 'parkName') {
 				if ($this->newsfeed) {
 					// Is newsfeed, add link

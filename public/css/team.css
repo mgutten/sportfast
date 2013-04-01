@@ -1,0 +1,43 @@
+/* team profile css */
+
+.body-column-wide {
+	width: 76%;
+}
+
+.body-column-narrow{
+	width: 24%;
+}
+
+/* top section */
+#profile-buttons-container {
+	width: 33%;
+	background:#ccc;
+}
+
+/* next game section */
+.team-next-game-left-container {
+	width: 68%;
+}
+
+.team-next-game-right-container {
+	width: 27%;
+	margin: .5em 1.5em 0 0;
+}
+
+#team-next-game-container {
+	padding: 1em;
+}
+
+/* players section */
+.team-players-section-header-going {
+	margin: .3em 1em 0 .3em;
+}
+
+.team-player-container {
+	padding: 3px 2px 0 0;
+}
+
+.team-confirm-img {
+	margin: -24px 0 0 .5em;
+}
+

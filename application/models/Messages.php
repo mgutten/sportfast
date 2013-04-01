@@ -11,12 +11,19 @@ class Application_Model_Messages extends Application_Model_ModelAbstract
 	public function addMessage($resultRow)
 	{
 		// Result row from getOldUserNotifications and getNewUserNotifications is array, not object
-		if ($resultRow->read == '0') {
-			// New notification
-			$message = $this->_attribs['unread'][] = new Application_Model_Message($resultRow);
+		$resultRow = $resultRow->toArray();
+		if (isset($resultRow['read'])) {
+			// Read column exists, test it
+			if ($resultRow->read == '0') {
+				// New notification
+				$message = $this->_attribs['unread'][] = new Application_Model_Message($resultRow);
+			} else {
+				// Old notification
+				$message = $this->_attribs['read'][] = new Application_Model_Message($resultRow);
+			}
 		} else {
-			// Old notification
-			$message = $this->_attribs['read'][] = new Application_Model_Message($resultRow);
+				// Old notification
+				$message = $this->_attribs['read'][] = new Application_Model_Message($resultRow);
 		}
 		return $message;
 	}
@@ -36,6 +43,15 @@ class Application_Model_Messages extends Application_Model_ModelAbstract
 		}
 	}
 	
+	/**
+	 * get team messages
+	 */
+	public function getTeamMessages($teamID)
+	{
+		return $this->getMapper()->getTeamMessages($teamID, $this);
+	}
+	
+		
 	public function moveUnreadToRead()
 	{
 		if (count($this->_attribs['unread']) > 0) {

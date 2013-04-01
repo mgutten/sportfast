@@ -5,7 +5,8 @@
  */
 $this->headTitle($this->currentUser->shortName);
 $this->headLink()->prependStylesheet($this->baseUrl() . '/css/user.css');
-	$this->headScript()->prependFile($this->baseUrl() . '/js/user.js');
+$this->headLink()->prependStylesheet($this->baseUrl() . '/css/profile.css');
+$this->headScript()->prependFile($this->baseUrl() . '/js/user.js');
 ?>
 
 
@@ -43,7 +44,6 @@ $this->placeholder('narrowColumn')->captureEnd();
 </header>
 
 <div id='user-buttons-container'>
-    <?php echo $this->inviteButton;?>
     <p class='button'>
     	Message
     </p>
@@ -58,7 +58,9 @@ $this->placeholder('narrowColumn')->captureEnd();
     		<p class='light center' id='user-already-friend'>
             	You and <?php echo $this->currentUser->firstName;?> are friends.
             </p>
-    <?php } ?>
+    <?php }
+	    echo $this->inviteButton;
+	?>
 </div>
 
 <div id='user-sports-container' class='clear'>
@@ -102,13 +104,13 @@ $this->placeholder('narrowColumn')->captureEnd();
 			$lowerOutput .= 		"<p class='darkest clear'>";
 			
 			if ($firstSkill = $sport->ratings->getBestSkill(0)) {
-				$lowerOutput .= "<span class='dark largest-text'>" . $firstSkill . "</span>";
+				$lowerOutput .= "<span class='darkest largest-text'>" . $firstSkill . "</span>";
 			}
 			if ($secondSkill = $sport->ratings->getBestSkill(1)) { 
-				$lowerOutput .= ", <span class='dark larger-text'>" . $secondSkill . "</span>";
+				$lowerOutput .= ", <span class='darkest larger-text'>" . $secondSkill . "</span>";
 			}
 			if ($thirdSkill = $sport->ratings->getBestSkill(2)) { 
-				$lowerOutput .= ", <span class='dark'>" . $thirdSkill . "</span>";
+				$lowerOutput .= ", <span class='darkest'>" . $thirdSkill . "</span>";
 			}
 			
 			if (!$firstSkill) {
@@ -121,8 +123,28 @@ $this->placeholder('narrowColumn')->captureEnd();
 			$lowerOutput .= 			"<p class='clear dark user-sport-want-looking'> Looking for:</p>";
 			$lowerOutput .= 			"<div class='user-sport-want-inner-container left'>";
 			foreach ($sport->formats as $format) {
-				$lowerOutput .=				"<p class='dark '>" . ucwords($format) . "</p>";
+				$lowerOutput .=				"<p class='darkest clear'>" . ucwords($format) . "</p>";
 			}
+
+			// Array of types, display
+			$typeSuffixes = '';
+			$typeSuffixArray = array();
+			foreach ($sport->types as $type) {
+				if (in_array($type->typeName, $sport->formats)) {
+					// Type was already displayed above
+					continue;
+				}
+				$lowerOutput  .=			"<p class='medium clear user-sport-type'>" . ucwords($type->typeName) . "</p>";
+				
+				if (in_array($type->typeSuffix, $typeSuffixArray)) {
+					// Suffix was already used
+					continue;
+				}
+				$typeSuffixes .= 			"<p class='medium clear user-sport-type'>" . ucwords($type->typeSuffix) . "</p>";
+				$typeSuffixArray[] = $type->typeSuffix;
+			}
+			$lowerOutput .= $typeSuffixes;
+			
 			$lowerOutput .=				"</div>";
 			$lowerOutput .=			"</div>";
 			$lowerOutput .=		"</div>";	

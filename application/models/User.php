@@ -264,6 +264,7 @@ class Application_Model_User extends Application_Model_ModelAbstract
 	
 	public function getSport($sport) 
 	{
+		$sport = strtolower($sport);
 		if (!isset($this->_attribs['sports'][$sport])) {
 			$this->_attribs['sports'][$sport] = new Application_Model_Sport();
 		}
@@ -339,6 +340,11 @@ class Application_Model_User extends Application_Model_ModelAbstract
 	public function getProfilePic($size, $userID = false, $type = 'users') 
 	{
 		return parent::getProfilePic($size, $this->userID, $type);
+	}
+	
+	public function getBoxProfilePic($size, $type = 'users', $class = '', $userID = false) 
+	{
+		return parent::getBoxProfilePic($size, $this->userID, $type, $class);
 	}
 	
 	public function setChangedLocation($value) 

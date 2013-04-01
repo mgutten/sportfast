@@ -380,10 +380,26 @@ $(function()
 		
 	})
 	
-	/* cannot nest anchor tags, force redirect of notification-container.click */
+	/* notification Confirm or Decline button was clicked */
+	$('.notification-action-button').click(function(e)
+	{
+		e.preventDefault();
+		e.stopPropagation(); // To prevent $('.notification-container').click from firing
+		
+		var notificationLogID = $(this).parent().attr('notificationLogID');
+		var type = $(this).parent().attr('type');
+		var confirmOrDeny 	  = $(this).text().toLowerCase();
+		var optionalID = '';
+		
+		notificationConfirmDeny(notificationLogID, confirmOrDeny, type, optionalID);
+	})
+	
+	/* cannot nest anchor tags, force redirect of notification-container.click (could now be changed to simple a tag) */
 	$('.notification-container').click(function()
 	{
-		window.location.href = $(this).attr('href');
+		if ($(this).attr('href')) {
+			window.location.href = $(this).attr('href');
+		}
 	})
 	
 	$('.notification-container.light-green-back').mouseenter(function()
@@ -578,6 +594,24 @@ $(function()
 		
 })
 
+/**
+ * Ajax call to confirm (eg add as friends) or deny (delete) specific notification
+ * @params(notificationLogID => id of parent notificationLogID from db,
+ *		   confirmOrDeny	 => "confirm" or "deny",
+ *		   type				 => type (friend, game, team, group etc) retrieved from db to determine what table to add to
+ *		   optionalID		 => ID for game or group if issued, but blank if not)
+ */
+function notificationConfirmDeny(notificationLogID, confirmOrDeny, type, optionalID)
+{
+	$.ajax({
+		url: '/ajax/notification-action',
+		type: 'POST',
+		data: {notificationLogID: notificationLogID,
+			   confirmOrDeny: confirmOrDeny,
+			   type: type,
+			   optionalID: optionalID}
+	})
+}
 
 /**
  * Ajax call to get city name from zipcode

@@ -62,4 +62,97 @@ class Application_Model_TeamsMapper extends Application_Model_MapperAbstract
 		return $savingClass;
 	}
 	
+	/**
+	 * get team info from db
+	 * @params ($teamID => teamID
+	 *			$savingClass => team model)
+	 */
+	public function getTeamByID($teamID, $savingClass)
+	{
+		$table   = $this->getDbTable();
+		$select  = $table->select();
+		$select->setIntegrityCheck(false);
+		
+		$select->from(array('t'  => 'teams'))
+			   ->join(array('ll' => 'league_levels'),
+			   		 'll.leagueLevelID = t.leagueLevelID')
+			   ->joinLeft(array('ut' => 'user_teams'),
+			   		 'ut.teamID = t.teamID',
+					 array(''))
+			   ->joinLeft(array('us' => 'user_sports'),
+			   		 'ut.userID = us.userID AND us.sportID = t.sportID',
+					 array('avg(us.skillCurrent) as averageSkill',
+					 	   'avg(us.attendance) as averageAttendance',
+						   'avg(us.sportsmanship) as averageSportsmanship',
+						   'COUNT(us.userID) as totalPlayers'
+						   ))
+				->where('t.teamID = ?', $teamID)
+				->limit(1);
+		
+					   
+		$team = $table->fetchRow($select);
+
+		$savingClass->setAttribs($team);
+		
+		// Get all players
+		$sportID = $savingClass->sportID;
+		$select = $table->select();
+		$select->setIntegrityCheck(false);	
+			
+		$select->from(array('ut' => 'user_teams'))
+			   ->join(array('u' => 'users'),
+			   		  'ut.userID = u.userID')
+			   ->join(array('us' => 'user_sports'),
+			   		  'ut.userID = us.userID AND us.sportID = "' . $sportID . '"')
+			   ->join(array('s' => 'sports'),
+			   		  's.sportID = ' . $sportID)
+			   ->where('ut.teamID = ?', $teamID);
+			   
+		$players = $table->fetchAll($select);
+
+		foreach ($players as $player) {
+			$savingClass->addPlayer($player)
+						->getSport($player->sport)
+						->setAttribs($player);
+				
+		}
+		
+		// Get all games as well as players playing/played in those games
+		$select = $table->select();
+		$select->setIntegrityCheck(false);	
+			
+		$select->from(array('tg' => 'team_games'))
+			   ->join(array('ll' => 'league_locations'),
+			   		  'll.leagueLocationID = tg.leagueLocationID')
+			   ->joinLeft(array('utg' => 'user_team_games'),
+			   		 'tg.teamID = utg.teamID')
+			   ->where('tg.teamID = ?', $teamID)
+			   ->where('tg.date > DATE_SUB(NOW(), INTERVAL 3 WEEK)')
+			   ->order('tg.date ASC');
+		
+		
+		$games = $table->fetchAll($select);
+		
+		foreach ($games as $game) {
+			$gameModel = $savingClass->addGame($game);
+			
+			if ($game->userID !== NULL) {
+				if ($game->confirmed == true) {
+					// Player is going
+					$gameModel->addConfirmedPlayer($game->userID);	
+				} else {
+					// Player is confirmed not going
+					$gameModel->addNotConfirmedPlayer($game->userID);
+				}
+			}
+			
+		}
+		
+		return $savingClass;
+
+	}
+			   
+			
+
+			
 }

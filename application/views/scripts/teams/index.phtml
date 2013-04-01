@@ -1,0 +1,159 @@
+<?php
+/** 
+ * controller => teams
+ * action => index
+ */
+$this->headTitle($this->team->teamName);
+$this->headLink()->prependStylesheet($this->baseUrl() . '/css/team.css');
+$this->headLink()->prependStylesheet($this->baseUrl() . '/css/profile.css');
+$this->headScript()->prependFile($this->baseUrl() . '/js/team.js');
+
+?>
+
+
+<?php
+// Narrow right column
+$this->placeholder('narrowColumn')->captureStart();
+echo "<img src='" . $this->team->getProfilePic('large') . "' class='rounded-corners'/>";
+
+/*
+$sections = array('players', 'teams', 'groups');
+
+echo $this->narrowteamsection($this->currentUser, $sections);
+*/
+$this->placeholder('narrowColumn')->captureEnd();
+
+?>
+
+<header class='clear profile-name-container'>
+	<p class='profile-name heavy darkest clear'>
+    	<?php echo $this->team->teamName;?>
+	</p>
+    <div class='profile-city-container clear'>
+        <p class='light clear larger-text'>
+            <span class='darkest'><?php echo $this->team->city . '</span> &nbsp;' . $this->team->sport . ' &nbsp;<span class="darkest">' . '1-3-1</span>';?>
+        </p>    
+
+    </div>
+</header>
+
+<div id='profile-buttons-container'>
+    <?php
+		
+		if ($this->team->players->userExists($this->user->userID)) {
+			// You are on team
+			?>
+			<p class='red-button right leave-button' id='leave-button'>
+				Leave
+			</p>
+    <?php } else {?>
+    		<p class='green-button right larger-text join-button heavy' id='join-button'>
+            	Join
+            </p>
+    <?php } 
+		
+		if ($this->captain) {
+			// User is captain
+			echo $this->inviteButton;
+		}
+	?>
+</div>
+    
+<?php 
+// Create header for next game section
+$nextGameHeader = '';
+if ($this->nextGame) {
+	// Next game exists
+	$nextGameHeader .= "<div class='right profile-section-bold-subheader'>";
+	$nextGameHeader .= 		"<p class='right medium'>" . $this->countConfirmedPlayers . " confirmed</p>";
+	$nextGameHeader .= "</div>";
+}
+echo $this->partial('partials/global/sectionHeaderBold.phtml',array('title'   => 'next game',
+																	'content' => $nextGameHeader)); 
+																	
+?>
+
+<div class='clear width-100' id='team-next-game-container'>
+<?php
+	if (!$this->nextGame) {
+		// No next game
+?>
+	<p class='center width-100 medium larger-text none-text'> There are no games in the near future.</p>
+<?php } else { 
+		// Next game, show info
+?>
+	<div class='team-next-game-left-container left'>
+    	<p class='left largest-text darkest'>vs. <?php echo $this->nextTeamName;?></p>
+        <p class='clear darkest'>
+        	<?php echo $this->nextDay;?> <span class='light'><?php echo $this->nextShortDate;?></span> at <?php echo $this->nextHour;?>
+        </p>
+        <p class='clear darkest'>
+        	<?php echo $this->nextLocationName;?> <a href='http://www.maps.google.com/maps?q=<?php echo $this->nextLocationStreetAddress;?>' class='light'>directions</a>
+        </p>
+    </div>
+	
+    <?php
+		if ($this->userNextGame) {
+			// User is attending next game
+			$class = 'inner-shadow schedule-button-selected';
+		} else {
+			$class = '';
+		}
+	?>
+    <div class='team-next-game-right-container right'>
+        <p class='darkest center'>Are you in, or are you out?</p>
+        <p class='button larger-text schedule-in <?php echo $class;?>'>in</p>
+        <p class='button larger-text schedule-out'>out</p>
+	</div>
+
+
+<?php 
+}
+echo "</div>";
+// Create header for players section
+
+$playersHeader  = "<div class='right profile-section-bold-subheader'>";
+$playersHeader .= 		"<p class='right medium'>" . $this->totalPlayers . " out of " . $this->rosterLimit . "</p>";
+$playersHeader .= "</div>";
+$playersHeader .= "<div class='left profile-section-bold-subheader'>";
+$playersHeader .= 		"<img class='left' src='/images/team/confirm/small.png' />";
+$playersHeader .= 		"<p class='left smaller-text medium team-players-section-header-going'>Going to next game</p>";
+$playersHeader .= 		"<img class='left' src='/images/team/deny/small.png' />";
+$playersHeader .= 		"<p class='left smaller-text medium team-players-section-header-going'>Not going to next game</p>";
+$playersHeader .= "</div>";
+echo $this->partial('partials/global/sectionHeaderBold.phtml',array('title'   => 'players',
+																	'content' => $playersHeader)); 
+	
+foreach ($this->team->players->users as $player) {
+
+	echo "<a href='/users/" . $player->userID . "' class='left team-player-container'>";
+	echo 	$player->getBoxProfilePic('medium');
+	
+	$success = false;
+	if ($this->nextGame) {
+		if ($this->nextGame->userConfirmed($player->userID)) {
+			// User is going to next game
+			$src = "/images/team/confirm/small.png";
+			$success = true;
+		} elseif ($this->nextGame->userNotConfirmed($player->userID)) {
+			// User is confirmed as not going
+			$src = "/images/team/deny/small.png";
+			$success = true;
+		}
+	}
+	
+	if ($success) {
+		// User is either confirmed or not
+		echo "<img src='" . $src . "' class='clear team-confirm-img' />";
+	}
+	
+	echo 	"<div class='hover-dark profile-player-overlay-container'>";
+	echo		"<div class='profile-player-overlay'>";
+	echo			"<p class='white width-100 center left'>" . $player->shortName . "</p>";
+	echo			"<p class='white width-100 center left largest-text heavy'>" . $player->getSport($this->team->sport)->overall . "</p>";
+	echo		"</div>";
+	echo	"</div>";
+	echo "</a>";
+}
+?>
+

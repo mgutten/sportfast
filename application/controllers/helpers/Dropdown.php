@@ -60,7 +60,7 @@ class Application_Controller_Helper_Dropdown extends Zend_Controller_Action_Help
 				   <img src='/images/global/dropdown/dropdown_arrow.png' class='dropdown-menu-option-img' id='dropdown-menu-arrow-button'/>
 				   </div>";
 		
-		$output .= ($id == 'invite' ? $this->createLowerDropdownInvite() : $this->createLowerDropdown($id, $options));
+		$output .= ($id == 'invite-to' ? $this->createLowerDropdownInvite() : $this->createLowerDropdown($id, $options));
 		
 		$output .= "</div>";
 					
@@ -118,7 +118,7 @@ class Application_Controller_Helper_Dropdown extends Zend_Controller_Action_Help
 		$user    = $auth->getIdentity();
 		
 		$output  = '';
-		$id 	 = 'invite';
+		$id 	 = 'invite-to';
 		$output .= "<div class='dropdown-menu-hidden-container' id='dropdown-menu-hidden-container-" . $id . "'>
 				    <img src='/images/global/dropdown/dropdown_tip.png' class='dropdown-menu-tip' />
 				    <div dropdown-menu='" . $id . "' id='dropdown-menu-" . $id . "' class='dropdown-menu-options-container  dropdown-menu-options-container-dark invite dropshadow'>";
