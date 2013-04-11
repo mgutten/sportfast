@@ -18,35 +18,82 @@ class Application_Model_Games extends Application_Model_ModelAbstract
 	 */
 	public function addGame($resultRow, $byDay = false)
 	{
+		if (!is_array($resultRow)) {
+			$resultRow = $resultRow->toArray();
+		}
+		
 		if ($this->hasValue('games')) {
 			// Values exist
-			if ($game = $this->gameExists($resultRow->teamGameID)) {
-				// Check if game already exists in game array
-				return $game;
+			if (isset($resultRow['teamGameID'])) {
+				if ($game = $this->gameExists($resultRow['teamGameID'], 'teamGameID')) {
+					// Check if game already exists in game array
+					return $game;
+				}
+			} elseif (isset($resultRow['gameID'])) {
+				if ($game = $this->gameExists($resultRow['gameID'], 'gameID')) {
+					// Check if game already exists in game array
+					return $game;
+				}
 			}
 		}
 		
+		/*
 		if ($byDay) {
 			// Order games by day in array
 			$date = date('w', strtotime($resultRow->date));
+			echo $date;
 			$game = $this->_attribs['games'][$date][] = new Application_Model_Game($resultRow);
-		} else {
+		} else {*/
+	
 			$game = $this->_attribs['games'][] = new Application_Model_Game($resultRow);
-		}
+			if (isset($resultRow['teamGameID'])) {
+				// Change primary key for team game
+				$game->setPrimaryKey('teamGameID');
+			}
+		//}
 		
 		return $game;
 	}
 	
-	public function gameExists($id) {
+	/**
+	 * test if game exists (either team game or pickup game)
+	 * @params ($id => id to test for,
+	 *			$typeOfID => 'teamGameID' or 'gameID'
+	 */
+	public function gameExists($id, $typeOfID) {
 		foreach ($this->_attribs['games'] as $game) {
-			if ($game->gameID == $id || $game->teamGameID == $id) {
-				// Game exists, return it
-				return $game;
+			if (is_array($game)) {
+				// Game is array of sub games
+				foreach ($game as $innerGame) {
+					if ($this->testGameExists($innerGame, $id, $typeOfID)) {
+						return $innerGame;
+					}
+				}
+			} else {
+				if ($this->testGameExists($game, $id, $typeOfID)) {
+					return $game;
+				}
 			}
+				
 		}
 		
 		return false;
 	}
+	
+	public function testGameExists($game, $id, $typeOfID) 
+	{
+		if (!isset($game->_attribs[$typeOfID])) {
+			return false;
+		}
+		
+		if ($game->$typeOfID == $id) {
+				// Game exists, return it
+				return true;
+		}
+		
+		return false;
+	}
+	
 	
 	/**
 	 * get next game (by date), games should be ordered by date
@@ -57,7 +104,42 @@ class Application_Model_Games extends Application_Model_ModelAbstract
 			return false;
 		}
 		
-		return reset($this->_attribs['games']);
+		$nextGames = array();
+		$time = time();
+		foreach ($this->games as $game) {
+			$date = strtotime($game->date);
+			$diff = $date - $time;
+			
+			if ($diff < 0) {
+				// Past game
+				continue;
+			}
+	
+			$nextGames[$diff] = $game;
+		}
+		
+		return reset($nextGames);
+	}
+	
+	/**
+	 * get previous games
+	 */
+	public function getPreviousGames()
+	{
+		if (!$this->hasValue('games')) {
+			return false;
+		}
+		
+		$previousGames = array();
+		foreach ($this->games as $game) {
+			$date = strtotime($game->date);
+			if ($date < time()) {
+				// Previous game
+				$previousGames[] = $game;
+			}
+		}
+		
+		return $previousGames;
 	}
 	
 									

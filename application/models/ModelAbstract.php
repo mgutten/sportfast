@@ -55,17 +55,17 @@ abstract class Application_Model_ModelAbstract
 	
 	public function getLimitedName($attrib, $limit)
 	{
-		$name = $this->_attribs[$attrib];
-		
+		$name = $newName = $this->$attrib;
+
 		if (strlen($name) > $limit) {
-			$name = '';
+			$newName = '';
 			for ($i = 0; $i < $limit - 2; $i++) {
-				$name .= $this->_attribs[$attrib][$i];
+				$newName .= $name[$i];
 			}
-			$name .= '...';
-		}
+			$newName .= '...';
+		} 
 		
-		return $name;
+		return $newName;
 	}
 	
 	/**
@@ -162,6 +162,13 @@ abstract class Application_Model_ModelAbstract
 				
 		return $jsonArray;
 	}
+	
+	public function setPrimaryKey($value) 
+	{
+		$this->_primaryKey = $value;
+		
+		return $this;
+	}
 
 	public function __set($name, $value)
 	{
@@ -223,12 +230,18 @@ abstract class Application_Model_ModelAbstract
 	
 	public function getDbTable()
 	{
-		if (isset($this->_dbTable)) {
+		if (!empty($this->_dbTable)) {
 			return $this->_dbTable;
 		} else {
 			return false;
 		}
 	}
+	
+	public function setDbTable($dbTable)
+	{
+		$this->_dbTable = $dbTable;
+	}
+
 	
 	public function getOverwriteKeys()
 	{
@@ -303,11 +316,11 @@ abstract class Application_Model_ModelAbstract
 	 *			$type => plural type that we are searching for)
 	 * @returns href for picture (str)
 	 */
-	public function getBoxProfilePic($size, $id, $type = 'users', $class = '')
+	public function getBoxProfilePic($size, $id, $type = 'users', $class = '', $outerClass = '')
 	{
 		$picture = $this->getProfilePic($size, $id, $type);
 		
-		$output  = "<div class='box-img-container-" . $size . "'>";
+		$output  = "<div class='box-img-container-" . $size . " " . $outerClass . "'>";
 		$output .= 		"<img src='" . $picture . "' class='box-img-" . $size . " " . $class . "'/>";
 		$output .= "</div>";
 		
@@ -384,6 +397,12 @@ abstract class Application_Model_ModelAbstract
 		$this->getMapper()->save($this);
 		return $this;
 	}
+	
+	public function delete()
+	{
+		return $this->getMapper()->delete($this);
+	}
+		
 	
 	public function getVars()
 	{

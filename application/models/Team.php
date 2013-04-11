@@ -18,11 +18,19 @@ class Application_Model_Team extends Application_Model_ModelAbstract
 									'averageSkill' => '',
 									'match'		   => '',
 									'city'		   => '',
+									'cityID'	   => '',
 									'league'	   => '',
 									'players'	   => '',
 									'messages'	   => '',
 									'games'		   => '',
-									'captain'	   => ''
+									'captain'	   => '',
+									'wins'		   => '',
+									'losses'	   => '',
+									'ties'		   => '',
+									'minSkill'	   => '',
+									'maxSkill'	   => '',
+									'sportupCreated' => '',
+									'leagues'	   => ''
 									);
 									
 	protected $_primaryKey = 'teamID';
@@ -128,13 +136,28 @@ class Application_Model_Team extends Application_Model_ModelAbstract
 		return $this->_attribs['games'];
 	}
 	
+	public function getLeagues()
+	{
+		if (!$this->hasValue('leagues')) {
+			$this->_attribs['leagues'] = new Application_Model_Leagues();
+		}
+		
+		return $this->_attribs['leagues'];
+	}
+	
 	public function getMessages()
 	{
 		if (!$this->hasValue('messages')) {
 			$this->_attribs['messages'] = new Application_Model_Messages();
+			$this->_attribs['messages']->setParent($this);
 		}
 		
 		return $this->_attribs['messages'];
+	}
+	
+	public function getSport()
+	{		
+		return ucwords($this->_attribs['sport']);
 	}
 	
 	
@@ -148,7 +171,10 @@ class Application_Model_Team extends Application_Model_ModelAbstract
 	public function addGame($resultRow)
 	{
 		$games = $this->getGames();
-		return $games->addGame($resultRow);
+		$game = $games->addGame($resultRow);
+		$game->sport = $this->sport;
+		
+		return $game;
 		
 	}
 	
@@ -166,6 +192,40 @@ class Application_Model_Team extends Application_Model_ModelAbstract
 		return $this->games->getNextGame();
 	}
 	
+	public function getAverage($rating)
+	{
+		$finalRating = 0;
+		$totalCount  = 0;
+		if (!$this->hasValue('players')) {
+			// There are no players
+			return $finalRating;
+		}
+		
+		$sport = $this->sport;
+		foreach ($this->players->users as $player) {
+			$finalRating += $player->getSport($sport)->$rating;
+			$totalCount++;
+		}
+		
+		return floor($finalRating/$totalCount);
+	}
+	
+	public function getRecord()
+	{
+		return $this->wins . '-' . $this->losses . '-' . $this->ties;
+	}
+	
+	public function getTeamName()
+	{
+		return ucwords($this->_attribs['teamName']);
+	}
+	
+	public function getCity()
+	{
+		return ucwords($this->_attribs['city']);
+	}
+			
+	
 	/**
 	 * order players by whether they are confirmed or not
 	 */
@@ -182,6 +242,7 @@ class Application_Model_Team extends Application_Model_ModelAbstract
 				
 				if ($nextGame->userConfirmed($player->userID)) {
 					// User is confirmed
+
 					array_unshift($playerArray, $player);
 				} elseif ($nextGame->userNotConfirmed($player->userID)) {
 					// User is not going
@@ -211,7 +272,6 @@ class Application_Model_Team extends Application_Model_ModelAbstract
 	private static function sortByConfirmed ($a, $b)
 	{
 		
-		
 		if ($nextGame->userConfirmed($a->userID)) {
 			// User is confirmed
 			return 1;
@@ -229,6 +289,18 @@ class Application_Model_Team extends Application_Model_ModelAbstract
 	{
 		if ($userID == $this->_attribs['captain']) {
 			// User is captain
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	/**
+	 * test if team is public
+	 */
+	public function isPublic()
+	{
+		if ($this->_attribs['public'] == '1') {
 			return true;
 		} else {
 			return false;

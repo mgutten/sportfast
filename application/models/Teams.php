@@ -17,5 +17,17 @@ class Application_Model_Teams extends Application_Model_ModelAbstract
 		$team = $this->_attribs['teams'][] = new Application_Model_Team($resultRow);
 		return $team;
 	}
-									
+	
+	public function teamExists($id) 
+	{
+		foreach ($this->getAll() as $team) {
+			if ($team->teamID == $id) {
+				return $team;
+			}
+				
+		}
+		
+		return false;
+	}
+							
 }

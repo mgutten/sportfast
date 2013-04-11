@@ -141,7 +141,12 @@ class Application_View_Helper_SignupSportForm
 		return $output;
 	}
 	
-	public function selectableText($array)
+	/**
+	 * create options for selectable text
+	 * @params( $array => array of options,
+	 *			$onlyOne => only one option can be selected at a time
+	 */
+	public function selectableText($array, $onlyOne = false)
 	{
 		
 		$output  = '';
@@ -154,6 +159,10 @@ class Application_View_Helper_SignupSportForm
 					if ($counter == 0) {
 						$class .= ' clear';
 					}
+					if ($onlyOne) {
+						$class .= ' selectable-text-one';
+					}
+					
 					if (is_array($key)) {
 						// $key is associative array with value
 						if (!empty($key['subtext'])) {
@@ -161,6 +170,11 @@ class Application_View_Helper_SignupSportForm
 						} else {
 							$value = ucwords($keys[$counter]);
 						}
+						if (!empty($key['selected'])) {
+							// Should be selected
+							$class .= ' green-bold';
+						}
+						
 						
 					} else {
 						// Simple value, no associative

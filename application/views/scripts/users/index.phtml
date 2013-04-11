@@ -25,7 +25,13 @@ $sections = array('players', 'teams', 'groups');
 
 echo $this->narrowteamsection($this->currentUser, $sections);
 
+echo "<div class='width-100 narrow-column-calendar-container clear'>";
+echo $this->calendar()->createCalendar($this->currentUser->games->games, true);
+echo "</div>";
+
 $this->placeholder('narrowColumn')->captureEnd();
+
+
 
 ?>
 
@@ -44,22 +50,22 @@ $this->placeholder('narrowColumn')->captureEnd();
 </header>
 
 <div id='user-buttons-container'>
-    <p class='button'>
+    <p class='button right'>
     	Message
     </p>
     <?php
 		if (!$this->user->players->userExists($this->currentUser->userID)) {
 			// user is not already a friend
 			?>
-			<p class='button' id='user-player-request'>
+			<p class='button right profile-buttons-margin-right' id='user-player-request'>
 				Player Request
 			</p>
     <?php } else {?>
     		<p class='light center' id='user-already-friend'>
-            	You and <?php echo $this->currentUser->firstName;?> are friends.
+            	You and <?php echo $this->currentUser->firstName;?> are players.
             </p>
     <?php }
-	    echo $this->inviteButton;
+	    echo "<div class='clear-right larger-margin-top'>" . $this->inviteButton . "</div>";
 	?>
 </div>
 

@@ -14,9 +14,9 @@ class Application_Model_SearchMapper extends Application_Model_MapperAbstract
 		$db 	= Zend_Db_Table::getDefaultAdapter();
 		
 		$users  = "SELECT userID as id,CONCAT(firstName, ' ', lastName) as name, 'users' as prefix, cityID FROM users 
-						WHERE firstName LIKE '" . $searchTerm . "%' 
+						WHERE (firstName LIKE '" . $searchTerm . "%' 
 							OR CONCAT(firstName, ' ',lastName) LIKE '" . $searchTerm . "%'
-							OR lastName LIKE '" . $searchTerm . "%'";
+							OR lastName LIKE '" . $searchTerm . "%') AND active = '1'";
 							   
 		$teams  = "SELECT teamID as id,teamName as name, 'teams' as prefix, cityID FROM teams 
 						WHERE teamName LIKE '" . $searchTerm . "%' OR
@@ -48,5 +48,40 @@ class Application_Model_SearchMapper extends Application_Model_MapperAbstract
 		return $results;
 	}
 	
+	/**
+	 * search db for league location by name and/or address
+	 */
+	public function getLeagueLocationResults($locationName, $address, $cityID, $savingClass)
+	{
+		$db 	= Zend_Db_Table::getDefaultAdapter();
+		
+		$cityIDRange = $this->getCityIdRange($cityID);
+				   
+		$leagueLocations  = "SELECT leagueLocationID as id,locationName as name, streetAddress as address, cityID FROM league_locations 
+								WHERE temporary = '0' AND cityID IN " . $cityIDRange . " AND (";
+		
+		$success = false;			
+		if (!empty($locationName)) {
+			$leagueLocations .= "locationName LIKE '" . $locationName . "%' ";
+			$success = true;
+		}
+		
+		if (!empty($address)) {
+			if ($success) {
+				$leagueLocations .= " OR ";
+			}
+			$leagueLocations .= " streetAddress LIKE '" . $address . "%'";
+		}
+		
+		$leagueLocations .= ') ';
+					 		
+		$select = $leagueLocations . ' ORDER BY ABS(' . $cityID . ' - cityID) LIMIT 4';
+		
+
+		$results = $db->fetchAll($select); // returned result is array, not object
+		
+		
+		return $results;
+	}
 }
 	

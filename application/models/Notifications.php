@@ -93,11 +93,13 @@ class Application_Model_Notifications extends Application_Model_ModelAbstract
 	{
 		if (count($this->_attribs['unread']) > 0) {
 			// Unread notifications
-			foreach ($this->_attribs['unread'] as $notification) {
-				$notification->read = true;
+			for ($i = count($this->_attribs['unread']) - 1; $i >= 0; $i--) {
+				$this->_attribs['unread'][$i]->read = true;
+				array_unshift($this->_attribs['read'],$this->_attribs['unread'][$i]);
 			}
 		
-			array_unshift($this->_attribs['read'],$this->_attribs['unread']);
+			//array_unshift($this->_attribs['read'],$this->_attribs['unread']);
+			
 			$this->resetNewNotifications();
 		}
 		return $this;

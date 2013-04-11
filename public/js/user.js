@@ -25,17 +25,5 @@ $(function()
 		
 	})
 	
-	/* show rating percent on mouseover */
-	$(document).on('mouseenter','.user-sport-rating-other-outer', function()
- 		{
-			$(this).children().children('.user-sport-rating-percent').show();
-		}
-	)
-	.on('mouseleave','.user-sport-rating-other-outer', function()
-		{
-			$(this).children().children('.user-sport-rating-percent').hide();
-		}
-	)
-	
 	
 })

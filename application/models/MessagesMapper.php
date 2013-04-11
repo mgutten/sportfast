@@ -32,17 +32,40 @@ class Application_Model_MessagesMapper extends Application_Model_MapperAbstract
 	 */
 	 public function getTeamMessages($teamID, $savingClass)
 	 {
+		$db		= Zend_Db_Table::getDefaultAdapter();
 		$table   = $this->getDbTable();
 		$select  = $table->select();
 		$select->setIntegrityCheck(false);
 		
-		$select->from(array('tm'  => 'team_messages'))
-			   ->join(array('u' => 'users'),
-			   		 'tm.userID = u.userID')
-			   ->where('tm.teamID = ?', $teamID)
-			   ->order('tm.dateHappened DESC');
-			   
-		$messages = $table->fetchAll($select);
+		$messages = "SELECT tm.teamID as teamID, 
+					   tm.userID as userID, 
+					   u.firstName as firstName,
+					   u.lastName as lastName,
+					   tm.message as message, 
+					   tm.dateHappened as dateHappened,
+					   '' as pictureType,
+					   'message' as type
+					   FROM team_messages as tm
+					INNER JOIN users as u ON tm.userID = u.userID
+					WHERE tm.teamID = '" . $teamID . "'";
+				
+		$notifications = "SELECT nl.teamID as teamID, 
+							   nl.actingUserID as userID, 
+							   u.firstName as firstName,
+					   		   u.lastName as lastName,
+							   n.text as message, 
+							   nl.dateHappened as dateHappened,
+							   n.pictureType as pictureType,
+							   'notification' as type
+							   FROM notification_log as nl
+							INNER JOIN users as u ON nl.actingUserID = u.userID
+							INNER JOIN notifications as n ON n.notificationID = nl.notificationID
+							WHERE nl.teamID = '" . $teamID . "'";
+							
+		$sql = $messages . " UNION " . $notifications;
+		$sql .= " ORDER BY dateHappened DESC LIMIT 10";
+		
+		$messages = $db->fetchAll($sql);
 		
 		foreach ($messages as $message)
 		{

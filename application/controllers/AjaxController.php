@@ -33,16 +33,67 @@ class AjaxController extends Zend_Controller_Action
 	 */
 	public function resetNotificationsAction()
 	{
-		
-		$user = $this->view->user;
+		$auth = Zend_Auth::getInstance();
+		$user = $auth->getIdentity();
 		
 		$user->setLastReadCurrent()
 			 ->save(false);
-			 
+		 
 		$user->notifications->moveUnreadToRead();
+		
+		$auth->getStorage()->write($user);
 		
 		
 	}
+	
+	/**
+	 * create notification based on given parameters
+	 */
+	public function createNotificationAction()
+	{
+		 $options = $this->getRequest()->getPost('options');
+		 $notificationsMapper = new Application_Model_NotificationsMapper();
+		 $notificationDetails = array('action'  => $options['action'],
+									  'type'	=> $options['type'],
+									  'details' => $options['details']);
+
+		 if ($options['receivingUserID'] == 'captain') {
+			 $options['receivingUserID'] = $notificationsMapper->getForeignID('Application_Model_DbTable_Teams', 'captain', array($options['idType'] => $options['typeID']));
+		 }
+		 
+
+		 $data = array('actingUserID' 	  => $options['actingUserID'],
+		 			   'receivingUserID'  => $options['receivingUserID'],
+					   $options['idType'] => $options['typeID'],
+					   'cityID'		 	  => $this->view->user->city->cityID);								 
+			
+						  
+		 $notificationsMapper->addNotification($notificationDetails, $data);
+			 
+		 
+	 }
+	 
+	 
+	 /**
+	  * add post to team or group page
+	  */
+	 public function addPostAction()
+	 {
+		 $options = $this->getRequest()->getPost('options');
+		 
+		 $messageArray = array();
+		 $messageArray[$options['idType']] = $options['typeID'];
+		 $messageArray['userID'] = $options['actingUserID'];
+		 $messageArray['message'] = $options['message'];
+		 $date = new DateTime('now');
+		 $messageArray['dateHappened'] = $date->format('Y-m-d H:i:s');
+		 
+		 $message = new Application_Model_Message($messageArray);
+		 
+		 $message->save();
+
+	 }
+	 
 		
 	/** 
 	 * create and return full html of dropdown
@@ -284,6 +335,26 @@ class AjaxController extends Zend_Controller_Action
 		
 	}
 	
+	/** 
+	 * search db for league location specifically
+	 */
+	public function searchDbForLeagueLocationAction()
+	{
+
+		$locationName = $this->getRequest()->getPost('locationName');
+		$address	  = $this->getRequest()->getPost('address');
+		
+		$auth = Zend_Auth::getInstance();
+		$user = $auth->getIdentity();
+		
+		$cityID = $user->city->cityID;
+		
+		$search = new Application_Model_Search();
+		$results = $search->getLeagueLocationResults($locationName, $address, $cityID);
+		
+		echo json_encode($results);
+	}
+	
 	
 	/** 
 	 * handle click of "confirm", "deny", or "join" button clicks from user's notification dropdown
@@ -316,8 +387,246 @@ class AjaxController extends Zend_Controller_Action
 			
 		}
 			
-
 	}
+	
+
+	/*
+	 * change team/group name
+	 */
+	public function changeTypeAttribsAction()
+	{
+		$options = $this->getRequest()->getPost('options');
+		
+		if ($options['idType'] == 'teamID') {
+			// Team
+			$type = $this->view->user->teams->teamExists($options['typeID']);
+		} elseif ($options['idType'] == 'groupID') {
+			// Group
+			$type = $this->view->user->groups->groupExists($options['typeID']);
+		}
+		
+
+		
+		if (!empty($options['city'])) {
+			// City is being changed
+			$cityID = $type->getMapper()->getForeignID('Application_Model_DbTable_Cities','cityID', array('city' => $options['city']));
+			
+			if (!$cityID) {
+				// City not found in db
+				return false;
+			}
+
+			$type->cityID = $cityID;
+			$type->city   = $options['city'];
+		}
+		
+		if (!empty($options['sport'])) {
+			// Sport is being set
+			$sportID =  $type->getMapper()->getForeignID('Application_Model_DbTable_Sports','sportID', array('sport' => $options['sport']));
+			
+			if (!$sportID) {
+				// City not found in db
+				return false;
+			}
+			
+			$type->sport = $options['sport'];
+			$type->sportID = $sportID;
+		}
+		
+		if (!empty($options['public'])) {
+			// Public attrib changed
+			$type->public = (strtolower($options['public']) == 'public' ? '1' : '0');
+		}
+		
+		if (!empty($options['rosterLimit'])) {
+			// Roster limit changed
+			$type->rosterLimit = $options['rosterLimit'];
+		}
+		
+		$type->save(false);
+	}
+
+	
+	/*
+	 * change team/group name
+	 */
+	public function changeTypeNameAction()
+	{
+		$options = $this->getRequest()->getPost('options');
+		
+		if (empty($options['name']) || empty($options['typeID'])) {
+			// No name or id, return
+			return;
+		}
+		
+		if ($options['idType'] == 'teamID') {
+			// Team
+			$type = $this->view->user->teams->teamExists($options['typeID']);
+			$type->teamName = $options['name'];
+		} elseif ($options['idType'] == 'groupID') {
+			// Group
+			$type = $this->view->user->groups->groupExists($options['typeID']);
+			$type->groupName = $options['name'];
+		}
+		
+		$type->save();
+	}
+		
+	
+	/*
+	 * change team/group captain
+	 */
+	public function changeCaptainAction()
+	{
+		$options = $this->getRequest()->getPost('options');
+		
+		$auth = Zend_Auth::getInstance();
+		$user = $auth->getIdentity();
+		
+		
+		if ($options['idType'] == 'teamID') {
+			// Team
+			$model = $user->teams->teamExists($options['typeID']);
+		} elseif ($options['idType'] == 'groupID') {
+			// Group captain
+			$model = new Application_Model_Group();		
+		}
+		
+		$model->captain = $options['userID'];
+		
+		$model->save();
+	}
+
+	
+	
+	/*
+	 * remove player from group or team
+	 */
+	public function removeUserFromTypeAction()
+	{
+		$options = $this->getRequest()->getPost('options');
+
+		if ($options['idType'] == 'teamID') {
+			// delete user from team
+			$table = new Application_Model_DbTable_UserTeams();
+		} elseif($options['idType'] == 'groupID') {
+			$table = new Application_Model_DbTable_UserGroups();
+		}
+			
+		if (empty($options['typeID']) || empty($options['userID'])) {
+			return false;
+		}
+			
+		$where = array();
+		$where[] = $table->getAdapter()->quoteInto($options['idType'] . ' = ?', $options['typeID']);
+		$where[] = $table->getAdapter()->quoteInto('userID = ?', $options['userID']);
+		
+		$table->delete($where);
+				
+	}
+	
+	/** 
+	 * handle click of "in" or "out" button clicks from game confirmation
+	 */
+	public function confirmUserAction()
+	{
+		$post = $this->getRequest()->getPost();
+		
+		$inOrOut = ($post['inOrOut'] == 'in' ? 1 : 0);
+		$type	 = $post['type'];
+		$typeID  = $post['id'];
+		$insertOrUpdate = $post['insertOrUpdate'];
+		$teamID  = $post['teamID'];
+		
+		$auth = Zend_Auth::getInstance();
+		$user = $auth->getIdentity();
+		
+		$mapper  = new Application_Model_GamesMapper();
+		
+		if ($type == 'pickupGame') {
+			// Pickup game
+			$mapper->savePickupGameConfirmation($this->view->user->userID, $typeID, $inOrOut, $insertOrUpdate);
+			$idType = 'gameID';
+		} elseif ($type == 'teamGame') {
+			$mapper->saveTeamGameConfirmation($this->view->user->userID, $typeID, $inOrOut, $insertOrUpdate, $teamID);
+			$idType = 'teamGameID';
+		}
+				
+		$game = $user->games->gameExists($typeID, $idType);
+		if ($insertOrUpdate == 'insert') {
+			$game->confirmedPlayers = $game->confirmedPlayers + 1;
+		} else {
+			$game->movePlayerConfirmation($user->userID, $inOrOut);
+		}
+	}
+	
+	
+	/**
+	 * add/edit team game from team captain's actions
+	 */
+	public function addTeamGameAction()
+	{
+		$post = $this->getRequest()->getPost();
+		
+		if (isset($post['winOrLoss'])) {
+			// Must be edit of old game to tell win or loss
+			$game = new Application_Model_Game();
+			$game->setPrimaryKey('teamGameID');
+			
+			$game->teamGameID = $post['teamGameID'];
+			
+			if ($post['winOrLoss'] == 'delete') {
+				$game->delete();
+			}
+			$game->winOrLoss  = $post['winOrLoss'];
+			
+			$game->save();
+			
+		} else {
+			// Otherwise editing/adding game 
+			$game = new Application_Model_Game();
+			$game->setPrimaryKey('teamGameID');
+			
+			$game->opponent = $post['opponent'];
+			$game->teamGameID = $post['teamGameID'];
+			$game->locationName = $post['location'];
+			$game->streetAddress = $post['address'];
+			
+			if (empty($post['locationID'])) {
+				// No location ID was chosen, search db for similar location else add it
+				$post['locationID'] = $game->searchDbForLeagueLocation($post['location'], $post['address'], $this->view->user->city->cityID);
+			} else {
+				$data = array('locationName' => $post['location'],
+							  'streetAddress' => $post['address']);
+							  
+				$game->updateLeagueLocation($post['locationID'], $data);
+			}
+			
+			$game->leagueLocationID = $post['locationID'];
+			$game->teamID = $post['teamID'];
+			
+			$time = $post['month'] . '-' . $post['day'] . '-' . $post['year'] . ' ' . $post['time'];
+			
+			$date = DateTime::createFromFormat('m-j-Y g:ia',$time);
+			
+			$game->setDate($date->format('Y-m-d H:i:s'));
+			
+			$game->save();
+			
+			$notificationsMapper = new Application_Model_NotificationsMapper();
+			
+			$notificationDetails = array('action' => 'edit',
+										 'type'	  => 'team',
+										 'details'=> 'schedule');
+										 
+			$data = array('actingUserID' => $this->view->user->userID,
+						  'teamID'		 => $post['teamID'],
+						  'cityID'		 => $this->view->user->city->cityID);
+						  
+			$notificationsMapper->addNotification($notificationDetails, $data);
+		}
+	}
+			
 
 }
 

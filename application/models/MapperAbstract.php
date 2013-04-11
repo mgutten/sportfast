@@ -8,6 +8,8 @@ abstract class Application_Model_MapperAbstract
 	
 	public function save($savingClass, $loopSave = true)
 	{			
+		// reset db table in case it has been changed before
+		$this->_dbTable = null;
 		
 		if ($savingClass->getDbTable()) {
 			// dbTable is set
@@ -20,17 +22,11 @@ abstract class Application_Model_MapperAbstract
 		$attribs = $savingClass->getAttribs();
 		$models  = array();
 		
-		
-		/*
-		foreach ($columns as $column => $value) {
-				
-			$data[$value] = $savingClass->$value;
-		}
-		*/
 		foreach ($attribs as $column => $value) {
 			// Loop through savingClass attributes and determine what is an individual object
 			// and what is a valid column for this table
-			if (is_object($value)) {
+			
+			if (is_object($value) && !($value instanceof DateTime)) {
 				array_push($models, $value);
 				continue;
 			} elseif(is_array($value)) {
@@ -50,8 +46,7 @@ abstract class Application_Model_MapperAbstract
 					}
 				} else {
 					// Invalid array with no objects, just values
-					throw new Exception('Invalid attribute array without being objects at: ' . $column);
-					
+					throw new Exception('Invalid attribute array without being objects at: ' . $column);				
 				}
 				continue;
 			} elseif (!in_array($column, $columns)) {
@@ -60,7 +55,7 @@ abstract class Application_Model_MapperAbstract
 				// This attrib is a location 
 				$data[$column] = new Zend_Db_Expr("GeomFromText('" . $value . "')");
 				continue;
-			} elseif (empty($value)) {
+			} elseif (empty($value) && $value !== '0') {
 				// Skip empty columns
 				continue;
 			} elseif ($savingClass instanceof Application_Model_User && $column == 'cityID' && !empty($savingClass->changedLocation)) {
@@ -68,6 +63,10 @@ abstract class Application_Model_MapperAbstract
 				continue;
 			} elseif ($column == 'password') {
 				// Password column, do not strtolower
+				$data[$column] = $savingClass->$column;
+				continue;
+			} elseif ($savingClass instanceof Application_Model_Message && $column == 'message') {
+				// Message column for message model should not be lower case as it is a user's post
 				$data[$column] = $savingClass->$column;
 				continue;
 			}
@@ -80,8 +79,7 @@ abstract class Application_Model_MapperAbstract
 		$primaryColumn = $table->info('primary');
 		$primaryColumn = $primaryColumn[1];
 		$primaryKey    = $savingClass->$primaryColumn;
-
-
+		
 		if (empty($primaryKey)) {
 			// No primary key set, create row
 			$primaryVal = $this->getDbTable()->insert($data);
@@ -114,15 +112,29 @@ abstract class Application_Model_MapperAbstract
 
 	}
 	
+	public function delete($savingClass) {
+		if ($savingClass->getDbTable()) {
+			// dbTable is set
+			$this->setDbTable($savingClass->getDbTable());
+		}
+		
+		$table   = $this->getDbTable();
+		
+		$where = $table->getAdapter()->quoteInto($savingClass->_primaryKey . ' = ?', $savingClass->_attribs[$savingClass->_primaryKey]);
+		
+		return $table->delete($where);
+	}
+	
 	public function getForeignID($table, $column, $whereValues)
 	{
+		
 		$this->setDbTable($table);
 		$table	   = $this->getDbTable();
 		$tableName = $table->info('name');
 		$select    = $table->select()
 						   ->from($tableName, $column);
 		foreach ($whereValues as $columns => $value) {
-			if (strtolower($value) == 'null') {
+			if (strtolower($value) == 'null' || empty($value)) {
 				$select->where($columns . ' IS NULL');
 				continue;
 			}
@@ -130,13 +142,37 @@ abstract class Application_Model_MapperAbstract
 		}
 		$select->limit(1);
 		
+
 		
 		$result = $table->fetchRow($select);  
+		
+		if (!$result) {
+			return false;
+		}
 		
 		return $result->$column;
 	}
 
-
+	
+	/**
+	 * get create parentheses encased range for cityID
+	 * @returns str to be used with IN statements
+	 */
+	public function getCityIdRange($cityID)
+	{
+		$output = '(';
+		
+		$idArray = array();
+		for ($i = ($cityID - 10); $i <= ($cityID + 10); $i++) {
+			$idArray[] = $i;
+		}
+		
+		$output .= implode(',', $idArray);
+		
+		$output .= ')';
+		
+		return $output;
+	}
 	
 	public function getColumnValue($column, $value)
 	{

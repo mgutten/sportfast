@@ -26,7 +26,7 @@ class Application_Form_HeaderSearch extends Zend_Form
 			
 
 														
-		$this->addElement('image', 'login', array(
+		$this->addElement('image', 'search', array(
 				'src'			=> '/images/global/header/header_magnifying.png',
 				'required' 		=> false,
 				'ignore'   		=> true,

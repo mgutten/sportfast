@@ -13,6 +13,7 @@ class Application_View_Helper_MemberHomepage
 	public function memberHomepage() 
 	{
 		$user = $this->_view->user;
+
 		$this->_view->placeholder('narrowColumn')->captureStart();
 		
 		$href = '/users/' . $user->userID;
@@ -44,9 +45,11 @@ class Application_View_Helper_MemberHomepage
 				}
 			echo $this->_view->narrowcolumnsection()->end();
 			*/
-			echo $this->_view->narrowcolumnsection()->start(array('title' => 'My Schedule'));
-				echo "Schedule information will go here";
-			echo $this->_view->narrowcolumnsection()->end();
+			
+				echo "<div class='narrow-column-calendar-container left width-100'>";
+				echo $this->_view->calendar()->createCalendar($this->_view->user->games->getAll(), true);
+				echo "</div>";
+			
 
 		$this->_view->placeholder('narrowColumn')->captureEnd();
 			
@@ -83,7 +86,7 @@ class Application_View_Helper_MemberHomepage
 	{
 		$output = '<div id="member-schedule-days-container">';
 		$schedule = $this->_view->userSchedule;
-		
+		$firstDayEvent = false;
 		
 		for ($i = 0; $i < 7; $i++) {
 			// Create the days in reverse order (float:right)
@@ -91,6 +94,7 @@ class Application_View_Helper_MemberHomepage
 			$day  	 = date('l', $curDay);
 			$date 	 = date('d', $curDay);
 			$dayOfWeek = date('w', $curDay);
+			
 			if ($day == 'Sunday' ||
 				$day == 'Saturday' ||
 				$day == 'Thursday') {
@@ -102,14 +106,19 @@ class Application_View_Helper_MemberHomepage
 			}
 			
 			$class = '';
-			if ($day == date('l')) {
-				// Today!
+			if ($day == date('l') && isset($schedule[$dayOfWeek])) {
+				// Today and event scheduled
+				$displayDay = $day;
+				$class		= ' light-back';
+				$firstDayEvent = true;
+			} elseif ($day == date('l', strtotime('+1 day')) && !$firstDayEvent) {
+				// Tomorrow, show abbreviated names
 				$displayDay = $day;
 				$class		= ' light-back';
 			} else {
-				// Not today, show abbreviated names
 				$displayDay = $dayShort;
 			}
+			
 			$subClass = ''; // Class for inner paragraphs
 			if (isset($schedule[$dayOfWeek])) {
 				// Day has event
@@ -117,8 +126,8 @@ class Application_View_Helper_MemberHomepage
 			}
 			
 			$output .= "<div class='member-schedule-day-container pointer " . $class . "'>
-							<p class='member-schedule-day-subtext medium smaller-text " . $subClass . "'>" . $date . "</p>
-							<p class='member-schedule-day medium center " . $subClass . "' fullDay='" . $day . "' shortDay='" . $dayShort . "'>" . $displayDay . "</p>
+							<p class='member-schedule-day-subtext light smaller-text " . $subClass . "'>" . $date . "</p>
+							<p class='member-schedule-day light center " . $subClass . "' fullDay='" . $day . "' shortDay='" . $dayShort . "'>" . $displayDay . "</p>
 						</div>";
 		}
 		
@@ -136,6 +145,7 @@ class Application_View_Helper_MemberHomepage
 		$output   = "<div id='member-schedule-body-container'>";
 		$curDay   = date('w');
 		$schedule = $this->_view->userSchedule; 
+		$firstDayEvent = false;
 		
 		for ($i = $curDay; $i < ($curDay + 7);$i++) {
 			if ($i > 6) {
@@ -145,10 +155,10 @@ class Application_View_Helper_MemberHomepage
 				$b = $i;
 			}
 			
-			
+			$display = '';
 			$date  	 = date('l', strtotime('+' . ($i - $curDay) . ' days'));
 			
-			if ($i - $curDay == 0) {
+			if ($i == $curDay) {
 				// Today
 				$dateCombo = 'today';
 			} elseif ($i - $curDay == 1) {
@@ -161,8 +171,16 @@ class Application_View_Helper_MemberHomepage
 			
 			if (isset($schedule[$b])) {
 				// Event for today
+				if ($i == $curDay) {
+					// Today
+					$display = " style='display:block'";
+					$firstDayEvent = true;
+				} elseif ($i == date('w', strtotime('+1 day')) && !$firstDayEvent) {
+					// Tomorrow				
+					$display = " style='display:block'";
+				}
 				$games   = $schedule[$b];
-				$output .= "<div class='member-schedule-day-body-container'>";
+				$output .= "<div class='member-schedule-day-body-container' " . $display . ">";
 				$output .= "<div class='member-schedule-day-body-pagination-container'>";
 				if (count($games) > 1) {
 					// More than one game
@@ -178,34 +196,77 @@ class Application_View_Helper_MemberHomepage
 				$output .= "<div class='member-schedule-day-body-outer-container'>
 							<div class='member-schedule-day-body-inner-container'>";
 				foreach ($games as $game) {
-					$class = '';
+					$inClass  = '';
+					$outClass = '';
+					$existingID = '';
+					$type   = '';
+					$typeID = '';
+					$teamID = " teamID=''";
+
 					if ($game->confirmed == '1') {
 						// User is confirmed, change class of in button
-						$class = 'inner-shadow member-schedule-button-selected';
+						$inClass = 'inner-shadow member-schedule-button-selected';
+						$existingID = " existingID='update'";
 					}
-					$output .= "<a href='/games/" . $game->gameID . "' class='member-schedule-day-body-game-container'>";
-					$output .= "<div class='member-schedule-day-body-game-left-container'>";
-					$output .= "<p class='bold darkest larger-text'>" . ucwords($game->sport) . ' Game';
-					$output .= "<p class='clear'>" . $game->getDay() . "</p>";
-					$output .= "<p class='clear'>" . $game->getHour() . "</p>";
-					$output .= "<p class='clear medium'>" . $game->getPark()->parkName . "</p>";
-					$output .= "</div>";
-					$output .= "<div class='member-schedule-day-body-players-container darkest bold'>";
-					$output .= "<p class='member-schedule-day-body-players larger-text center'>" . $game->totalPlayers . "/" . $game->rosterLimit . "</p>";
-					$output .= "<p class='member-schedule-day-body-players center clear'>players</p>";
-					$output .= "<p class='center clear green smaller-text member-schedule-day-body-players-confirmed'>" . $game->countConfirmedPlayers() . " confirmed</p>";
-					$output .= "</div>";
-					$output .= "<div class='member-schedule-day-body-game-right-container'>";
+					
+					if ($game->confirmed == '0') {
+						// User is not confirmed
+						$outClass = 'inner-shadow member-schedule-button-selected';
+						$existingID = " existingID='update'";
+					}
+					
+					if ($game->isPickup()) {
+						$output .= "<a href='/games/" . $game->gameID . "' class='member-schedule-day-body-game-container schedule-container'>";
+						$output .= "<div class='member-schedule-day-body-game-left-container'>";
+						$output .= "<p class='bold darkest larger-text'>" . ucwords($game->sport) . ' Game';
+						$output .= "<p class='clear'>" . $game->getDay() . "</p>";
+						$output .= "<p class='clear'>" . $game->getHour() . "</p>";
+						$output .= "<p class='clear medium'>" . $game->getPark()->parkName . "</p>";
+						$output .= "</div>";
+						$output .= "<div class='member-schedule-day-body-players-container darkest bold'>";
+						$output .= "<p class='member-schedule-day-body-players larger-text center'>" . $game->totalPlayers . "/" . $game->rosterLimit . "</p>";
+						$output .= "<p class='member-schedule-day-body-players center clear'>players</p>";
+						$output .= "<p class='center clear green smaller-text member-schedule-day-body-players-confirmed'><span class='confirmed'>" . $game->countConfirmedPlayers() . "</span> confirmed</p>";
+						$output .= "</div>";
+						$type	 = " type='pickupGame'";
+						$typeID  = " typeID='" . $game->gameID . "'";
+					} elseif ($game->isTeamGame()) {
+						$team    = $this->_view->user->teams->teamExists($game->teamID);
+						$teamID  = " teamID='" . $team->teamID . "'";
+						$output .= "<a href='/teams/" . $game->teamID . "' class='member-schedule-day-body-game-container schedule-container'>";
+						$output .= "<div class='member-schedule-day-body-game-left-container'>";
+						$output .= "<p class='bold darkest larger-text'>vs. " . $game->getLimitedName('opponent', 25);
+						$output .= "<p class='clear medium'>" . $team->teamName . "</p>";
+						$output .= "<p class='clear darkest'>" . $game->getDay() . "</p>";
+						$output .= "<p class='clear darkest'>" . $game->getHour() . "</p>";
+						$output .= "<p class='clear medium'>" . $game->locationName . "</p>";
+						$output .= "</div>";
+						$output .= "<div class='member-schedule-day-body-players-container darkest bold'>";
+
+						$output .= "<p class='center clear darkest member-schedule-day-body-players-confirmed'>
+										<span class='confirmed larger-text heavy member-teamGame-confirmed left width-100 center'>" . $game->countConfirmedPlayers() . "</span> 
+										<span class='clear darkest width-100 heavy center'>confirmed</span>
+									</p>";
+						$output .= "</div>";
+						$type	 = " type='teamGame'";
+						$typeID	 = " typeID='" . $game->teamGameID . "'";
+					}
+
+					$output .= "<div class='member-schedule-day-body-game-right-container' " . $type . $typeID . $existingID . $teamID . ">";
 					$output .= "<p class='darkest center'>Are you in, or are you out?</p>";
-					$output .= "<p class='button larger-text member-schedule-in " . $class . "'>in</p>";
-					$output .= "<p class='button larger-text member-schedule-out'>out</p>";
+					$output .= "<p class='button larger-text member-schedule-in schedule-in " . $inClass . "'>in</p>";
+					$output .= "<p class='button larger-text member-schedule-out schedule-out " . $outClass . "'>out</p>";
 					$output .= "</div>";
 					$output .= "</a>";
 				}
 				$output .= "</div></div></div>";
 				
 			} else {
-				$output .= "<p class='member-schedule-day-none member-schedule-day-body-container medium larger-text center'>You have no games scheduled for " . $dateCombo . ".</p>";
+				if ($i == date('w', strtotime('+1 day')) && !$firstDayEvent) {
+					// Show tomorrow by default
+					$display = " style='display:block'";
+				}
+				$output .= "<p class='member-schedule-day-none member-schedule-day-body-container light larger-text center' " . $display . ">You have no games scheduled for " . $dateCombo . ".</p>";
 			}
 			
 		}
@@ -251,7 +312,7 @@ class Application_View_Helper_MemberHomepage
 		if (empty($matches)) {
 			// No matches 
 			$output  = "<p class='medium larger-text member-find-none center'>No matches could be found.</p>";
-			$output .= "<a href='/find' class='light center member-find-none-search'> Search more</a>";
+			$output .= "<a href='/find' class='light center member-find-none-search'> Broader search</a>";
 			return $output;
 		}
 			
@@ -368,18 +429,16 @@ class Application_View_Helper_MemberHomepage
 	 public function createNotification($notification, $size = 'tiny')
 	 {
 		  $output = '';
-		  $preWrapper  = "<a href='" . $notification->getFormattedURL() . "' class='left'>";
+		  $preWrapper  = "<a href='" . $notification->getFormattedURL() . "' class='left box-img-container-" . strtolower($size) . "'>";
 		  $postWrapper = "</a>";
-		  $class	   = '';
-		  if ($notification->_attribs['picture'] == 'sports') {
+		  $class	   = 'box-img-' . strtolower($size);
+		  if ($notification->_attribs['pictureType'] == 'sports') {
 			  // Sport icon to be shown, wrap in container
 			  $preWrapper = "<a href='" . $notification->getFormattedURL() . "' class='notification-sports-img-container-" . $size . "'>";
+			  $class = '';
 			  //$postWrapper = "</a>";
-		  } elseif ($size == 'tiny') {
-			  $preWrapper = "<a href='" . $notification->getFormattedURL() . "' class='box-img-container-tiny left'>";
-			   
-			  $class = 'box-img-tiny';
-		  }
+		  } 
+		  
 		  $output .= "<div class='newsfeed-notification-container'>";
 		  $output .= 	$preWrapper . "<img src='" . $notification->getPicture($size) . "' class='newsfeed-notification-img " . $class . "' />" . $postWrapper;
 		  $output .= 	"<div class='newsfeed-notification-text-container'>";

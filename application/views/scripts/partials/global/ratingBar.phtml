@@ -1,0 +1,16 @@
+<?php
+$class = 'user-sport-rating-other-outer';
+$hiddenClass = 'user-sport-rating-percent';
+
+echo "<div class='" . $class . " rating-outer'>";
+echo	"<div class='rating-inner' style='width:" . $this->rating . "%'>";
+echo		"<p class='white left rating-inner-word default'>" . $this->ratingLabel. "</p>";
+if ($this->rating < 78) {
+	// Move rating to outside of bar
+	echo "</div>";
+	echo "<p class='green right rating-inner-percent " . $hiddenClass . " heavy default'>" . $this->rating . "%</p>";
+} else {
+	echo 		"<p class='white right rating-inner-percent " . $hiddenClass . " heavy default'>" . $this->rating . "%</p>";
+	echo 	"</div>";
+}
+echo "</div>";

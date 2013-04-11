@@ -29,10 +29,15 @@ class Application_Model_Game extends Application_Model_ModelAbstract
 									'notConfirmedPlayers' => '',
 									'opponent'		=> '',
 									'locationName'  => '',
-									'streetAddress' => ''
+									'streetAddress' => '',
+									'winOrLoss'		=> '',
+									'gameDate'		=> '',
+									'teamID'		=> '',
+									'leagueLocationID'	=> ''
 									);
 									
 	protected $_primaryKey = 'gameID';
+	protected $_dbTable   = 'Application_Model_DbTable_Games';
 
 
 	public function __construct($resultRow = false)
@@ -42,6 +47,26 @@ class Application_Model_Game extends Application_Model_ModelAbstract
 			$this->getPark()->setAttribs($resultRow);
 		}
 				
+	}
+	
+	
+	public function setPrimaryKey($key)
+	{
+		if ($key == 'teamGameID') {
+			parent::setPrimaryKey($key);
+			$this->setDbTable('Application_Model_DbTable_TeamGames');
+		}
+		return $this;
+	}
+	
+	public function searchDbForLeagueLocation($locationName = false, $address = false, $cityID = false)
+	{
+		return $this->getMapper()->searchDbForLeagueLocation($locationName, $address, $cityID);
+	}
+	
+	public function updateLeagueLocation($locationID, $data)
+	{
+		return $this->getMapper()->updateLeagueLocation($locationID, $data);
 	}
 	
 	public function getPark()
@@ -59,6 +84,21 @@ class Application_Model_Game extends Application_Model_ModelAbstract
 		return $this->getPark()->getLimitedName('parkName', $limit);
 	}
 	
+	public function isPickup()
+	{
+		if ($this->hasValue('gameID')) {
+			return true;
+		}
+		return false;
+	}
+	
+	public function isTeamGame()
+	{
+		if ($this->hasValue('teamGameID')) {
+			return true;
+		}
+		return false;
+	}
 	
 	public function getMatchName()
 	{
@@ -119,32 +159,63 @@ class Application_Model_Game extends Application_Model_ModelAbstract
 	
 	public function getDay($format = 'l')
 	{
-		$curDate  = new DateTime();
+		$curDate  = new DateTime('now');
 		$gameDate = DateTime::createFromFormat('Y-m-d H:i:s', $this->date);
-		$diff	  = $curDate->diff($gameDate)->days;
+		$diff	  = $curDate->diff($gameDate, false);
+		$posOrNeg = $diff->format("%R");
+		$dayDiff  = $diff->format("%a");
+		$hourDiff = $diff->format("%h");
+		$minDiff  = $diff->format("%i");
 		
+		if ($hourDiff > 12 && $hourDiff < 24) {
+			// Correct for ::diff() failure when event is (eg 2 days ahead but under 48 hours, returns 1 day)
+			$dayDiff += 1;
+		}
+		
+		$diff = $posOrNeg . $dayDiff;
+		$endNextWeek = (7 - $curDate->format('w')) + 7;
+		
+		if ($diff <= -7 || $diff >= $endNextWeek) {
+			// More than one week forward or back
+			return $gameDate->format('M j');
+		}
+		
+		
+		$prepend = '';
 		if ($diff == 0) {
 			// Today
 			return 'Today';
 		} elseif ($diff == 1) {
 			// Tomorrow
 			return 'Tomorrow';
+		} elseif ($diff == -1) {
+			return 'Yesterday';
+		} elseif ($diff < -1 && $diff > -7) {
+			// Last
+			$prepend = 'Last ';
 		} elseif ($diff < 7) {
 			// Under a week, prepend "this"
-			return 'This ' . $gameDate->format($format);
+			$prepend = 'This ';
+		} elseif ($diff >= 7 && $diff < $endNextWeek) {
+			$prepend = 'Next ';
 		}
 		
-		return $gameDate->format($format);
+		return $prepend . $gameDate->format($format);
 	}
 	
 	public function getHour()
 	{
-		return date('ga', strtotime($this->date));
+		$date = $this->gameDate;
+		if ($date->format('i') !== '00') {
+			return $this->gameDate->format('g:ia');
+		} else {
+			return $this->gameDate->format('ga');
+		}
 	}
 	
 	public function getShortDate()
 	{
-		return date('M j', strtotime($this->date));
+		return $this->gameDate->format('M j');
 	}
 	
 	public function getOpponent()
@@ -153,9 +224,42 @@ class Application_Model_Game extends Application_Model_ModelAbstract
 			return 'Unknown Team';
 		}
 		
-		return $this->_attribs['opponent'];
+		return ucwords($this->_attribs['opponent']);
 	}
 
+	public function getWinOrLoss()
+	{
+		if (!$this->hasValue('winOrLoss')) {
+			return '?';
+		}
+		
+		return $this->_attribs['winOrLoss'];
+	}
+	
+	public function getFullWinOrLoss()
+	{
+		$winOrLoss = $this->getWinOrLoss();
+		if ($winOrLoss == '?') {
+			return '?';
+		} elseif ($winOrLoss == 'W') {
+			return 'Win';
+		} elseif ($winOrLoss == 'L') {
+			return 'Loss';
+		} else {
+			return 'Tie';
+		}
+		
+		//return $this->_attribs['winOrLoss'];
+	}
+	
+	public function setDate($date) {
+		$this->_attribs['date'] = $date;
+		$this->_attribs['gameDate'] = DateTime::createFromFormat('Y-m-d H:i:s', $date);
+		
+		return $this;
+	}
+	
+	
 	public function countConfirmedPlayers()
 	{
 		$count = $this->_attribs['confirmedPlayers'];
@@ -198,5 +302,25 @@ class Application_Model_Game extends Application_Model_ModelAbstract
 	{
 		return !empty($this->_attribs['notConfirmedPlayers'][$userID]);
 	}
-
+	
+	/**
+	 * move player from confirmed to not confirmed or vice versa
+	 * @params ($userID => user's id to move,
+	 *			$inOrOut => 1 = confirmed, 0 = notconfirmed)
+	 */
+	public function movePlayerConfirmation($userID, $inOrOut) 
+	{
+		$userID = (int)$userID;
+		$this->confirmed = $inOrOut;
+		
+		if ($inOrOut) {
+			// Now confirmed			
+			$this->confirmedPlayers += 1;
+		} else {
+			// Now not confirmed
+			$this->confirmedPlayers -= 1;
+		}
+		
+		return $this;
+	}
 }

@@ -1,5 +1,7 @@
 /* team profile css */
 
+/* overwrites */
+
 .body-column-wide {
 	width: 76%;
 }
@@ -8,11 +10,12 @@
 	width: 24%;
 }
 
-/* top section */
-#profile-buttons-container {
-	width: 33%;
-	background:#ccc;
+.profile-narrow-rating-container {
+	margin-top: .2em;
+	margin-bottom: .5em;
 }
+
+/* top section */
 
 /* next game section */
 .team-next-game-left-container {
@@ -28,16 +31,149 @@
 	padding: 1em;
 }
 
-/* players section */
-.team-players-section-header-going {
-	margin: .3em 1em 0 .3em;
+.team-player-going-description-container {
+	opacity: 0;
 }
 
-.team-player-container {
-	padding: 3px 2px 0 0;
+
+/* previous games */
+.team-narrow-game-container {
+	margin: .5em 0;
 }
 
-.team-confirm-img {
-	margin: -24px 0 0 .5em;
+/* alerts */
+.team-manage-calendar {
+	width: 30em;
+	height: 28em;
+	margin-left: .1em;
 }
 
+.team-manage-calendar > .calendar-container > .calendar-day {
+	height: 13.3%;
+}
+
+.team-manage-calendar > .calendar-container > div {
+	font-size: 1.25em;
+}
+
+.team-manage-calendar > .calendar-container > a > p.calendar-old-event {
+	font-size: 2.2em;
+}
+
+.team-manage-calendar > .calendar-container > div.calendar-day {
+	cursor: pointer;
+}
+
+
+#manage-schedule-alert-container {
+	margin-top: -16em;
+	margin-left: -16em;
+}
+
+#tooltip-team-manage-winOrLoss,#tooltip-team-manage-addGame {
+	z-index: 997;
+	position: absolute;
+}
+
+#tooltip-team-manage-winOrLoss > #tooltip-body {
+	background: #fff;
+	width: 16em;
+}
+
+#tooltip-team-manage-addGame > #tooltip-body {
+	background: #fff;
+	width: 14em;
+}
+
+.tooltip-team-manage-winOrLoss-button {
+	margin-left: 2.2em;
+}
+
+.tooltip-team-manage-winOrLoss-button:nth-child(2) {
+	margin-left: 1.5em;
+}
+
+.x {
+	cursor: pointer;
+}
+
+/*
+#manage-schedule-time-hour {
+	width: 3em;
+	clear:left;
+}
+
+#dropdown-menu-manage-schedule-time-hour > .dropdown-menu-option-container {
+	width: 3em;
+}
+
+#manage-schedule-time-minute, #manage-schedule-time-ampm {
+	width: 3.4em;
+}
+
+#dropdown-menu-manage-schedule-time-minute > .dropdown-menu-option-container, #dropdown-menu-manage-schedule-time-ampm > .dropdown-menu-option-container {
+	width: 3.4em;
+}
+
+#manage-schedule-time-ampm {
+	margin-left: .8em;
+}
+*/
+.team-manage-schedule-time-separator {
+	margin: 0 .3em 0 .3em;
+}
+
+
+#teamManageScheduleAmPm {
+	margin-left: .3em;
+}
+
+#team-manage-schedule-location-results {
+	width: 100%;
+	margin: .2em 0 0 0;
+	font-size: .9em;
+}
+
+#teamManageScheduleAddress-container {
+	margin-top: 0;
+}
+
+.team-manage-schedule-result {
+	width: 96%;
+	padding: .3em 2%;
+	background: #fff;
+}
+
+.save-button,.delete-button {
+	margin: .3em 0 ;
+}
+
+.delete-button {
+	display:none;
+}
+
+#team-manage-schedule-date {
+	margin-top: .2em;
+}
+
+#tooltip-team-manage-addGame>#tooltip-body>.input-container {
+	width: 14em;
+}
+
+#tooltip-team-manage-addGame > #tooltip-body > .input-container > .input-overlay {
+	color: #bbb;
+}
+
+/* remove players alert 
+.team-manage-remove-player-overlay {
+	float:left;
+	clear:both;
+	top: -96px;
+	height:auto;
+	z-index: 999;
+}
+*/
+
+
+
+	 

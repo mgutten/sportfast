@@ -29,8 +29,8 @@ class Application_View_Helper_NarrowTeamSection
 						$url  = '/users';
 						$name = 'shortName';
 						$id   = 'userID';
-						$class = 'box-img-container-tiny narrow-column-box-img animate-opacity';
-						$imgClass = 'box-img-tiny';
+						$class = 'box-img-container-tiny narrow-column-box-img dark-back';
+						$imgClass = 'box-img-tiny animate-opacity';
 						$text = '';
 					} else {
 						$url  = '/' . $section;
@@ -53,6 +53,7 @@ class Application_View_Helper_NarrowTeamSection
 								// This name will be limited
 								$tooltip = "tooltip = '" . $result->$name . "'";
 							} 
+
 							
 							if ($section == 'players') {
 								// Friends section, add tooltip

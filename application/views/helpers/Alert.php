@@ -29,4 +29,20 @@ class Application_View_Helper_Alert
 					
 		return $output;
 	}
+	
+	public function changesAlert() 
+	{
+		$output = $this->start('changes');
+		
+		$output .= "<div class='changes-alert-container'>";
+		$output .= 		"<p class='width-100 largest-text medium center'>Save all changes?</p>";
+		$output .= 		"<p class='button larger-text changes-save'>Save</p>";
+		$output .= 		"<p class='button larger-text changes-discard'>Discard</p>";
+		$output .= "</div>";
+		
+		$output .= $this->end();
+		
+		return $output;
+	}
+
 }

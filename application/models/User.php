@@ -48,8 +48,8 @@ class Application_Model_User extends Application_Model_ModelAbstract
 	{
 		$this->password = '';
 		$this->getUserSportsInfo();
-		$this->getOldUserNotifications();
 		$this->getUserInfo();
+		$this->getOldUserNotifications();
 		
 		return $this;
 	}
@@ -68,6 +68,7 @@ class Application_Model_User extends Application_Model_ModelAbstract
 		return $this;
 	}
 	
+	
 	/**
 	 * get shorthand (name and id) for user's friends, groups, and teams
 	 */
@@ -81,15 +82,21 @@ class Application_Model_User extends Application_Model_ModelAbstract
 		return $this->getMapper()->getUserRatings($this);
 	}
 
-	public function getScheduledGames()
+	public function getNextWeekScheduledGames()
 	{
-		if (is_object($this->games)) {
+		$returnArray = array();
+		if ($this->games->hasValue('games')) {
 			// User has games scheduled
-			return $this->games->games;
-		} else {
-			// No games scheduled
-			return false;
+			foreach ($this->games->getAll() as $game) {
+				$curDate = new DateTime();
+				if ($game->gameDate->diff($curDate)->days < 7) {
+					// Game is happening in next week
+					$returnArray[$game->gameDate->format('w')][] = $game;
+				}
+			}
 		}
+		
+		return $returnArray;
 	}
 
 	public function getMessages()
@@ -104,9 +111,9 @@ class Application_Model_User extends Application_Model_ModelAbstract
 	/**
 	 * get all of user's scheduled games from db
 	 */
-	public function getUserGames()
+	public function getUserGames($byDay = true)
 	{
-		return $this->getMapper()->getUserGames($this);
+		return $this->getMapper()->getUserGames($this, $byDay);
 	}
 	
 	/**
@@ -222,6 +229,7 @@ class Application_Model_User extends Application_Model_ModelAbstract
 	{
 		return $this->firstName . ' ' . $this->lastName;
 	}
+	
 	
 	public function getHeightInFeet()
 	{
@@ -342,9 +350,9 @@ class Application_Model_User extends Application_Model_ModelAbstract
 		return parent::getProfilePic($size, $this->userID, $type);
 	}
 	
-	public function getBoxProfilePic($size, $type = 'users', $class = '', $userID = false) 
+	public function getBoxProfilePic($size, $type = 'users', $class = '', $outerClass = '', $userID = false) 
 	{
-		return parent::getBoxProfilePic($size, $this->userID, $type, $class);
+		return parent::getBoxProfilePic($size, $this->userID, $type, $class, $outerClass);
 	}
 	
 	public function setChangedLocation($value) 

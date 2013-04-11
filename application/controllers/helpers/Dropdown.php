@@ -10,7 +10,7 @@ class Application_Controller_Helper_Dropdown extends Zend_Controller_Action_Help
 	 *			$options => array of options (could container sub arrays of text, image, and class),
 	 *			$selected=> which value is selected (str))
 	 */
-	public function dropdown($id, $options, $selected = false)
+	public function dropdown($id, $options, $selected = false, $ucwords = true)
 	{
 		if (!$selected) {
 			if (is_array($options[0])) {
@@ -21,16 +21,16 @@ class Application_Controller_Helper_Dropdown extends Zend_Controller_Action_Help
 			}
 		}
 		
-		$output  = "<div id = '" . $id . "-holder' class='dropdown-menu-holder'></div>";
-		$output .= "<div id='" . $id . "' class='dropdown-menu-container'>
-					<div  class='dropdown-menu-selected dropshadow'>
-				   <p class='dropdown-menu-option-text medium'>" . $selected . "</p>
-				   <img src='/images/global/dropdown/dropdown_arrow.png' class='dropdown-menu-option-img' id='dropdown-menu-arrow'/>
+		$output = "<div id='" . $id . "' class='dropdown-menu-container' dropdown-id='dropdown-menu-hidden-container-" . $id . "'>
+						<div  class='dropdown-menu-selected dropshadow'>
+						   <p class='dropdown-menu-option-text medium'>" . $selected . "</p>
+						   <img src='/images/global/dropdown/dropdown_arrow.png' class='dropdown-menu-option-img' id='dropdown-menu-arrow'/>
+					   </div>
 				   </div>";
 		
-		$output .= $this->createLowerDropdown($id, $options);
+		$output .= $this->createLowerDropdown($id, $options, $ucwords);
 		
-		$output .= "</div>";
+		//$output .= "</div>";
 					
 		return $output;
 	}
@@ -53,16 +53,23 @@ class Application_Controller_Helper_Dropdown extends Zend_Controller_Action_Help
 			}
 		}
 		
-		$output  = "<div id = '" . $id . "-holder' class='dropdown-menu-holder'></div>";
-		$output .= "<div id='" . $id . "' class='dropdown-menu-container dropdown-menu-container-button'>
-					<div class='dropdown-menu-selected button'>
-				   <p class='dropdown-menu-option-text medium'>" . $selected . "</p>
-				   <img src='/images/global/dropdown/dropdown_arrow.png' class='dropdown-menu-option-img' id='dropdown-menu-arrow-button'/>
+		$output = "<div id='" . $id . "' class='dropdown-menu-container dropdown-menu-container-button' dropdown-id='dropdown-menu-hidden-container-" . $id . "'>
+						<div class='dropdown-menu-selected button'>
+						   <p class='dropdown-menu-option-text medium'>" . $selected . "</p>
+						   <img src='/images/global/dropdown/dropdown_arrow.png' class='dropdown-menu-option-img' id='dropdown-menu-arrow-button'/>
+					    </div>
 				   </div>";
 		
-		$output .= ($id == 'invite-to' ? $this->createLowerDropdownInvite() : $this->createLowerDropdown($id, $options));
+		if ($id == 'invite-to') {
+			// Invite user to...
+			$output .= $this->createLowerDropdownInviteTo();
+		} elseif ($id == 'invite') {
+			// Invite a group or user...
+			$output .= $this->createLowerDropdownInvite();
+		} else {
+			$output .= $this->createLowerDropdown($id, $options);
+		}
 		
-		$output .= "</div>";
 					
 		return $output;
 	}
@@ -71,7 +78,7 @@ class Application_Controller_Helper_Dropdown extends Zend_Controller_Action_Help
 	/**
 	 * create lower (hidden) portion of custom dropdown
 	 */
-	public function createLowerDropdown($id, $options)
+	public function createLowerDropdown($id, $options, $ucwords = true)
 	{
 		$output  = '';
 		$output .= "<div class='dropdown-menu-hidden-container' id='dropdown-menu-hidden-container-" . $id . "'>
@@ -79,7 +86,7 @@ class Application_Controller_Helper_Dropdown extends Zend_Controller_Action_Help
 				    <div dropdown-menu='" . $id . "' id='dropdown-menu-" . $id . "' class='dropdown-menu-options-container dropshadow'>";
 					
 		foreach ($options as $option) {
-			$output   .= "<div class='dropdown-menu-option-container medium'>";
+			$output   .= "<div class='dropdown-menu-option-container medium animate-darker'>";
 			$img       = '';
 			$textClass = 'medium';
 			
@@ -94,11 +101,19 @@ class Application_Controller_Helper_Dropdown extends Zend_Controller_Action_Help
 					$img = "<img src='" . $option['image'] . "' class='dropdown-menu-option-img " . $textClass . "-background' />";
 				}
 				
+				if ($ucwords) {
+					// ucwords for option
+					$option['text'] = ucwords($option['text']);
+				}
 				
-				$text = '<p class="dropdown-menu-option-text ' . $textClass . '">' . ucwords($option['text']) . '</p>';
+				$text = '<p class="dropdown-menu-option-text ' . $textClass . '">' . $option['text'] . '</p>';
 			} else {
 				// Simple text
-				$text      = '<p class="dropdown-menu-option-text ' . $textClass . '">' . ucwords($option) . '</p>';
+				if ($ucwords) {
+					// ucwords for option
+					$option = ucwords($option);
+				}
+				$text      = '<p class="dropdown-menu-option-text ' . $textClass . '">' . $option . '</p>';
 			}
 			$output .= $text . $img;
 			$output .= "</div>";
@@ -110,9 +125,9 @@ class Application_Controller_Helper_Dropdown extends Zend_Controller_Action_Help
 	}
 	
 	/**
-	 * create lower (hidden) portion of custom dropdown
+	 * create lower (hidden) portion of custom "invite to" dropdown (used on user profile)
 	 */
-	public function createLowerDropdownInvite()
+	public function createLowerDropdownInviteTo()
 	{
 		$auth    = Zend_Auth::getInstance();
 		$user    = $auth->getIdentity();
@@ -124,13 +139,14 @@ class Application_Controller_Helper_Dropdown extends Zend_Controller_Action_Help
 				    <div dropdown-menu='" . $id . "' id='dropdown-menu-" . $id . "' class='dropdown-menu-options-container  dropdown-menu-options-container-dark invite dropshadow'>";
 		
 		
-		$pre 	 = "<div class='dropdown-menu-option-container invite lightest smaller-text'>";
-		$post    = "</div>";
+		$pre 	 = "<div class='dropdown-menu-option-container animate-darker invite medium smaller-text'>
+						<p class='dropdown-menu-option-text medium'>";
+		$post    = "</p></div>";
 		$sections = array('games','teams','groups');
 		
 		foreach ($sections as $section) {
 			
-			$output .= "<p class='smaller-text clear white dropdown-menu-invite-section heavy'>My " . ucwords($section) . "</p>";
+			$output .= "<p class='smaller-text clear dark dropdown-menu-invite-section heavy'>My " . ucwords($section) . "</p>";
 			
 			if ($user->hasValue($section)) {
 				// This section has values, display as options for invite
@@ -160,5 +176,66 @@ class Application_Controller_Helper_Dropdown extends Zend_Controller_Action_Help
 		
 		return $output;
 	}
+	
+	/**
+	 * create lower (hidden) portion of custom "invite" dropdown (used on team profile)
+	 */
+	public function createLowerDropdownInvite()
+	{
+		$auth    = Zend_Auth::getInstance();
+		$user    = $auth->getIdentity();
+		$form    = new Application_Form_HeaderSearch();
+		
+		$output  = '';
+		$id 	 = 'invite';
+		$output .= "<div class='dropdown-menu-hidden-container' id='dropdown-menu-hidden-container-" . $id . "'>
+				    <img src='/images/global/dropdown/dropdown_tip.png' class='dropdown-menu-tip' />
+				    <div dropdown-menu='" . $id . "' id='dropdown-menu-" . $id . "' class='dropdown-menu-options-container  dropdown-menu-options-container-dark invite dropshadow'>";
+		
+		
+		$pre 	 = "<div class='dropdown-menu-option-container animate-darker invite medium smaller-text'>
+						<p class='dropdown-menu-option-text medium'>";
+		$post    = "</p></div>";
+		$sections = array('groups');
+		
+		$output  .= $form->headerSearchBar->setName('inviteSearchBar');
+		
+		$output  .= "<div class='dropdown-menu-option-results' id='dropdown-menu-option-results-" . $id . "'></div>";
+		
+		$output  .= "<div class='dropdown-menu-option-default'>";
+		
+		foreach ($sections as $section) {
+			
+			$output .= "<p class='smaller-text clear medium dropdown-menu-invite-section heavy'>My " . ucwords($section) . "</p>";
+			
+			if ($user->hasValue($section)) {
+				// This section has values, display as options for invite
+
+				foreach ($user->$section->getAll() as $model) {
+					if (($model->rosterLimit == $model->totalPlayers) && !$model instanceof Application_Model_Group) {
+						// Team/Game is full do not show, exclude Group from this as it does not have a roster limit
+						continue;
+					}
+					if ($section == 'games') {
+						// Game
+						$output .= $pre . $model->sport . ' <span class="light">' . date('M j, ga', strtotime($model->date)) . '</span>' . $post;
+					} elseif ($section == 'teams') {
+						// Team
+						$output .= $pre . $model->getLimitedName('teamName', 23) . $post;
+					} elseif ($section == 'groups') {
+						// Group
+						$output .= $pre . $model->getLimitedName('groupName', 23) . $post;
+					}
+				}
+			} else {
+				$output .= "<p class='smaller-text clear medium'>You have no " . $section . ".</p>";
+			}
+		}
+		
+		$output .= "</div></div></div>";
+		
+		return $output;
+	}
+
 		
 }

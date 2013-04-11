@@ -19,7 +19,6 @@ class IndexController extends Zend_Controller_Action
 			$this->view->whiteBacking = false;
 		} else {
 			// Member homepage
-			
 			$this->view->narrowColumn = 'right';
 			
 			$this->view->userSports = $this->view->user->getSportNames();
@@ -68,7 +67,7 @@ class IndexController extends Zend_Controller_Action
 			$this->view->newsfeed = $newsfeed->getNewsfeed($this->view->user->city->cityID);
 			
 			// Schedule section
-			$this->view->userSchedule = $this->view->user->getScheduledGames();
+			$this->view->userSchedule = $this->view->user->getNextWeekScheduledGames();
 			
 			$array = array();
 			$array[5] = 'cat';

@@ -7,22 +7,245 @@ $this->headTitle($this->team->teamName);
 $this->headLink()->prependStylesheet($this->baseUrl() . '/css/team.css');
 $this->headLink()->prependStylesheet($this->baseUrl() . '/css/profile.css');
 $this->headScript()->prependFile($this->baseUrl() . '/js/team.js');
+$this->headScript()->prependFile($this->baseUrl() . '/js/profile.js');
 
+
+	echo $this->placeholder('absolute')->captureStart();
+	echo $this->partial('partials/global/alertBack.phtml');
+	
+	if ($this->captain) {
+		// User is captain, show alerts for captain's management
+			echo $this->alert()->start('manage-schedule','Click on a day to add/edit schedule.');
+			
+			echo "<div class='team-manage-calendar left'>";
+			echo $this->calendar()->createCalendar($this->events, true, false, false, false, true, true);
+			echo "</div>";
+			
+			$winOrLossContent  = "<p class='left darkest larger-text'>vs. <span id='tooltip-team-manage-winOrLoss-opponent' class='darkest'>Unknown</span></p>";
+			$winOrLossContent .= "<p class='right header medium x'>X</p>";
+			$winOrLossContent .= "<div class='clear width-100 larger-margin-top larger-text'>";
+			$winOrLossContent .= 	"<p class='button tooltip-team-manage-winOrLoss-button win-button'>Win</p>";
+			$winOrLossContent .= 	"<p class='button tooltip-team-manage-winOrLoss-button loss-button'>Loss</p>";
+			$winOrLossContent .= "</div>";
+			$winOrLossContent .= "<p class='clear light pointer tie margin-top'>Tie</p>";
+			$winOrLossContent .= "<p class='right light pointer remove-game margin-top'>Remove</p>";
+			echo $this->tooltip('-team-manage-winOrLoss', $winOrLossContent);
+			
+			
+			$futureEventContent  = "<p class='left heavy darkest larger-text' id='team-manage-schedule-date'></p><p class='right header medium x'>X</p>";
+			$futureEventContent .= $this->generalForm->text->setName('teamManageScheduleOpponent')->setLabel('Opponent');
+			$futureEventContent .= "<select class='clear' id='teamManageScheduleHour'>";//$this->manageScheduleTimeHour
+			for ($i = 1 ; $i <= 12; $i++) {
+				$selected = '';
+				if ($i == 7) {
+					$selected = 'selected';
+				}
+				$futureEventContent .= "<option " . $selected . ">" . $i . "</option>";
+			}
+			$futureEventContent .= "</select>";
+			$futureEventContent .= "<p class='left team-manage-schedule-time-separator'>:</p>";
+			/*$futureEventContent .= $this->manageScheduleTimeMinute;
+			$futureEventContent .= $this->manageScheduleTimeAmPm;*/
+			$futureEventContent .= "<select class='left' id='teamManageScheduleMinute'>
+										<option>00</option>
+										<option>15</option>
+										<option>30</option>
+										<option>45</option>
+									</select>";
+			$futureEventContent .= "<select class='left' id='teamManageScheduleAmPm'>
+										<option selected>pm</option>
+										<option>am</option>
+									</select>";
+			$futureEventContent .= $this->generalForm->text->setName('teamManageScheduleLocation')->setLabel('Location Name');
+			$futureEventContent .= $this->generalForm->text->setName('teamManageScheduleAddress')->setLabel('Address');
+			$futureEventContent .= "<div id='team-manage-schedule-location-results' class='clear'></div>";
+			$futureEventContent .= "<p class='green-button clear-right right save-button'>Save</p>";
+			$futureEventContent .= "<p class='button left delete-button remove-game'>Delete</p>";
+			echo $this->tooltip('-team-manage-addGame', $futureEventContent);
+			
+			echo $this->alert()->end();
+			
+			// Remove player alert
+			echo $this->alert()->start('manage-remove-player','Click on a player to remove from roster.');
+				echo "<div class='team-manage-remove-player-container width-100 left'>";
+				echo 	"<div class='clear margin-top'>";
+				foreach ($this->team->players->users as $player) {
+					echo "<div class='team-player-container left pointer profile-manage-remove-player' tooltip='" . $player->fullName . "' playerName='" . $player->fullName . "' userID='" . $player->userID . "'>" 
+							. $player->getBoxProfilePic('medium', 'users', 'animate-opacity', 'dark-back') 
+						. "</div>";
+				}
+				echo	"</div>";
+				echo 	"<div id='profile-manage-remove-player-confirm-container' class='hidden'>
+							<p class='clear larger-margin-top light larger-text'>Remove 
+								<span id='profile-manage-remove-player-name' class='heavy red largest-text'></span> from " 
+								. $this->team->teamName . "?</p>";
+				echo		"<div class='clear width-100 larger-margin-top'>
+								<p class='red-button profile-manage-button larger-margin-top' id='profile-manage-remove-player-remove'>Remove</p>
+								<p class='button profile-manage-button larger-margin-top' id='profile-manage-remove-player-cancel'>Cancel</p>
+							</div>";
+				echo 	"</div>";
+				echo "</div>";
+								
+			echo $this->alert()->end();
+			
+			// Edit team info alert
+			echo $this->alert()->start('manage-team-info',"Click on anything to edit.");
+				echo "<div class='team-manage-team-info-container width-100 left'>";
+				echo 	"<div class='team-manage-team-info-tab-container width-100 clear larger-text'>";
+				echo		"<p class='team-manage-team-info-tab left pointer team-manage-team-info-tab-selected'>Team Info</p>";
+				echo		"<p class='team-manage-team-info-tab left pointer'>Advanced</p>";
+				echo	"</div>";
+				echo	"<div class='team-manage-team-info-lower-container width-100 clear'>";
+				echo		"<img src='" . $this->team->getProfilePic('medium') . "' class='left' id='team-manage-team-info-img' />";
+				echo 		"<div class='team-manage-team-info-name-container left'>";
+				echo 			"<p class='left smaller-text darkest'>Team Name</p>";
+				echo 			"<input type='text' class='clear darkest heavy team-manage-team-info-name' id='team-manage-team-info-name' value='" . $this->team->teamName . "'/>";
+				echo 		"</div>";
+				echo 		"<div class='team-manage-team-info-name-container left larger-margin-top'>";
+				echo 			"<p class='left smaller-text darkest'>Team Captain</p>";
+				echo 			"<p class='clear largest-text darkest heavy team-manage-team-info-name pointer' id='team-manage-team-info-captain' defaultName='" . $this->team->players->getUser($this->team->captain)->getLimitedName('fullName',21) . "'>"
+									 . $this->team->players->getUser($this->team->captain)->getLimitedName('fullName', 21) 
+								. "</p>";
+				echo			"<div class='clear hidden' id='team-manage-team-info-captain-container'>";
+				
+				foreach ($this->team->players->getAll() as $player) {
+					echo "<div class='left pointer team-manage-team-info-captain' playerName='" . $player->getLimitedName('fullName', 21) . "' userID='" . $player->userID . "'>";
+					echo	$player->getBoxProfilePic('tiny', 'users', 'animate-opacity', 'dark-back');
+					echo "</div>";
+				}
+			echo				"<p class='margin-top medium smaller-text clear'>Note: you will not be able to access any management controls if you are no longer the captain.</p>";
+			
+			echo			"</div>";
+			echo 		"</div>";
+			echo	"</div>";
+			
+			// Team Advanced Options
+			echo	"<div class='team-manage-team-info-lower-container width-100 clear hidden'>";
+			
+			// Visibility
+			echo 		"<div class='width-100 clear selectable-container' section='public'>
+							<p class='selectable-text-section-title'>Visibility</p>";
+							
+			$what    = array('Public' => array('selected' => $this->isPublic),
+							 'Private' => array('selected' => $this->isPrivate)
+							);
+			echo 			$this->signupsportform()->selectableText($what, true);
+			echo	   '</div>';
+			
+			// Location
+			echo 		"<div class='width-100 clear selectable-container' section='city'>
+							<p class='selectable-text-section-title'>Location</p>";
+							
+			echo			"<input type='text' value='" . $this->team->city . "' id='team-manage-team-info-location' class='clear selectable-input' />";
+			echo	   '</div>';
+
+			
+			// Roster Limit
+			echo 		"<div class='width-100 clear selectable-container' section='rosterLimit'>
+							<p class='selectable-text-section-title'>Roster limit</p>";
+							
+			echo			"<input type='text' value='" . $this->team->rosterLimit . "' id='team-manage-team-info-roster-limit' class='clear selectable-input profile-manage-team-info-roster-limit'/>";
+			echo	   '</div>';
+
+
+			echo 	"</div>";
+			echo "</div>";
+			
+			echo		"<div class='clear width-100 larger-margin-top hidden' id='team-manage-team-info-confirm-container'>";
+			echo			"<p class='button team-manage-team-info-button larger-margin-top right' id='team-manage-team-info-save-changes'>Save changes</p>";
+			echo			"<p class='team-manage-team-info-button right medium smaller-text alert-cancel-button pointer'>Cancel</p>";
+			echo 		"</div>";
+				
+			echo $this->alert()->end();
+				
+			
+	}
+			echo $this->alert()->start('confirm-action','');
+			echo 	"<p class='width-100 clear center'>&nbsp;Are you sure you want to <span id='confirm-action-text'></span>?</p>";
+			echo	"<p class='button clear' id='confirm-action'>Yes</p>";
+			echo	"<p class='button' id='deny-action'>No</p>";
+			echo $this->alert()->end();	
+	echo $this->placeholder('absolute')->captureEnd();
 ?>
 
 
 <?php
-// Narrow right column
+// Narrow left column
 $this->placeholder('narrowColumn')->captureStart();
 echo "<img src='" . $this->team->getProfilePic('large') . "' class='rounded-corners'/>";
 
-/*
-$sections = array('players', 'teams', 'groups');
+$ratings = array('skill', 'sportsmanship', 'attendance');
 
-echo $this->narrowteamsection($this->currentUser, $sections);
-*/
+echo $this->narrowcolumnsection()->start(array('title' => 'Team Ratings'));
+
+if ($this->team->players->hasValue('users')) {
+	// Players exist, show average ratings
+	echo "<div class='profile-narrow-rating-container clear'>";
+	foreach ($ratings as $rating) {
+		echo $this->partial('partials/global/ratingBar.phtml', array('rating' => $this->team->getAverage($rating),
+																	 'ratingLabel' => $rating));
+	}
+	echo "</div>";
+} else {
+	// No players
+	echo "<p class='width-100 left center light'>No players</p>";
+}
+echo $this->narrowcolumnsection()->end();
+
+// Previous Games
+echo $this->narrowcolumnsection()->start(array('title' => 'Previous Games'));
+if (!$this->previousGames) {
+	// No games
+	echo "<p class='clear light'>No previous games were found.</p>";
+} else {
+	foreach ($this->previousGames as $game) {
+		echo "<div class='team-narrow-game-container clear width-100'>";
+		echo 	"<p class='dark left'>vs. " . $game->getLimitedName('opponent', 16) . "</p>";
+		echo	"<p class='largest-text heavy green right profile-narrow-winOrLoss center'>" . $game->winOrLoss . "</p>";		
+		echo	"<p class='light clear-left'>" . $game->getDay() . "</p>";
+
+		echo "</div>";
+	}
+}
+echo $this->narrowcolumnsection()->end();
+
+// Leagues
+echo $this->narrowcolumnsection()->start(array('title' => 'Leagues'));
+if (!$this->team->leagues->hasValue('leagues')) {
+	// No leagues
+	echo "<p class='clear light'>This team is not signed up for a league.</p>";
+} else {
+	foreach ($this->team->leagues->getAll() as $league) {
+		echo "<div class='team-narrow-game-container clear width-100'>";
+		echo 	"<p class='darkest left'>" . $league->getLimitedName('leagueName', 16) . "</p>";
+		echo	"<p class='dark clear'>\"" . $league->leagueLevel . "\" Level&nbsp;</p>";
+		echo	"<p class='left light'>" . $league->getStartFormat('M') . "-" . $league->getEndFormat('M') . "</p>";
+		echo "</div>";
+	}
+}
+echo $this->narrowcolumnsection()->end();
+
+
+echo "<div class='width-100 left narrow-column-calendar-container'>";
+echo $this->calendar()->createCalendar($this->events, true);
+echo "</div>";
+
+
 $this->placeholder('narrowColumn')->captureEnd();
 
+
+// Store universal team details in hidden container
+echo "<span id='team-details' 
+			teamID='" . $this->team->teamID . "' 
+			idType='teamID' 
+			actingUserID='" . $this->user->userID . "' 
+			captain='" . $this->captain . "'
+			city='" . $this->team->city . "'
+			rosterLimit='" . $this->team->rosterLimit . "'
+			sport='" . $this->team->sport . "'
+			public='" . ($this->isPublic ? 'public' : 'private') . "'
+			teamName='" . $this->team->teamName . "'>
+	 </span>";
 ?>
 
 <header class='clear profile-name-container'>
@@ -31,7 +254,7 @@ $this->placeholder('narrowColumn')->captureEnd();
 	</p>
     <div class='profile-city-container clear'>
         <p class='light clear larger-text'>
-            <span class='darkest'><?php echo $this->team->city . '</span> &nbsp;' . $this->team->sport . ' &nbsp;<span class="darkest">' . '1-3-1</span>';?>
+            <span class='darkest'><?php echo $this->team->city . '</span> &nbsp;' . $this->team->sport . ' Team &nbsp;<span class="darkest">' . $this->team->record . '</span>';?>
         </p>    
 
     </div>
@@ -40,21 +263,41 @@ $this->placeholder('narrowColumn')->captureEnd();
 <div id='profile-buttons-container'>
     <?php
 		
-		if ($this->team->players->userExists($this->user->userID)) {
+		if ($this->userOnTeam) {
 			// You are on team
+			
 			?>
-			<p class='red-button right leave-button' id='leave-button'>
+            <p class='darkest smaller-text right current-position'>You are currently <?php echo ($this->captain ? 'Team Captain' : 'a member');?>.</p>
+			<p class='red-button clear-right leave-button margin-top right' id='leave-button' style='margin-right:0'>
 				Leave
 			</p>
-    <?php } else {?>
-    		<p class='green-button right larger-text join-button heavy' id='join-button'>
-            	Join
+    <?php } else {
+			$lower = '';
+			$class = '';
+			$text = 'Join';
+			$id    = 'join-button';
+			if (!$this->team->sportupCreated) {
+				// Not sportup created team, allow any user to join without request
+				$text = 'Request to Join';
+				$id   = 'request-join-button';
+			}
+			if ($this->team->minSkill > $this->user->getSport($this->team->sport)->skill) {
+				// User is not good enough for this team
+				$class = 'transparent default';
+				$id = '';
+				$lower = '<p class="light clear-right smaller-text margin-top">You must have a minimum skill of ' . $this->team->minSkill . ' to join.';
+			}
+			?>
+    		<p class='green-button right larger-text join-button heavy <?php echo $class;?>' id='<?php echo $id;?>'>
+            	<?php echo $text;?>
             </p>
+            <?php echo $lower; ?>
     <?php } 
 		
 		if ($this->captain) {
 			// User is captain
-			echo $this->inviteButton;
+			echo "<div class='larger-margin-top clear-right profile-buttons-second-row' style='margin-right:0'>" . $this->inviteButton . "</div>";
+			echo "<div class='larger-margin-top right profile-buttons-second-row'>" . $this->manageButton . "</div>";
 		}
 	?>
 </div>
@@ -65,7 +308,7 @@ $nextGameHeader = '';
 if ($this->nextGame) {
 	// Next game exists
 	$nextGameHeader .= "<div class='right profile-section-bold-subheader'>";
-	$nextGameHeader .= 		"<p class='right medium'>" . $this->countConfirmedPlayers . " confirmed</p>";
+	$nextGameHeader .= 		"<p class='right medium'><span class='confirmed'>" . $this->countConfirmedPlayers . "</span> confirmed</p>";
 	$nextGameHeader .= "</div>";
 }
 echo $this->partial('partials/global/sectionHeaderBold.phtml',array('title'   => 'next game',
@@ -78,12 +321,12 @@ echo $this->partial('partials/global/sectionHeaderBold.phtml',array('title'   =>
 	if (!$this->nextGame) {
 		// No next game
 ?>
-	<p class='center width-100 medium larger-text none-text'> There are no games in the near future.</p>
+	<p class='center width-100 light larger-text none-text'> There are no games in the near future.</p>
 <?php } else { 
-		// Next game, show info
+		// Next game and user on team, show info
 ?>
 	<div class='team-next-game-left-container left'>
-    	<p class='left largest-text darkest'>vs. <?php echo $this->nextTeamName;?></p>
+    	<p class='left largest-text darkest heavy'>vs. <?php echo $this->nextTeamName;?></p>
         <p class='clear darkest'>
         	<?php echo $this->nextDay;?> <span class='light'><?php echo $this->nextShortDate;?></span> at <?php echo $this->nextHour;?>
         </p>
@@ -95,65 +338,73 @@ echo $this->partial('partials/global/sectionHeaderBold.phtml',array('title'   =>
     <?php
 		if ($this->userNextGame) {
 			// User is attending next game
-			$class = 'inner-shadow schedule-button-selected';
+			$inClass  = '';
+			$outClass = '';
+			$existingID = ' existingID="update"';
+			if ($this->userNextGame == 'confirmed') {
+				$inClass = 'inner-shadow member-schedule-button-selected';
+			} else {
+				$outClass = 'inner-shadow member-schedule-button-selected';
+			}
+			
 		} else {
-			$class = '';
+			// User either has not responded, or is definitely not going
+			$outClass  = '';
+			$inClass = '';
+			$existingID = '';
 		}
+		if ($this->userOnTeam) {
+			// User is on team
 	?>
-    <div class='team-next-game-right-container right'>
+    <div class='team-next-game-right-container right' <?php echo $this->nextGameType . $this->nextGameTypeID . $this->nextGameTeamID . $existingID;?>>
         <p class='darkest center'>Are you in, or are you out?</p>
-        <p class='button larger-text schedule-in <?php echo $class;?>'>in</p>
-        <p class='button larger-text schedule-out'>out</p>
+        <p class='button larger-text schedule-in <?php echo $inClass;?>'>in</p>
+        <p class='button larger-text schedule-out <?php echo $outClass;?>'>out</p>
 	</div>
 
 
 <?php 
+		}
 }
 echo "</div>";
-// Create header for players section
 
+// Create header for players section
 $playersHeader  = "<div class='right profile-section-bold-subheader'>";
 $playersHeader .= 		"<p class='right medium'>" . $this->totalPlayers . " out of " . $this->rosterLimit . "</p>";
 $playersHeader .= "</div>";
-$playersHeader .= "<div class='left profile-section-bold-subheader'>";
-$playersHeader .= 		"<img class='left' src='/images/team/confirm/small.png' />";
-$playersHeader .= 		"<p class='left smaller-text medium team-players-section-header-going'>Going to next game</p>";
-$playersHeader .= 		"<img class='left' src='/images/team/deny/small.png' />";
-$playersHeader .= 		"<p class='left smaller-text medium team-players-section-header-going'>Not going to next game</p>";
-$playersHeader .= "</div>";
+if ($this->nextGame) {
+	$playersHeader .= "<div class='left profile-section-bold-subheader team-player-going-description-container'>";
+	$playersHeader .= 		"<img class='left' src='/images/team/confirm/small.png' />";
+	$playersHeader .= 		"<p class='left smaller-text medium team-players-section-header-going'>Going to next game</p>";
+	$playersHeader .= 		"<img class='left' src='/images/team/deny/small.png' />";
+	$playersHeader .= 		"<p class='left smaller-text medium team-players-section-header-going'>Not going to next game</p>";
+	$playersHeader .= "</div>";
+}
 echo $this->partial('partials/global/sectionHeaderBold.phtml',array('title'   => 'players',
 																	'content' => $playersHeader)); 
-	
-foreach ($this->team->players->users as $player) {
 
-	echo "<a href='/users/" . $player->userID . "' class='left team-player-container'>";
-	echo 	$player->getBoxProfilePic('medium');
-	
-	$success = false;
-	if ($this->nextGame) {
-		if ($this->nextGame->userConfirmed($player->userID)) {
-			// User is going to next game
-			$src = "/images/team/confirm/small.png";
-			$success = true;
-		} elseif ($this->nextGame->userNotConfirmed($player->userID)) {
-			// User is confirmed as not going
-			$src = "/images/team/deny/small.png";
-			$success = true;
-		}
-	}
-	
-	if ($success) {
-		// User is either confirmed or not
-		echo "<img src='" . $src . "' class='clear team-confirm-img' />";
-	}
-	
-	echo 	"<div class='hover-dark profile-player-overlay-container'>";
-	echo		"<div class='profile-player-overlay'>";
-	echo			"<p class='white width-100 center left'>" . $player->shortName . "</p>";
-	echo			"<p class='white width-100 center left largest-text heavy'>" . $player->getSport($this->team->sport)->overall . "</p>";
-	echo		"</div>";
-	echo	"</div>";
-	echo "</a>";
+echo "<div id='team-players-container' class='clear width-100'>";
+
+if ($this->team->players->hasValue('users')) {
+	// Players exist
+	echo $this->playerssection($this->team->players->users, $this->nextGame);
+} else {
+	echo "<p class='none-text larger-text light width-100 center'>There are no players.</p>";
 }
+echo "</div>";
+
+echo $this->partial('partials/global/sectionHeaderPlain.phtml',array('title' => 'Recent Activity'));
+
+if ($this->userOnTeam) {
+	// User is on team, allow to post
+?>
+<div id='team-post-container' class='clear width-100'>
+	<img src='<?php echo $this->user->getProfilePic('small');?>' class='left' />
+    <?php echo $this->postForm;?>
+</div>
+
+<?php
+	}
+echo $this->profilenewsfeed()->create($this->newsfeed);
 ?>
 

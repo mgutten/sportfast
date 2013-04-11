@@ -14,14 +14,31 @@
 	margin-top: .2em;
 }
 
+/*
 #user-buttons-container>p,#user-buttons-container>div,#profile-buttons-container>p,#profile-buttons-container>div {
 	float:right;
 	margin-right: 1em;
 }
+*/
 
-#user-buttons-container > p:first-child,#user-buttons-container > div:first-child {
+.profile-buttons-second-row,.profile-buttons-margin-right {
+	margin-right: 1em;
+}
+
+.profile-buttons-second-row:first-child {
+	margin-right:0;
+}
+
+
+#profile-buttons-container>div.dropdown-menu-hidden-container {
 	margin-right: 0;
 }
+
+#user-buttons-container > p:first-child,#user-buttons-container > div:first-child,
+#profile-buttons-container > p:first-child,#profile-buttons-container > div:first-child {
+	margin-right: 0;
+}
+
 
 #user-buttons-container > #invite-to {
 	margin-right: 0;
@@ -29,7 +46,7 @@
 }
 
 .user-city-container,.profile-city-container {
-	margin: .3em 0 0 .5em;
+	margin: .3em 0 0 .2em;
 }
 
 
@@ -53,4 +70,186 @@
 .profile-player-overlay {
 	position: absolute;
 	width: 100%;
+}
+
+/* post message section */
+#postMessage-container {
+	width: 88%;
+	height: 5.8em;
+	font-size: 1em;
+	margin: 0 0 0 .5em;
+}
+
+#input-overlay-postMessage {
+	top: -5.3em;
+}
+
+textarea.post-message {
+	width: 98%;
+	height: 5.3em;
+	max-height: 5.3em;
+	max-width: 98%;	
+}
+
+.profile-post-button {
+	float:right;
+	clear:both;
+	margin-right: 1.4em;
+	font-size: 1em;
+}
+
+/* players section */
+.team-players-section-header-going {
+	margin: .3em 1em 0 .3em;
+}
+
+.team-player-container {
+	padding: 2px 2px 0 0;
+}
+
+.team-confirm-img {
+	margin: -24px 0 0 .5em;
+}
+
+#team-players-container {
+	margin-bottom:2em;
+}
+
+
+
+/* newsfeed section */
+.profile-newsfeed-container {
+	width: 80%;
+}
+
+.profile-newsfeed {
+	margin-top: .2em;
+}
+
+.profile-message-container {
+	margin-left: 1em;
+	width: 88%;
+}
+
+.profile-message {
+	width: auto;
+	border: 1px solid #bbb;
+	padding: .2em 1em;
+}
+
+.newsfeed-notification-text-container {
+	width:88%;
+	margin-top: .4em;
+}
+
+.newsfeed-notification-text {
+	min-height: 1.8em;
+}
+
+.newsfeed-notification-time {
+	float:left;
+}
+
+.newsfeed-notification-container {
+	padding-bottom: 1.5em;
+}
+
+/* narrow column */
+/* ratings */
+.user-sport-rating-other-outer {
+	float:right;
+	height: 1em;
+	margin-right: 0;
+}
+
+.user-sport-rating-percent {
+	display:none;
+}
+
+.profile-narrow-rating-container {
+	margin: 1em 0;
+}
+
+.profile-narrow-winOrLoss {
+	width: 1.3em;
+}
+
+/* alerts */
+
+#manage-remove-player-alert-container {
+	margin-top: -16em;
+	margin-left: -19em;
+	width: 38em;
+}
+
+.profile-manage-button {
+	margin-left: 12em;
+}
+
+.profile-manage-button:nth-child(2) {
+	margin-left: 2em;
+}
+
+#manage-team-info-alert-container {
+	margin-top: -16em;
+	margin-left: -17.5em;
+	width: 35em;
+}
+
+.team-manage-team-info-tab {
+	padding: .2em .6em;
+	color: #D9D9D9;
+}
+
+.team-manage-team-info-tab:hover {
+	color: #bbb;
+}
+
+.team-manage-team-info-tab-selected {
+	color: #8d8d8d;
+	background: #e9e9e9;
+}
+
+.team-manage-team-info-lower-container {
+	padding-top: 1.5em;
+}
+
+
+#team-manage-team-info-img {
+	margin-left: 1em;
+}
+
+.team-manage-team-info-name-container {
+	margin-left: 2em;
+	width: 20em;
+}
+
+.team-manage-team-info-name {
+	margin-top: -.15em;
+}
+
+.team-manage-team-info-captain {
+	padding-left: 1px;
+	padding-top: 1px;
+}
+
+#team-manage-team-info-name {
+	border:none;
+	font-size: 2em;
+	margin-top: 0;
+	padding-top: 0em;
+	padding-left: 0;
+	width: 10em;
+}
+
+.team-manage-team-info-button {
+	margin-right: .5em;
+}
+
+input[type=text].profile-manage-team-info-roster-limit {
+	width: 2em;
+}
+
+.alert-cancel-button {
+	margin-top: 1.35em;
 }

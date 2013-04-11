@@ -38,7 +38,7 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 		$view   = $this->getResource('view');
 		
 		$auth = Zend_Auth::getInstance();
-		$auth->clearIdentity();
+		//$auth->clearIdentity();
 		if (!empty($_COOKIE['user']) || $auth->hasIdentity()) {
 			// User is logged in 
 			if (!$auth->hasIdentity()) {
@@ -112,6 +112,12 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 	protected function _initRoutes()
 	{
 		$view   = $this->getResource('view');
+		$auth = Zend_Auth::getInstance();
+		if ($auth->hasIdentity()) {
+			$id = $view->user->userID;
+		} else {
+			$id = 1;
+		}
 		
 		$frontController = Zend_Controller_Front::getInstance(); 
 		$router = $frontController->getRouter();
@@ -121,7 +127,7 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 						'action' => 'index',
 						'controller' => 'users',
 						'module' => 'default',
-						'id'	 => $view->user->userID
+						'id'	 => $id
 				),
 				array(
 						1 => 'id',

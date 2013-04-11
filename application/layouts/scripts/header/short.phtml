@@ -12,7 +12,7 @@
 		
 		$class = '';
 		if ($section == 'unread') {
-			$class = 'light-green-back';
+			$class = 'light-back';
 		}
 		foreach ($this->user->notifications->$section as $notification) {
 			$buttons = '';
@@ -51,6 +51,11 @@
 
 <div id='header-search-results-container'>
 </div>
+
+<div id='confirm-alert' class='heavy white dropshadow center'>
+Request sent
+</div>
+
 
     <div class='centered-body body-wrapper'>
     	<div class='header-nav-container-short'>
@@ -109,7 +114,7 @@
                         <div class='dropdown-back-inner' id='nav-dropdown-inner-cog'>
                              <a href="/users/<?php echo $this->user->userID;?>" class='header-dropdown-option-cog animate-opacity'>
                                  <div class='box-img-container-tiny left'><img src='<?php echo $this->user->getProfilePic('tiny');?>' class='cog-dropdown-account-pic box-img-tiny'/></div>
-                                 <p class='white cog-dropdown-account-text cog-dropdown-account-text animate-opacity'><?php echo $this->user->shortName;?></p>
+                                 <p class='white cog-dropdown-account-text cog-dropdown-account-text'><?php echo $this->user->shortName;?></p>
                              </a>
                              <a href="/users/<?php echo $this->user->userID;?>/inbox" class='header-dropdown-option-cog animate-opacity white'>
                                  Inbox (<?php echo $this->countNewMessages;?>)

@@ -27,7 +27,9 @@ class Application_Model_Notification extends Application_Model_ModelAbstract
 									'sport'				=> '',
 									'date'				=> '',
 									'parkName'			=> '',
-									'picture'			=> '',
+									'teamName'			=> '',
+									'groupName'			=> '',
+									'pictureType'			=> '',
 									'url'				=> '',
 									'action'			=> '',
 									'type'				=> '',
@@ -40,17 +42,7 @@ class Application_Model_Notification extends Application_Model_ModelAbstract
 									
 	protected $_primaryKey = 'notificationLogID';	
 	
-	
-	public function __construct($resultRow = false)
-	{
 		
-		if ($resultRow) {
-			$this->setAttribs($resultRow);
-		}
-		
-				
-	}
-	
 	public function getTimeFromNow($date = false, $maxDays = 7)
 	{
 		return parent::getTimeFromNow($this->dateHappened, $maxDays);	
@@ -58,7 +50,7 @@ class Application_Model_Notification extends Application_Model_ModelAbstract
 	
 	public function getPicture($size = 'small')
 	{
-		$picture = $this->_attribs['picture'];
+		$picture = $this->_attribs['pictureType'];
 		
 		if ($picture == 'users') {
 			// User pic
@@ -79,15 +71,6 @@ class Application_Model_Notification extends Application_Model_ModelAbstract
 			// Default pic
 			$path = $this->getProfilePic($size, '', 'logo');
 		}
-		
-		/*if (!empty($this->_attribs['actingUserID'])) {
-			// Some user did this
-			$picturePath = $this->getProfilePic($size, $this->actingUserID);
-		} else {
-			// Non user (system, team, group, etc)
-			
-		}
-		*/
 		
 		return $path;
 	}
@@ -113,11 +96,12 @@ class Application_Model_Notification extends Application_Model_ModelAbstract
 		preg_match_all('/(?:%)[a-zA-Z]+/', $this->text, $matches);
 		
 		$possession = 'your';
-		$class = 'dark bold text-width';
+		$class = 'dark heavy text-width';
+		$is = 'is';
 		
 		if ($this->newsfeed) {
 			// This notification is meant for newsfeed, give different class
-			$class = 'green';
+			$class = 'green heavy';
 			$possession = 'a';
 		}
 		
@@ -128,8 +112,7 @@ class Application_Model_Notification extends Application_Model_ModelAbstract
 			$pre   = '';
 			$post  = '';
 			
-			$replaceVal = (isset($this->_attribs[$match]) ? $this->_attribs[$match] : '');
-			
+			$replaceVal = (isset($this->_attribs[$match]) ? $this->$match : '');
 			
 			if ($match == 'userName' || $match == 'receivingUserName') {
 				// Username replace
@@ -157,6 +140,7 @@ class Application_Model_Notification extends Application_Model_ModelAbstract
 					$pre = '';
 					$replaceVal = 'you';
 					$post = '';
+					$is = 'are';
 					if (strpos($this->text, '%' . $match) == 0) {
 						// username is first word in sentence
 						$replaceVal = 'You';
@@ -186,12 +170,22 @@ class Application_Model_Notification extends Application_Model_ModelAbstract
 				$time = strtotime($replaceVal);
 				// Format date (Wednesday, Dec 31 at 4pm)
 				$replaceVal = date('l', $time) . ' <span class="light">' . date('M j', $time) . '</span> at ' . date('ga', $time);
+			} elseif ($match == 'teamName') {
+				if ($this->newsfeed) {
+					// Is newsfeed, add link
+					$pre  = "<a href='/teams/" . $this->teamID . "' class='" . $class . "'>";
+					$post = "</a>";
+				} else {
+					$pre  = "<span class='" . $class . "'>";
+					$post = "</span>";
+				} 
 			} else {
-				$pre  = "<span class='" . $class . "'>";
-				$replaceVal = $match;
-				$post = "</span>";
+				if ($replaceVal !== '') {
+					$pre  = "<span class='" . $class . "'>";
+					$replaceVal = $match;
+					$post = "</span>";
+				}
 			}
-			
 			
 			$replace[] = $pre . $replaceVal . $post;
 		}
@@ -199,11 +193,23 @@ class Application_Model_Notification extends Application_Model_ModelAbstract
 		$str = str_replace($matches[0],$replace, $this->text);
 		
 		// Replace possession holder with possession var (ie a game, your game)
-		return str_replace('&possession', $possession, $str);
+		
+		return str_replace(array('&possession', '&is'), array($possession, $is), $str);
 		
 	}
-		
-			
+	
+	public function getTeamName()
+	{
+		return ucwords($this->_attribs['teamName']);
+	}
+	
+	/**
+	 * used in MessagesMapper to let notification be shown in newsfeed with messages
+	 */	
+	public function setMessage($message) {
+		$this->text = $message;
+		return $this;
+	}
 	
 	public function save()
 	{

@@ -97,20 +97,16 @@ $(function() {
 		$(this).addClass('light-back');
 	})
 	
-	/* schedule "in" and "out" on click */
-	$('.member-schedule-in,.member-schedule-out').click(function(e)
-	{
-		e.preventDefault();
-		
-		if ($(this).is('.member-schedule-button-selected')) {
-			// Is already selected 
-			return;
+	/* animate background for scheduled game on mouseover */
+	$('.member-schedule-day-body-game-container').hover(
+		function() {
+			$(this).stop().animate({'background-color': '#E6FFE6'}, 300);
+		},
+		function() {
+			$(this).stop().animate({'background-color': '#ffffff'}, 300);
 		}
-		
-		$(this).parent().children('.member-schedule-button-selected').removeClass('member-schedule-button-selected inner-shadow');
-		
-		$(this).addClass('member-schedule-button-selected inner-shadow');
-	})
+	)	
+	
 	
 	/* narrow column ratings click icon */
 	$('.member-narrow-rating-icon').click(function()

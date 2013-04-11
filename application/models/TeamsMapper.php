@@ -7,7 +7,7 @@ class Application_Model_TeamsMapper extends Application_Model_MapperAbstract
 	/**
 	 * Get all teams that meet user needs
 	 * @params($userClass   => user object,
-	 *		   $savingClass => games object,
+	 *		   $savingClass => teams object,
 	 *		   $options		=> additional sql "where" constraints)
 	 */
 	
@@ -16,11 +16,15 @@ class Application_Model_TeamsMapper extends Application_Model_MapperAbstract
 		$table   = $this->getDbTable();
 		$select  = $table->select();
 		$userID  = $userClass->userID;
+		$teamIDs = ($userClass->hasValue('teams') ? $userClass->teams->implodeIDs('teams') : '');
+
 		
 		$select->setIntegrityCheck(false);
 		$select->from(array('t'  => 'teams'))
+			   ->join(array('tll' => 'team_leagues'),
+			   		 'tll.teamID = t.teamID')
 			   ->join(array('ll' => 'league_levels'),
-			   		 'll.leagueLevelID = t.leagueLevelID')
+			   		 'll.leagueLevelID = tll.leagueLevelID')
 			   ->join(array('uus' => 'user_sports'),
 			   		 'uus.sportID = t.sportID AND uus.userID = "' . $userID . '"',
 					 array('skillCurrent as userSkill'))
@@ -39,6 +43,7 @@ class Application_Model_TeamsMapper extends Application_Model_MapperAbstract
 			   ->where('uus.skillCurrent >= ll.minSkill AND uus.skillCurrent <= ll.maxSkill')
 			   ->where('ll.cityID = ?', $userClass->city->cityID);
 		
+		
 		if ($options) {
 			// Additional options are set
 			foreach ($options as $option) {
@@ -46,12 +51,16 @@ class Application_Model_TeamsMapper extends Application_Model_MapperAbstract
 			}
 		}
 		
+		if (!empty($teamIDs)) {
+			// Do not select teams that are already the user's
+			$select->where('t.teamID NOT IN (' . $teamIDs . ')');
+		}
+		
 		$select->group('t.teamID');
 			   //->order('abs(avg(us.skillCurrent) - (SELECT skillCurrent FROM user_sports WHERE userID = "' . $userID . '" AND sportID = t.sportID)) ASC');
-		/*
-		echo $select->__toString();
-		return;
-		*/
+		
+		echo $select;
+		
 		
 		$results = $table->fetchAll($select);
 		
@@ -74,8 +83,6 @@ class Application_Model_TeamsMapper extends Application_Model_MapperAbstract
 		$select->setIntegrityCheck(false);
 		
 		$select->from(array('t'  => 'teams'))
-			   ->join(array('ll' => 'league_levels'),
-			   		 'll.leagueLevelID = t.leagueLevelID')
 			   ->joinLeft(array('ut' => 'user_teams'),
 			   		 'ut.teamID = t.teamID',
 					 array(''))
@@ -93,6 +100,24 @@ class Application_Model_TeamsMapper extends Application_Model_MapperAbstract
 		$team = $table->fetchRow($select);
 
 		$savingClass->setAttribs($team);
+		
+		// Get all leagues
+		$select  = $table->select();
+		$select->setIntegrityCheck(false);
+		
+		$select->from(array('tll'  => 'team_leagues'))
+			   ->join(array('ll' => 'league_levels'),
+			   		 'tll.leagueLevelID = ll.leagueLevelID')
+			   ->join(array('l' => 'leagues'),
+			   		 'l.leagueID = ll.leagueID')
+				->where('tll.teamID = ?', $teamID);
+		
+					   
+		$leagues = $table->fetchAll($select);
+		
+		foreach ($leagues as $league) {
+			$savingClass->leagues->addLeague($league);
+		}
 		
 		// Get all players
 		$sportID = $savingClass->sportID;
@@ -125,9 +150,10 @@ class Application_Model_TeamsMapper extends Application_Model_MapperAbstract
 			   ->join(array('ll' => 'league_locations'),
 			   		  'll.leagueLocationID = tg.leagueLocationID')
 			   ->joinLeft(array('utg' => 'user_team_games'),
-			   		 'tg.teamID = utg.teamID')
+			   		 'tg.teamGameID = utg.teamGameID',
+					 array('utg.userID','utg.confirmed'))
 			   ->where('tg.teamID = ?', $teamID)
-			   ->where('tg.date > DATE_SUB(NOW(), INTERVAL 3 WEEK)')
+			   ->where('tg.date > DATE_SUB(NOW(), INTERVAL 4 WEEK)')
 			   ->order('tg.date ASC');
 		
 		
@@ -139,6 +165,7 @@ class Application_Model_TeamsMapper extends Application_Model_MapperAbstract
 			if ($game->userID !== NULL) {
 				if ($game->confirmed == true) {
 					// Player is going
+					
 					$gameModel->addConfirmedPlayer($game->userID);	
 				} else {
 					// Player is confirmed not going
@@ -147,6 +174,35 @@ class Application_Model_TeamsMapper extends Application_Model_MapperAbstract
 			}
 			
 		}
+		
+		// Get team record
+		$select = $table->select();
+		$select->setIntegrityCheck(false);	
+			
+		$select->from(array('tg' => 'team_games'),
+					  array('tg.winOrLoss'))
+			   ->where('tg.teamID = ?', $teamID);
+			   
+		$results = $table->fetchAll($select);
+		
+		$recordArray = array('W' => array(),
+							 'L' => array(),
+							 'T' => array()
+							 );
+		
+		foreach ($results as $result) {
+			if ($result->winOrLoss !== NULL) {
+				$recordArray[$result->winOrLoss][] = true;
+			}
+		}
+		
+		$wins = count($recordArray['W']);
+		$losses = count($recordArray['L']);
+		$ties = count($recordArray['T']);
+		
+		$savingClass->wins = $wins;
+		$savingClass->losses = $losses;
+		$savingClass->ties = $ties;	
 		
 		return $savingClass;
 

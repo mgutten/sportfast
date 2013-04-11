@@ -5,6 +5,7 @@ var copyAvailability = new Array();
 var jcropAPI;
 var days = new Array('Su','M','T','W','Th','F','Sa');
 var oftenConversion = new Array('30','7','2','0');
+var failedCity;
 
 $(function()
 {
@@ -218,6 +219,10 @@ $(function()
 		
 		var isValid = $(this).isValid({number: true, minLength: 5, maxLength: 5});
 			
+		if (failedCity) {
+			// City was not found, failure
+			isValid = false;
+		}
 		
 		changeInputBackground($(this), isValid);
 		
@@ -579,8 +584,14 @@ function populateCity(city)
 	if (city.length > 150) {
 		// if city length seems to be error (long message), do not display
 		$('#signup-account-zipcode-city').text('Not found');
+	} else if (city.length == 0) {
+		// No city found
+		changeInputBackground($('#zipcode'), false);
+		failedCity = true;
+		$('#signup-account-zipcode-city').text('City not found');
 	} else {
 		var cityName = city[0]['city'] + ', ' + city[0]['state'];
+		failedCity = false;
 		$('#signup-account-zipcode-city').text(cityName);
 		
 	}
@@ -593,6 +604,29 @@ function setUserLocation()
 	var value = 'POINT(' + userLocation[0] + ' ' + userLocation[1] + ')';
 	$('#userLocation').val(value);
 }
+
+/**
+* function to fade out or hide overlay text for input
+* @params (inputEle => input type element
+*		   focusIn  => true/false if input is focusin or focusout)
+*/
+function fadeOutInputOverlay(inputEle, focusIn)
+{
+	var overlayEle = inputEle.next('.input-overlay');
+	var inputVal = $.trim(inputEle.val());
+	if (inputVal !== '') {
+		//inputEle.removeClass('input-fail'); same as global.js minus this line to prevent removal of red back for failed eles
+		overlayEle.hide();
+	} else {
+		overlayEle.show();
+		if (focusIn || inputEle.is(':focus')) {
+			overlayEle.animate({'opacity':'.4'},200);
+		} else {
+			overlayEle.animate({'opacity':'1'},200);
+		}
+	}
+}
+
 
 /**
  * form is being submitted, test all selected sports for completeness
@@ -757,18 +791,19 @@ function updateProfilePic(coords)
  */
 function testDrop(ele)
 {
-		var id = $.trim(ele.parents('.signup-section-container').find('.signup-section-title').text().toLowerCase()).replace(/ /g,'-');
+		var id = $.trim(ele.parents('.signup-section-container').find('.header-section-title').text().toLowerCase()).replace(/ /g,'-');
 		var narrowColumnEle = $('#narrow-column-' + id);
 		var hiddenEle	    = narrowColumnEle.find('.narrow-column-body');
+		
 		
 		if (hiddenEle.is('.animate-hidden-selected')) {
 			return;
 		}
-		
-
+	
 		if (hiddenEle.innerHeight() > 5) {
 			// Body of narrow column has values in it
-			narrowColumnEle.children('.narrow-column-header').trigger('click');
+			narrowColumnEle.find('.narrow-column-header').trigger('click');
+
 		}
 }
 

@@ -4,6 +4,7 @@ var dropdownClickDown = false;
 var fadeRunning 	  = false;
 var tooltipTimer;
 var tooltipEle 		  = null;
+var confirmAlertTimer;
 var sliderSkillValues = [];
 sliderSkillValues[0]  = {level:'Beginner',
 						description: 'I have rarely (if ever) played.'};
@@ -24,12 +25,14 @@ var notificationDropdown = false;
 var preloadImageArray    = new Array('/images/global/header/notification_shield_reverse.png');
 var gmapMarkers;
 var userLocation = new Array();
+var curDate = new Date();
 
 
 $(function()
 {
 	/* jquery plugin to limit value of input */
 	(function($) {
+		
 	  $.fn.limitVal = function(lower, upper) {
 		
 			if(this.val().length == 0) {
@@ -43,6 +46,27 @@ $(function()
 				this.val(lower)
 			}
 			return;
+	
+	  };
+	  
+	  /* force text box to only allow numbers */
+	   $.fn.forceNumeric = function() {
+		
+			return this.each(function()
+			{
+			$(this).keydown(function(e)
+				{
+				var key = e.charCode || e.keyCode || 0;
+				// allow backspace, tab, delete, arrows, numbers and keypad numbers ONLY
+				return (
+					key == 8 || 
+					key == 9 ||
+					key == 46 ||
+					(key >= 37 && key <= 40) ||
+					(key >= 48 && key <= 57) ||
+					(key >= 96 && key <= 105));
+			});
+		});
 	
 	  };
 
@@ -140,6 +164,7 @@ $(function()
 				dropdownMenu(dropdowns.dropdownMenuDown);
 			}
 		}
+		
 		dropdownMenu($(this).parent('.dropdown-menu-container'));
 		
 		
@@ -155,19 +180,74 @@ $(function()
 		
 	})
 	
-	$(document).on('mouseenter','.dropdown-menu-option-container',function()
-	{
-		$(this).animateDarker();
-	})
-	.on('mouseleave','.dropdown-menu-option-container',function()
-	{
-		$(this).animateLighter();
-	})
-	.on('click.swapValue','.dropdown-menu-option-container',function()
+	$(document).on('click.swapValue','.dropdown-menu-option-container',function()
 	{
 		//Option has been clicked
 		var value = $(this).children('p').text();
 		$(this).parents('.dropdown-menu-container').children('.dropdown-menu-selected').children('p').text(value);
+	})
+	
+	
+	/* animate darker background */
+	$(document).on('mouseenter','.animate-darker',function()
+	{
+		$(this).animateDarker();
+	})
+	.on('mouseleave','.animate-darker',function()
+	{
+		$(this).animateLighter();
+	})
+	
+	/* show rating percent on mouseover */
+	$(document).on('mouseenter','.user-sport-rating-other-outer', function()
+ 		{
+			$(this).find('.user-sport-rating-percent').show();
+		}
+	)
+	.on('mouseleave','.user-sport-rating-other-outer', function()
+		{
+			$(this).find('.user-sport-rating-percent').hide();
+		}
+	)
+	
+	/* schedule "in" and "out" button on click */
+	$('.schedule-in,.schedule-out').click(function(e)
+	{
+		e.preventDefault();
+		
+		if ($(this).is('.member-schedule-button-selected')) {
+			// Is already selected 
+			return;
+		}
+		
+		$(this).parent().children('.member-schedule-button-selected').removeClass('member-schedule-button-selected inner-shadow');
+		
+		$(this).addClass('member-schedule-button-selected inner-shadow');
+
+		var inOrOut = $(this).text().toLowerCase();
+		var type	= $(this).parent().attr('type');
+		var id		= $(this).parent().attr('typeID');
+		var insertOrUpdate = 'insert';
+		var teamID  = $(this).parent().attr('teamID');
+	
+		if (typeof $(this).parent().attr('existingID') !== 'undefined') {
+			// Row exists in db, update
+			insertOrUpdate = $(this).parent().attr('existingID');
+		}
+		
+		addUserToGame(inOrOut, type, id, insertOrUpdate, teamID);
+		
+		/*
+		var confirmed = $(this).parents('.schedule-container').find('.confirmed');
+		var confirmedNum = parseInt(confirmed.text(), 10);
+		if (inOrOut == 'in') {
+			// In clicked, add 1 to confirmed list
+			confirmedNum += 1;
+		} else {
+			confirmedNum -= 1;
+		}
+		confirmed.text(confirmedNum);
+		*/
 	})
 	
 	
@@ -236,6 +316,21 @@ $(function()
 		$(this).trigger('keyup');
 	});
 	
+	
+	/* Search function for "invite" button */
+	$('#inviteSearchBar').keyup(function()
+	{
+
+		if ($(this).val().length < 3) {
+			// Blank box (or too short), do not run check
+			$(this).parent().next('.dropdown-menu-option-results').hide();
+			$(this).parent().parent().children('.dropdown-menu-option-default').show();
+			$(this).parent().next('.dropdown-menu-option-default').show();
+			return;
+		}
+		searchDatabase($(this).val(), populateSearchResultsInvite);
+	})
+	
 	$('#city-change-reset').click(function()
 	{
 		setUserLocation('home');
@@ -265,8 +360,8 @@ $(function()
 	/* animate narrow-column sections onclick */
 	$('.narrow-column-header').click(function()
 	{
-		
 		var ele = $(this).siblings('.animate-hidden-container').children('.narrow-column-body');
+
 		var down = false;
 		if (ele.css('display') !== 'none') {
 			down = true;
@@ -392,6 +487,7 @@ $(function()
 		var optionalID = '';
 		
 		notificationConfirmDeny(notificationLogID, confirmOrDeny, type, optionalID);
+		showConfirmationAlert('"' + $(this).text() + '" processed');
 	})
 	
 	/* cannot nest anchor tags, force redirect of notification-container.click (could now be changed to simple a tag) */
@@ -402,9 +498,9 @@ $(function()
 		}
 	})
 	
-	$('.notification-container.light-green-back').mouseenter(function()
+	$('.notification-container.light-back').mouseleave(function()
 	{
-		$(this).removeClass('light-green-back');
+		$(this).removeClass('light-back');
 	});
 	
 	/* preload any images that require preloading */
@@ -429,24 +525,35 @@ $(function()
 	
 	
 	/* animate opaque text lighter */
-	$('.animate-opacity').hover(function()
+	$('.animate-opacity').bind('mouseenter.animateOpacity',function()
 	{
+		if ($(this).is('.clicked')) {
+			// Has clicked class, do nothing
+			return false;
+		}
+		
 		if (!$(this).attr('opacity')) {
 			// Opacity attribute has not been set before, set it
 			$(this).attr('opacity', $(this).css('opacity'));
 		}
 		
 		$(this).stop().animate({opacity: 1}, 200);
-	},
-	function()
+	})
+	.bind('mouseleave.animateOpacity',function()
 	{
+		if ($(this).is('.clicked')) {
+			// Has clicked class, do nothing
+			$(this).trigger('mouseleave.tooltip');
+			return false;
+		}
+		
 		var originalOpacity = $(this).attr('opacity');
 		$(this).stop().animate({opacity: originalOpacity}, 200);
 	})
 	
 	
 	/* fade input text on focusin and focusout */
-	$('input[type=text],input[type=password]').focusin(function()
+	$('input[type=text],input[type=password],textarea').focusin(function()
 	{
 		$(this).parents('.nav-dropdown').trigger('mouseover');
 		fadeOutInputOverlay($(this), true);
@@ -455,6 +562,7 @@ $(function()
 		if($(this).parents('.input-container').attr('tooltip')) {
 			startTooltipTimer($(this).parents('.input-container'));
 		}
+		
 		
 	})
 	.keyup(function()
@@ -502,46 +610,94 @@ $(function()
 	
 	/* change color of selectable text */
 	$('.selectable-text').click(function() {
+		if ($(this).is('.selectable-text-one')) {
+			// Only one can be chosen at a time
+			$(this).siblings('.green-bold').removeClass('green-bold')
+		}
 		$(this).toggleClass('green-bold');
-	})	
+	})
+	
+	/* change calendar to new month */
+	$('#calendar-right-arrow,#calendar-left-arrow').click(function()
+	{
+		var curMonthEle = $(this).parents('.calendar-container');
+		var newMonthEle;
+		var curMonth = parseInt(curMonthEle.find('.calendar-month-name').attr('monthID'),10);
+		var newMonth;
+		
+		if ($(this).is('#calendar-right-arrow')) {
+			// Right arrow, move forward in time
+			newMonth = (curMonth + 1 > 12 ? 1 : curMonth + 1);
+			newMonthEle = curMonthEle.siblings('#calendar-container-' + newMonth)
+			
+			if (newMonthEle.length < 1) {
+				// Does not exist
+				return false;
+			}
+			
+			if (newMonth > (curDate.getMonth() + 1)) {
+				// Show arrows if currently in past month and move to current month 
+				newMonthEle.find('#calendar-right-arrow').hide();
+			} else {
+				newMonthEle.find('#calendar-right-arrow').show();
+			}
+			
+		} else {
+			// Left arrow
+			newMonth = (curMonth - 1 < 1 ? 12 : curMonth - 1);
+			newMonthEle = curMonthEle.siblings('#calendar-container-' + newMonth)
+			
+			if (newMonthEle.length < 1) {
+				// Does not exist
+				return false;
+			}
+			
+			if (newMonth < (curDate.getMonth() + 1)) {
+				// Show arrows if currently in past month and move to current month 
+				newMonthEle.find('#calendar-left-arrow').hide();
+			} else {
+				newMonthEle.find('#calendar-left-arrow').show();
+			}
+		}
+		
+		curMonthEle.hide();
+		newMonthEle.show();
+		
+	})
 	
 	
 	/* set behavior for all alert boxes (close them onclick) */
-	$('.alert-black-back,.alert-x').click(function()
+	$('.alert-black-back,.alert-x').bind('click.default',function()
 	{
 		$('.alert-container').hide();
 		$('.alert').animate({'opacity':0},{duration: 200, complete: function() {
 																		$('.alert').hide()
-																				   .css('opacity',1)
+																				   .css('opacity',1);
+																		$('.alert-black-back').css('opacity',.85);
 																	}
 		})
 	})
 	
 	/* test all elements for tooltip onhover */
-	$('*').bind('mouseenter.tooltip',function()
+	$(document).on('mouseenter.tooltip','*',function()
 	{
-		
-		if($(this).parents('.input-container').attr('tooltip')) {
-			return;
+		if(!$(this).parents('.input-container').attr('tooltip')) {
+			if ($(this).attr('tooltip')) {
+				var ele = $(this);
+				startTooltipTimer(ele);
+			}
 		}
-		
-		
+	}).on('mouseleave.tooltip','*', function()
+	{
 		if ($(this).attr('tooltip')) {
-			var ele = $(this);
-			startTooltipTimer(ele);
+					
+			endTooltipTimer();
+			
+			$('#tooltip').stop().animate({opacity:0},{duration:50, complete: function() {
+																					$(this).hide()
+																			}
+										});
 		}
-	}).bind('mouseleave.tooltip', function()
-	{
-		if(tooltipEle.is('.input-container')) {
-			return;
-		}
-		
-		endTooltipTimer();
-		
-		$('#tooltip').stop().animate({opacity:0},{duration:50, complete: function() {
-																				$(this).hide()
-																		}
-									});
 		
 	});	
 	
@@ -577,6 +733,11 @@ $(function()
 		
 		if (dropdowns.dropdownMenuDown) {
 			// Dropdown menu is down
+			if ($(e.target).parents('.dropdown-menu-options-container').length > 0 || 
+				$(e.target).is('.dropdown-menu-options-container')) {
+					// Clicked on search bar for dropdown-menu
+					return;
+				}
 			dropdowns.dropdownMenuDown.children('.dropdown-menu-selected').removeClass('dropdown-menu-container-reverse');
 			dropdowns.dropdownMenuDown.children('.dropdown-menu-selected').children('p').removeClass('dropdown-menu-container-reverse-text');
 
@@ -587,12 +748,105 @@ $(function()
 			// Hide results container for search
 			$('#header-search-results-container').hide();
 		}
-		
-		
-
 	});
+	
+	
 		
 })
+
+
+/**
+ * Ajax call to change team/group's name
+ * @params(name	  => userid of new captain,
+ *		   idType => "teamID" or "groupID",
+ *		   typeID => actual teamID or groupID,
+ *		   actingUserID => who did it)
+ */
+
+function changeTypeName(name, idType, typeID, actingUserID)
+{
+	var options = new Object();
+	options.name = name;
+	options.idType = idType;
+	options.typeID = typeID;
+	
+	$.ajax({
+		url: '/ajax/change-type-name',
+		type: 'POST',
+		data: {options: options},
+		success: function(data) {
+			createNotification(idType, typeID, actingUserID, '', 'edit', getType(idType), 'name');
+		}
+	})
+}
+
+/**
+ * Ajax call to change team/group's captain
+ * @params(userID => userid of new captain,
+ *		   idType => "teamID" or "groupID",
+ *		   typeID => actual teamID or groupID)
+ */
+function changeCaptain(userID, idType, typeID) {
+	var options = new Object();
+	options.userID = userID;
+	options.idType = idType;
+	options.typeID = typeID;
+
+	$.ajax({
+		url: '/ajax/change-captain',
+		type: 'POST',
+		data: {options: options},
+		success: function() {
+			createNotification(idType, typeID, userID, userID, 'become', getType(idType), 'captain');
+		}
+	})
+}
+
+
+/**
+ * Ajax call to remove player from a team or group
+ * @params(userID		  => id of user to remove,
+ *		   idType		  => "teamID" or "groupID",
+ *		   typeID		  => actual teamID or groupID)
+ */
+function removeUserFromType(userID, idType, typeID) {
+	
+	var options = new Object();
+	options.userID = userID;
+	options.idType = idType;
+	options.typeID = typeID;
+	
+	$.ajax({
+		url: '/ajax/remove-user-from-type',
+		type: 'POST',
+		data: {options: options},
+		success: function(data) {
+		}
+	})
+}
+
+/**
+ * Ajax call to confirm or not confirm user attendance to team game or pickup game
+ * @params(inOrOut 		  => "in" or "out",
+ *		   type			  => "teamGame" or "pickupGame",
+ *		   id			  => id or teamGame or pickupGame
+ *		   insertOrUpdate => "insert" or id of already existing row
+ *		   teamID		  => teamID or blank)
+ */
+function addUserToGame(inOrOut, type, id, insertOrUpdate, teamID)
+{
+
+	$.ajax({
+		url: '/ajax/confirm-user',
+		type: 'POST',
+		data: {inOrOut: inOrOut,
+			   type: type, 
+			   id: id, 
+			   insertOrUpdate: insertOrUpdate,
+			   teamID: teamID}
+	})
+}
+	
 
 /**
  * Ajax call to confirm (eg add as friends) or deny (delete) specific notification
@@ -609,7 +863,41 @@ function notificationConfirmDeny(notificationLogID, confirmOrDeny, type, optiona
 		data: {notificationLogID: notificationLogID,
 			   confirmOrDeny: confirmOrDeny,
 			   type: type,
-			   optionalID: optionalID}
+			   optionalID: optionalID},
+		success: function(data) {
+			
+		}
+	})
+}
+
+
+/**
+ * Create notification based on given parameters
+ * @params (idType => what is typeID referring to? (teamID, groupID, userID, gameID, etc),
+ *			typeID => id of group, team, user, etc that is being acted upon,
+ *			actingUserID => id of user who acted,
+ *			receivingUserID => id of user who is receiving action,
+ *			action => action being performed (from notifications table),
+ *			type => type being acted upon (from notifications table),
+ *			details => details of notification (from notifications table))
+ */
+function createNotification(idType, typeID, actingUserID, receivingUserID, action, type, details)
+{
+	var options = new Object();
+	options.idType = idType;
+	options.typeID = typeID;
+	options.actingUserID = actingUserID;
+	options.receivingUserID = (typeof receivingUserID == 'undefined' ? '' : receivingUserID);
+	options.action = (typeof action == 'undefined' ? '' : action);
+	options.type = (typeof type == 'undefined' ? '' : type);
+	options.details = (typeof details == 'undefined' ? '' : details);
+	
+	$.ajax({
+		url: '/ajax/create-notification',
+		type: 'POST',
+		data: {options: options},
+		success: function(data) {
+		}
 	})
 }
 
@@ -681,19 +969,16 @@ function dropdownMenu(dropdownEle)
 {
 	
 		var dropdown = dropdownEle;
+		var hiddenID = dropdownEle.attr('dropdown-id');
 		var selected = dropdown.children('.dropdown-menu-selected');
-		var holder   = dropdown.prev('.dropdown-menu-holder');
-		var options  = dropdown.children('.dropdown-menu-hidden-container');
+		var options  = dropdown.next('#' + hiddenID);
 		
 		if (dropdowns.dropdownMenuDown) {
 			if (dropdowns.dropdownMenuDown.attr('id') == dropdown.attr('id')) {
 				// Dropdown is already down
 				options.animate({opacity: 0}, {duration: 200, complete: function() {
 																			options.hide();
-																			dropdown.css({position: 'static',
-																						  top     : 0,
-																						  left    : 0});
-																			holder.hide()
+
 																			}
 											  }
 								);
@@ -702,17 +987,13 @@ function dropdownMenu(dropdownEle)
 				return;
 			}
 		}
-			
-		dropdown.css({top: 		selected.position().top,
-					  left: 	selected.position().left,
-					  position: 'absolute'});
-					  					  
-					  
-		holder.css({width:  dropdown.outerWidth(true),
-					height: selected.outerHeight(true)})
-			  .show();
-			  
-		options.css('display', 'block')
+		
+		
+		alignDropdown(options, selected, 'right');
+		
+		var top = selected.position().top + selected.innerHeight()
+		options.css({top: top,
+					 display: 'block'})
 			   .animate({opacity: 1}, 200);
 			      
 		
@@ -791,7 +1072,7 @@ function populateSearchResults(results)
 	
 		for (i = 0; i < results.length; i++) {
 			
-			if (i >= 2) {
+			if (i >= 4) {
 				// Limit to 5 results, display more results afterwards
 				output += "<a href='/find/search/" + encodeURIComponent(searchVal).replace(/%20/g, '+').toLowerCase() + "' class='header-search-result dark-back medium pointer'>" + (results.length - i) + " more results</a>";
 				break;
@@ -823,6 +1104,61 @@ function populateSearchResults(results)
 	$('.header-search-result').highlight(searchVal);
 	
 }
+
+/**
+ * populate invite button's search results
+ * @params (results => returned results from ajax)
+ */
+function populateSearchResultsInvite(results) 
+{
+	var output = '';
+	
+	if (results.length < 1) {
+		// No results
+		output += "<div class='header-search-result dark-back medium'>No results found</div>";
+	} else {
+		// Results found
+	
+		for (i = 0; i < results.length; i++) {
+			
+			var tooltip = '';
+			if (results[i]['name'].length > 22) {
+				// Limit any name to 20 characters
+				tooltip = "tooltip='" + results[i]['name'] + "'";
+				results[i]['name'] = results[i]['name'].substring(0,21) + '..';
+				
+			}
+			
+			output += "<div class='invite-search-result clear medium pointer animate-darker' >\
+							<p class='medium clear invite-search-result-name' " + tooltip + ">" + results[i]['name'] + "</p>";
+			
+			if (results[i]['prefix'] !== 'users') {
+				// Not users, show what "type" result is
+				output += "<p class='clear-right medium smaller-text header-search-result-subtext'>" + capitalize(results[i]['prefix'].slice(0,-1)) + "</p>";
+			}
+			
+			output += "</div>";
+						
+
+		}
+	}
+	
+	$('.dropdown-menu-option-default').hide();
+	
+	$('#dropdown-menu-option-results-invite').html(output);
+	
+	if ($('#inviteSearchBar').is(':focus') && $('#inviteSearchBar').val().length >= 3) {
+		// Search bar has focus and val is greater than 2 (protect against accidently overfire due to ajax delay
+		$('#dropdown-menu-option-results-invite') .show();
+	}
+	
+	
+	var searchBar = $('#inviteSearchBar');
+	var searchVal = searchBar.val();
+	$('.invite-search-result').highlight(searchVal);
+	
+}
+
 
 
 /**
@@ -860,8 +1196,9 @@ function toggleGreenBackground(ele, removeOld)
 */
 function animateNotShow(ele, down, fadeIn)
 {
-	
-var height = ele.outerHeight();
+
+	var height = ele.outerHeight();
+
 	if (down) {	
 		// Hidden element is down, animate it up
 		ele.stop().animate({marginTop: -height}, {duration:400, complete: function() {
@@ -869,19 +1206,22 @@ var height = ele.outerHeight();
 																			}
 		});
 	} else {
+		
 		// Hidden element is up, animate it down
 		ele.css({marginTop: -height + 'px',
 				 opacity: 0})
-		   .show();
-		
+
 		if (!fadeIn) {
 			// Do not fade in
-			ele.stop().css('opacity', 1)
+			ele.stop().css({'opacity': 1,
+							'display': 'block'})
 					  .animate({marginTop: 0}, 400);
+			
 		} else {
 			// Fade in after animation is complete
 			ele.stop().animate({marginTop: 0}, {duration:400, complete: function() {
-																			$(this).animate({opacity: 1}, 400)
+				
+																			$(this).animate({opacity: 1}, {duration:400})
 																		}
 			});
 		}
@@ -955,6 +1295,7 @@ function fadeOutInputOverlay(inputEle, focusIn)
 	var overlayEle = inputEle.next('.input-overlay');
 	var inputVal = $.trim(inputEle.val());
 	if (inputVal !== '') {
+		inputEle.removeClass('input-fail'); // remove if problems exist in signup.js
 		overlayEle.hide();
 	} else {
 		overlayEle.show();
@@ -1046,12 +1387,19 @@ function alignDropdownContainer(ele)
  * align any dropdown to alignEle on left, center, or right
  * @params (alignEle  => element to align to,
  *			moveEle   => element to align,
- *			alignment => how to align (center, right, left)
+ *			alignment => how to align (center, right, left),
+ *			clickableDropdown => is this a clickable dropdown? boolean)
  */
- function alignDropdown(moveEle, alignEle, alignment)
+ function alignDropdown(moveEle, alignEle, alignment, clickableDropdown)
  {
+
 	 var alignedWidth = alignEle.outerWidth(true);
-	 var alignedPos   = alignEle.offset().left;
+	 
+	 
+	 var alignedPos = alignEle.offset().left;
+	 if (moveEle.is('.dropdown-menu-hidden-container') || moveEle.css('position') !== 'absolute') {
+		 alignedPos = alignEle.position().left;
+	 }
 	
 	 var windowWidth  = $(window).width();
 	 var bodyWidth    = $('.centered-body').width();
@@ -1061,8 +1409,10 @@ function alignDropdownContainer(ele)
 	 var left = alignedPos;
 	
 	 if (alignment == 'right') {
-		 left -= alignedWidth;
+		 var widthDiff = moveEle.outerWidth(true) - alignedWidth;
+		 left -= widthDiff;
 	 } else if (alignment == 'center') {
+		 left   = alignEle.offset().left;
 		 var moveWidth = moveEle.width();
 		 left -= moveWidth/2;
 	 }
@@ -1153,7 +1503,7 @@ function showTooltip(ele)
 	var top   = ele.offset().top + ele.innerHeight() + 3;
 	var left  = ele.offset().left;
 	
-	$('#tooltip-body').html(value);
+	$('#tooltip').find('#tooltip-body').html(value);
 	
 	var tooltipWidth = $('#tooltip').innerWidth();
 	var endOfBody    = $('#body-white-back').innerWidth() + $('#body-white-back').offset().left;
@@ -1233,14 +1583,46 @@ function getCoordinatesFromAddress(address, callbackSuccess, callbackFailure)
 		}
 			
 	   });
-	   		   
-				
-		   
+}
 
+/**
+ * populate confirmation alert (are you sure you want to "")
+ */
+function populateConfirmActionAlert(str)
+{
+	$('#confirm-action-text').text(str);
 }
 
 
-
+/**
+ * set and show confirm-alert value with str
+ */
+function showConfirmationAlert(str) 
+{
+	$('#confirm-alert').text(str)
+					   .css({display: 'block',
+							 opacity: 0})
+					   .stop().animate({opacity: 1}, {duration: 300, complete: function() {
+						   														confirmAlertTimer = setTimeout(function() {
+																										animateHidden($('#confirm-alert'));
+																											
+																										}, 1500)
+					  															 }
+					   })
+}
+						   														
+							 
+	
+/**
+ * animate opacity down and then hide ele
+ */
+function animateHidden(ele)
+{
+	ele.stop().animate({opacity: 0},{duration: 300, complete: function() {
+														   ele.hide();
+														}
+				})
+}
 /** capitalize first letter of text
  * @params(text => text to capitalize)
  */
@@ -1252,6 +1634,15 @@ function capitalize(text)
 																}
 					  		  );
 		  return text;
+}
+
+
+/**
+ * get type of page (team, group, game) from idType (teamID, gameID)
+ */
+function getType(idType)
+{
+	return idType.replace(/ID/, '');
 }
 
 

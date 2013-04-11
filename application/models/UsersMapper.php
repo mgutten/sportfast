@@ -9,9 +9,7 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 		$table   = $this->getDbTable();
 		$select  = $table->select();
 		$select->setIntegrityCheck(false);
-		/*$select->where($column . ' = ' . '?', $value)
-			   ->limit(1);
-			   */
+		
 		$select->from(array('u' => 'users'))
                ->join(array('c' => 'cities'),
                       'u.cityID = c.cityID')
@@ -19,6 +17,7 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 			   		  'ul.userID = u.userID',
 					   array('AsText(location) as location'))
 			   ->where($column . ' = ?', $value)
+			   ->where('u.active = ?', 1)
 			   ->limit(1);   
 		
 		$results = $table->fetchAll($select);
@@ -58,7 +57,7 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 	/**
      * Find all events that user is scheduled for
      *
-     * @params ($savingClass => where to save)
+     * @params ($savingClass => user class)
      */
 	public function getUserGames($savingClass)
 	{
@@ -77,10 +76,38 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 			   ->where('g.date > CURDATE()')
 			   ->group('ug.gameID');
 		
+		
 		$results = $table->fetchAll($select);
 		
+		
 		foreach ($results as $result) {
-			$savingClass->games->addGame($result, true);
+			//$savingClass->games->addGame($result, $byDay); true = by day
+			$savingClass->games->addGame($result);
+		}
+		
+		// Get team games also
+		$select  = $table->select();
+		
+		$select->setIntegrityCheck(false);
+		$select->from(array('ut' => 'user_teams'))
+			   ->join(array('tg' => 'team_games'),
+			   		  'ut.teamID = tg.teamID')
+			   ->join(array('ll' => 'league_locations'),
+			   		  'll.leagueLocationID = tg.leagueLocationID')
+			   ->joinLeft(array('utg' => 'user_team_games'),
+			   		  'utg.teamGameID = tg.teamGameID',
+					  array('(SELECT COUNT(utg2.userID) FROM user_team_games as utg2 WHERE utg2.teamID = ut.teamID AND utg2.confirmed = 1 AND utg2.teamGameID = tg.teamGameID) as confirmedPlayers',
+					  		'utg.confirmed as confirmed'))
+			   ->where('ut.userID = ?', $savingClass->userID)
+			   //->where('utg.userID = ?' ,  $savingClass->userID)
+			   ->where('tg.date > CURDATE()')
+			   ->group('tg.teamGameID');
+		
+		$results = $table->fetchAll($select);
+		
+		
+		foreach ($results as $result) {
+			$savingClass->games->addGame($result);
 		}
 
 		return $savingClass;
@@ -418,7 +445,7 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 		
 		if ($success) {
 			// One of $names had a value
-			$select .= ") AND n.action != 'create')";
+			$select .= ") AND (n.action != 'create' AND nl.receivingUserID IS NULL AND nl.actingUserID != " . $userID . "))";
 		} 
 		
 		$select .= ") ";
@@ -426,19 +453,17 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 		
 		if ($onlyNew) {
 			// Select only notifications since last read
-			$select .= "AND nl.dateHappened > '" . $lastRead . "' ";
+			$select .= " AND nl.dateHappened > '" . $lastRead . "' ";
 		} else {
 			// Select old notifications
-			$select .= "AND nl.dateHappened <= '" . $lastRead . "' ";
+			$select .= " AND nl.dateHappened <= '" . $lastRead . "' ";
 		}
 		
-		$select .= "ORDER BY nl.dateHappened DESC";
+		$select .= " ORDER BY nl.dateHappened DESC";
 		
 		if (!$onlyNew) {
 			$select .= " LIMIT 10";
 		}
-		
-		
 		
 		$results = $db->fetchAll($select);
 
@@ -514,12 +539,13 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 	
 	/**
      * Reset user class to home location
-     * @params ($savingClass => where to save)
+     * @params ($savingClass => user class)
      */
 	public function resetHomeLocation($savingClass)
 	{
 		$table   = $this->getDbTable();
 		$select  = $table->select();
+		$userID  = $savingClass->userID;
 		
 		$select->setIntegrityCheck(false);
 		$select->from(array('ul'  => 'user_locations'),
@@ -528,6 +554,7 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 			   		  'u.userID = ul.userID')
 			    ->join(array('c' => 'cities'),
 			   		  'c.cityID = u.cityID')
+				->where('u.userID = ?', $userID)
 				->limit(1);
 		
 		$result = $table->fetchRow($select);

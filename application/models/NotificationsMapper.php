@@ -132,6 +132,20 @@ class Application_Model_NotificationsMapper extends Application_Model_MapperAbst
 								 NOW()
 						 	FROM notification_log as `nl`
 							WHERE nl.notificationLogID = '" . $notificationLogID . "')";
+		 } elseif ($type == 'team') {
+			 $query = "INSERT INTO user_teams (teamID, userID)
+			 			(SELECT nl.teamID,
+								nl.actingUserID
+							FROM notification_log as `nl`
+							WHERE nl.notificationLogID = '" . $notificationLogID . "')";
+			
+			 $query2 = "INSERT INTO notification_log (actingUserID, teamID, notificationID, dateHappened)
+			 			 (SELECT nl.actingUserID, 
+						 		 nl.teamID, 
+								 (SELECT notificationID FROM notifications WHERE type ='team' AND action = 'join' AND details IS NULL), 
+								 NOW()
+						 	FROM notification_log as `nl`
+							WHERE nl.notificationLogID = '" . $notificationLogID . "')";
 		 }
 		 
 		 
@@ -141,7 +155,58 @@ class Application_Model_NotificationsMapper extends Application_Model_MapperAbst
 		 $db->query($query2);
 		 
 	 }
+	 
+	 /**
+	  * add notification to notification_log
+	  * @params ($notificationDetails => array of details to identify what notification was done (eg action, type, details),
+	  *			 $data				  => array of data to be stored in notification_log)
+	  */
+	 public function addNotification($notificationDetails, $data)
+	 {
+		 $this->setDbTable($this->_dbTableClass); // reset table in case has been reset with "getForeignID" as in AjaxController createNotification
+		 $table = $this->getDbTable();
+		 
+		 $select = $table->select();
+		 
+		 $select->setIntegrityCheck(false);
+		 $select->from(array('nl' => 'notification_log'))
+		 		->join(array('n' => 'notifications'),
+					   'n.notificationID = nl.notificationID');
+				   
+		 foreach ($notificationDetails as $key => $val) {
+			 if (empty($val)) {
+				 $select->where('n.' . $key . ' IS NULL');
+			 } else {
+				 $select->where('n.' . $key . ' = ?', $val);
+			 }
+		 }
+		 
+		 foreach ($data as $key => $val) {
+			 if (empty($val)) {
+				 $select->where('nl.' . $key . ' IS NULL');
+				 $data[$key] = new Zend_Db_Expr('NULL');
+			 } else {
+				 $select->where('nl.' . $key . ' = ?', $val);
+			 }
+		 }
+		 
+		$select->where('nl.dateHappened >= (NOW() - INTERVAL 3 HOUR)');
 
 		
-	
+		$results = $table->fetchAll($select);
+
+		if (count($results) > 0) {
+			// A similar notification was added very recently
+			return false;
+		}
+		 
+		 
+		 $data['dateHappened']	 = new Zend_Db_Expr('NOW()');
+		 $data['notificationID'] = $this->getForeignID('Application_Model_DbTable_Notifications', 'notificationID', $notificationDetails);
+		 
+		 $table->insert($data);
+		 
+		 
+	 }
+
 }
