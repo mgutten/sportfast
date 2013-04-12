@@ -7,10 +7,12 @@ class Application_Model_Game extends Application_Model_ModelAbstract
 	protected $_attribs     = array('gameID' 	    => '',
 									'teamGameID'	=> '',
 									'park' 			=> '',
+									'parkID'		=> '',
 									'public'		=> '',
 									'sport'			=> '',
 									'sportID' 		=> '',
 									'rosterLimit' 	=> '',
+									'minPlayers'	=> '',
 									'maxSkill'  	=> '',
 									'minSkill'		=> '',
 									'maxAge'    	=> '',
@@ -33,7 +35,9 @@ class Application_Model_Game extends Application_Model_ModelAbstract
 									'winOrLoss'		=> '',
 									'gameDate'		=> '',
 									'teamID'		=> '',
-									'leagueLocationID'	=> ''
+									'leagueLocationID'	=> '',
+									'players'		=> '',
+									'type'			=> ''
 									);
 									
 	protected $_primaryKey = 'gameID';
@@ -49,7 +53,40 @@ class Application_Model_Game extends Application_Model_ModelAbstract
 				
 	}
 	
+	public function getProfilePic($size, $id = false, $type = false)
+	{
+		if ($this->_primaryKey == 'gameID') {
+			// Is pickup game
+			$type = 'parks';
+			$id = $this->parkID;
+		} else {
+			// Is team game
+			$type = 'teams';
+			$id = $this->teamID;
+		}
+		
+		return parent::getProfilePic($size, $id, $type);
+	}
 	
+	public function getAverage($rating)
+	{
+		$finalRating = 0;
+		$totalCount  = 0;
+		if (!$this->hasValue('players')) {
+			// There are no players
+			return $finalRating;
+		}
+		
+		$sport = $this->sport;
+		foreach ($this->players->users as $player) {
+			$finalRating += $player->getSport($sport)->$rating;
+			$totalCount++;
+		}
+		
+		return floor($finalRating/$totalCount);
+	}
+
+
 	public function setPrimaryKey($key)
 	{
 		if ($key == 'teamGameID') {
@@ -57,6 +94,11 @@ class Application_Model_Game extends Application_Model_ModelAbstract
 			$this->setDbTable('Application_Model_DbTable_TeamGames');
 		}
 		return $this;
+	}
+	
+	public function getGameByID($gameID)
+	{
+		return $this->getMapper()->getGameByID($gameID, $this);
 	}
 	
 	public function searchDbForLeagueLocation($locationName = false, $address = false, $cityID = false)
@@ -69,6 +111,25 @@ class Application_Model_Game extends Application_Model_ModelAbstract
 		return $this->getMapper()->updateLeagueLocation($locationID, $data);
 	}
 	
+	public function getType()
+	{
+		if (!$this->hasValue('type')) {
+			$this->_attribs['type'] = new Application_Model_SportType();
+		}
+		
+		return $this->_attribs['type'];
+	}
+
+	public function getPlayers()
+	{
+		if (!$this->hasValue('players')) {
+			$this->_attribs['players'] = new Application_Model_Users();
+		}
+		
+		return $this->_attribs['players'];
+	}
+
+	
 	public function getPark()
 	{
 		if (empty($this->_attribs['park'])) {
@@ -77,6 +138,15 @@ class Application_Model_Game extends Application_Model_ModelAbstract
 			$this->_attribs['park'];
 		}
 		return $this->_attribs['park'];
+	}
+	
+	public function getGameTitle()
+	{
+		$gameTitle = $this->type->typeName . ' ' . $this->sport;
+		if ($this->type->hasValue('typeSuffix')) {
+			$gameTitle .= ' <span class="game-title-suffix">' . $this->type->typeSuffix . '</span>';
+		}
+		return $gameTitle;
 	}
 	
 	public function getLimitedParkName($limit) {
@@ -213,6 +283,19 @@ class Application_Model_Game extends Application_Model_ModelAbstract
 		}
 	}
 	
+	public function getPlayersNeeded()
+	{
+		$difference = $this->minPlayers - $this->totalPlayers;
+		
+		if ($difference == 1) {
+			return $difference . ' player';
+		} elseif ($difference <= 0) {
+			return false;
+		} else {
+			return $difference . ' players';
+		}
+	}
+	
 	public function getShortDate()
 	{
 		return $this->gameDate->format('M j');
@@ -271,6 +354,17 @@ class Application_Model_Game extends Application_Model_ModelAbstract
 		return $count;
 	}
 	
+	/**
+	 * add player to players list
+	 */
+	public function addPlayer($resultRow)
+	{
+		$players = $this->getPlayers();
+		return $players->addUser($resultRow);
+		
+	}
+
+	
 	public function addConfirmedPlayer($userID)
 	{
 		if (!is_array($this->_attribs['confirmedPlayers'])) {
@@ -323,4 +417,16 @@ class Application_Model_Game extends Application_Model_ModelAbstract
 		
 		return $this;
 	}
+	
+	/**
+	 * get correct type name for sport (ie basketball GAME, football GAME, tennis MATCH
+	 
+	public function getTypeName()
+	{
+		if ($this->sport == 'Tennis') {
+			return 'Match';
+		} else {
+			return 'Game';
+		}
+	}*/
 }

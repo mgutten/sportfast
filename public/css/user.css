@@ -12,6 +12,9 @@
 	line-height: 1.1em;
 }
 
+#user-message {
+	width: 5em;
+}
 
 /* sports section */
 #user-sports-container {

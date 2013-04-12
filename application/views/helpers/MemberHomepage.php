@@ -27,7 +27,7 @@ class Application_View_Helper_MemberHomepage
 				echo $this->buildUserRatings();
 			echo $this->_view->narrowcolumnsection()->end();
 			
-			$sections = array('my teams', 'my groups');
+			$sections = array('my teams');
 			echo $this->_view->narrowteamsection($user, $sections);
 			
 			/*$this->_view->narrowcolumnsection()->start(array('title' => 'My Teams'));

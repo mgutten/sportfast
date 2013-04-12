@@ -161,6 +161,19 @@ $(function()
 		changeInputBackground($(this), isValid);
 	});
 	
+	/* show important tooltip for email */
+	$('#email').focus(function()
+	{
+		$('#tooltip').children('#tooltip-body').html('<span class="heavy darkest">This email will be used to notify you of upcoming games.</span>');
+		startTooltipTimer($(this));
+	});
+	
+	$('#email').blur(function()
+	{
+		endTooltipTimer();
+		$('#tooltip').hide();
+	})
+	
 	
 	/* validate signup password and reenter password */
 	$('#signupPassword,#signupReenterPassword').keyup(function()

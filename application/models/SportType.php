@@ -27,4 +27,15 @@ class Application_Model_SportType extends Application_Model_ModelAbstract
 
 		parent::save($this);
 	}
+	
+	public function getTypeName()
+	{
+		return ucwords($this->_attribs['typeName']);
+	}
+	
+	public function getTypeSuffix()
+	{
+		return ucwords($this->_attribs['typeSuffix']);
+	}
+	
 }

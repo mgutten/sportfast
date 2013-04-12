@@ -235,7 +235,7 @@ $(function()
 			insertOrUpdate = $(this).parent().attr('existingID');
 		}
 		
-		addUserToGame(inOrOut, type, id, insertOrUpdate, teamID);
+		confirmUserToGame(inOrOut, type, id, insertOrUpdate, teamID);
 		
 		/*
 		var confirmed = $(this).parents('.schedule-container').find('.confirmed');
@@ -826,6 +826,33 @@ function removeUserFromType(userID, idType, typeID) {
 }
 
 /**
+ * Ajax call to add user to a game
+ * @params(typeID => id of game,
+ *		   idType => "teamGameID" or "gameID"
+ *		   userID => userID)
+ */
+function addUserToGame(idType, typeID, userID)
+{
+	var options = new Object();
+	options.idType = idType;
+	options.typeID = typeID;
+	options.userID = userID;
+	
+	$.ajax({
+		url: '/ajax/add-user-to-game',
+		type: 'POST',
+		data: {options: options},
+		success: function(data) {
+			var action = 'join';
+			var type   = 'game';
+			var details;
+			createNotification(idType, typeID, userID, '', action, type, details);
+			reloadPage();
+		}
+	})
+}
+
+/**
  * Ajax call to confirm or not confirm user attendance to team game or pickup game
  * @params(inOrOut 		  => "in" or "out",
  *		   type			  => "teamGame" or "pickupGame",
@@ -833,7 +860,7 @@ function removeUserFromType(userID, idType, typeID) {
  *		   insertOrUpdate => "insert" or id of already existing row
  *		   teamID		  => teamID or blank)
  */
-function addUserToGame(inOrOut, type, id, insertOrUpdate, teamID)
+function confirmUserToGame(inOrOut, type, id, insertOrUpdate, teamID)
 {
 
 	$.ajax({
@@ -1751,4 +1778,14 @@ function clearMarkers() {
     markers = new Array();
 };
 	
+
+/**
+ * reload page after settimeout delay to allow ajax to complete
+ */
+function reloadPage()
+{
+	setTimeout(function() {
+				location.reload();
+	}, 400);
+}
 

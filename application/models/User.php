@@ -63,7 +63,7 @@ class Application_Model_User extends Application_Model_ModelAbstract
 		
 		$this->getUserTeams();
 		$this->getUserFriends();
-		$this->getUserGroups();
+		//$this->getUserGroups();
 		$this->getUserGames();
 		return $this;
 	}

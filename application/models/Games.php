@@ -18,6 +18,17 @@ class Application_Model_Games extends Application_Model_ModelAbstract
 	 */
 	public function addGame($resultRow, $byDay = false)
 	{
+		if (is_object($resultRow) && !($resultRow instanceof Zend_Db_Table_Row)) {
+			// Directly adding already retrieved game
+			if ($game = $this->gameExists($resultRow->gameID, 'gameID')) {
+				return $game;
+			} else {
+				$game = $this->_attribs['games'][] = $resultRow;
+			}
+			
+			return $game;
+		}
+		
 		if (!is_array($resultRow)) {
 			$resultRow = $resultRow->toArray();
 		}
@@ -69,10 +80,8 @@ class Application_Model_Games extends Application_Model_ModelAbstract
 						return $innerGame;
 					}
 				}
-			} else {
-				if ($this->testGameExists($game, $id, $typeOfID)) {
-					return $game;
-				}
+			} else if ($this->testGameExists($game, $id, $typeOfID)) {
+				return $game;
 			}
 				
 		}

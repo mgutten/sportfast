@@ -102,7 +102,7 @@ class Application_Model_Team extends Application_Model_ModelAbstract
 		$matchDescription = 'This team is a <span class="bold medium">' . $match . '</span> match for you.<br><span class="smaller-text medium">The average player on this team is ' . $adverb . ' ' . $better . ' than you.</span>';
 		
 		if ($match == 'great') {
-			$matchDescription = 'You are a near perfect match for the players on this team.';
+			$matchDescription = 'You are a near perfect match for this team.';
 		}
 		
 		return $matchDescription;

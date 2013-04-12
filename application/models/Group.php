@@ -2,7 +2,7 @@
 
 class Application_Model_Group extends Application_Model_ModelAbstract
 {
-	protected $_mapperClass = 'Application_Model_GroupssMapper';
+	protected $_mapperClass = 'Application_Model_GroupsMapper';
 	
 	protected $_attribs     = array('groupID'   => '',
 									'groupName' => '',
@@ -15,6 +15,15 @@ class Application_Model_Group extends Application_Model_ModelAbstract
 	public function getProfilePic($size, $id = false, $type = 'groups') 
 	{
 		return parent::getProfilePic($size, $this->groupID, $type);
+	}
+	
+	/**
+	 * get group info from db
+	 * @params ($groupID => groupID)
+	 */
+	public function getGroupByID($groupID)
+	{
+		return $this->getMapper()->getGroupByID($groupID, $this);
 	}
 	
 }

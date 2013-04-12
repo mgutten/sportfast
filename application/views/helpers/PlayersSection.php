@@ -77,6 +77,23 @@ class Application_View_Helper_PlayersSection
 			
 			$counter ++;
 		}
+		
+		
+		$remaining = 7 - $counter;
+		if ($remaining > 0) {
+			// Populate remaining with empty open spots
+			$text = 'Join';
+			$class = 'profile-join-player-container pointer';
+			if ($this->_view->userOnTeam || $this->_view->userInGame) {
+				// No need to show join spots for users on team already
+				$text = 'Open';
+				$class = 'profile-open-player-container default';
+			}	
+			
+			for ($i = 0; $i < $remaining; $i++) {
+				$output .= "<div class='left " . $class . " light animate-opacity'>" . $text . "</div>";
+			}
+		}
 
 					
 		return $output;

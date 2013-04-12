@@ -126,8 +126,10 @@ $this->headScript()->prependFile($this->baseUrl() . '/js/profile.js');
 			echo 		"<div class='width-100 clear selectable-container' section='public'>
 							<p class='selectable-text-section-title'>Visibility</p>";
 							
-			$what    = array('Public' => array('selected' => $this->isPublic),
-							 'Private' => array('selected' => $this->isPrivate)
+			$what    = array('Public'  => array('selected' => $this->isPublic,
+											    'tooltip'  => 'Your team will be visible to users looking for teams.'),
+							 'Private' => array('selected' => $this->isPrivate,
+							 					'tooltip'  => 'Your team will only be visible to your players.')
 							);
 			echo 			$this->signupsportform()->selectableText($what, true);
 			echo	   '</div>';
@@ -160,11 +162,11 @@ $this->headScript()->prependFile($this->baseUrl() . '/js/profile.js');
 				
 			
 	}
-			echo $this->alert()->start('confirm-action','');
-			echo 	"<p class='width-100 clear center'>&nbsp;Are you sure you want to <span id='confirm-action-text'></span>?</p>";
-			echo	"<p class='button clear' id='confirm-action'>Yes</p>";
-			echo	"<p class='button' id='deny-action'>No</p>";
-			echo $this->alert()->end();	
+	echo $this->alert()->start('confirm-action','');
+	echo 	"<p class='width-100 clear center'>&nbsp;Are you sure you want to <span id='confirm-action-text'></span>?</p>";
+	echo	"<p class='button clear' id='confirm-action'>Yes</p>";
+	echo	"<p class='button' id='deny-action'>No</p>";
+	echo $this->alert()->end();	
 	echo $this->placeholder('absolute')->captureEnd();
 ?>
 
@@ -210,6 +212,7 @@ if (!$this->previousGames) {
 echo $this->narrowcolumnsection()->end();
 
 // Leagues
+/*
 echo $this->narrowcolumnsection()->start(array('title' => 'Leagues'));
 if (!$this->team->leagues->hasValue('leagues')) {
 	// No leagues
@@ -224,7 +227,7 @@ if (!$this->team->leagues->hasValue('leagues')) {
 	}
 }
 echo $this->narrowcolumnsection()->end();
-
+*/
 
 echo "<div class='width-100 left narrow-column-calendar-container'>";
 echo $this->calendar()->createCalendar($this->events, true);
@@ -248,6 +251,15 @@ echo "<span id='team-details'
 	 </span>";
 ?>
 
+<?php
+if ($this->team->sportupCreated && !$this->userOnTeam) {
+	// Show alert box
+	echo "<div class='green-alert-box green' id='profile-top-alert'>";
+	echo	"This is a Sportup-created " . $this->team->sport . " team.
+		 </div>";
+}
+?>
+
 <header class='clear profile-name-container'>
 	<p class='profile-name heavy darkest clear'>
     	<?php echo $this->team->teamName;?>
@@ -265,7 +277,6 @@ echo "<span id='team-details'
 		
 		if ($this->userOnTeam) {
 			// You are on team
-			
 			?>
             <p class='darkest smaller-text right current-position'>You are currently <?php echo ($this->captain ? 'Team Captain' : 'a member');?>.</p>
 			<p class='red-button clear-right leave-button margin-top right' id='leave-button' style='margin-right:0'>
@@ -276,7 +287,7 @@ echo "<span id='team-details'
 			$class = '';
 			$text = 'Join';
 			$id    = 'join-button';
-			if (!$this->team->sportupCreated) {
+			if (!$this->team->sportupCreated && $this->hasCaptain) {
 				// Not sportup created team, allow any user to join without request
 				$text = 'Request to Join';
 				$id   = 'request-join-button';

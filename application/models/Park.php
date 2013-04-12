@@ -35,5 +35,13 @@ class Application_Model_Park extends Application_Model_ModelAbstract
 		
 		return $this->_attribs['location'];
 	}
+	
+	public function getDistanceFromUser($userLat, $userLon)
+	{
+		$parkLat = $this->location->getLatitude();
+		$parkLon = $this->location->getLongitude();
+		
+		return parent::getDistanceInMiles($userLat, $userLon, $parkLat, $parkLon);
+	}
 										
 }

@@ -17,10 +17,23 @@ class Application_Model_TeamsMapper extends Application_Model_MapperAbstract
 		$select  = $table->select();
 		$userID  = $userClass->userID;
 		$teamIDs = ($userClass->hasValue('teams') ? $userClass->teams->implodeIDs('teams') : '');
-
 		
+		// Default location to search near is user's home location, look for games within $distance of user's home location
+		$latitude  = $userClass->getLocation()->getLatitude();
+		$longitude = $userClass->getLocation()->getLongitude();
+		$bounds = $this->getBounds($latitude, $longitude);	
+		
+		$zipcodeQuery = '(SELECT cityID FROM zipcodes as z2
+							WHERE MBRContains(
+												LINESTRING(
+												' . $bounds["upper"] . ' , ' . $bounds["lower"] . '
+												), z2.location
+											 )
+							GROUP BY cityID)';
+		
+		$select = $table->select();
 		$select->setIntegrityCheck(false);
-		$select->from(array('t'  => 'teams'))
+		/*$select->from(array('t'  => 'teams'))
 			   ->join(array('tll' => 'team_leagues'),
 			   		 'tll.teamID = t.teamID')
 			   ->join(array('ll' => 'league_levels'),
@@ -41,7 +54,30 @@ class Application_Model_TeamsMapper extends Application_Model_MapperAbstract
 						   ))
 			   ->where('t.public = "1"')
 			   ->where('uus.skillCurrent >= ll.minSkill AND uus.skillCurrent <= ll.maxSkill')
-			   ->where('ll.cityID = ?', $userClass->city->cityID);
+			   ->where('ll.cityID = ?', $userClass->city->cityID);*/
+			   
+		
+
+		$select->from(array('t'  => 'teams'))
+			   ->join(array('uus' => 'user_sports'),
+			   		 'uus.sportID = t.sportID AND uus.userID = "' . $userID . '"',
+					 array('skillCurrent as userSkill'))
+			   ->join(array('z' => new Zend_Db_Expr($zipcodeQuery)),
+			   				'z.cityID = t.cityID')
+			   ->joinLeft(array('ut' => 'user_teams'),
+			   		 'ut.teamID = t.teamID',
+					 array(''))
+			   ->joinLeft(array('us' => 'user_sports'),
+			   		 'ut.userID = us.userID AND us.sportID = t.sportID',
+					 array('avg(us.skillCurrent) as averageSkill',
+					 	   'avg(us.attendance) as averageAttendance',
+						   'avg(us.sportsmanship) as averageSportsmanship',
+						   'avg(us.skillCurrent) - (SELECT skillCurrent FROM user_sports WHERE userID = "' . $userID . '" AND sportID = t.sportID) as skillDifference',
+						   'COUNT(us.userID) as totalPlayers'
+						   ))
+			   ->where('t.public = "1"')
+			   ->where('uus.skillCurrent >= t.minSkill AND uus.skillCurrent <= t.maxSkill');
+
 		
 		
 		if ($options) {
@@ -58,10 +94,7 @@ class Application_Model_TeamsMapper extends Application_Model_MapperAbstract
 		
 		$select->group('t.teamID');
 			   //->order('abs(avg(us.skillCurrent) - (SELECT skillCurrent FROM user_sports WHERE userID = "' . $userID . '" AND sportID = t.sportID)) ASC');
-		
-		echo $select;
-		
-		
+
 		$results = $table->fetchAll($select);
 		
 		foreach ($results as $result) {
@@ -102,6 +135,7 @@ class Application_Model_TeamsMapper extends Application_Model_MapperAbstract
 		$savingClass->setAttribs($team);
 		
 		// Get all leagues
+		/*
 		$select  = $table->select();
 		$select->setIntegrityCheck(false);
 		
@@ -118,7 +152,7 @@ class Application_Model_TeamsMapper extends Application_Model_MapperAbstract
 		foreach ($leagues as $league) {
 			$savingClass->leagues->addLeague($league);
 		}
-		
+		*/
 		// Get all players
 		$sportID = $savingClass->sportID;
 		$select = $table->select();
@@ -207,8 +241,5 @@ class Application_Model_TeamsMapper extends Application_Model_MapperAbstract
 		return $savingClass;
 
 	}
-			   
-			
-
 			
 }

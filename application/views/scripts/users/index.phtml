@@ -21,7 +21,7 @@ echo 	"<p class='clear darkest'>" . $this->currentUser->getSexFull() . "</p>";
 echo 	"<p class='clear darkest'>" . $this->currentUser->getHeightInFeet() . " " . $this->currentUser->weight . " lb</p>";
 echo "</div>";
 
-$sections = array('players', 'teams', 'groups');
+$sections = array('players', 'teams');
 
 echo $this->narrowteamsection($this->currentUser, $sections);
 
@@ -50,7 +50,7 @@ $this->placeholder('narrowColumn')->captureEnd();
 </header>
 
 <div id='user-buttons-container'>
-    <p class='button right'>
+    <p class='button right' id='user-message'>
     	Message
     </p>
     <?php

@@ -1,0 +1,33 @@
+/* top section */
+.game-title-suffix {
+	font-size: .65em;
+	font-family: 'Futura-Heavy';
+	color: #8d8d8d;
+}
+
+.profile-city-container {
+	margin-top: .1em;
+}
+
+.game-location {
+	margin-top: -.1em;
+	margin-left: .2em;
+}
+
+.game-distance {
+	margin-top: .05em;
+}
+
+.game-rating-box {
+	margin-left: 15%;
+	width: 12%;
+	padding: 1em 0 1em 0;
+}
+
+.narrow-overlay-container {
+	position:absolute;
+	top: 1em;
+	left: -1.5em;
+	padding: .7em 2em;
+	
+}

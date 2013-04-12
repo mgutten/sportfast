@@ -23,10 +23,9 @@ class Application_Model_GamesMapper extends Application_Model_MapperAbstract
 			$lowerPoint = $points[1];
 		} else {
 			// Default location to search near is user's home location, look for games within $distance of user's home location
-			$distance = 10; // in miles 
-			$rad	  = $distance/69; // (1 degree about = 69 mi) could incorporate haversine formula later for more accurate distance calculation
-			$upperPoint = 'POINT(' . ($userClass->location->latitude + $rad) . ',' . ($userClass->location->longitude + $rad) . ')';
-			$lowerPoint = 'POINT(' . ($userClass->location->latitude - $rad) . ',' . ($userClass->location->longitude - $rad) . ')';
+			$latitude = $userClass->location->latitude;
+			$longitude = $userClass->location->longitude;
+			$bounds = $this->getBounds($latitude, $longitude);
 		}
 		
 		
@@ -48,7 +47,7 @@ class Application_Model_GamesMapper extends Application_Model_MapperAbstract
 					 	   'avg(us.attendance) as averageAttendance',
 						   'avg(us.sportsmanship) as averageSportsmanship',
 						   'avg(us.skillCurrent) - (SELECT skillCurrent FROM user_sports WHERE userID = "' . $userID . '" AND sportID = t.sportID) as skillDifference',
-						   'COUNT(us.userID) as totalPlayers'
+						   '(COUNT(us.userID) + SUM(ug.plus)) as totalPlayers'
 						   ))
 			   //->where('g.cityID = ?', $cityID)
 			   ->where('usa.userID = ?', $userID)
@@ -57,7 +56,7 @@ class Application_Model_GamesMapper extends Application_Model_MapperAbstract
 			   ->where('g.public = "1"')
 			   ->where('MBRContains(
 								LINESTRING(
-								' . $upperPoint . ' , ' . $lowerPoint . '
+								' . $bounds["upper"] . ' , ' . $bounds["lower"] . '
 								), pl.location
 								)')
 			   ->where('g.date > NOW()');
@@ -72,7 +71,7 @@ class Application_Model_GamesMapper extends Application_Model_MapperAbstract
 		
 		$select->group('g.gameID')
 			   ->order('abs(avg(us.skillCurrent) - (SELECT skillCurrent FROM user_sports WHERE userID = "' . $userID . '" AND sportID = t.sportID)) ASC');
-	
+		
 		$results = $table->fetchAll($select);
 
 		foreach ($results as $result) {
@@ -80,6 +79,69 @@ class Application_Model_GamesMapper extends Application_Model_MapperAbstract
 		}
 		
 		return $savingClass;
+	}
+	
+	/**
+	 * get game info from db
+	 * @params ($gameID => gameID
+	 *			$savingClass => game model)
+	 */
+	public function getGameByID($gameID, $savingClass)
+	{
+		$table   = $this->getDbTable();
+		$select  = $table->select();
+		$select->setIntegrityCheck(false);
+		
+		$select->from(array('g'  => 'games'))
+			   ->join(array('st' => 'sport_types'),
+			   		  'g.typeID = st.typeID')
+			   ->join(array('pl' => 'park_locations'),
+			   		  'g.parkID = pl.parkID',
+					  array('AsText(location) as location'))
+			   ->joinLeft(array('ug' => 'user_games'),
+			   		 'ug.gameID = g.gameID',
+					 array(''))
+			   ->joinLeft(array('us' => 'user_sports'),
+			   		 'ug.userID = us.userID AND us.sportID = g.sportID',
+					 array('avg(us.skillCurrent) as averageSkill',
+					 	   'avg(us.attendance) as averageAttendance',
+						   'avg(us.sportsmanship) as averageSportsmanship',
+						   '(COUNT(us.userID) + SUM(ug.plus)) as totalPlayers'
+						   ))
+				->where('g.gameID = ?', $gameID)
+				->limit(1);
+				
+		$result = $table->fetchRow($select);
+		
+		$savingClass->setAttribs($result);
+		$savingClass->park->setAttribs($result);
+		$savingClass->park->location->setAttribs($result);
+		$savingClass->type->setAttribs($result);
+		
+		// Get game's players
+		$sportID = $savingClass->sportID;
+		$select = $table->select();
+		$select->setIntegrityCheck(false);	
+			
+		$select->from(array('ug' => 'user_games'))
+			   ->join(array('u' => 'users'),
+			   		  'ug.userID = u.userID')
+			   ->join(array('us' => 'user_sports'),
+			   		  'ug.userID = us.userID AND us.sportID = "' . $sportID . '"')
+			   ->join(array('s' => 'sports'),
+			   		  's.sportID = ' . $sportID)
+			   ->where('ug.gameID = ?', $gameID);
+			   
+		$players = $table->fetchAll($select);
+
+		foreach ($players as $player) {
+			$savingClass->addPlayer($player)
+						->getSport($player->sport)
+						->setAttribs($player);
+				
+		}
+		return $savingClass;
+				
 	}
 	
 	/**

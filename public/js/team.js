@@ -7,6 +7,11 @@ $(function()
 	teamID = $('#team-details').attr('teamID');
 	
 	
+	$('.schedule-in,.schedule-out').click(function()
+	{
+		reloadPage();
+	})
+	
 	$('#team-players-container').hover(
 		function() {
 			$('.team-player-going-description-container').stop().animate({opacity: 1}, 300);

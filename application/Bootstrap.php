@@ -38,7 +38,7 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 		$view   = $this->getResource('view');
 		
 		$auth = Zend_Auth::getInstance();
-		//$auth->clearIdentity();
+		$auth->clearIdentity();
 		if (!empty($_COOKIE['user']) || $auth->hasIdentity()) {
 			// User is logged in 
 			if (!$auth->hasIdentity()) {
@@ -121,6 +121,8 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 		
 		$frontController = Zend_Controller_Front::getInstance(); 
 		$router = $frontController->getRouter();
+		
+		// Users page
 		$r = new Zend_Controller_Router_Route_Regex(
 				'users(?:/(\d+))?(?:/(\w+))?',
 				array(
@@ -137,6 +139,7 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 				
 		$router->addRoute('users', $r);
 		
+		// Teams page
 		$r = new Zend_Controller_Router_Route_Regex(
 				'teams(?:/(\d+))?(?:/(\w+))?',
 				array(
@@ -152,6 +155,42 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 				'teams/%d');
 				
 		$router->addRoute('teams', $r);
+		
+		/*
+		// Groups page
+		$r = new Zend_Controller_Router_Route_Regex(
+				'groups(?:/(\d+))?(?:/(\w+))?',
+				array(
+						'action' => 'index',
+						'controller' => 'groups',
+						'module' => 'default',
+						'id'	 => '1'
+				),
+				array(
+						1 => 'id',
+						2 => 'action'
+				),
+				'groups/%d');
+				
+		$router->addRoute('groups', $r);
+		*/
+		
+		// Games page
+		$r = new Zend_Controller_Router_Route_Regex(
+				'games(?:/(\d+))?(?:/(\w+))?',
+				array(
+						'action' => 'index',
+						'controller' => 'games',
+						'module' => 'default',
+						'id'	 => '1'
+				),
+				array(
+						1 => 'id',
+						2 => 'action'
+				),
+				'games/%d');
+				
+		$router->addRoute('games', $r);
 		
 		return $view;
 	}

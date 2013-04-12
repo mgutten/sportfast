@@ -28,6 +28,18 @@ class Application_Model_Notifications extends Application_Model_ModelAbstract
 		return $this->getMapper()->getNewsfeed($cityID, $this, $onlyNew, $limit);
 	}
 	
+	public function combineLikeNotifications()
+	{
+		$combinedArray = $this->unread;
+		array_push($combinedArray, $this->read);
+		
+		foreach ($combinedArray as $notification) {
+			if ($notification->action == 'join'){
+			}
+		}
+				
+		
+	}
 	
 	public function addNotification($resultRow)
 	{

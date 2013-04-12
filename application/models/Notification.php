@@ -37,7 +37,8 @@ class Application_Model_Notification extends Application_Model_ModelAbstract
 									'read'				=> false,
 									'dateHappened'      => '',
 									'actionRequired'	=> '',
-									'parentUserID'		=> ''
+									'parentUserID'		=> '',
+									'likeNotifications' => ''
 									);
 									
 	protected $_primaryKey = 'notificationLogID';	
@@ -116,7 +117,11 @@ class Application_Model_Notification extends Application_Model_ModelAbstract
 			
 			if ($match == 'userName' || $match == 'receivingUserName') {
 				// Username replace
-				if ($match == 'userName') {
+				if ($this->likeNotifications > 1) {
+					$id = $this->actingUserID;
+					$replaceVal = $this->likeNotifications . ' players';
+					$is = 'are';
+				} elseif ($match == 'userName') {
 					// Refers to acting user
 					$id = $this->actingUserID;
 					$replaceVal = ucwords($this->actingFirstName) . " " . ucwords($this->actingLastName[0]);

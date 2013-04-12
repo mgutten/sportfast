@@ -180,6 +180,10 @@ img {
 	background:#222;
 }
 
+.dark-red-back {
+	background: #C60000;
+}
+
 .red-back {
 	background: #F3B1B1;
 }
@@ -284,6 +288,11 @@ div.selected-green,img.selected-green,p.selected-green {
 	-moz-box-shadow: 2px 0px 8px 0px #bbb,-2px 0px 8px 0px #bbb;
 	box-shadow: 2px 0px 8px 0px #bbb,-2px 0px 8px 0px #bbb;
 	z-index:1;
+}
+
+.inherit {
+	color: inherit;
+	font: inherit;
 }
 
 .none-text {
@@ -1117,12 +1126,13 @@ input.header-search-bar {
 
 .green-alert-box,.red-alert-box {
 	width: 95%;
-	padding: 1em 2%;
+	padding: .75em 2%;
 	float:left;
 	clear:both;
 	text-align:center;
 	background:#E6FFE6;
 	border:2px dashed #58bf12;
+	margin-bottom: 1em;
 }
 
 .red-alert-box {
@@ -1590,6 +1600,7 @@ div.dropdown-menu-container-reverse:hover {
 
 .button:hover {
 	background: #e9e9e9;
+	color: #777;
 }
 
 .button.right,.green-button.right,.red-button.right {
@@ -1610,6 +1621,7 @@ div.dropdown-menu-container-reverse:hover {
 
 .green-button:hover {
 	background: #1C931F;
+	color: #ddd;
 }
 
 .red-button {
@@ -1626,6 +1638,7 @@ div.dropdown-menu-container-reverse:hover {
 
 .red-button:hover {
 	background: #970000;
+	color: #ddd;
 }
 
 .import-button {

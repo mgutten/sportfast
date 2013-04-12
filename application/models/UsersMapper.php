@@ -70,7 +70,7 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 			   		  'ug.gameID = g.gameID')
 			   ->join(array('ug2' => 'user_games'),
 			   		  'ug2.gameID = ug.gameID',
-					  array('COUNT(ug2.userID) as totalPlayers',
+					  array('(COUNT(ug2.userID) + SUM(ug2.plus)) as totalPlayers',
 					  		'(SELECT COUNT(userID) FROM user_games WHERE gameID = ug.gameID AND confirmed = "1") AS confirmedPlayers'))
 			   ->where('ug.userID = ?', $savingClass->userID)
 			   ->where('g.date > CURDATE()')
@@ -182,7 +182,7 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
      * Find all groups for user
      *
      * @params ($savingClass => where to save)
-     */
+     
 	public function getUserGroups($savingClass)
 	{
 		$table   = $this->getDbTable();
@@ -207,6 +207,7 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 		return $savingClass;
 		
 	}
+	*/
 	
 	/**
      * Find all friends for user
@@ -394,10 +395,10 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 		$gameIDs  = ($userClass->hasValue('games') ? $userClass->games->implodeIDs('games') : '');
 		$teamIDs  = ($userClass->hasValue('teams') ? $userClass->teams->implodeIDs('teams') : '');
 
-		$names	  = array('game','team','group');
+		$names	  = array('game','team');
 		$userID   = $userClass->userID;
 		
-		$select = "SELECT `nl`.*, 
+		/*$select = "SELECT `nl`.*, 
 						  `n`.*, 
 						  `u`.firstName as actingFirstName, 
 						  `u`.lastName as actingLastName, 
@@ -419,6 +420,29 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 					 LEFT JOIN `games` AS `ga` ON ga.gameID = nl.gameID
 					 LEFT JOIN `teams` AS `t` ON t.teamID = nl.teamID
 					 LEFT JOIN `groups` AS `gr` ON gr.groupID = nl.groupID
+					 LEFT JOIN `user_ratings` AS `ur` ON ur.userRatingID = nl.ratingID 
+					 WHERE ((nl.receivingUserID = " . $userID . ") OR
+					 	(nl.actingUserID =  " . $userID . " AND n.action = 'friend') ";*/
+		$select = "SELECT `nl`.*, 
+						  `n`.*, 
+						  `u`.firstName as actingFirstName, 
+						  `u`.lastName as actingLastName, 
+						  `u2`.firstName as receivingFirstName, 
+						  `u2`.lastName as receivingLastName, 
+						  `u`.userID as actingUserID,
+						  `u2`.userID as receivingUserID,
+						  COALESCE(`ga`.sport,`t`.sport,`ur`.sport) as sport,
+						  COALESCE(`ga`.date,`ur`.dateHappened) as date, 
+						  ga.parkName, 
+						  ga.parkID, 
+						  ga.date, 
+						  t.teamName
+					 FROM `notification_log` AS `nl`
+					 INNER JOIN `notifications` AS `n` ON n.notificationID = nl.notificationID
+					 LEFT JOIN `users` AS `u` ON u.userID = nl.actingUserID
+					 LEFT JOIN `users` AS `u2` ON u2.userID = nl.receivingUserID
+					 LEFT JOIN `games` AS `ga` ON ga.gameID = nl.gameID
+					 LEFT JOIN `teams` AS `t` ON t.teamID = nl.teamID
 					 LEFT JOIN `user_ratings` AS `ur` ON ur.userRatingID = nl.ratingID 
 					 WHERE ((nl.receivingUserID = " . $userID . ") OR
 					 	(nl.actingUserID =  " . $userID . " AND n.action = 'friend') ";
@@ -495,17 +519,16 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 					INNER JOIN teams as `t` ON t.teamID = ut.teamID
 					WHERE ut.userID = '" . $userID . "'";
 					   
-		$groups  = "SELECT `ug`.`groupID` AS `id`, 
+		/*$groups  = "SELECT `ug`.`groupID` AS `id`, 
 						  `g`.`groupName` AS `name`, 
 						  'groups' AS `prefix` FROM `user_groups` AS `ug` 
 					INNER JOIN groups as `g` ON g.groupID = ug.groupID
-					WHERE ug.userID = '" . $userID . "'";
+					WHERE ug.userID = '" . $userID . "'";*/
 		
 
 					  
 		$select  = $friends . " UNION "
-				 . $teams . " UNION "
-				 . $groups;
+				 . $teams;
 		
 		$results = $db->fetchAll($select);
 		
@@ -523,12 +546,12 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 				$result['teamName'] = $result['name'];
 				$result['teamID']   = $result['id'];
 				$savingClass->teams->addTeam($result);
-			} elseif ($type == 'groups') {
+			} /*elseif ($type == 'groups') {
 				// Group
 				$result['groupName'] = $result['name'];
 				$result['groupID']   = $result['id'];
 				$savingClass->groups->addGroup($result);
-			}
+			}*/
 		}
 				
 				

@@ -75,6 +75,34 @@ class AjaxController extends Zend_Controller_Action
 	 
 	 
 	 /**
+	  * add user to game
+	  */
+	 public function addUserToGameAction()
+	 {
+		 $options = $this->getRequest()->getPost('options');
+		 
+		 if (empty($options['userID']) || empty($options['typeID'])) {
+			 return false;
+		 }
+		 
+		 if ($options['idType'] == 'gameID') {
+			 // Add user to game, and add game to user's auth session
+			 $table = new Application_Model_DbTable_UserGames();
+			 $game = new Application_Model_Game();
+			 $game->getGameById($options['typeID']);
+			 $this->view->user->games->addGame($game);	 
+		 }
+		 
+		 $table->insert(array($options['idType'] => $options['typeID'],
+		 					  'userID'		     => $options['userID']));
+						
+							  
+		
+	 }
+		 
+		 
+	 
+	 /**
 	  * add post to team or group page
 	  */
 	 public function addPostAction()
@@ -511,6 +539,8 @@ class AjaxController extends Zend_Controller_Action
 			$table = new Application_Model_DbTable_UserTeams();
 		} elseif($options['idType'] == 'groupID') {
 			$table = new Application_Model_DbTable_UserGroups();
+		} elseif($options['idType'] == 'gameID') {
+			$table = new Application_Model_DbTable_UserGames();
 		}
 			
 		if (empty($options['typeID']) || empty($options['userID'])) {

@@ -14,6 +14,16 @@
 	margin-top: .2em;
 }
 
+#profile-top-alert {
+	margin-bottom: 1em;
+}
+
+#leave-button {
+	font-size: .9em;
+	padding-bottom: .1em;
+	padding-top: 0em;
+}
+
 /*
 #user-buttons-container>p,#user-buttons-container>div,#profile-buttons-container>p,#profile-buttons-container>div {
 	float:right;
@@ -70,6 +80,16 @@
 .profile-player-overlay {
 	position: absolute;
 	width: 100%;
+}
+
+.profile-open-player-container,.profile-join-player-container {
+	width: 92px;
+	height: auto;
+	border: solid 1px #e9e9e9;
+	text-align: center;
+	padding-top: 39px;
+	padding-bottom: 39px;
+	margin-right: -1px;
 }
 
 /* post message section */

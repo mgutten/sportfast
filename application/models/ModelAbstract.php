@@ -408,6 +408,30 @@ abstract class Application_Model_ModelAbstract
 	{
 		return get_object_vars($this);
 	}
+	
+	/**
+	 * calculate distance between two longitude, latitude points
+	 * @params ($unit => 'M' = miles, 'N' = nautical miles, 'K' = kilometers)
+	 */
+	public function getDistanceInMiles($lat1, $lon1, $lat2, $lon2, $unit = 'M') 
+	{
+		  $theta = $lon1 - $lon2;
+		  $dist = sin(deg2rad($lat1)) * sin(deg2rad($lat2)) +  cos(deg2rad($lat1)) * cos(deg2rad($lat2)) * cos(deg2rad($theta));
+		  $dist = acos($dist);
+		  $dist = rad2deg($dist);
+		  $miles = $dist * 60 * 1.1515;
+		  $unit = strtoupper($unit);
 		
+		  $miles = round($miles,1);
+		
+		  if ($unit == "K") {
+			return ($miles * 1.609344);
+		  } else if ($unit == "N") {
+			  return ($miles * 0.8684);
+			} else {
+				return $miles;
+			  }
+		}
+
 
 }

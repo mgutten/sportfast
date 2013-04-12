@@ -47,6 +47,18 @@ $(function()
 		createNotification(idType, typeID, actingUserID, receivingUserID, action, type, details);
 	})
 	
+	/* join */
+	$('#join-button').click(function()
+	{
+		var detailsEle = getDetailsEle();
+		var idType = detailsEle.attr('idType');
+		var typeID = detailsEle.attr(idType);
+		var actingUserID = detailsEle.attr('actingUserID');
+		
+		addUserToGame(idType, typeID, actingUserID);
+		showConfirmationAlert('Added to game.');
+	})
+	
 	/* post message to wall */
 	$('#postMessage').submit(function(e)
 	{
@@ -260,14 +272,20 @@ $(function()
 				createNotification(idType, typeID, actingUserID, receivingUserID, action, type, details);
 				removeUserFromType(userID, idType, typeID);
 				changedAlert = $('.team-manage-remove-player-container');
-				
 				reloadPage();
 		}
 		
-		populateConfirmActionAlert('leave ' + detailsEle.attr('teamName'));
+		var name = (typeof detailsEle.attr('teamName') == 'undefined' ? 'this game' : detailsEle.attr('teamName'));
+		populateConfirmActionAlert('leave ' + name);
 		$('#confirm-action-alert-container').show();
 		$('.alert-black-back').show();
 	});
+	
+	
+	$('.profile-join-player-container').click(function()
+	{
+		$('#join-button').trigger('click');
+	})
 	
 	$('#confirm-action').click(function()
 	{
@@ -282,7 +300,7 @@ $(function()
  */
 function getDetailsEle()
 {
-	return ($('#team-details').length > 0 ? $('#team-details') : $('#group-details'))
+	return ($('#team-details').length > 0 ? $('#team-details') : $('#game-details'))
 }
 
 
@@ -398,16 +416,6 @@ function changeTypeAttribs(options)
 	})
 }
 
-/**
- * reload page after settimeout delay to allow ajax to complete
- */
-function reloadPage()
-{
-	setTimeout(function() {
-				location.reload();
-	}, 400);
-}
-	
 
 /**
  * test which inputs have been changed in the advanced section of team-info alert

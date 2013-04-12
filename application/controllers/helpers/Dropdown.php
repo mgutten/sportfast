@@ -142,15 +142,14 @@ class Application_Controller_Helper_Dropdown extends Zend_Controller_Action_Help
 		$pre 	 = "<div class='dropdown-menu-option-container animate-darker invite medium smaller-text'>
 						<p class='dropdown-menu-option-text medium'>";
 		$post    = "</p></div>";
-		$sections = array('games','teams','groups');
+		$sections = array('games','teams');
 		
 		foreach ($sections as $section) {
 			
-			$output .= "<p class='smaller-text clear dark dropdown-menu-invite-section heavy'>My " . ucwords($section) . "</p>";
-			
-			if ($user->hasValue($section)) {
+			if ($user->$section->hasValue($section)) {
 				// This section has values, display as options for invite
-
+				$output .= "<p class='smaller-text clear dark dropdown-menu-invite-section heavy default'>My " . ucwords($section) . "</p>";	
+				
 				foreach ($user->$section->getAll() as $model) {
 					if (($model->rosterLimit == $model->totalPlayers) && !$model instanceof Application_Model_Group) {
 						// Team/Game is full do not show, exclude Group from this as it does not have a roster limit
@@ -196,14 +195,14 @@ class Application_Controller_Helper_Dropdown extends Zend_Controller_Action_Help
 		$pre 	 = "<div class='dropdown-menu-option-container animate-darker invite medium smaller-text'>
 						<p class='dropdown-menu-option-text medium'>";
 		$post    = "</p></div>";
-		$sections = array('groups');
+		//$sections = array('groups');
 		
 		$output  .= $form->headerSearchBar->setName('inviteSearchBar');
 		
 		$output  .= "<div class='dropdown-menu-option-results' id='dropdown-menu-option-results-" . $id . "'></div>";
 		
 		$output  .= "<div class='dropdown-menu-option-default'>";
-		
+		/*
 		foreach ($sections as $section) {
 			
 			$output .= "<p class='smaller-text clear medium dropdown-menu-invite-section heavy'>My " . ucwords($section) . "</p>";
@@ -231,6 +230,7 @@ class Application_Controller_Helper_Dropdown extends Zend_Controller_Action_Help
 				$output .= "<p class='smaller-text clear medium'>You have no " . $section . ".</p>";
 			}
 		}
+		*/
 		
 		$output .= "</div></div></div>";
 		

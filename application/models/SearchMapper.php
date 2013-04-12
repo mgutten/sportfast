@@ -22,13 +22,13 @@ class Application_Model_SearchMapper extends Application_Model_MapperAbstract
 						WHERE teamName LIKE '" . $searchTerm . "%' OR
 								teamName LIKE 'The " . $searchTerm . "%'";
 					
-		$groups = "SELECT groupID as id,groupName as name, 'groups' as prefix, cityID FROM groups 
-						WHERE groupName LIKE '" . $searchTerm . "%'";
+		/*$groups = "SELECT groupID as id,groupName as name, 'groups' as prefix, cityID FROM groups 
+						WHERE groupName LIKE '" . $searchTerm . "%'";*/
 					 
 		$parks  = "SELECT parkID as id,parkName as name, 'parks' as prefix, cityID FROM parks 
 						WHERE parkName LIKE '" . $searchTerm . "%'";
 					 
-		$leagues  = "SELECT leagueID as id,leagueName as name, 'leagues' as prefix, cityID FROM leagues 
+		/*$leagues  = "SELECT leagueID as id,leagueName as name, 'leagues' as prefix, cityID FROM leagues 
 						WHERE leagueName LIKE '" . $searchTerm . "%'";
 					 
 					 		
@@ -36,7 +36,12 @@ class Application_Model_SearchMapper extends Application_Model_MapperAbstract
 				. $teams   . ' UNION '  
 				. $groups  . ' UNION ' 
 				. $parks   . ' UNION ' 
-				. $leagues . ' ORDER BY ABS(' . $cityID . ' - cityID)';
+				. $leagues . ' ORDER BY ABS(' . $cityID . ' - cityID)';*/
+				
+		$select = $users   . ' UNION ' 
+				. $teams   . ' UNION '  
+				//. $groups  . ' UNION ' 
+				. $parks   . ' ORDER BY ABS(' . $cityID . ' - cityID)';
 
 		$results = $db->fetchAll($select); // returned result is array, not object
 		
