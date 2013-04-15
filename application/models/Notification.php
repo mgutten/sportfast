@@ -37,6 +37,7 @@ class Application_Model_Notification extends Application_Model_ModelAbstract
 									'read'				=> false,
 									'dateHappened'      => '',
 									'actionRequired'	=> '',
+									'joinOption'		=> '',
 									'parentUserID'		=> '',
 									'likeNotifications' => ''
 									);
@@ -90,7 +91,7 @@ class Application_Model_Notification extends Application_Model_ModelAbstract
 		return str_replace($matches[0],$replace,$this->url);
 	}
 	
-	public function getFormattedText()
+	public function getFormattedText($currentID = false)
 	{
 		
 		// match %sign holders in text (eg %name has joined the %sport game)
@@ -103,7 +104,12 @@ class Application_Model_Notification extends Application_Model_ModelAbstract
 		if ($this->newsfeed) {
 			// This notification is meant for newsfeed, give different class
 			$class = 'green heavy';
-			$possession = 'a';
+			if ($this->gameID == $currentID) {
+				// On that game's page, all notifications should read "this game"
+				$possession = 'this';
+			} else {
+				$possession = 'a';
+			}
 		}
 		
 		$replace = array();

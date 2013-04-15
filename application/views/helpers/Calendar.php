@@ -267,6 +267,11 @@ class Application_View_Helper_Calendar
 					$eventArray = $this->scheduledDays[$month . $day . $this->year];
 
 					$class  .= ' calendar-dark';
+					if (strpos($eventArray[1], '/games/') !== false) {
+						// Show special class for pickup games
+						$class .= ' calendar-green';
+					}
+					
 					$innerTooltip = $eventArray[0];
 					if ($tooltips) {
 						// Set tooltip
@@ -279,6 +284,7 @@ class Application_View_Helper_Calendar
 							$eventArray[2] = $matches[1];
 						}
 					}
+					
 					
 					if ($c < $this->today) {
 						// Event happened before today, make more transparent

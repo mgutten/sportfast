@@ -197,7 +197,7 @@ class Application_Controller_Helper_Dropdown extends Zend_Controller_Action_Help
 		$post    = "</p></div>";
 		//$sections = array('groups');
 		
-		$output  .= $form->headerSearchBar->setName('inviteSearchBar');
+		$output  .= $form->headerSearchBar->setName('inviteSearchBar')->setLabel("player name...");
 		
 		$output  .= "<div class='dropdown-menu-option-results' id='dropdown-menu-option-results-" . $id . "'></div>";
 		

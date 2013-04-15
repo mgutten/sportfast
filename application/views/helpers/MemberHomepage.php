@@ -288,6 +288,7 @@ class Application_View_Helper_MemberHomepage
 		
 		$output  .= $this->_view->lookingDropdownSport;
 		$output  .= $this->_view->lookingDropdownType;
+		$output  .= $this->_view->lookingDropdownTime;
 		
 		
 		$output .= "</div>";
@@ -338,7 +339,7 @@ class Application_View_Helper_MemberHomepage
 				$typeClass= 'bold';
 				$dateTime = DateTime::createFromFormat('Y-m-d H:i:s', $match->date);
 				$newDate  = $dateTime->format('m n');
-				$day      = $match->getDay();
+				$day      = $match->getDay('D');
 				$hour	  = $match->getHour();
 				$dateDesc = $dateTime->format('M j');
 				$id		  = $match->gameID;
@@ -432,17 +433,23 @@ class Application_View_Helper_MemberHomepage
 		  $preWrapper  = "<a href='" . $notification->getFormattedURL() . "' class='left box-img-container-" . strtolower($size) . "'>";
 		  $postWrapper = "</a>";
 		  $class	   = 'box-img-' . strtolower($size);
+		  $currentID = false;
 		  if ($notification->_attribs['pictureType'] == 'sports') {
 			  // Sport icon to be shown, wrap in container
 			  $preWrapper = "<a href='" . $notification->getFormattedURL() . "' class='notification-sports-img-container-" . $size . "'>";
 			  $class = '';
 			  //$postWrapper = "</a>";
 		  } 
+		  if ($this->_view->game) {
+			  //On game page, change notifications to "this game..."
+			  $currentID     = $notification->gameID;
+		  }
+		  
 		  
 		  $output .= "<div class='newsfeed-notification-container'>";
 		  $output .= 	$preWrapper . "<img src='" . $notification->getPicture($size) . "' class='newsfeed-notification-img " . $class . "' />" . $postWrapper;
 		  $output .= 	"<div class='newsfeed-notification-text-container'>";
-		  $output .= 		"<p class='left newsfeed-notification-text'>" . $notification->getFormattedText() . "</p>
+		  $output .= 		"<p class='left newsfeed-notification-text'>" . $notification->getFormattedText($currentID) . "</p>
 		  					 <span class='newsfeed-notification-time light smaller-text'>" . $notification->getTimeFromNow() . "</span>";
 		  $output .= 	"</div>
 					  </div>";

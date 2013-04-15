@@ -6,9 +6,9 @@ class Application_Model_Games extends Application_Model_ModelAbstract
 	
 	protected $_attribs     = array('games' => '');
 	
-	public function findUserGames($userClass, $options = false, $points = false)
+	public function findUserGames($userClass, $options = false, $points = false, $day = false, $hour = false)
 	{
-		return $this->getMapper()->findUserGames($userClass, $this, $options, $points);
+		return $this->getMapper()->findUserGames($userClass, $this, $options, $points, $day, $hour);
 	}
 	
 	/**

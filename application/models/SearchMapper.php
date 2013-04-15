@@ -6,10 +6,11 @@ class Application_Model_SearchMapper extends Application_Model_MapperAbstract
 	
 	/**
 	 * Search database for any user, group, team, park, or league with name similar to searchTerm
-	 * @params($searchTerm  => term to search for
+	 * @params($searchTerm  => term to search for,
+	 *		   $limit => array of types to search for (eg users, teams, etc))
 	 * 		   $savingClass => where to save the results)
 	 */
-	public function getSearchResults($searchTerm, $cityID, $savingClass)
+	public function getSearchResults($searchTerm, $cityID, $limit = false, $savingClass)
 	{
 		$db 	= Zend_Db_Table::getDefaultAdapter();
 		
@@ -37,12 +38,25 @@ class Application_Model_SearchMapper extends Application_Model_MapperAbstract
 				. $groups  . ' UNION ' 
 				. $parks   . ' UNION ' 
 				. $leagues . ' ORDER BY ABS(' . $cityID . ' - cityID)';*/
-				
-		$select = $users   . ' UNION ' 
-				. $teams   . ' UNION '  
-				//. $groups  . ' UNION ' 
-				. $parks   . ' ORDER BY ABS(' . $cityID . ' - cityID)';
-
+		
+		$select = '';
+		if ($limit) {
+			// only choose those types that are specified
+			$counter = 0;
+			foreach ($limit as $limitName) {
+				if ($counter != 0) {
+					$select .= ' UNION ';
+				}
+				$select .= $$limitName;
+			}
+		} else {
+			// Select all types
+			$select .= $users   . ' UNION ' 
+					. $teams   . ' UNION '  
+					//. $groups  . ' UNION ' 
+					. $parks   . ' ORDER BY ABS(' . $cityID . ' - cityID)';
+		}
+		
 		$results = $db->fetchAll($select); // returned result is array, not object
 		
 		for ($i = 0; $i < count($results); $i++) {

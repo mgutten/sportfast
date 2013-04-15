@@ -31,9 +31,12 @@ echo "</div>";
 
 $this->placeholder('narrowColumn')->captureEnd();
 
-
-
 ?>
+<span id='user-details'
+		actingUserID='<?php echo $this->user->userID;?>'
+	  	receivingUserID='<?php echo $this->currentUser->userID;?>'>
+</span>
+
 
 <header class='clear user-name-container'>
 	<p class='user-name heavy darkest clear'>

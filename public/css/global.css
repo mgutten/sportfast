@@ -645,6 +645,10 @@ div.nav-back:hover {
 	margin-left: 1.4em;
 }
 
+.notification-join {
+	margin-left: 3.5em;
+}
+
 .notification-time-subscript {
 	float:right;
 	clear:both;
@@ -723,7 +727,6 @@ a.header-dropdown-option-cog {
 }
 
 
-
 .nav:hover {
 	color:#fff;
 }
@@ -767,12 +770,12 @@ a.header-dropdown-option-cog {
 
 .dropdown-back-inner#nav-dropdown-inner-find,.dropdown-back-outer#nav-dropdown-outer-find {
 	width: auto;
-	height: 7.5em;
+	height: 5.9em;
 }
 
 .dropdown-back-inner#nav-dropdown-inner-create,.dropdown-back-outer#nav-dropdown-outer-create {
 	width: 6.5em;
-	height: 4.5em;
+	height: 2.9em;
 }
 
 .dropdown-back-inner#nav-dropdown-inner-cog,.dropdown-back-outer#nav-dropdown-outer-cog {
@@ -1944,6 +1947,10 @@ input.city-change-input {
 
 .calendar-dark {
 	background: #8d8d8d;
+}
+
+.calendar-green {
+	background:#58bf12;
 }
 
 .calendar-arrow-container {

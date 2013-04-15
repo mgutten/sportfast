@@ -42,6 +42,7 @@ class AjaxController extends Zend_Controller_Action
 		$user->notifications->moveUnreadToRead();
 		
 		$auth->getStorage()->write($user);
+		$auth->clearIdentity(); // clear user identity when check notifications so system can regroup new and old notifications
 		
 		
 	}
@@ -64,12 +65,13 @@ class AjaxController extends Zend_Controller_Action
 
 		 $data = array('actingUserID' 	  => $options['actingUserID'],
 		 			   'receivingUserID'  => $options['receivingUserID'],
-					   $options['idType'] => $options['typeID'],
-					   'cityID'		 	  => $this->view->user->city->cityID);								 
-			
-						  
+					   'cityID'		 	  => $this->view->user->city->cityID);		
+					   
+		if (!empty($options['idType'])) {
+			$data[$options['idType']] = $options['typeID'];
+		}
+			  
 		 $notificationsMapper->addNotification($notificationDetails, $data);
-			 
 		 
 	 }
 	 
@@ -100,7 +102,31 @@ class AjaxController extends Zend_Controller_Action
 		
 	 }
 		 
+	 /**
+	  * add user to team INACTIVE
+	  */
+	 public function addUserToTeamAction()
+	 {
+		 echo 'nope';
+		 return;
+		 $options = $this->getRequest()->getPost('options');
 		 
+		 if (empty($options['userID']) || empty($options['teamID'])) {
+			 return false;
+		 }
+		 
+
+		 $table = new Application_Model_DbTable_UserTeams();
+		 $team = new Application_Model_Team();
+		 $team->getTeamById($options['typeID']);
+		 $this->view->user->teams->addTeam($team);	 
+
+		 
+		 $table->insert(array('teamID' => $options['typeID'],
+		 					  'userID' => $options['userID']));
+						
+							  
+	 }
 	 
 	 /**
 	  * add post to team or group page
@@ -212,9 +238,16 @@ class AjaxController extends Zend_Controller_Action
 				$options[] = "g.sport IN ('" . $sportStr  . "')";
 			}
 
+			if (trim($post['time']) == 'my availability') {
+				// Use user's availability
+				$day = $hour = false;
+			} else {
+				$day = $hour = '';
+			}
+
 			$points = ($post['points'] != 'false' ? $post['points'] : false);
 			$games = new Application_Model_Games();
-			$games->findUserGames($this->view->user, $options, $points);
+			$games->findUserGames($this->view->user, $options, $points, $day, $hour);
 			$matches->addMatches($games->games);
 		}
 		if (in_array('teams',$post['types'])) {
@@ -357,8 +390,10 @@ class AjaxController extends Zend_Controller_Action
 		
 		$cityID  = $this->view->user->city->cityID;
 		
+		$limit = $this->getRequest()->getPost('limit');
+		
 		$search  = new Application_Model_Search();
-		$results = $search->getSearchResults($searchTerm, $cityID);
+		$results = $search->getSearchResults($searchTerm, $cityID, $limit);
 		echo json_encode($results);
 		
 	}
@@ -390,30 +425,34 @@ class AjaxController extends Zend_Controller_Action
 	public function notificationActionAction()
 	{
 		$post = $this->getRequest()->getPost();
+		$options = $post['options'];
 		
-		if (isset($post['confirmOrDeny'])) {
+		if (isset($options['confirmOrDeny'])) {
 			// Confirm or deny action
-			if ($post['confirmOrDeny'] == 'confirm') {
-				// Confirm action, add to db
-				$type = $post['type'];
-				
+			if ($options['confirmOrDeny'] == 'confirm') {
+				// Confirm action, add to db				
 				$mapper = new Application_Model_NotificationsMapper();
-				
-				$mapper->notificationConfirm($post['notificationLogID'], $type);
+				$mapper->notificationConfirm($options['notificationLogID'], $options['type']);
 				
 			}
-			
-			// Delete notification
-			$db = Zend_Db_Table::getDefaultAdapter();
-			$db->delete('notification_log',array('notificationLogID = ?' => $post['notificationLogID']));
-			
-			/* If cannot maintain integrity of $auth user notifications, clearIdentity and force reload of everything */
-			//$auth = Zend_Auth::getInstance();
-			//$auth->clearIdentity();
-			
-			$this->view->user->notifications->deleteNotificationByID($post['notificationLogID']);
-			
+						
+		} else {
+			// Join action
+			$mapper = new Application_Model_NotificationsMapper();
+			$mapper->notificationConfirm($options['notificationLogID'], $options['type']);	
 		}
+		
+		// Delete notification
+		$db = Zend_Db_Table::getDefaultAdapter();
+		$db->delete('notification_log',array('notificationLogID = ?' => $options['notificationLogID']));
+		
+		/* If cannot maintain integrity of $auth user notifications, clearIdentity and force reload of everything */
+		//$auth = Zend_Auth::getInstance();
+		//$auth->clearIdentity();
+		
+		$this->view->user->notifications->deleteNotificationByID($options['notificationLogID']);
+
+			
 			
 	}
 	

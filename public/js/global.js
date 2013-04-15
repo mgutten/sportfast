@@ -328,7 +328,8 @@ $(function()
 			$(this).parent().next('.dropdown-menu-option-default').show();
 			return;
 		}
-		searchDatabase($(this).val(), populateSearchResultsInvite);
+		var limit = new Array('users');
+		searchDatabase($(this).val(), populateSearchResultsInvite, limit);
 	})
 	
 	$('#city-change-reset').click(function()
@@ -490,13 +491,26 @@ $(function()
 		showConfirmationAlert('"' + $(this).text() + '" processed');
 	})
 	
-	/* cannot nest anchor tags, force redirect of notification-container.click (could now be changed to simple a tag) */
+	/* notification Join button was clicked */
+	$('.notification-join').click(function(e)
+	{
+		e.preventDefault();
+		e.stopPropagation(); // To prevent $('.notification-container').click from firing
+		
+		var notificationLogID = $(this).parent().attr('notificationLogID');
+		var type = $(this).parent().attr('type');
+		
+		notificationJoin(notificationLogID, type);
+		showConfirmationAlert('You have been added to the roster');
+	})
+	
+	/* cannot nest anchor tags, force redirect of notification-container.click (could now be changed to simple a tag) 
 	$('.notification-container').click(function()
 	{
 		if ($(this).attr('href')) {
 			window.location.href = $(this).attr('href');
 		}
-	})
+	})*/
 	
 	$('.notification-container.light-back').mouseleave(function()
 	{
@@ -762,7 +776,6 @@ $(function()
  *		   typeID => actual teamID or groupID,
  *		   actingUserID => who did it)
  */
-
 function changeTypeName(name, idType, typeID, actingUserID)
 {
 	var options = new Object();
@@ -826,6 +839,36 @@ function removeUserFromType(userID, idType, typeID) {
 }
 
 /**
+ * Ajax call to add user to a team (NOT BEING USED YET)
+ * @params(teamID => id of team,
+ *		   userID => userID)
+ */
+function addUserToTeam(teamID, userID)
+{
+	var options = new Object();
+	options.teamID = teamID;
+	options.userID = userID;
+	
+	$.ajax({
+		url: '/ajax/add-user-to-team',
+		type: 'POST',
+		data: {options: options},
+		success: function(data) {
+			alert(data);
+			var typeID = teamID;
+			var idType = 'teamID';
+			var action = 'join';
+			var type   = 'team';
+			var details;
+			createNotification(idType, typeID, userID, '', action, type, details);
+			reloadPage();
+		}
+	})
+}
+
+
+
+/**
  * Ajax call to add user to a game
  * @params(typeID => id of game,
  *		   idType => "teamGameID" or "gameID"
@@ -884,6 +927,12 @@ function confirmUserToGame(inOrOut, type, id, insertOrUpdate, teamID)
  */
 function notificationConfirmDeny(notificationLogID, confirmOrDeny, type, optionalID)
 {
+	var options = new Object();
+	options.notificationLogID = notificationLogID;
+	options.type = type;
+	options.confirmOrDeny = confirmOrDeny;
+	options.optionalID = optionalID;
+	
 	$.ajax({
 		url: '/ajax/notification-action',
 		type: 'POST',
@@ -893,6 +942,28 @@ function notificationConfirmDeny(notificationLogID, confirmOrDeny, type, optiona
 			   optionalID: optionalID},
 		success: function(data) {
 			
+		}
+	})
+}
+
+/**
+ * Ajax call to confirm (eg add as friends) or deny (delete) specific notification
+ * @params(notificationLogID => id of parent notificationLogID from db,
+ *		   confirmOrDeny	 => "confirm" or "deny",
+ *		   type				 => type (friend, game, team, group etc) retrieved from db to determine what table to add to
+ *		   optionalID		 => ID for game or group if issued, but blank if not)
+ */
+function notificationJoin(notificationLogID, type)
+{
+	var options = new Object();
+	options.notificationLogID = notificationLogID;
+	options.type = type;
+	$.ajax({
+		url: '/ajax/notification-action',
+		type: 'POST',
+		data: {options: options},
+		success: function(data) {
+			alert(data);
 		}
 	})
 }
@@ -924,6 +995,7 @@ function createNotification(idType, typeID, actingUserID, receivingUserID, actio
 		type: 'POST',
 		data: {options: options},
 		success: function(data) {
+			alert(data);
 		}
 	})
 }
@@ -947,14 +1019,16 @@ function getCity(zipcodeOrCity, callback)
 
 /**
  * Ajax call to search database for username, park, league, game, team, or group
- * @params (search => search term to look for)
+ * @params (search => search term to look for
+ *			limit  => array with names of types of things to look for (eg "users", "teams", etc))
  */
-function searchDatabase(searchTerm, callback)
+function searchDatabase(searchTerm, callback, limit)
 {
 	$.ajax({
 		url: '/ajax/search-db',
 		type: 'POST',
-		data: {search: searchTerm},
+		data: {search: searchTerm,
+			   limit: limit},
 		success: function(data) {
 			data = JSON.parse(data);
 			callback(data);
@@ -1156,7 +1230,7 @@ function populateSearchResultsInvite(results)
 				
 			}
 			
-			output += "<div class='invite-search-result clear medium pointer animate-darker' >\
+			output += "<div class='invite-search-result clear medium pointer animate-darker' userID='" + results[i]['id'] + "'>\
 							<p class='medium clear invite-search-result-name' " + tooltip + ">" + results[i]['name'] + "</p>";
 			
 			if (results[i]['prefix'] !== 'users') {
@@ -1176,7 +1250,7 @@ function populateSearchResultsInvite(results)
 	
 	if ($('#inviteSearchBar').is(':focus') && $('#inviteSearchBar').val().length >= 3) {
 		// Search bar has focus and val is greater than 2 (protect against accidently overfire due to ajax delay
-		$('#dropdown-menu-option-results-invite') .show();
+		$('#dropdown-menu-option-results-invite').show();
 	}
 	
 	
@@ -1564,7 +1638,9 @@ function initializeMap(lat, lon, zoom, callback)
         var mapOptions = {
           //center: new google.maps.LatLng(lat, lon),
           zoom: zoom,
-          mapTypeId: google.maps.MapTypeId.ROADMAP
+          mapTypeId: google.maps.MapTypeId.ROADMAP,
+		  mapTypeControl: false // Disable ability to change to satellite etc
+		  
         };
         gmap = new google.maps.Map(document.getElementById("gmap"),
             mapOptions);

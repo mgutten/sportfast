@@ -87,14 +87,20 @@ if ($this->pastGame) {
     	<?php echo $this->gameTitle;?>
 	</p>
     <div class='profile-city-container clear'>
-        <p class='darkest heavy clear largest-text'>
+        <p class='darkest clear largest-text'>
             <?php echo $this->game->getDay() . ' at ' . $this->game->getHour();?>
         </p>  
-        <a href='/parks/<?php echo $this->game->park->parkID;?>' class='clear dark larger-text game-location'><?php echo $this->game->park->parkName;?></a>
-        <p class='left light game-distance'>&nbsp;&nbsp;<?php echo $this->game->park->getDistanceFromUser($this->user->location->latitude, $this->user->location->longitude);?> miles</p>  
-
+        <a href='/parks/<?php echo $this->game->park->parkID;?>' class='clear darkest larger-text game-location'>
+			<?php echo $this->game->park->parkName;?>
+        </a>
+        <a href='http://www.google.com/maps?q=<?php echo $this->parkLocation->latitude . ',' . $this->parkLocation->longitude;?>' class='left light game-distance smaller-text'>
+        	&nbsp;&nbsp;
+			<?php echo $this->game->park->getDistanceFromUser($this->user->location->latitude, $this->user->location->longitude);?> miles from you
+        </a>
+        <a href='/parks/<?php echo $this->game->backupParkID;?>' class='clear light game-location' tooltip='If <?php echo $this->game->park->parkName;?> is unavailable, go to this nearby park instead.'>
+        	Backup park: <?php echo $this->game->backupParkName;?>
+        </a> 
     </div>
-
 </header>
 
 <div id='profile-buttons-container'>
@@ -103,28 +109,40 @@ if ($this->pastGame) {
 		if ($this->userInGame) {
 			// You are in game
 			?>
-            <p class='darkest smaller-text right current-position'>You are currently attending.</p>
+            <p class='darkest smaller-text right current-position' >You are currently attending with 
+            	<select>
+            		<option>0</option>
+                    <option>1</option>
+                    <option>2</option>
+                    <option>3</option>
+                </select>
+            others.</p>
 			<p class='red-button clear-right leave-button margin-top right' id='leave-button' style='margin-right:0'>
 				Leave
 			</p>
+            <div class='clear-right larger-margin-top'>
+            	<?php echo $this->inviteButton;?>
+            </div>
     <?php } else {
 			$lower = '';
 			$class = '';
 			$text = 'Join';
 			$id    = 'join-button';
-			if (!$this->game->sportupCreated && $this->hasCaptain) {
+			$tooltip = '';
+			if (!$this->isPublic) {
 				// Not sportup created team, allow any user to join without request
 				$text = 'Request to Join';
 				$id   = 'request-join-button';
+				$tooltip = "tooltip='This is a private game.'";
 			}
 			if ($this->game->minSkill > $this->user->getSport($this->game->sport)->skill) {
-				// User is not good enough for this team
+				// User is not good enough for this game
 				$class = 'transparent default';
 				$id = '';
 				$lower = '<p class="light clear-right smaller-text margin-top">You must have a minimum skill of ' . $this->team->minSkill . ' to join.';
 			}
 			?>
-    		<p class='green-button right larger-text join-button heavy <?php echo $class;?>' id='<?php echo $id;?>'>
+    		<p class='green-button clear-right larger-text join-button heavy <?php echo $class;?>' <?php echo $tooltip;?> id='<?php echo $id;?>'>
             	<?php echo $text;?>
             </p>
             <?php echo $lower; ?>
@@ -132,7 +150,6 @@ if ($this->pastGame) {
 		
 		if ($this->captain) {
 			// User is captain
-			echo "<div class='larger-margin-top clear-right profile-buttons-second-row' style='margin-right:0'>" . $this->inviteButton . "</div>";
 			echo "<div class='larger-margin-top right profile-buttons-second-row'>" . $this->manageButton . "</div>";
 		}
 	?>
@@ -176,4 +193,19 @@ if ($this->game->players->hasValue('users')) {
 }
 echo "</div>";
 
+// Recent Activity section
+echo $this->partial('partials/global/sectionHeaderPlain.phtml',array('title' => 'Recent Activity'));
+
+if ($this->userInGame) {
+	// User is on team, allow to post
+?>
+<div id='team-post-container' class='clear width-100'>
+	<img src='<?php echo $this->user->getProfilePic('small');?>' class='left' />
+    <?php echo $this->postForm;?>
+</div>
+
+<?php
+	}
+echo $this->profilenewsfeed()->create($this->newsfeed);
+?>
 

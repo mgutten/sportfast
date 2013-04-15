@@ -15,7 +15,7 @@
 }
 
 .game-distance {
-	margin-top: .05em;
+	margin-top: .4em;
 }
 
 .game-rating-box {
@@ -30,4 +30,8 @@
 	left: -1.5em;
 	padding: .7em 2em;
 	
+}
+
+#game-plus-one {
+	font-size: .9em;
 }

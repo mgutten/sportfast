@@ -8,6 +8,8 @@ class Application_Model_Game extends Application_Model_ModelAbstract
 									'teamGameID'	=> '',
 									'park' 			=> '',
 									'parkID'		=> '',
+									'backupParkID'  => '',
+									'backupParkName'=> '',
 									'public'		=> '',
 									'sport'			=> '',
 									'sportID' 		=> '',
@@ -37,7 +39,8 @@ class Application_Model_Game extends Application_Model_ModelAbstract
 									'teamID'		=> '',
 									'leagueLocationID'	=> '',
 									'players'		=> '',
-									'type'			=> ''
+									'type'			=> '',
+									'messages'		=> ''
 									);
 									
 	protected $_primaryKey = 'gameID';
@@ -110,6 +113,17 @@ class Application_Model_Game extends Application_Model_ModelAbstract
 	{
 		return $this->getMapper()->updateLeagueLocation($locationID, $data);
 	}
+	
+	public function getMessages()
+	{
+		if (!$this->hasValue('messages')) {
+			$this->_attribs['messages'] = new Application_Model_Messages();
+			$this->_attribs['messages']->setParent($this);
+		}
+		
+		return $this->_attribs['messages'];
+	}
+
 	
 	public function getType()
 	{
@@ -252,26 +266,30 @@ class Application_Model_Game extends Application_Model_ModelAbstract
 		
 		
 		$prepend = '';
-		if ($diff == 0) {
-			// Today
-			return 'Today';
-		} elseif ($diff == 1) {
-			// Tomorrow
-			return 'Tomorrow';
-		} elseif ($diff == -1) {
-			return 'Yesterday';
-		} elseif ($diff < -1 && $diff > -7) {
-			// Last
-			$prepend = 'Last ';
-		} elseif ($diff < 7) {
-			// Under a week, prepend "this"
-			$prepend = 'This ';
-		} elseif ($diff >= 7 && $diff < $endNextWeek) {
-			$prepend = 'Next ';
+		if ($format == 'l') {
+			// Format is longer day (Tuesday) show more details
+			if ($diff == 0) {
+				// Today
+				return 'Today';
+			} elseif ($diff == 1) {
+				// Tomorrow
+				return 'Tomorrow';
+			} elseif ($diff == -1) {
+				return 'Yesterday';
+			} elseif ($diff < -1 && $diff > -7) {
+				// Last
+				$prepend = 'Last ';
+			} elseif ($diff < 7) {
+				// Under a week, prepend "this"
+				$prepend = 'This ';
+			} elseif ($diff >= 7 && $diff < $endNextWeek) {
+				$prepend = 'Next ';
+			}
 		}
 		
 		return $prepend . $gameDate->format($format);
 	}
+	
 	
 	public function getHour()
 	{

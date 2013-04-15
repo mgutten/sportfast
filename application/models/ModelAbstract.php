@@ -24,29 +24,47 @@ abstract class Application_Model_ModelAbstract
 		}
 	}
 	
-	public function getIDs($attrib)
+	/**
+	 * @attrib ($attrib => attrib of parent model to loop through (ie games or teams)
+	 *			$primaryKey => if set, then only choose children with that primaryKey set (else use default _primaryKey of class) (prevents inclusion of teamGameID in gameID search)
+	 */
+	public function getIDs($attrib, $primaryKey = false)
 	{
 		if (is_array($this->_attribs[$attrib])) {
 			// Is array, return as array
 			$ids = array();
+			
+			
 			foreach ($this->_attribs[$attrib] as $obj) {
 				if (is_array($obj)) {
 					// Sub-array
 					foreach($obj as $object) {
-						$ids[] = $object->_attribs[$object->_primaryKey];
+						if (!$primaryKey) {
+							$primaryKey = $object->_primaryKey;
+						}
+						if (!empty($object->_attribs[$primaryKey])) {
+							$ids[] = $object->_attribs[$primaryKey];
+						}
 					}
 					continue;
 				} else {
-					$ids[] = $obj->_attribs[$obj->_primaryKey];
+					if (!$primaryKey) {
+						$primaryKey = $obj->_primaryKey;
+					}
+					if (!empty($obj->_attribs[$primaryKey])) {
+						$ids[] = $obj->_attribs[$primaryKey];
+					}
 				}
 			}
+
 			return $ids;
 		}
 	}
 	
-	public function implodeIDs($attrib)
+	public function implodeIDs($attrib, $primaryKey = false)
 	{
-		$ids = $this->getIDs($attrib);
+		$ids = $this->getIDs($attrib, $primaryKey);
+		
 		if (is_array($ids)) {
 			$str = implode(',', $ids);
 			return $str;

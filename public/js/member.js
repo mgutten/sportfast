@@ -14,6 +14,12 @@ $(function() {
 		var textValue = childText.text();
 		var childImg  = $(this).children('img');
 		
+		if ($(this).parents('#dropdown-menu-member-looking-times').length > 0) {
+			// Only allow times dropdown to select one option
+			$(this).parents('#dropdown-menu-member-looking-times').find('p').removeClass('green-bold');
+			$(this).parents('#dropdown-menu-member-looking-times').find('img').removeClass('green-back');
+		}
+		
 		childText.toggleClass('green-bold');
 		
 		if (childImg.length > 0) {
@@ -31,7 +37,16 @@ $(function() {
 		var childText = $(this).children('p');
 		var textValue = childText.text();
 		var childImg  = $(this).children('img');
-				
+		
+		if ($(this).parents('#dropdown-menu-member-looking-times').length > 0) {
+			// Times section only has one selected
+			if ($(this).index() > 0) {
+				// Only bold first one
+				return
+			}
+		}
+			
+
 		childText.addClass('green-bold');
 		if (childImg.length > 0) {
 			childImg.addClass('green-back');
@@ -322,22 +337,27 @@ function loadFind(points)
 
 	var sports = new Array();
 	var types  = new Array();
+	var time   = '';
 	
-	$('#dropdown-menu-member-looking-sports,#dropdown-menu-member-looking-types').children('.dropdown-menu-option-container').each(function()
+	$('#dropdown-menu-member-looking-sports,#dropdown-menu-member-looking-types,#dropdown-menu-member-looking-times').children('.dropdown-menu-option-container').each(function()
 	{
 		if ($(this).children('p').is('.green-bold')) {
 			// Is selected
 			if ($(this).parent().is('#dropdown-menu-member-looking-sports')) {
 				// Sports dropdown
 				sports.push($(this).children('p').text())
-			} else {
+			} else if ($(this).parent().is('#dropdown-menu-member-looking-types')) {
 				// Types dropdown
 				types.push($(this).children('p').text().toLowerCase())
+			} else {
+				// Times dropdown
+				time = $(this).children('p').text().toLowerCase();
 			}
+				
 		}
 	})
 
-	
+
 	$('.member-find-loading').show();
 	$('#member-find-body').hide();
 
@@ -346,7 +366,8 @@ function loadFind(points)
 		type: 'POST',
 		data: {sports: sports, 
 			   types: types,
-			   points: points},
+			   points: points,
+			   time: time},
 		success: function(matches) {
 			matches = JSON.parse(matches);
 			$('#member-find-body').html(matches[0]);

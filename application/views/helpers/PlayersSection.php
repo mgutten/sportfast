@@ -77,10 +77,27 @@ class Application_View_Helper_PlayersSection
 			
 			$counter ++;
 		}
-		
+
+		if ($typeModel instanceof Application_Model_Game) {
+			if ($counter < $typeModel->totalPlayers) {
+				// There are "plus-ones"
+				for($counter = $counter; $counter < $typeModel->totalPlayers; $counter++) {
+					$player  = new Application_Model_User();					
+					$output .= "<div class='left team-player-container'>";
+					$output .= 	$player->getBoxProfilePic('medium');
+					$output .= 	"<div class='hover-dark profile-player-overlay-container'>";
+					$output .=		"<div class='profile-player-overlay'>";
+					$output .=			"<p class='white width-100 center left'>Anonymous</p>";
+					$output .=			"<p class='white width-100 center left smaller-text'>not a member</p>";
+					$output .=		"</div>";
+					$output .=	"</div>";
+					$output .= "</div>";
+				}
+			}
+		}
 		
 		$remaining = 7 - $counter;
-		if ($remaining > 0) {
+		if ($remaining > 0 && $typeModel->public == '1') {
 			// Populate remaining with empty open spots
 			$text = 'Join';
 			$class = 'profile-join-player-container pointer';

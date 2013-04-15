@@ -37,7 +37,7 @@ $(function()
 		var type   = idType.replace(/ID/, '');
 		var details = 'request';
 		
-		showConfirmationAlert('Request sent.');
+		showConfirmationAlert('Request sent');
 		
 		$(this).text('Request sent')
 		$(this).removeClass('heavy')
@@ -56,7 +56,7 @@ $(function()
 		var actingUserID = detailsEle.attr('actingUserID');
 		
 		addUserToGame(idType, typeID, actingUserID);
-		showConfirmationAlert('Added to game.');
+		showConfirmationAlert('Added to game');
 	})
 	
 	/* post message to wall */
@@ -243,7 +243,7 @@ $(function()
 		
 		reloadPage();
 		
-		showConfirmationAlert('Changes saved.');
+		showConfirmationAlert('Changes saved');
 	});
 	
 	/* user willingly leaves team */
@@ -278,7 +278,11 @@ $(function()
 		var name = (typeof detailsEle.attr('teamName') == 'undefined' ? 'this game' : detailsEle.attr('teamName'));
 		populateConfirmActionAlert('leave ' + name);
 		$('#confirm-action-alert-container').show();
-		$('.alert-black-back').show();
+		
+		var opacity = $('.alert-black-back').css('opacity');
+		$('.alert-black-back').css({display: 'block',
+								   opacity: 0})
+							  .animate({opacity: opacity}, 200);
 	});
 	
 	
@@ -290,6 +294,21 @@ $(function()
 	$('#confirm-action').click(function()
 	{
 		confirmAction();
+	})
+	
+	$(document).on('click','.invite-search-result',function()
+	{
+		var detailsEle = getDetailsEle();
+		var actingUserID = detailsEle.attr('actingUserID');
+		var idType = detailsEle.attr('idType');
+		var typeID = detailsEle.attr(idType);
+		var receivingUserID = $(this).attr('userID');
+		var action = 'invite';
+		var type   = idType.replace(/ID/, '');
+		var details;		
+		
+		createNotification(idType, typeID, actingUserID, receivingUserID, action, type, details);
+		showConfirmationAlert('Invite sent');
 	})
 	
 	

@@ -68,6 +68,13 @@ class Application_Model_Messages extends Application_Model_ModelAbstract
 		return $this->getMapper()->getTeamMessages($teamID, $this);
 	}
 	
+	/**
+	 * get game messages
+	 */
+	public function getGameMessages($gameID)
+	{
+		return $this->getMapper()->getGameMessages($gameID, $this);
+	}	
 		
 	public function moveUnreadToRead()
 	{

@@ -392,7 +392,7 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 		$db = Zend_Db_Table::getDefaultAdapter();   
 		
 		$lastRead = $userClass->lastRead;
-		$gameIDs  = ($userClass->hasValue('games') ? $userClass->games->implodeIDs('games') : '');
+		$gameIDs  = ($userClass->hasValue('games') ? $userClass->games->implodeIDs('games', 'gameID') : '');
 		$teamIDs  = ($userClass->hasValue('teams') ? $userClass->teams->implodeIDs('teams') : '');
 
 		$names	  = array('game','team');
@@ -422,9 +422,39 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 					 LEFT JOIN `groups` AS `gr` ON gr.groupID = nl.groupID
 					 LEFT JOIN `user_ratings` AS `ur` ON ur.userRatingID = nl.ratingID 
 					 WHERE ((nl.receivingUserID = " . $userID . ") OR
-					 	(nl.actingUserID =  " . $userID . " AND n.action = 'friend') ";*/
-		$select = "SELECT `nl`.*, 
+					 	(nl.actingUserID =  " . $userID . " AND n.action = 'friend') 
+						SELECT `nl`.*, 
 						  `n`.*, 
+						  COUNT(nl.notificationID) as likeNotifications,
+						  `u`.firstName as actingFirstName, 
+						  `u`.lastName as actingLastName, 
+						  `u2`.firstName as receivingFirstName, 
+						  `u2`.lastName as receivingLastName, 
+						  `u`.userID as actingUserID,
+						  `u2`.userID as receivingUserID,
+						  COALESCE(`ga`.sport,`t`.sport,`ur`.sport) as sport,
+						  COALESCE(`ga`.date,`ur`.dateHappened) as date, 
+						  ga.parkName, 
+						  ga.parkID, 
+						  ga.date, 
+						  t.teamName
+					 FROM `notification_log` AS `nl`
+					 INNER JOIN `notifications` AS `n` ON n.notificationID = nl.notificationID
+					 LEFT JOIN `users` AS `u` ON u.userID = nl.actingUserID
+					 LEFT JOIN `users` AS `u2` ON u2.userID = nl.receivingUserID
+					 LEFT JOIN `games` AS `ga` ON ga.gameID = nl.gameID
+					 LEFT JOIN `teams` AS `t` ON t.teamID = nl.teamID
+					 LEFT JOIN `user_ratings` AS `ur` ON ur.userRatingID = nl.ratingID 
+					 WHERE ((nl.receivingUserID = " . $userID . ") OR
+					 	(nl.actingUserID =  " . $userID . " AND n.action = 'friend')";
+						 */
+		$select = "(SELECT `nl`.gameID,
+							`nl`.teamID,
+							`nl`.parkID,
+							`nl`.notificationLogID, 
+						   MAX(nl.dateHappened) as dateHappened,
+						  `n`.*, 
+						  COUNT(nl.notificationID) as likeNotifications,
 						  `u`.firstName as actingFirstName, 
 						  `u`.lastName as actingLastName, 
 						  `u2`.firstName as receivingFirstName, 
@@ -472,7 +502,7 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 			$select .= ") AND (n.action != 'create' AND nl.receivingUserID IS NULL AND nl.actingUserID != " . $userID . "))";
 		} 
 		
-		$select .= ") ";
+		$select .= " AND n.action = 'join') ";
 		
 		
 		if ($onlyNew) {
@@ -482,8 +512,73 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 			// Select old notifications
 			$select .= " AND nl.dateHappened <= '" . $lastRead . "' ";
 		}
+	
+		$select .= " GROUP BY nl.notificationID, nl.gameID, nl.teamID) UNION ";
+		$select .= "(SELECT `nl`.gameID,
+							`nl`.teamID,
+							`nl`.parkID,
+							`nl`.notificationLogID,
+						 `nl`.dateHappened as dateHappened, 
+						  `n`.*, 
+						  " . new Zend_Db_Expr('1') . " as likeNotifications,
+						  `u`.firstName as actingFirstName, 
+						  `u`.lastName as actingLastName, 
+						  `u2`.firstName as receivingFirstName, 
+						  `u2`.lastName as receivingLastName, 
+						  `u`.userID as actingUserID,
+						  `u2`.userID as receivingUserID,
+						  COALESCE(`ga`.sport,`t`.sport,`ur`.sport) as sport,
+						  COALESCE(`ga`.date,`ur`.dateHappened) as date, 
+						  ga.parkName, 
+						  ga.parkID, 
+						  ga.date, 
+						  t.teamName
+					 FROM `notification_log` AS `nl`
+					 INNER JOIN `notifications` AS `n` ON n.notificationID = nl.notificationID
+					 LEFT JOIN `users` AS `u` ON u.userID = nl.actingUserID
+					 LEFT JOIN `users` AS `u2` ON u2.userID = nl.receivingUserID
+					 LEFT JOIN `games` AS `ga` ON ga.gameID = nl.gameID
+					 LEFT JOIN `teams` AS `t` ON t.teamID = nl.teamID
+					 LEFT JOIN `user_ratings` AS `ur` ON ur.userRatingID = nl.ratingID 
+					 WHERE ((nl.receivingUserID = " . $userID . ") OR
+					 	(nl.actingUserID =  " . $userID . " AND n.action = 'friend') ";
 		
-		$select .= " ORDER BY nl.dateHappened DESC";
+		$counter = 0;
+		$success = false;
+		foreach ($names as $name) {
+			$nameCombo = $name . 'IDs';
+			if (!empty($$nameCombo)) {
+				if ($counter == 0) {
+					// First successful group
+					$select .= "OR ((";
+				} else {
+					$select .= " OR ";
+				}
+				
+				$select .= "nl." . $name . "ID IN (" . $$nameCombo . ")";
+				if (!$success) {
+					$success = true;
+				}
+				$counter++;
+			}
+		}
+		
+		if ($success) {
+			// One of $names had a value
+			$select .= ") AND (n.action != 'create' AND nl.receivingUserID IS NULL AND nl.actingUserID != " . $userID . "))";
+		} 
+		
+		$select .= "and n.action != 'join') ";
+		
+		
+		if ($onlyNew) {
+			// Select only notifications since last read
+			$select .= " AND nl.dateHappened > '" . $lastRead . "' ";
+		} else {
+			// Select old notifications
+			$select .= " AND nl.dateHappened <= '" . $lastRead . "' ";
+		}
+		$select .= " ) ORDER BY dateHappened DESC";
 		
 		if (!$onlyNew) {
 			$select .= " LIMIT 10";
@@ -498,7 +593,7 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 
 	}
 	
-	/**
+	/**3
 	 * get user's teams, friends, and groups
 	 * @params($savingClass => user model)
 	 */

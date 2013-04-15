@@ -152,15 +152,19 @@
 	margin: .1em .4em 0 0 ;
 }
 
-#member-looking-sports {
+#member-looking-sports,#member-looking-types {
 	margin-right: .5em;
 }
 
-#member-looking-sports>.dropdown-menu-selected>.dropdown-menu-option-text, #member-looking-types>.dropdown-menu-selected>.dropdown-menu-option-text {
+#member-looking-sports>.dropdown-menu-selected>.dropdown-menu-option-text, 
+#member-looking-types>.dropdown-menu-selected>.dropdown-menu-option-text,
+#member-looking-times>.dropdown-menu-selected>.dropdown-menu-option-text {
 	color: #bbb; /* overwrite normal dropdown color */
 }
 
-#member-looking-sports>.dropdown-menu-selected>.dropdown-menu-container-reverse-text, #member-looking-types>.dropdown-menu-selected>.dropdown-menu-container-reverse-text{
+#member-looking-sports>.dropdown-menu-selected>.dropdown-menu-container-reverse-text, 
+#member-looking-types>.dropdown-menu-selected>.dropdown-menu-container-reverse-text,
+#member-looking-times>.dropdown-menu-selected>.dropdown-menu-container-reverse-text{
 	color: #fff;
 }
 

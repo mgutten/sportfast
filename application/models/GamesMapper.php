@@ -6,21 +6,28 @@ class Application_Model_GamesMapper extends Application_Model_MapperAbstract
 	
 	/**
 	 * Get all games that are happening during user's availability
-	 * @params($userClass   => user object,
-	 *		   $savingClass => games object,
-	 *		   $options		=> additional sql "where" constraints)
+	 * @params ($userClass   => user object,
+	 *		    $savingClass => games object,
+	 *		    $options		=> additional sql "where" constraints,
+	 *		   	$points => array of upper and lower points of map area,
+	 *			$day	=> what day to search by (default user availability),
+	 *			$hour => array of what hour to search for (default user availability))
 	 */
-	public function findUserGames($userClass, $savingClass, $options = false, $points = false)
+	public function findUserGames($userClass, $savingClass, $options = false, $points = false, $day = false, $hour = false)
 	{
 		$table    = $this->getDbTable();
 		$select   = $table->select();
 		$userID   = $userClass->userID;
 		$cityID   = $userClass->getCity()->cityID;
+		$gameIDs  = ($userClass->hasValue('games') ? $userClass->games->implodeIDs('games', 'gameID') : '');
+
+		$gameIDs  = (!empty($gameIDs) ? '(' . $gameIDs . ')' : false);
 		
+
 		if ($points) {
 			// Map was moved or points have been set to not be around user location
-			$upperPoint = $points[0];
-			$lowerPoint = $points[1];
+			$bounds['upper'] = $points[0];
+			$bounds['lower'] = $points[1];
 		} else {
 			// Default location to search near is user's home location, look for games within $distance of user's home location
 			$latitude = $userClass->location->latitude;
@@ -32,10 +39,15 @@ class Application_Model_GamesMapper extends Application_Model_MapperAbstract
 		$select->setIntegrityCheck(false);
 		$select->from(array('g'  => 'games'))
 			   ->join(array('t' => 'sport_types'),
-			   		  't.typeID = g.typeID')
-			   ->join(array('usa' => 'user_sport_availabilities'),
-			   		  't.sportID = usa.sportID')
-			   ->join(array('pl' => 'park_locations'),
+			   		  't.typeID = g.typeID');
+		
+		if ($day === false || is_array($day)) {
+			// Need user's availability, join table
+			$select->join(array('usa' => 'user_sport_availabilities'),
+						  't.sportID = usa.sportID');
+		}
+					  
+		$select->join(array('pl' => 'park_locations'),
 			   		  'pl.parkID = g.parkID',
 					  array('AsText(location) as location'))
 			   ->joinLeft(array('ug' => 'user_games'),
@@ -50,9 +62,6 @@ class Application_Model_GamesMapper extends Application_Model_MapperAbstract
 						   '(COUNT(us.userID) + SUM(ug.plus)) as totalPlayers'
 						   ))
 			   //->where('g.cityID = ?', $cityID)
-			   ->where('usa.userID = ?', $userID)
-			   ->where('DATE_FORMAT(g.date,"%w") = usa.day')
-			   ->where('HOUR(g.date) = usa.hour')
 			   ->where('g.public = "1"')
 			   ->where('MBRContains(
 								LINESTRING(
@@ -60,6 +69,37 @@ class Application_Model_GamesMapper extends Application_Model_MapperAbstract
 								), pl.location
 								)')
 			   ->where('g.date > NOW()');
+			   
+		if ($gameIDs) {
+			// User is in games, do not show those
+			$select->where('g.gameID NOT IN ' . $gameIDs);
+		}
+			   
+		if (($day === false || is_array($day)) ||
+			($hour === false || is_array($hour))) {
+			// add id column for user
+			$select->where('usa.userID = ?', $userID);
+		}
+		if ($day === false) {
+			// Default to user's availabilty
+			$select->where('DATE_FORMAT(g.date,"%w") = usa.day');
+		} elseif (is_array($day)) {
+			$days  = '(';
+			$days .= implode(',', $day);
+			$days .= ')';
+			$select->where('DATE_FORMAT(g.date,"%w") IN ' . $days);
+		}
+		
+		if ($hour === false) {
+			// Default to user's availability
+			$select->where('HOUR(g.date) = usa.hour');
+		} elseif (is_array($hour)) {
+			$hours  = '(';
+			$hours .= implode(',', $hour);
+			$hours .= ')';
+			$select->where('HOUR(g.date) IN ' . $hours);
+		}
+			   
 								
 		
 		if ($options) {
@@ -72,6 +112,7 @@ class Application_Model_GamesMapper extends Application_Model_MapperAbstract
 		$select->group('g.gameID')
 			   ->order('abs(avg(us.skillCurrent) - (SELECT skillCurrent FROM user_sports WHERE userID = "' . $userID . '" AND sportID = t.sportID)) ASC');
 		
+
 		$results = $table->fetchAll($select);
 
 		foreach ($results as $result) {

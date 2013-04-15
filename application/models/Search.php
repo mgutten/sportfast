@@ -9,11 +9,12 @@ class Application_Model_Search extends Application_Model_ModelAbstract
 	/**
 	 * search db for searchTerm
 	 * @params ($searchTerm => term to search for
+	 *			$limit => array of types to search for (eg users, teams, etc))
 	 * @return (array of results)
 	 */
-	public function getSearchResults($searchTerm, $cityID)
+	public function getSearchResults($searchTerm, $cityID, $limit = false)
 	{
-		return $this->getMapper()->getSearchResults($searchTerm, $cityID, $this);
+		return $this->getMapper()->getSearchResults($searchTerm, $cityID, $limit, $this);
 	}
 	
 	/**

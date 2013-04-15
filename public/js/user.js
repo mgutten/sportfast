@@ -25,5 +25,20 @@ $(function()
 		
 	})
 	
+	$("#user-player-request").click(function()
+	{
+		var detailsEle = $('#user-details');
+		var actingUserID = detailsEle.attr('actingUserID');
+		var receivingUserID = detailsEle.attr('receivingUserID');
+		var action = 'friend';
+		var type   = 'friend';
+		var details = ''
+		var idType = '';
+		var typeID = '';
+
+		createNotification(idType, typeID, actingUserID, receivingUserID, action, type, details);
+		showConfirmationAlert('Request sent.');
+	})
+	
 	
 })

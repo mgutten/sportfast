@@ -6,7 +6,12 @@
 <div class='dropshadow white-back' id='notifications-container'>
 
 <?php
-
+	
+	if (!$this->user->notifications->hasValue('read') && !$this->user->notifications->hasValue('unread')) {
+		// No messages
+		echo "<p class='notification-container medium left'>You have no notifications</p>";
+	}
+	
 	$sections = array('unread', 'read');
 	foreach ($sections as $section) {
 		
@@ -24,16 +29,20 @@
 				$buttons .= "<p class='button notification-action-button'>Confirm</p>";
 				$buttons .= "<p class='button notification-action-button notification-action-button-second'>Decline</p>";
 				$buttons .= "</div>";
-			} 
+			} elseif ($notification->hasValue('joinOption')) {
+				$buttons = "<div class='notification-button-container clear-right' notificationLogID='" . $notification->notificationLogID . "' type='" . $notification->type . "'>";
+				$buttons .= "<p class='button notification-join'>Join</p>";
+				$buttons .= "</div>";
+			}
 			
-			echo "<div href='" . $notification->getFormattedUrl() . "' class='notification-container " . $class . " pointer'>" 
+			echo "<a href='" . $notification->getFormattedUrl() . "' class='notification-container " . $class . " pointer'>" 
 				 . "<div class='notification-text-picture-container'>"
 					 . "<img src='" . $notification->getPicture() . "' class='notification-picture' />"
 					 . "<span class='notification-text'>" . $notification->getFormattedText() . "</span>"
 					 . $buttons
 				 . "</div>"
 				 . "<span class='notification-time-subscript light'>" . $notification->getTimeFromNow() . "</span>"
-				 . "</div>";
+				 . "</a>";
 			
 		}
 	}
@@ -72,7 +81,7 @@ Request sent
                 <div class='dropdown-back-outer' id='nav-dropdown-outer-find'>
                     <div class='dropdown-back-inner' id='nav-dropdown-inner-find'>
                         <?php 
-							$find = array('games','teams','players','tournaments','groups');
+							$find = array('games','teams','players','tournaments');
 							foreach ($find as $section) {
 								echo $this->partial('partials/global/headerDropdownOption.phtml', array('controller' => 'find','section' => $section));
 							}
@@ -90,7 +99,7 @@ Request sent
                 <div class='dropdown-back-outer' id='nav-dropdown-outer-create'>
                     <div class='dropdown-back-inner' id='nav-dropdown-inner-create'>
                          <?php 
-							$create = array('game','team','group');
+							$create = array('game','team');
 							foreach ($create as $section) {
 								echo $this->partial('partials/global/headerDropdownOption.phtml', array('controller' => 'create','section' => $section));
 							}

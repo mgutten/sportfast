@@ -58,9 +58,15 @@ class IndexController extends Zend_Controller_Action
 												 	'color' => 'light'),
 											  array('text'  => 'Tournaments',
 												 	'color' => 'light'));
+													
+			$lookingDropdownTimeArray = array(array('text'  => 'My Availability',
+												 	'color' => 'light'),
+											  array('text'  => 'Any Time',
+												 	'color' => 'light'));
 			
 			$this->view->lookingDropdownSport = $dropdown->dropdown('member-looking-sports',$lookingDropdownSportArray, 'Select sports');
 			$this->view->lookingDropdownType  = $dropdown->dropdown('member-looking-types',$lookingDropdownTypeArray, 'Select types');
+			$this->view->lookingDropdownTime  = $dropdown->dropdown('member-looking-times',$lookingDropdownTimeArray, 'Select times');
 			
 			// Newsfeed
 			$newsfeed = new Application_Model_Notifications();
