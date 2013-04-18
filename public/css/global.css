@@ -53,6 +53,12 @@ ul {
 	padding-left: 2em;
 }
 
+.inherit {
+	color: inherit;
+	font: inherit;
+}
+
+
 .arial {
 	font-family: Arial,Helvetica;
 }
@@ -103,7 +109,6 @@ a {
 img {
 	border:none;
 }
-
 
 .lightest {
 	color:#F3F3F3;
@@ -288,11 +293,6 @@ div.selected-green,img.selected-green,p.selected-green {
 	-moz-box-shadow: 2px 0px 8px 0px #bbb,-2px 0px 8px 0px #bbb;
 	box-shadow: 2px 0px 8px 0px #bbb,-2px 0px 8px 0px #bbb;
 	z-index:1;
-}
-
-.inherit {
-	color: inherit;
-	font: inherit;
 }
 
 .none-text {
@@ -736,6 +736,10 @@ a.header-dropdown-option-cog {
 	margin: .2em 0 0 .1em;
 }
 
+.highlight {
+	color:inherit;
+}
+
 .nav-dropdown-text {
 	float:left;
 	color: inherit;
@@ -970,7 +974,7 @@ div#password-container {
 
 .checkbox-text {
 	float:left;
-	margin:-0.0625em 0 0 .3em;
+	margin:-0.2em 0 0 .3em;
 }
 
 input.dropdown-login-submit {
@@ -1606,6 +1610,15 @@ div.dropdown-menu-container-reverse:hover {
 	color: #777;
 }
 
+.button.transparent:hover {
+	background: #f0f0f0;
+	background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#fff), to(#e9e9e9));
+	background-image: -webkit-linear-gradient(top, #fff, #e9e9e9); 
+	background-image: -moz-linear-gradient(top, #fff, #e9e9e9);
+	background-image: -ms-linear-gradient(top, #fff, #e9e9e9);
+	background-image: -o-linear-gradient(top, #fff, #e9e9e9);
+}
+
 .button.right,.green-button.right,.red-button.right {
 	float:right;
 }
@@ -1941,8 +1954,9 @@ input.city-change-input {
 }
 	
 .calendar-today {
-	background:#fff;
-
+	-webkit-box-shadow:inset 0px 0px 0px 1px #333;
+    -moz-box-shadow:inset 0px 0px 0px 1px #333;
+    box-shadow:inset 0px 0px 0px 1px #333;
 }
 
 .calendar-dark {
@@ -2024,4 +2038,9 @@ input[type=text].selectable-input {
 	border: none;
 	font-size: 1.25em;
 	color: #bbb;
+}
+
+/* game title */
+.game-title-suffix {
+	
 }

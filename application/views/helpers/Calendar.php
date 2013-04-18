@@ -179,8 +179,14 @@ class Application_View_Helper_Calendar
 							  'F'  => 'Friday',
 							  'Sa' => 'Saturday');
 			$output .= "<div class='calendar-days-container clear width-100'>";
+
 			foreach ($days as $day) {
-				$output .= 		"<p class='light left calendar-day-name width-100 center'>" . $day . "</p>";
+				$class = 'light';
+				if ($daysLong[$day] == date('l')) {
+					// Today
+					$class = 'darkest';
+				}
+				$output .= 		"<p class='" . $class . " left calendar-day-name width-100 center'>" . $day . "</p>";
 			}
 			$output .= "</div>";
 		}

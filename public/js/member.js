@@ -3,6 +3,7 @@ var markers = new Array();
 var gamesPerPage = 4;
 var newsfeedTimeout;
 var zoomChanged;
+var paginationClicked;
 
 $(function() {
 	$(document).on('click','.dropdown-menu-option-container', function(e)
@@ -91,7 +92,11 @@ $(function() {
 	$(document).on('click', '.member-find-pagination',function()
 	{
 		var page = $(this).text();
+		paginationClicked = true;
+		
 		animateFindContainer(page);
+		
+		setTimeout(function() {paginationClicked = false}, 100);
 		
 		$('.member-find-pagination.light-back').removeClass('light-back');
 		$(this).addClass('light-back');
@@ -122,7 +127,6 @@ $(function() {
 		}
 	)	
 	
-	
 	/* narrow column ratings click icon */
 	$('.member-narrow-rating-icon').click(function()
 	{
@@ -139,6 +143,7 @@ $(function() {
 	preloadImageArray.push('/images/global/gmap/markers/green_reverse.png');
 	
 	initializeMap(37.98, -122.5, 12, createMarkers);
+	setZoom();
 
 	// Update newsfeed every 2 minutes (if update, must change ajax call in notificationsMapper
 	newsfeedTimeout = setInterval(function() { getNewsfeed('new') }, 120000);
@@ -158,23 +163,6 @@ function createMarkers()
 	var marker, i, latLon, index;
 	var bounds  = new google.maps.LatLngBounds();
 	
-	// Zoom constraint
-	/*
-	google.maps.event.addListener(gmap, 'zoom_changed', function() {
-			zoomChangeBoundsListener = 
-				google.maps.event.addListener(gmap, 'bounds_changed', function(event) {
-					if (this.getZoom() > 12 && this.initialZoom == true) {
-						// Change max/min zoom here
-						this.setZoom(12);
-						this.initialZoom = false;
-					}
-				google.maps.event.removeListener(zoomChangeBoundsListener);
-			});
-	});
-	
-	
-	gmap.initialZoom = true;
-	*/
 
 	
 	//google.maps.event.removeListener(dragListener);
@@ -247,6 +235,10 @@ function createMarkers()
  */
 function mapMoved()
 {
+	if (paginationClicked) {
+		// Prevent trigger of gmap event listeners on page change
+		return false;
+	}
 	var points = new Array();
 	var bounds = gmap.getBounds();
 	points[0] = 'POINT(' + bounds.getNorthEast().lat() + ',' + bounds.getNorthEast().lng() + ')';

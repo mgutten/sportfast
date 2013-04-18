@@ -4,7 +4,8 @@ class Application_Model_Games extends Application_Model_ModelAbstract
 {
 	protected $_mapperClass = 'Application_Model_GamesMapper';
 	
-	protected $_attribs     = array('games' => '');
+	protected $_attribs     = array('games' => '',
+									'totalRows' => '');
 	
 	public function findUserGames($userClass, $options = false, $points = false, $day = false, $hour = false)
 	{
@@ -64,6 +65,15 @@ class Application_Model_Games extends Application_Model_ModelAbstract
 		//}
 		
 		return $game;
+	}
+	
+	
+	/**
+	 * find games for Find controller given options
+	 */
+	public function findGames($options, $userClass, $limit = false)
+	{
+		return $this->getMapper()->findGames($options, $userClass, $this, $limit);
 	}
 	
 	/**

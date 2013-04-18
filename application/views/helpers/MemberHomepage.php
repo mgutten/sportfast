@@ -168,7 +168,6 @@ class Application_View_Helper_MemberHomepage
 				$dateCombo = 'this ' . $date;
 			}
 			
-			
 			if (isset($schedule[$b])) {
 				// Event for today
 				if ($i == $curDay) {
@@ -218,7 +217,7 @@ class Application_View_Helper_MemberHomepage
 					if ($game->isPickup()) {
 						$output .= "<a href='/games/" . $game->gameID . "' class='member-schedule-day-body-game-container schedule-container'>";
 						$output .= "<div class='member-schedule-day-body-game-left-container'>";
-						$output .= "<p class='bold darkest larger-text'>" . ucwords($game->sport) . ' Game';
+						$output .= "<p class='bold darkest larger-text'>" . $game->getGameTitle() . '</p>';
 						$output .= "<p class='clear'>" . $game->getDay() . "</p>";
 						$output .= "<p class='clear'>" . $game->getHour() . "</p>";
 						$output .= "<p class='clear medium'>" . $game->getPark()->parkName . "</p>";

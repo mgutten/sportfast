@@ -34,15 +34,20 @@ $(function()
 	(function($) {
 		
 	  $.fn.limitVal = function(lower, upper) {
-		
-			if(this.val().length == 0) {
+		  
+			var val = this.val();
+			var lowerLength = lower + '';
+
+			if((val.length == 0) ||
+			   (val.length < lowerLength.length) ||
+			   (parseInt(val + '0',10) <= upper)) {
 				// Empty string
 				return;
 			}
 			
-			if (this.val() > upper) {
+			if (val > upper) {
 				this.val(upper);
-			} else if(this.val() < lower) {
+			} else if(val < lower) {
 				this.val(lower)
 			}
 			return;
@@ -1297,9 +1302,8 @@ function toggleGreenBackground(ele, removeOld)
 */
 function animateNotShow(ele, down, fadeIn)
 {
-
 	var height = ele.outerHeight();
-
+	
 	if (down) {	
 		// Hidden element is down, animate it up
 		ele.stop().animate({marginTop: -height}, {duration:400, complete: function() {
@@ -1307,9 +1311,8 @@ function animateNotShow(ele, down, fadeIn)
 																			}
 		});
 	} else {
-		
 		// Hidden element is up, animate it down
-		ele.css({marginTop: -height + 'px',
+		ele.css({marginTop: -height,
 				 opacity: 0})
 
 		if (!fadeIn) {
@@ -1645,7 +1648,6 @@ function initializeMap(lat, lon, zoom, callback)
         gmap = new google.maps.Map(document.getElementById("gmap"),
             mapOptions);
 			
-		
 			
 		if (userLocation.length > 0) {
 			// User location is set, center on it initially
@@ -1659,6 +1661,27 @@ function initializeMap(lat, lon, zoom, callback)
 		callback();
 		
 }
+
+function setZoom()
+{
+		// Zoom constraint
+	
+	google.maps.event.addListener(gmap, 'zoom_changed', function() {
+			zoomChangeBoundsListener = 
+				google.maps.event.addListener(gmap, 'bounds_changed', function(event) {
+
+					if (this.getZoom() > 12 && this.initialZoom == true) {
+						// Change max/min zoom here
+						this.setZoom(12);
+						this.initialZoom = false;
+					}
+				google.maps.event.removeListener(zoomChangeBoundsListener);
+			});
+	});
+	
+	gmap.initialZoom = true;
+}
+
 
 
 /**
@@ -1851,7 +1874,9 @@ function clearMarkers() {
 		
         markers[i].setMap(null);
     }
+	
     markers = new Array();
+
 };
 	
 

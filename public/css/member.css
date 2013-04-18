@@ -11,8 +11,9 @@
 	float: left;
 	padding: 0 .4em;
 	height: inherit;
-	font-size: 1.2em;
+	font-size: 19px;
 	margin-left: 0em;
+	max-height:32px;
 }
 
 .member-schedule-day-subtext {
@@ -180,7 +181,7 @@
 	clear:both;
 	width:100%;
 	overflow:hidden;
-	height: auto; /* 9em */
+	height: 9em; /* 9em */
 }
 
 .member-find-lower-outer-inner-container {

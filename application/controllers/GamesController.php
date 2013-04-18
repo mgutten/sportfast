@@ -19,6 +19,7 @@ class GamesController extends Zend_Controller_Action
 		$this->view->game = $game;
 		
 		$this->view->userInGame = $userInGame = $game->players->userExists($this->view->user->userID);
+		$this->view->userPlus = $userInGame->plus;
 		
 		$this->view->pastGame  = ($game->gameDate->format('U') < time() ? true : false);
 		$this->view->todayGame = ($game->gameDate->format('mdy') == date('mdy') ? true : false);

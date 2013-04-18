@@ -24,6 +24,13 @@
 	padding-top: 0em;
 }
 
+.current-position {
+	min-width: 1px;
+	height: 1.2em;
+	margin-top: -1.4em;
+	margin-bottom: .1em;
+}
+
 
 /*
 #user-buttons-container>p,#user-buttons-container>div,#profile-buttons-container>p,#profile-buttons-container>div {

@@ -68,6 +68,8 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 		$select->from(array('ug' => 'user_games'))
 			   ->join(array('g' => 'games'),
 			   		  'ug.gameID = g.gameID')
+			   ->join(array('st' => 'sport_types'),
+			   		  'st.typeID = g.typeID')
 			   ->join(array('ug2' => 'user_games'),
 			   		  'ug2.gameID = ug.gameID',
 					  array('(COUNT(ug2.userID) + SUM(ug2.plus)) as totalPlayers',

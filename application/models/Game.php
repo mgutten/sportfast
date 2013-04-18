@@ -51,6 +51,7 @@ class Application_Model_Game extends Application_Model_ModelAbstract
 	{
 		if ($resultRow) {
 			$this->setAttribs($resultRow);
+			$this->type->setAttribs($resultRow);
 			$this->getPark()->setAttribs($resultRow);
 		}
 				
@@ -156,16 +157,31 @@ class Application_Model_Game extends Application_Model_ModelAbstract
 	
 	public function getGameTitle()
 	{
-		$gameTitle = $this->type->typeName . ' ' . $this->sport;
+		// if want bolded prefix, change class to inherit
+		$gameTitle = '<span class="darkest">' . $this->type->typeName . '</span> ' . $this->sport;
 		if ($this->type->hasValue('typeSuffix')) {
-			$gameTitle .= ' <span class="game-title-suffix">' . $this->type->typeSuffix . '</span>';
+			$gameTitle .= ' <span class="game-title-suffix darkest">' . $this->type->typeSuffix . '</span>';
 		}
 		return $gameTitle;
+	}
+	
+	public function getTotalPlayers()
+	{
+		if (!$this->hasValue('totalPlayers')) {
+			return '0';
+		}
+		
+		return $this->_attribs['totalPlayers'];
 	}
 	
 	public function getLimitedParkName($limit) {
 		
 		return $this->getPark()->getLimitedName('parkName', $limit);
+	}
+	
+	public function getSport()
+	{
+		return ucwords($this->_attribs['sport']);
 	}
 	
 	public function isPickup()

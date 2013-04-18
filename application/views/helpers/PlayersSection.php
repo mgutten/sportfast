@@ -87,8 +87,8 @@ class Application_View_Helper_PlayersSection
 					$output .= 	$player->getBoxProfilePic('medium');
 					$output .= 	"<div class='hover-dark profile-player-overlay-container'>";
 					$output .=		"<div class='profile-player-overlay'>";
-					$output .=			"<p class='white width-100 center left'>Anonymous</p>";
-					$output .=			"<p class='white width-100 center left smaller-text'>not a member</p>";
+					$output .=			"<p class='light width-100 center left'>Guest</p>";
+					$output .=			"<p class='light width-100 center left smaller-text'>not a member</p>";
 					$output .=		"</div>";
 					$output .=	"</div>";
 					$output .= "</div>";

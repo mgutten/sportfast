@@ -22,6 +22,13 @@ class Application_Form_General extends Zend_Form
 				'class'			=> 'dropshadow',
 				'autocomplete'  => 'off'
 				));
+				
+		$this->addElement('checkbox', 'checkbox',  array(
+				'required'		=> false,
+				'decorators'	=> array('Checkbox'),
+				'checked'		=> false,
+				'class'			=> 'medium'
+				));
 	}
 	
 }

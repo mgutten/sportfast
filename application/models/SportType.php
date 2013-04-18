@@ -11,7 +11,8 @@ class Application_Model_SportType extends Application_Model_ModelAbstract
 									'typeSuffix' 		=> 'null',
 									'typeDescription' 	=> '',
 									'userSportTypeID'	=> '',
-									'sportID'			=> ''
+									'sportID'			=> '',
+									'sport'				=> ''
 									);
 	protected $_primaryKey = 'userSportTypeID';	
 	protected $_overwriteKeys = array('userID');

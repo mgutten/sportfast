@@ -1,0 +1,201 @@
+<?php
+/** 
+ * controller => find
+ * action => games
+ */
+$this->headTitle('Find Games');
+$this->headLink()->prependStylesheet($this->baseUrl() . '/css/find.css');
+$this->headScript()->prependFile($this->baseUrl() . '/js/find.js');
+$this->headScript()->prependFile('https://maps.googleapis.com/maps/api/js?key=AIzaSyAhxSMQ-WQux2nzTW4dBoKmpfGHVQOk7r8&sensor=false');
+$this->headScript()->prependFile($this->baseUrl() . '/js/plugins/smartslider.js');
+?>
+
+
+<?php
+$this->placeholder('narrowColumn')->captureStart();
+	echo "<div id='gmap' class='narrow-column-picture'></div>";
+	echo "<p class='clear larger-margin-top white arial bold larger-text width-100 center dark-back'>FILTERS</p>";
+	echo $this->narrowcolumnsection()->start(array('title' => 'Sports'));
+	$counter = 0;
+	foreach ($this->sports as $sport => $inner) {
+		$class = 'selectable-text light pointer narrow-sport';
+		if ($counter % 2 == 0) {
+			// even
+			$class .= ' clear';
+		} else {
+			$class .= ' right';
+		}
+		if (isset($this->types[$sport])) {
+			// User has this sport
+			$class .= ' green-bold';
+		}
+		
+		echo	"<p class='" . $class . "'>" . ucwords($sport) . "</p>";
+		$counter++;
+	}
+	echo $this->narrowcolumnsection()->end();
+	
+	$typeArray = array('title' => 'Type');
+	
+	if (!isset($this->types['tennis'])) {
+		// Tennis is set, show type option
+		$typeArray['class'] = 'hidden';
+	}
+	echo $this->narrowcolumnsection()->start($typeArray);
+	/*
+	$types = array('singles','match','doubles','rally');
+	$counter = 0;
+
+	foreach ($types as $type) {
+		$class = 'selectable-text light pointer narrow-sport';
+		if ($counter % 2 == 0) {
+			// Even
+			$class .= ' clear';
+		} else {
+			$class .= ' right';
+		}
+		
+		foreach ($this->types['tennis'] as $holder) {
+			if ($holder['typeName'] == $type || $holder['typeSuffix'] == $type) {
+				$class .= ' green-bold';
+				break;
+			}
+		}
+		echo	"<p class='" . $class . "'>" . ucwords($type) . "</p>";
+		$counter++;
+	}
+	*/
+	$output = '';
+	$keys = array_keys($this->sports);
+	$counter = 0;
+
+	foreach ($this->sports as $sport) {
+		if (isset($sport['type'])) {
+			// Has unique types
+			$output .= "<div class='find-type-outer-container' class='width-100' id='find-type-" . strtolower($keys[$counter]) . "' sport='" . strtolower($keys[$counter]) . "'>";
+			$output .= 		"<p class='width-100 dark center'>" . ucwords($keys[$counter]) . "</p>";
+			foreach ($sport['type'] as $typeName => $typeSuffix) {
+				
+				$output .= "<div class='left find-type-container'>";
+				$output .=		"<p class='left dark smaller-text width-100 center'>" . ucwords($typeName) . "</p>";
+				
+				foreach ($typeSuffix as $title => $options) {
+					
+					$class = '';
+
+					if (isset($this->types['tennis'][$typeName][$title])) {
+						$class .= ' green-bold';
+					}
+
+					
+					$output .= 		"<p class='clear selectable-text light pointer " . $class . "'>" . ucwords($title) . "</p>";
+				}
+				
+				$output .= "</div>";
+			}
+			$output .= "</div>";
+		}
+		$counter++;
+	}
+	echo $output;
+	echo $this->narrowcolumnsection()->end();
+	
+	
+	echo $this->narrowcolumnsection()->start(array('title' => 'Time'));
+	echo $this->checkbox->setName('timeUser')
+						->setAttribs(array('text' =>'My Availability',
+										   'checked' => 'checked'));
+	echo $this->checkbox->setName('timeAny')
+						->setAttribs(array('text' =>'Any Time',
+										   'checked' => false));
+	echo $this->narrowcolumnsection()->end();
+	
+	echo $this->narrowcolumnsection()->start(array('title' => 'Skill'));
+	/*echo $this->slider()->create(array('id' => 'skill',
+									   'valuePosition' => 'above',
+									   'valueClass'	=> 'larger-text'));*/
+	echo $this->checkbox->setName('skillAny')
+						->setAttribs(array('text' =>'Any Level',
+										   'checked' => 'checked'));
+	echo $this->checkbox->setName('skillSpecific')
+						->setAttribs(array('text' =>'Specific Level',
+										   'checked' => false,
+										   'class' => 'medium find-filter-textInput'));
+	echo "<div class='find-filter-hidden hidden'>";
+	echo $this->inputText->setLabel('min')
+					     ->setName('skillMin');
+	echo "<p class='left medium skill-separator'>-</p>";
+	echo $this->inputText->setLabel('max')
+					     ->setName('skillMax');
+	echo "</div>";
+	echo $this->narrowcolumnsection()->end();
+	
+	echo $this->narrowcolumnsection()->start(array('title' => 'Age'));
+	echo $this->checkbox->setName('ageAny')
+						->setAttribs(array('text' =>'Any Age',
+										   'checked' => 'checked',
+										   'class'	=> 'medium'));
+	echo $this->checkbox->setName('ageSpecific')
+						->setAttribs(array('text' =>'Specific Age',
+										   'checked' => false,
+										   'class' => 'medium find-filter-textInput'));
+	echo "<div class='find-filter-hidden hidden'>";
+	echo $this->inputText->setLabel('min')
+					     ->setName('ageMin');
+	echo "<p class='left medium skill-separator'>-</p>";
+	echo $this->inputText->setLabel('max')
+					     ->setName('ageMax');	
+	echo "</div>";
+	echo $this->narrowcolumnsection()->end();
+	
+$this->placeholder('narrowColumn')->captureEnd();
+
+?>
+
+<p class='left dark indent'><span class='inherit' id='find-num-results'><?php echo $this->numMatches;?></span> games found</p>
+<?php
+$content  = "<div class='right' id='find-looking-container'>";
+$content .=		"<p class='left darkest heavy'>Looking for:</p>";
+$content .= 	"<div class='left indent'>" . $this->lookingFor . "</div>";
+$content .= "</div>";
+$content .= "<div class='left' id='find-order-by'>";
+$content .= 	"<p class='light left'>Order by:</p>";
+$content .= 	"<p class='light left pointer selectable-text selectable-text-one'>Players</p>";
+$content .= 	"<p class='light left pointer selectable-text selectable-text-one'>Date</p>";
+$content .= 	"<p class='light left pointer selectable-text selectable-text-one green-bold'>Match</p>";
+$content .= "</div>";
+echo $this->partial('partials/global/sectionHeaderBold.phtml',array('title'   => 'Results',
+																	  'content' => $content));
+
+echo $this->find()->createPagination(false);
+echo "<div class='find-results-outer-container left width-100' id='find-results-outer-container'>";
+echo "<div class='find-results-outer-inner-container left width-100' id='find-results-inner-container'>";
+echo $this->find()->loopMatches($this->matches, 'game');
+echo "</div></div>";
+echo $this->find()->createPagination(true);
+
+echo "<img src='/images/global/loading.gif' id='loading' class='hidden'/>";
+
+echo "<br/><p id='test'></p>";
+?>
+
+
+    <script type='text/javascript'>
+	<?php 
+	   if (!empty($this->matches)) {
+		   // Matches exist
+		   ?>
+		gmapMarkers = [		<?php
+								 foreach ($this->matches as $match) {
+									 if ($match instanceof Application_Model_Game) {
+										 // Is game, create marker on map
+										 $location = $match->getPark()->getLocation();
+										
+										 echo '[' . $location->latitude . ',' . $location->longitude . '],';
+									 }
+								 }?>
+					  ]
+	<?php } ?>
+					
+		userLocation = [<?php echo '"' . $this->user->getLocation()->latitude . '","' . $this->user->getLocation()->longitude . '"';?>];
+	</script> 

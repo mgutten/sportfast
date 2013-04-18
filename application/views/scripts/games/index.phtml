@@ -82,6 +82,27 @@ if ($this->pastGame) {
 	echo "<div class='green-alert-box green heavy'>This game is happening today at " . $this->game->gameDate->format('g:ia') . "!</div>";
 }
 ?>
+
+<p class='dark smaller-text right current-position' >
+<?php 
+	if ($this->userInGame) {
+		?>
+    You are currently attending with 
+      <select id='game-plus'>
+      	<?php
+			for ($i = 0; $i < 4; $i++) {
+				$selected = '';
+				if ($this->userPlus == $i) {
+					$selected = 'selected';
+				}
+				echo "<option " . $selected . ">" . $i . "</option>";
+			}
+        ?>
+      </select>
+    others.
+    <?php }?>
+</p>
+
 <header class='clear profile-name-container'>
 	<p class='profile-name heavy darkest clear'>
     	<?php echo $this->gameTitle;?>
@@ -109,14 +130,6 @@ if ($this->pastGame) {
 		if ($this->userInGame) {
 			// You are in game
 			?>
-            <p class='darkest smaller-text right current-position' >You are currently attending with 
-            	<select>
-            		<option>0</option>
-                    <option>1</option>
-                    <option>2</option>
-                    <option>3</option>
-                </select>
-            others.</p>
 			<p class='red-button clear-right leave-button margin-top right' id='leave-button' style='margin-right:0'>
 				Leave
 			</p>

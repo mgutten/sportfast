@@ -4,7 +4,8 @@ class Application_Model_Matches extends Application_Model_ModelAbstract
 {
 	protected $_mapperClass = 'Application_Model_UsersMapper';
 	
-	protected $_attribs     = array('matches' => '');
+	protected $_attribs     = array('matches' => '',
+									'totalRows' => '');
 	
 	public function addMatches($matches)
 	{
@@ -18,13 +19,41 @@ class Application_Model_Matches extends Application_Model_ModelAbstract
 		return $this;
 	}
 	
-	public function sortByMatch()
+	/**
+	 * sort matches by match, starting at $offset and going for $end
+	 */
+	public function sortByMatch($offset = 0, $end = false)
 	{
 		
 		if (!empty($this->_attribs['matches'])) {
 			// There are matches stored, sort them
-			usort($this->_attribs['matches'], array('Application_Model_Matches','matchSort'));
-			return $this->_attribs['matches'];
+			/*$matches = array();
+			if ($offset != 0) {
+				$end = (!$end ? count($this->_attribs['matches']) : $end);
+				for ($i = $offset; $i < $end; $i++) {
+					array_push($matches, $this->_attribs['matches'][$i]);
+				}
+			} else {
+				$matches = $this->_attribs['matches'];
+			}*/
+			$matches = $this->attribs['matches'];
+			usort($matches, array('Application_Model_Matches','matchSort'));
+			
+			$returnMatches = array();
+			if ($end) {
+				$end = (!$end ? count($this->_attribs['matches']) : $end);
+				for ($i = $offset; $i < ($end + $offset); $i++) {
+					if (!isset($this->_attribs['matches'][$i])) {
+						// End of matches
+						break;
+					}
+					array_push($returnMatches, $this->_attribs['matches'][$i]);
+				}
+			} else {
+				$returnMatches = $matches;
+			}
+			
+			return $returnMatches;
 		} else {
 			return false;
 		}
@@ -38,8 +67,8 @@ class Application_Model_Matches extends Application_Model_ModelAbstract
 			$a = -10;
 			$b = 0;
 		} else {
-			$a = $a->totalPlayers - (abs($a->skillDifference) * .5);
-			$b = $b->totalPlayers - (abs($b->skillDifference) * .5);
+			$a = $a->totalPlayers - (abs($a->skillDifference) * .7);
+			$b = $b->totalPlayers - (abs($b->skillDifference) * .7);
 		}
 		
        	if ($a == $b) {

@@ -29,7 +29,8 @@ class Application_Model_User extends Application_Model_ModelAbstract
 									'groups'		=> '',
 									'players'		=> '',
 									'changedLocation' => '',
-									'messages'		=> ''
+									'messages'		=> '',
+									'plus'			=> ''
 									);
 
 	protected $_primaryKey = 'userID';	
@@ -288,6 +289,32 @@ class Application_Model_User extends Application_Model_ModelAbstract
 		
 		return $sports;
 	}
+	
+	public function getSportTypes()
+	{
+		$returnArray = array();
+		foreach ($this->sports as $sport) {
+			$sportName = $sport->_attribs['sport'];
+			foreach ($sport->types as $type) {
+				if (strtolower($type->_attribs['typeName']) == 'pickup' && strtolower($type->_attribs['typeSuffix']) == null) {
+					$returnArray[$sportName] = false;
+					continue;
+				}
+				  $innerArray = array();
+				  $typeName = $type->_attribs['typeName'];
+				  
+				  $suffix = $type->_attribs['typeSuffix'];
+				  if ($suffix == 'null') {
+					  $suffix = false;
+				  }
+				  //$innerArray['typeSuffix'] = $suffix;
+				  $returnArray[$sportName][$typeName][$suffix] = true;
+			}
+		}
+		
+		return $returnArray;
+	}
+		
 	
 	public function sortSportsByOverall()
 	{

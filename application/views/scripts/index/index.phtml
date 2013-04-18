@@ -26,7 +26,7 @@ if (!$this->loggedIn) {
 		   ?>
 		gmapMarkers = [		<?php
 								 foreach ($this->matches as $match) {
-									 if (get_class($match) == 'Application_Model_Game') {
+									 if ($match instanceof Application_Model_Game) {
 										 // Is game, create marker on map
 										 $location = $match->getPark()->getLocation();
 										 echo '[' . $location->latitude . ',' . $location->longitude . '],';

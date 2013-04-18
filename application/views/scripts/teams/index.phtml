@@ -272,13 +272,14 @@ if ($this->team->sportupCreated && !$this->userOnTeam) {
     </div>
 </header>
 
+
 <div id='profile-buttons-container'>
     <?php
 		
 		if ($this->userOnTeam) {
 			// You are on team
 			?>
-            <p class='darkest smaller-text right current-position'>You are currently <?php echo ($this->captain ? 'Team Captain' : 'a member');?>.</p>
+            <p class='dark smaller-text right current-position'>You are currently <?php echo ($this->captain ? 'Team Captain' : 'a member');?>.</p>
 			<p class='red-button clear-right leave-button margin-top right' id='leave-button' style='margin-right:0'>
 				Leave
 			</p>

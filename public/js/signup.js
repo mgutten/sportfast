@@ -345,17 +345,17 @@ $(function()
 	// strackbar requires element to not be hidden (offset().left)
 	$('.signup-sports-form').show();
 	$('.signup-skill-slider').strackbar({callback: updateSkillHiddenInput, 
-									   defaultValue: 2,
-									   minValue: 0,
-									   maxValue: 6,
-									   sliderHeight: 4,
-									   sliderWidth: width,
-									   style: 'style1', 
-									   animate: false, 
-									   ticks: false, 
-									   labels: false, 
-									   trackerHeight: 20, 
-									   trackerWidth: 19 })
+									     defaultValue: 2,
+									     minValue: 0,
+									     maxValue: 6,
+									     sliderHeight: 4,
+									     sliderWidth: width,
+									     style: 'style1', 
+									     animate: false, 
+									     ticks: false, 
+									     labels: false, 
+									     trackerHeight: 20, 
+									     trackerWidth: 19 })
 	// Hide element again
 	$('.signup-sports-form').hide();
 												 

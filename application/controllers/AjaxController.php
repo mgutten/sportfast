@@ -75,6 +75,25 @@ class AjaxController extends Zend_Controller_Action
 		 
 	 }
 	 
+	  /**
+	  * update user's "plus" category for game
+	  */
+	 public function updateUserGamePlusAction()
+	 {
+		 $options = $this->getRequest()->getPost('options');
+		 
+		 if (empty($options['userID']) || empty($options['gameID'])) {
+			 return false;
+		 }
+		 
+		 $table = new Application_Model_DbTable_UserGames();
+		 
+		 $where = array();
+		 $where[] = $table->getAdapter()->quoteInto('userID = ?', $options['userID']);
+		 $where[] = $table->getAdapter()->quoteInto('gameID = ?', $options['gameID']);
+
+		 $table->update(array('plus' => $options['plus']), $where);
+	 }
 	 
 	 /**
 	  * add user to game
@@ -218,11 +237,72 @@ class AjaxController extends Zend_Controller_Action
 		
 	}
 
+	/**
+	 * get and return matches based on user's for find page
+	 */
+	public function findMatchesAction()
+	{
+		
+		$post    = $this->getRequest()->getPost();
+		$options = $post['options'];
+		$type    = $post['type'];
+		$orderBy = strtolower($post['orderBy']);
+		$offset  = $post['offset'];
+		
+		if ($orderBy != 'match') {
+			$options['order'] = $orderBy;
+		}
+		
+		$limit = '30';
+		if (!empty($post['offset'])) {
+			$limit .= ',' . $post['offset'];
+		} else {
+			$post['offset'] = 0;
+		} 
+		
+		if ($orderBy == 'match') {
+			// Order by match (done in php not mysql), no limit
+			$limit = '10000';
+		}
+			
+		$findMatches = Zend_Controller_Action_HelperBroker::getStaticHelper('FindMatches');
+		$findMatches = $findMatches->findmatches($type,$options, $this->view->user, $limit);
+
+		if ($orderBy == 'match') {
+			// Order by in php (order by match)
+			$matches = $findMatches->sortByMatch($post['offset'], 30);
+		} else {
+			// Order by in query
+			$matches = $findMatches->getAll();
+		}
+		
+		$output = array();
+		$output[0] = $this->view->find()->loopMatches($matches, 'game', $post['offset']);
+		
+		if (isset($matches[0])) {
+			// Matches exist
+			foreach ($matches as $match) {
+				if ($match instanceof Application_Model_Game) {
+					// Get latitude and longitude
+					$location = $match->getPark()->getLocation();
+					$output[1][] = array($location->getLatitude(), $location->getLongitude());
+				}
+				
+			}
+		} else {
+			$output[1][] = '';
+		}
+		
+		// Total rows
+		$output[2] = $findMatches->totalRows;
+		
+		echo json_encode($output);
+	}
+
+
 	
 	/**
 	 * get and return matches based on user's request/info
-	 * @params (profilePic => input type file)
-	 * @return (type of error if error OR path to temp img (str))
 	 */
 	public function getMatchesAction()
 	{
@@ -593,6 +673,7 @@ class AjaxController extends Zend_Controller_Action
 		$table->delete($where);
 				
 	}
+	
 	
 	/** 
 	 * handle click of "in" or "out" button clicks from game confirmation

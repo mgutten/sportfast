@@ -91,7 +91,7 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 			$this->view->user			  = $user;
 			$this->view->headerSearchForm = new Application_Form_HeaderSearch();
 			$this->view->loggedIn 		  = true;
-
+			$this->view->narrowColumn 	  = 'right';
 
 		} else {
 			// User is not logged in
@@ -191,6 +191,7 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 				'games/%d');
 				
 		$router->addRoute('games', $r);
+		
 		
 		return $view;
 	}
