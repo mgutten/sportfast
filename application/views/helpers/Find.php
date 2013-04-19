@@ -127,9 +127,9 @@ class Application_View_Helper_Find
 		$gameIndex = '';
 		if ($prefix == 'games') {
 			$gameIndex = " gameIndex='" . $this->resultCount . "' ";
-			$this->resultCount++;
 		}
-			
+		$this->resultCount++;	
+		
 		return "<a href='/" . $prefix . "/" . $id . "' class='find-result-container find-result-" . $prefix . " left animate-darker' " . $gameIndex . ">";
 	}
 	
@@ -175,6 +175,35 @@ class Application_View_Helper_Find
 		$output .= 		"</div>";
 		$output .=		"<img src='" . $match->getMatchImage() . "' tooltip='" . $match->getMatchDescription() . "' class='left find-result-match-img'/>";	
 		$output .=		($userInGame ? "<p class='left find-results-joined smaller-text green'> You are playing!</p>" : '');
+		$output .=		$this->createRight($match, $userInGame);
+		$output .= "</a>";
+		
+		return $output;
+	}
+	
+	/**
+	 * create game container for a match (controller => find, action => games)
+	 * @params ($match => team model,
+	 *			$number => # of match in list)
+	 */
+	public function createTeam($match, $number)
+	{
+		$userInGame = false;
+		if ($this->_view->user->teams->teamExists($match->teamID)) {
+			$userInGame = true;
+		}
+		$output  = $this->createOuterStart($match->teamID, 'teams');
+		$output .=		"<div class='left find-result-img-container'>";
+		$output .=			"<img src='" . $match->getProfilePic('medium') . "' class='left'/>";
+		$output .=			"<p class='find-result-number white green-back heavy'>" . $number . "</p>";
+		$output .= 		"</div>";
+		$output .=		"<div class='left find-result-left-container'>";
+		$output .=			"<p class='left heavy largest-text darkest'>" . $match->teamName . "</p>";
+		$output .=			"<p class='clear darkest larger-text'>" . $match->sport . " Team</p>";	
+		$output .=			"<p class='clear light'>" . $match->city . "</p>";		
+		$output .= 		"</div>";
+		$output .=		"<img src='" . $match->getMatchImage() . "' tooltip='" . $match->getMatchDescription() . "' class='left find-result-match-img'/>";	
+		$output .=		($userInGame ? "<p class='left find-results-joined smaller-text green'> You are on this team!</p>" : '');
 		$output .=		$this->createRight($match, $userInGame);
 		$output .= "</a>";
 		

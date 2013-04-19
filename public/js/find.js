@@ -5,6 +5,10 @@ var zoomChanged;
 var page = 1;
 var paginationClicked;
 
+/* BUGS:
+ * Ajax loaded containers (beyond initial 30 that are loaded) do not work with map, need to handle adding markers for them
+ */
+
 $(function()
 {
 	/* if Tennis is selected, show type section */
@@ -177,8 +181,14 @@ $(function()
 	preloadImageArray.push('/images/global/gmap/markers/green.png');
 	preloadImageArray.push('/images/global/gmap/markers/green_reverse.png');
 	
-	initializeMap(37.98, -122.5, 11, createMarkers);
+
+	if ($('#looking-for').find('.dropdown-menu-selected').children('p').text().toLowerCase() == 'games') {
+		// Map for games page
+		initializeMap(37.98, -122.5, 11, createMarkers);
+	}
 	
+	testFirstLastPagination(page);
+
 });
 
 /**
@@ -189,6 +199,7 @@ $(function()
  */
 function findMatches(options, type, orderBy, offset)
 {
+
 	offset = (typeof offset == 'undefined' ? '' : offset);
 
 	$('#loading').show();
@@ -491,6 +502,7 @@ function hideShowMarkers(page)
  */
 function testFirstLastPagination(page)
 {
+
 		var totalPages = $('.find-results-inner-container').length;
 		
 		if (page != 1) {
@@ -504,6 +516,7 @@ function testFirstLastPagination(page)
 		} else {
 			$('.pagination-next').hide();
 		}
+		
 }
 
 /**
@@ -543,11 +556,13 @@ function buildOptions(offset)
 		time = 'any';
 	}
 	
-	var points = new Array();
-	var bounds = gmap.getBounds();
-	points[0] = 'POINT(' + bounds.getNorthEast().lat() + ',' + bounds.getNorthEast().lng() + ')';
-	points[1] = 'POINT(' + bounds.getSouthWest().lat() + ',' + bounds.getSouthWest().lng() + ')';
 	
+	if (gmap) {
+		var points = new Array();
+		var bounds = gmap.getBounds();
+		points[0] = 'POINT(' + bounds.getNorthEast().lat() + ',' + bounds.getNorthEast().lng() + ')';
+		points[1] = 'POINT(' + bounds.getSouthWest().lat() + ',' + bounds.getSouthWest().lng() + ')';
+	}
 	
 	var options = {sports:sports,
 				   skill:skill,

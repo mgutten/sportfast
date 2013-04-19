@@ -103,7 +103,6 @@ class SignupController extends Zend_Controller_Action
 				$this->_redirect('/signup');
 				return;
 			} else {
-
 				// Form is valid
 				$user 	  = new Application_Model_User();
 				$userInfo = $user->getAttribs();

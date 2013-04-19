@@ -105,6 +105,136 @@ class Application_Model_TeamsMapper extends Application_Model_MapperAbstract
 	}
 	
 	/**
+	 * Get all games that match $options variable
+	 * @params ($options   => array of options including:
+	 *					sports => associative array of sport => type,
+	 *					distance => distance to look from user's location,
+	 *					time => time to look for ('user' for user availability, false for anytime),
+	 *					age => array('lower' => lower average age limit, 'upper' => upper average age limit),
+	 *					skill => array('lower' => lower average skill limit, 'upper' => upper average skill limit)
+	 *			$userClass   => user class,
+	 *		    $savingClass => games object,
+	 */
+	public function findTeams($options, $userClass, $savingClass, $limit = 200)
+	{
+		$table   = $this->getDbTable();
+		$select  = $table->select();
+		$userID  = $userClass->userID;
+		$where = array();
+		$having = array();
+		
+		$select->setIntegrityCheck(false);
+		// Default location to search near is user's home location, look for games within $distance of user's home location
+		$latitude  = $userClass->getLocation()->getLatitude();
+		$longitude = $userClass->getLocation()->getLongitude();
+		$bounds = $this->getBounds($latitude, $longitude, 20);	
+		
+		$zipcodeQuery = '(SELECT cityID FROM zipcodes as z2
+							WHERE MBRContains(
+												LINESTRING(
+												' . $bounds["upper"] . ' , ' . $bounds["lower"] . '
+												), z2.location
+											 )
+							GROUP BY cityID)';		   
+		
+
+		$select->from(array('t'  => 'teams'),
+					  array(new Zend_Db_Expr('SQL_CALC_FOUND_ROWS t.*')))
+			   ->join(array('uus' => 'user_sports'),
+			   		 'uus.sportID = t.sportID AND uus.userID = "' . $userID . '"',
+					 array('skillCurrent as userSkill'))
+			   ->join(array('z' => new Zend_Db_Expr($zipcodeQuery)),
+			   				'z.cityID = t.cityID')
+			   ->joinLeft(array('ut' => 'user_teams'),
+			   		 'ut.teamID = t.teamID',
+					 array(''))
+			   ->joinLeft(array('us' => 'user_sports'),
+			   		 'ut.userID = us.userID AND us.sportID = t.sportID',
+					 array('avg(us.skillCurrent) as averageSkill',
+					 	   'avg(us.attendance) as averageAttendance',
+						   'avg(us.sportsmanship) as averageSportsmanship',
+						   'avg(us.skillCurrent) - (SELECT skillCurrent FROM user_sports WHERE userID = "' . $userID . '" AND sportID = t.sportID) as skillDifference',
+						   'COUNT(us.userID) as totalPlayers'
+						   ))
+			   ->where('t.public = "1"')
+			   ->where('uus.skillCurrent >= t.minSkill AND uus.skillCurrent <= t.maxSkill');
+
+
+		$sportWhere = '';
+		$counter = 0;
+		
+		foreach ($options['sports'] as $sport => $inner) {
+			if ($counter != 0) {
+				$sportWhere .= ' OR ';
+			}
+			
+			$sportWhere .= "(t.sport = '" . $sport . "' )";
+			$counter++;
+		}
+		
+		$where[] = $sportWhere;
+		
+		/*
+		if (!empty($options['skill'])) {
+			$having[] = "avg(us.skillCurrent) >= '" . $options['skill']['lower'] . "' AND avg(us.skillCurrent) <= '" . $options['skill']['upper'] . "'";
+		}				  
+		*/	
+					   
+		foreach ($where as $statement) {
+			$select->where($statement);
+		}
+		
+		if (count($having) > 0) {
+			$statements = 'CASE WHEN COUNT(ug.userID) = 0 THEN 1=1 ELSE (';
+			$counter = 0;
+			foreach ($having as $statement) {
+				if ($counter != 0) {
+					$statements .= ' AND ';
+				}
+				$statements .= '(' . $statement . ')';
+				$counter++;
+			}
+			$statements .= ') END';
+			$select->having(new Zend_Db_Expr($statements));
+
+		}
+
+		
+		$select->group('t.teamID');
+			   //->order('abs(avg(us.skillCurrent) - (SELECT skillCurrent FROM user_sports WHERE userID = "' . $userID . '" AND sportID = t.sportID)) ASC');
+		
+		if (isset($options['order'])) {
+			// Order by
+			if ($options['order'] == 'players') {
+				$select->order('(COUNT(us.userID) + SUM(ug.plus)) DESC');
+			} elseif ($options['order'] == 'date') {
+				$select->order('g.date ASC');
+			}
+		}
+		
+		$limitArray = explode(',',$limit);
+		$totalLimit = trim($limitArray[0]);
+		$offsetLimit = (isset($limitArray[1]) ? $limitArray[1] : 0);
+		
+		$select->limit($totalLimit,$offsetLimit);
+	
+		$results = $table->fetchAll($select);
+		
+		$db = Zend_Db_Table::getDefaultAdapter();
+		$totalRows = $db->fetchAll('SELECT FOUND_ROWS() as totalRows');
+		$totalRows = $totalRows[0]['totalRows'];
+		
+		foreach ($results as $result) {
+			$savingClass->addTeam($result);
+		}
+		
+		$savingClass->totalRows = $totalRows;
+		
+		return $savingClass;
+		
+	}
+	
+	/**
 	 * get team info from db
 	 * @params ($teamID => teamID
 	 *			$savingClass => team model)

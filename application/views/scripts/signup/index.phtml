@@ -30,7 +30,7 @@ $this->placeholder('absolute')->captureStart();
 echo $this->partial('partials/global/alertBack.phtml');
 echo $this->alert()->start('signup-import','Upload and crop your image.');
 ?>
-<img class='signup-import-alert-img' id='signup-import-alert-img' src='/images/users/profile/pic/large/default.jpg' />
+<img class='signup-import-alert-img' id='signup-import-alert-img' src='/images/global/profile/xl/default.jpg' />
 <div class='signup-import-alert-text-container'>
 	<p class='medium clear' id='signup-import-alert-guidelines-header'>Profile pictures should be:</p>
 	<ul class='green heavy' id='signup-import-alert-guidelines'>
@@ -43,6 +43,10 @@ echo $this->alert()->start('signup-import','Upload and crop your image.');
         <form action="/ajax/upload-temp-picture" enctype="multipart/form-data" name='file_upload' id='upload-profile-pic'>
     		<input type='file' name='profilePic' id='profilePic' />
         </form>
+    </div>
+    <div id='signup-alert-rotate-container' class='clear width-100 clear'>
+        <img src='/images/global/img_upload/rotate_left.png' class='clear signup-alert-rotate pointer hidden' id='signup-alert-rotate-left' tooltip='Rotate image left'/>
+        <img src='/images/global/img_upload/rotate_right.png' class='right signup-alert-rotate pointer hidden' id='signup-alert-rotate-right' tooltip='Rotate image right'/>
     </div>
 	<p class='medium' id='signup-import-alert-warning'>
     	If players cannot recognize you by your picture, you <span class='heavy medium'>will not receive any ratings.</span>
@@ -61,7 +65,7 @@ $this->placeholder('absolute')->captureEnd();
 
 if (!empty($this->errors)) {
 	// There were errors
-	echo "<div class='red-alert-box red'>";
+	echo "<div class='red-alert-box white'>";
 	echo "Please fix the following:";
 	echo "<ul>";
 	foreach ($this->errors as $key => $val) {
@@ -71,8 +75,8 @@ if (!empty($this->errors)) {
 	echo "</div>";
 } else {
 	// No errors, display normally
-	echo "<div class='green-alert-box green'>
-				Organize and find your own pickup games based on your ability.  Sign up in just 4 steps!
+	echo "<div class='green-alert-box white'>
+				Organize and find your own pickup games based on your ability and availability.
 			</div>";
 }
 

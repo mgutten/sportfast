@@ -76,10 +76,10 @@ echo "<span id='game-details'
 <?php
 if ($this->pastGame) {
 	// This game already happened
-	echo "<div class='red-alert-box red heavy'>This game already happened!</div>";
+	echo "<div class='red-alert-box white heavy'>This game already happened!</div>";
 } elseif ($this->todayGame) {
 	// This game is happening today
-	echo "<div class='green-alert-box green heavy'>This game is happening today at " . $this->game->gameDate->format('g:ia') . "!</div>";
+	echo "<div class='green-alert-box white heavy'>This game is happening today at " . $this->game->gameDate->format('g:ia') . "!</div>";
 }
 ?>
 

@@ -1,10 +1,72 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<title>Untitled Document</title>
-</head>
+<?php
+/** 
+ * controller => find
+ * action => games
+ */
+$this->headTitle('Find Teams');
+$this->headLink()->prependStylesheet($this->baseUrl() . '/css/find.css');
+$this->headScript()->prependFile($this->baseUrl() . '/js/find.js');
+?>
 
-<body>
-</body>
-</html>
+
+<?php
+$this->placeholder('narrowColumn')->captureStart();
+	echo "<div class='narrow-column-picture'></div>";
+	echo "<p class='clear larger-margin-top white arial bold larger-text width-100 center dark-back'>FILTERS</p>";
+	echo $this->narrowcolumnsection()->start(array('title' => 'Sports'));
+	$counter = 0;
+	foreach ($this->sports as $sport => $inner) {
+		$class = 'selectable-text light pointer narrow-sport';
+		if ($counter % 2 == 0) {
+			// even
+			$class .= ' clear';
+		} else {
+			$class .= ' right';
+		}
+		if (isset($this->types[$sport])) {
+			// User has this sport
+			$class .= ' green-bold';
+		}
+		
+		echo	"<p class='" . $class . "'>" . ucwords($sport) . "</p>";
+		$counter++;
+	}
+	echo $this->narrowcolumnsection()->end();
+	
+	
+	
+	echo $this->narrowcolumnsection()->start(array('title' => 'Time'));
+	echo $this->checkbox->setName('timeUser')
+						->setAttribs(array('text' =>'My Availability',
+										   'checked' => 'checked'));
+	echo $this->checkbox->setName('timeAny')
+						->setAttribs(array('text' =>'Any Time',
+										   'checked' => false));
+	echo $this->narrowcolumnsection()->end();
+			
+$this->placeholder('narrowColumn')->captureEnd();
+
+?>
+
+<p class='left dark indent'><span class='inherit' id='find-num-results'><?php echo $this->numMatches;?></span> teams found</p>
+<?php
+$content  = "<div class='right' id='find-looking-container'>";
+$content .=		"<p class='left darkest heavy'>Looking for:</p>";
+$content .= 	"<div class='left indent'>" . $this->lookingFor . "</div>";
+$content .= "</div>";
+$content .= "<div class='left' id='find-order-by'>";
+$content .= 	"<p class='light left'>Order by:</p>";
+$content .= 	"<p class='light left pointer selectable-text selectable-text-one'>Players</p>";
+$content .= 	"<p class='light left pointer selectable-text selectable-text-one green-bold'>Match</p>";
+$content .= "</div>";
+echo $this->partial('partials/global/sectionHeaderBold.phtml',array('title'   => 'Results',
+																	  'content' => $content));
+
+echo $this->find()->createPagination(false);
+echo "<div class='find-results-outer-container left width-100' id='find-results-outer-container'>";
+echo "<div class='find-results-outer-inner-container left width-100' id='find-results-inner-container'>";
+echo $this->find()->loopMatches($this->matches, 'team');
+echo "</div></div>";
+echo $this->find()->createPagination(true);
+
+echo "<img src='/images/global/loading.gif' id='loading' class='hidden'/>";

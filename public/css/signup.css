@@ -14,7 +14,7 @@
 }
 
 .header-section-title-container {
-	height: 3em;
+	height: 49px;
 	margin-bottom: 1em;
 }
 
@@ -379,16 +379,31 @@ div.signup-narrow-column-img-container {
 	margin: 2em 0 0 1em;
 }
 
+.signup-alert-rotate {
+	margin: 0 2em 0 2em;
+}
+
+#signup-alert-rotate-container {
+	height: 40px;
+	margin-top: 1em;
+}
+
 #signup-import-alert-warning {
 	float:left;
 	clear:both;
-	margin: 4em 0 0 1em;
+	margin: 1em 0 0 1em;
 }
 
 #signup-import-alert-accept {
 	float:right;
 	clear:both;
 	margin: 2em 3em 0 0;	
+}
+
+#upload-container {
+/* used for upload profile pic later */
+	width: 44em;
+	margin: 2em 0 0 4em;
 }
 
 

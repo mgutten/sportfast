@@ -372,6 +372,15 @@ class Application_Model_User extends Application_Model_ModelAbstract
 		return $this;
 	}
 	
+	public function hasProfilePic()
+	{
+		if ($this->getProfilePic('small') == '/images/users/profile/pic/small/default.jpg') {
+			return false;
+		} else {
+			return true;
+		}
+	}
+	
 	public function getProfilePic($size, $userID = false, $type = 'users') 
 	{
 		return parent::getProfilePic($size, $this->userID, $type);

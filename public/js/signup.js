@@ -474,13 +474,21 @@ $(function()
 																						 },function(){
        																						jcropAPI = this;
 																							})
-																							
+													
+													$('.signup-alert-rotate').show();				
 													$('#signup-import-alert-accept').show();
 																				 
 													
 												}
 	})
 	
+	$('.signup-alert-rotate').click(function()
+	{
+		var leftOrRight = $(this).attr('id').replace(/signup-alert-rotate-/g,'');
+		var src = $('#signup-import-alert-img').attr('src');
+		
+		rotateImage(src, leftOrRight, populateUploadedImg);
+	})
 	
 	
 	
@@ -570,6 +578,43 @@ $(function()
  
 	
 });
+
+
+/**
+ * rotate user uploaded image
+ * @params (src => img src (should be relative),
+ *			leftOrRight => 'left' or 'right')
+ */
+function rotateImage(src, leftOrRight, callback)
+{
+	$.ajax({
+		url: '/ajax/rotate-image',
+		type: 'POST',
+		data: {src: src,
+			   leftOrRight: leftOrRight},
+		success: function(data) {
+			callback(data);
+
+		}
+	})
+}
+
+function populateUploadedImg(data)
+{		
+	if (jcropAPI) {
+		jcropAPI.destroy()
+	}
+	$('#fileName').val(data);
+	$('#signup-import-main-img,.narrow-column-picture').attr('src',data)
+	$('#signup-import-alert-img').attr('src',data)
+								 .maintainRatio()
+								 .Jcrop({aspectRatio: 1.26,
+										 setSelect: [0,0,200,200],
+										 onSelect: updateProfilePic
+										 },function(){
+											jcropAPI = this;
+											})
+}
 
 /**
  * test if geocode should be run, run it if so

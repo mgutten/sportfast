@@ -24,6 +24,7 @@ var dropdowns = new Array();
 var notificationDropdown = false;
 var preloadImageArray    = new Array('/images/global/header/notification_shield_reverse.png');
 var gmapMarkers;
+var gmap;
 var userLocation = new Array();
 var curDate = new Date();
 
@@ -1636,8 +1637,7 @@ function showTooltip(ele)
  *			callback => callback function
  */
 function initializeMap(lat, lon, zoom, callback) 
-{
-	
+{	
         var mapOptions = {
           //center: new google.maps.LatLng(lat, lon),
           zoom: zoom,
@@ -1645,8 +1645,7 @@ function initializeMap(lat, lon, zoom, callback)
 		  mapTypeControl: false // Disable ability to change to satellite etc
 		  
         };
-        gmap = new google.maps.Map(document.getElementById("gmap"),
-            mapOptions);
+        gmap = new google.maps.Map(document.getElementById("gmap"), mapOptions);
 			
 			
 		if (userLocation.length > 0) {

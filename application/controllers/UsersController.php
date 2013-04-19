@@ -39,6 +39,15 @@ class UsersController extends Zend_Controller_Action
 		
 		
     }
+	
+	function uploadAction()
+	{
+		if ($this->view->user->userID != $this->getRequest()->getParam('id')) {
+			// Not this user
+			$this->_forward('permission', 'error', null);
+		}
+		 $this->view->narrowColumn = 'false';
+	}
 
 
 }

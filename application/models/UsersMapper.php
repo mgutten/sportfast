@@ -12,7 +12,8 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 		
 		$select->from(array('u' => 'users'))
                ->join(array('c' => 'cities'),
-                      'u.cityID = c.cityID')
+                      'u.cityID = c.cityID',
+					  array('cityID', 'city', 'state'))
 			   ->join(array('ul' => 'user_locations'),
 			   		  'ul.userID = u.userID',
 					   array('AsText(location) as location'))

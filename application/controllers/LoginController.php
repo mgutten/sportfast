@@ -100,7 +100,7 @@ class LoginController extends Zend_Controller_Action
 			// Store user info in user session
 			/* ANY FUNCTIONS RUN ON USER HERE SHOULD BE MIMICKED IN BOOTSTRAP InitLayoutSetup*/
 			$user->login();
-			
+		
 			return $this->_helper->redirector->goToUrl('/');
 		}
         

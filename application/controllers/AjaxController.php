@@ -236,6 +236,38 @@ class AjaxController extends Zend_Controller_Action
 		}
 		
 	}
+	
+	/**
+	 * rotate uploaded image
+	 */
+	public function rotateImageAction()
+	{
+		$src = $this->getRequest()->getPost('src');
+		$leftOrRight = $this->getRequest()->getPost('leftOrRight');
+		
+		$path = PUBLIC_PATH . $src;
+		
+		$image = Zend_Controller_Action_HelperBroker::getStaticHelper('ImageManipulator');
+		$image->load($path);
+		
+		$image->rotate($leftOrRight);
+		if ($image->getRatio() >= 1.26) {
+			// image is too wide
+			// 400 and 200 are from signup-import-alert-img ratio
+			$image->resizeToWidth(450);
+		} elseif ($image->getRatio() < 1.26) {
+			// image is too tall
+			$image->resizeToHeight(360);
+		}
+		
+		$newPath = PUBLIC_PATH . '/images/tmp/profile/pic/' . mt_rand(1, 200000) . '.jpg';
+		$image->save($newPath);
+		
+		$newPath = str_replace(PUBLIC_PATH,'',$newPath);
+		
+		echo $newPath;
+		
+	}
 
 	/**
 	 * get and return matches based on user's for find page

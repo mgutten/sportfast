@@ -84,6 +84,10 @@ ul {
 	font-size: 2em;
 }
 
+.jumbo-text {
+	font-size: 3em;
+}
+
 /* make text unselectable 
 
 p,div,span {
@@ -1132,19 +1136,34 @@ input.header-search-bar {
 }
 
 .green-alert-box,.red-alert-box {
-	width: 95%;
+	width: 96%;
 	padding: .75em 2%;
 	float:left;
 	clear:both;
 	text-align:center;
-	background:#E6FFE6;
-	border:2px dashed #58bf12;
-	margin-bottom: 1em;
+	background:#58bf12; /* #E6FFE6*/
+	/*border:2px dashed #58bf12;*/
+	border: 1px solid #0A0;
+	margin-bottom: 1.5em;
+	-moz-box-shadow:    1px 1px 3px 1px rgba(0,0,0,0.35); /* #CECECE */
+ 	-webkit-box-shadow: 1px 1px 3px 1px rgba(0,0,0,0.35);
+  	box-shadow:         1px 1px 3px 1px rgba(0,0,0,0.35);
+	background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#58bf12), to(#1C931F));
+	background-image: -webkit-linear-gradient(top, #58bf12, #1C931F); 
+	background-image: -moz-linear-gradient(top, #58bf12, #1C931F);
+	background-image: -ms-linear-gradient(top, #58bf12, #1C931F);
+	background-image: -o-linear-gradient(top, #58bf12, #1C931F);
+	
 }
 
 .red-alert-box {
-	background:#EDA9A9;
-	border:2px dashed #C60000;
+	border: 1px solid #B00;
+	background: #58bf12;
+	background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#E80005), to(#970000));
+	background-image: -webkit-linear-gradient(top, #E80005, #970000); 
+	background-image: -moz-linear-gradient(top, #E80005, #970000);
+	background-image: -ms-linear-gradient(top, #E80005, #970000);
+	background-image: -o-linear-gradient(top, #E80005, #970000);
 }
 
 .sport-icon-large {

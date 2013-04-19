@@ -292,53 +292,6 @@ class Application_Model_GamesMapper extends Application_Model_MapperAbstract
 		
 		return $savingClass;
 		
-		/*
-		if ($points) {
-			// Map was moved or points have been set to not be around user location
-			$bounds['upper'] = $points[0];
-			$bounds['lower'] = $points[1];
-		} else {
-			// Default location to search near is user's home location, look for games within $distance of user's home location
-			$latitude = $userClass->location->latitude;
-			$longitude = $userClass->location->longitude;
-			$bounds = $this->getBounds($latitude, $longitude);
-		}
-		
-		
-		$select->setIntegrityCheck(false);
-		$select->from(array('g'  => 'games'))
-			   ->join(array('t' => 'sport_types'),
-			   		  't.typeID = g.typeID');
-		
-		if ($day === false || is_array($day)) {
-			// Need user's availability, join table
-			$select->join(array('usa' => 'user_sport_availabilities'),
-						  't.sportID = usa.sportID');
-		}
-					  
-		$select->join(array('pl' => 'park_locations'),
-			   		  'pl.parkID = g.parkID',
-					  array('AsText(location) as location'))
-			   ->joinLeft(array('ug' => 'user_games'),
-			   		 'ug.gameID = g.gameID',
-					 array(''))
-			   ->joinLeft(array('us' => 'user_sports'),
-			   		 'ug.userID = us.userID AND us.sportID = t.sportID',
-					 array('avg(us.skillCurrent) as averageSkill',
-					 	   'avg(us.attendance) as averageAttendance',
-						   'avg(us.sportsmanship) as averageSportsmanship',
-						   'avg(us.skillCurrent) - (SELECT skillCurrent FROM user_sports WHERE userID = "' . $userID . '" AND sportID = t.sportID) as skillDifference',
-						   '(COUNT(us.userID) + SUM(ug.plus)) as totalPlayers'
-						   ))
-			   //->where('g.cityID = ?', $cityID)
-			   ->where('g.public = "1"')
-			   ->where('MBRContains(
-								LINESTRING(
-								' . $bounds["upper"] . ' , ' . $bounds["lower"] . '
-								), pl.location
-								)')
-			   ->where('g.date > NOW()');
-			   */
 	}
 	/**
 	 * get game info from db

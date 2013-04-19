@@ -19,6 +19,7 @@ class IndexController extends Zend_Controller_Action
 			$this->view->whiteBacking = false;
 		} else {
 			// Member homepage
+			echo $this->view->user->active;
 			$this->view->narrowColumn = 'right';
 			
 			$this->view->userSports = $this->view->user->getSportNames();

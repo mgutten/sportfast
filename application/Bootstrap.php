@@ -59,7 +59,7 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 			if (!isset($session->active)) {
 				// Only update user "lastActive" attrib once per session (save on db updates)
 				$session->active = true;
-				
+
 				$user->setLastActiveCurrent()
 				 	 ->save(false);
 			} elseif (time() - strtotime($user->lastActive) > (60*2)) {

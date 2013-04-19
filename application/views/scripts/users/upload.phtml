@@ -1,0 +1,45 @@
+<?php
+/* 
+* controller => users
+* action => upload
+*/
+
+$this->headTitle('Upload Image');
+$this->headLink()->prependStylesheet($this->baseUrl() . '/css/signup.css');
+$this->headLink()->prependStylesheet($this->baseUrl() . '/css/plugins/jcrop.min.css');
+$this->headScript()->prependFile($this->baseUrl() . '/js/upload.js');
+$this->headScript()->prependFile($this->baseUrl() . '/js/plugins/jcrop.min.js');
+$this->headScript()->prependFile($this->baseUrl() . '/js/plugins/jform.js');
+?>
+
+<header class='left jumbo-text darkest heavy'>
+	Upload Profile Picture
+</header>
+<div id='upload-container' class='clear'>
+    <img class='signup-import-alert-img' id='signup-import-alert-img' src='/images/global/profile/xl/default.jpg' class='clear'/>
+    <div class='signup-import-alert-text-container'>
+        <p class='medium clear' id='signup-import-alert-guidelines-header'>Profile pictures should be:</p>
+        <ul class='green heavy' id='signup-import-alert-guidelines'>
+            
+            <li>easily recognizable</li>
+            <li>a clear shot of your face</li>
+        </ul>
+        <div class='button import-button' id='signup-import-alert-button'>
+            Choose photo
+            <form action="/ajax/upload-temp-picture" enctype="multipart/form-data" name='file_upload' id='upload-profile-pic'>
+                <input type='file' name='profilePic' id='profilePic' />
+            </form>
+        </div>
+        <div id='signup-alert-rotate-container' class='clear width-100 clear'>
+            <img src='/images/global/img_upload/rotate_left.png' class='clear signup-alert-rotate pointer hidden' id='signup-alert-rotate-left' tooltip='Rotate image left'/>
+            <img src='/images/global/img_upload/rotate_right.png' class='right signup-alert-rotate pointer hidden' id='signup-alert-rotate-right' tooltip='Rotate image right'/>
+        </div>
+        <p class='medium' id='signup-import-alert-warning'>
+            If players cannot recognize you by your picture, you <span class='heavy medium'>will not receive any ratings.</span>
+        </p>
+        <div class='button green-button larger-text' id='signup-import-alert-accept'>
+            Accept
+        </div>
+        
+    </div>
+</div>

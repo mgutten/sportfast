@@ -7,7 +7,6 @@ $this->headTitle('Find Games');
 $this->headLink()->prependStylesheet($this->baseUrl() . '/css/find.css');
 $this->headScript()->prependFile($this->baseUrl() . '/js/find.js');
 $this->headScript()->prependFile('https://maps.googleapis.com/maps/api/js?key=AIzaSyAhxSMQ-WQux2nzTW4dBoKmpfGHVQOk7r8&sensor=false');
-$this->headScript()->prependFile($this->baseUrl() . '/js/plugins/smartslider.js');
 ?>
 
 
@@ -151,7 +150,11 @@ $this->placeholder('narrowColumn')->captureStart();
 $this->placeholder('narrowColumn')->captureEnd();
 
 ?>
-
+<?php
+if (!$this->user->hasProfilePic()) {
+	echo "<a href='/users/" . $this->user->userID . "/upload' class='red-alert-box white heavy'>You must have a profile picture to join a game.  <br/>Add one now.</a>";
+}
+?>
 <p class='left dark indent'><span class='inherit' id='find-num-results'><?php echo $this->numMatches;?></span> games found</p>
 <?php
 $content  = "<div class='right' id='find-looking-container'>";
@@ -176,7 +179,6 @@ echo $this->find()->createPagination(true);
 
 echo "<img src='/images/global/loading.gif' id='loading' class='hidden'/>";
 
-echo "<br/><p id='test'></p>";
 ?>
 
 

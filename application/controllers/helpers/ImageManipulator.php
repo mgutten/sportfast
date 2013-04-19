@@ -22,8 +22,9 @@ class Application_Controller_Helper_ImageManipulator extends Zend_Controller_Act
 		} 
 	} 
 	
-	function save($filename, $image_type=IMAGETYPE_JPEG, $compression=90, $permissions=null) 
+	function save($filename, $image_type=IMAGETYPE_JPEG, $compression=100, $permissions=null) 
 	{   
+	
 		$filename = str_replace(array('.gif','.png'), '.jpg', $filename);
 		
 		if( $image_type == IMAGETYPE_JPEG ) { 
@@ -115,6 +116,21 @@ class Application_Controller_Helper_ImageManipulator extends Zend_Controller_Act
 		imagecopyresampled($new_image, $this->image, 0, 0, $crop['x'], $crop['y'], $width, $height, $crop['fileWidth'], $crop['fileHeight']); 
 		$this->image = $new_image;
 	}
+	
+	function rotate($leftOrRight)
+	{
+		if (is_int($leftOrRight)) {
+			// Degrees given
+			$degrees = $leftOrRight;
+		} elseif (strtolower($leftOrRight) == 'right') {
+			$degrees = -90;
+		} else {
+			$degrees = 90;
+		}
+		
+		$this->image = imagerotate($this->image, $degrees, 0);
+	}
+		
 	
 
 }
