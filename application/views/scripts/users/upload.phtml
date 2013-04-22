@@ -5,7 +5,7 @@
 */
 
 $this->headTitle('Upload Image');
-$this->headLink()->prependStylesheet($this->baseUrl() . '/css/signup.css');
+$this->headLink()->prependStylesheet($this->baseUrl() . '/css/upload.css');
 $this->headLink()->prependStylesheet($this->baseUrl() . '/css/plugins/jcrop.min.css');
 $this->headScript()->prependFile($this->baseUrl() . '/js/upload.js');
 $this->headScript()->prependFile($this->baseUrl() . '/js/plugins/jcrop.min.js');
@@ -37,7 +37,7 @@ $this->headScript()->prependFile($this->baseUrl() . '/js/plugins/jform.js');
         <p class='medium' id='signup-import-alert-warning'>
             If players cannot recognize you by your picture, you <span class='heavy medium'>will not receive any ratings.</span>
         </p>
-        <div class='button green-button larger-text' id='signup-import-alert-accept'>
+        <div class='button green-button larger-text hidden' id='signup-import-alert-accept'>
             Accept
         </div>
         

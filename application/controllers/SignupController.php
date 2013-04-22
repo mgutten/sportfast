@@ -285,28 +285,23 @@ class SignupController extends Zend_Controller_Action
 			$userID = $user->userID;
 			
 			// Save profile pic to permanent location
-			$src = PUBLIC_PATH . $_POST['fileName'];
-			$image = Zend_Controller_Action_HelperBroker::getStaticHelper('ImageManipulator');
-			$image->load($src);
-			/* Base profile img size is 199 x 160 */
-			$image->resize('199','160', array('x' => $_POST['fileX'],
-																		   'y' => $_POST['fileY'],
-																		   'fileHeight' => $_POST['fileHeight'],
-																		   'fileWidth'  => $_POST['fileWidth']));
+			//$src = PUBLIC_PATH . $_POST['fileName'];
+			$fileInfo = array();
+			$fileInfo['src']   = $_POST['fileName'];
+			$fileInfo['fileX'] = $_POST['fileX'];
+			$fileInfo['fileY'] = $_POST['fileY'];
+			$fileInfo['fileHeight'] = $_POST['fileHeight'];
+			$fileInfo['fileWidth'] = $_POST['fileWidth'];
 			
-			// Large img															   
-			$image->save(PUBLIC_PATH . '/images/users/profile/pic/large/' . $userID . '.jpg');
-			unlink($src); // Delete tmp img
-			$image->scale(60); // Medium img
-			$image->save(PUBLIC_PATH . '/images/users/profile/pic/medium/' . $userID . '.jpg');
-			$image->scale(47); // Small img
-			$image->save(PUBLIC_PATH . '/images/users/profile/pic/small/' . $userID . '.jpg');
-			$image->scale(65); // Tiny img
-			$image->save(PUBLIC_PATH . '/images/users/profile/pic/tiny/' . $userID . '.jpg');
+			$images = Zend_Controller_Action_HelperBroker::getStaticHelper('CreateImages');
+
+			$images->createimages($fileInfo, $userID);
 		}
 		
 	}
+
 	
 
 }
+
 

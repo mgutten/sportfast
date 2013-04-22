@@ -365,7 +365,6 @@ function addGameToDb(teamGameID, opponent, time, month, day, year, location, add
 			   locationID: locationID,
 			   teamID: teamID},
 		success: function(data) {
-			alert(data);
 			}
 	})
 }

@@ -508,6 +508,8 @@ $(function()
 		
 		notificationJoin(notificationLogID, type);
 		showConfirmationAlert('You have been added to the roster');
+		var url = $(this).parents('a').attr('href');
+		window.location = url;
 	})
 	
 	/* cannot nest anchor tags, force redirect of notification-container.click (could now be changed to simple a tag) 
@@ -801,13 +803,13 @@ function changeTypeName(name, idType, typeID, actingUserID)
 
 /**
  * Ajax call to change team/group's captain
- * @params(userID => userid of new captain,
+ * @params(userIDs => userids of new captains (object),
  *		   idType => "teamID" or "groupID",
  *		   typeID => actual teamID or groupID)
  */
-function changeCaptain(userID, idType, typeID) {
+function changeCaptains(userIDs, idType, typeID) {
 	var options = new Object();
-	options.userID = userID;
+	options.userIDs = userIDs;
 	options.idType = idType;
 	options.typeID = typeID;
 
@@ -815,8 +817,11 @@ function changeCaptain(userID, idType, typeID) {
 		url: '/ajax/change-captain',
 		type: 'POST',
 		data: {options: options},
-		success: function() {
-			createNotification(idType, typeID, userID, userID, 'become', getType(idType), 'captain');
+		success: function(data) {
+			var type = getType(idType);
+			$.each(userIDs, function(index, value) {
+				createNotification(idType, typeID, value, value, 'become', type, 'captain');
+			})
 		}
 	})
 }
@@ -860,7 +865,6 @@ function addUserToTeam(teamID, userID)
 		type: 'POST',
 		data: {options: options},
 		success: function(data) {
-			alert(data);
 			var typeID = teamID;
 			var idType = 'teamID';
 			var action = 'join';
@@ -969,7 +973,6 @@ function notificationJoin(notificationLogID, type)
 		type: 'POST',
 		data: {options: options},
 		success: function(data) {
-			alert(data);
 		}
 	})
 }
@@ -1001,7 +1004,6 @@ function createNotification(idType, typeID, actingUserID, receivingUserID, actio
 		type: 'POST',
 		data: {options: options},
 		success: function(data) {
-			alert(data);
 		}
 	})
 }

@@ -1,9 +1,11 @@
 /* top section */
+/*
 .game-title-suffix {
 	font-size: .65em;
 	font-family: 'Futura-Heavy';
 	color: #8d8d8d;
 }
+*/
 
 .profile-city-container {
 	margin-top: .1em;
@@ -34,4 +36,9 @@
 
 #game-plus-one {
 	font-size: .9em;
+}
+
+#game-subscribe,#game-unsubscribe {
+	margin-left: 40%;
+	margin-top: .5em;
 }

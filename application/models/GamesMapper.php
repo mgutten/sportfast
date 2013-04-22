@@ -342,14 +342,29 @@ class Application_Model_GamesMapper extends Application_Model_MapperAbstract
 			   		  'ug.userID = us.userID AND us.sportID = "' . $sportID . '"')
 			   ->join(array('s' => 'sports'),
 			   		  's.sportID = ' . $sportID)
+			   ->joinLeft(array('gs' => 'game_subscribers'),
+			   		  'ug.userID = gs.userID AND ug.gameID = gs.gameID',
+					  array('userID as subscribed'))
+			   ->joinLeft(array('gc' => 'game_captains'),
+			   		  'ug.gameID = gc.gameID AND ug.userID = gc.userID',
+					  array('userID as captain'))
 			   ->where('ug.gameID = ?', $gameID);
-			   
+			  
 		$players = $table->fetchAll($select);
 
 		foreach ($players as $player) {
 			$savingClass->addPlayer($player)
 						->getSport($player->sport)
 						->setAttribs($player);
+			
+			if ($player->subscribed !== null) {
+				// player is subscribed
+				$savingClass->addSubscriber($player->userID);
+			}
+
+			if ($player->captain !== null) {
+				$savingClass->addCaptain($player->userID);
+			}
 				
 		}
 		return $savingClass;

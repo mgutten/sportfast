@@ -1,0 +1,67 @@
+#signup-import-alert-container {
+	width: 44em;
+	height: 26em;
+	margin: -13em 0 0 -22em;
+}
+
+.signup-import-alert-img {
+	float:left;
+	width: 450px;
+	height: 360px;
+}
+
+#signup-import-alert-img-holder {
+	display:none;
+}
+
+.signup-import-alert-text-container {
+	float:right;
+	width: 33.3%;
+}
+
+#signup-import-alert-button {
+	float:left;
+	clear:both;
+	margin: 4em 0 0 3em;
+	width: 7em;
+}
+
+#signup-import-alert-guidelines {
+	float:left;
+	clear:both;
+	margin: 0 0 0 3em;
+	padding:0;
+	font-size: .9em;
+}
+
+#signup-import-alert-guidelines-header {
+	float:left;
+	margin: 2em 0 0 1em;
+}
+
+.signup-alert-rotate {
+	margin: 0 2em 0 2em;
+}
+
+#signup-alert-rotate-container {
+	height: 40px;
+	margin-top: 1em;
+}
+
+#signup-import-alert-warning {
+	float:left;
+	clear:both;
+	margin: 1em 0 0 1em;
+}
+
+#signup-import-alert-accept {
+	float:right;
+	clear:both;
+	margin: 2em 3em 0 0;	
+}
+
+#upload-container {
+/* used for upload profile pic later */
+	width: 44em;
+	margin: 2em 0 0 4em;
+}

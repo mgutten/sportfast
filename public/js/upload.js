@@ -1,5 +1,6 @@
 // JavaScript Document
 var jcropAPI;
+var fileInfo = new Object();
 
 $(function()
 {
@@ -31,7 +32,8 @@ $(function()
 													$('#signup-import-alert-img').attr('src',data)
 																				 .maintainRatio()
 																				 .Jcrop({aspectRatio: 1.26,
-																				 		 setSelect: [0,0,200,200]
+																				 		 setSelect: [0,0,200,200],
+																						 onSelect: updateProfilePic
 																						 },function(){
        																						jcropAPI = this;
 																							})
@@ -50,6 +52,11 @@ $(function()
 
 		rotateImage(src, leftOrRight, populateUploadedImg);
 	})
+	
+	$('#signup-import-alert-accept').click(function()
+	{
+		uploadProfilePic();
+	});
 	
 })
 
@@ -73,6 +80,22 @@ function rotateImage(src, leftOrRight, callback)
 	})
 }
 
+/**
+ * upload profile pic, submit the picture to be uploaded
+ */
+function uploadProfilePic()
+{
+	
+	$.ajax({
+		url: '/ajax/upload-profile-pic',
+		type: 'POST',
+		data: {fileInfo: fileInfo},
+		success: function(data) {
+			window.location = '/';
+		}
+	})
+}
+
 function populateUploadedImg(data)
 {		
 	if (jcropAPI) {
@@ -88,4 +111,26 @@ function populateUploadedImg(data)
 										 },function(){
 											jcropAPI = this;
 											})
+}
+
+/**
+ * callback function from jCrop to update the import-main img to reflect cropped image
+ * @params(coords => coordinates of jcrop)
+ */
+function updateProfilePic(coords)
+{
+	// 199 = width of preview image
+	var rx = 199 / coords.w;
+	// 160 = height of preview image
+	var ry = 160 / coords.h; 
+	var height = $('#signup-import-alert-img').height(); // height of original image
+	var width  = $('#signup-import-alert-img').width() //width of original image
+
+	
+	fileInfo.fileWidth = coords.w;
+	fileInfo.fileHeight = coords.h;
+	fileInfo.fileX = coords.x;
+	fileInfo.fileY = coords.y;
+	fileInfo.src = $('#signup-import-alert-img').attr('src');
+	
 }

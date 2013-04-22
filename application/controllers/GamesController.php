@@ -19,7 +19,7 @@ class GamesController extends Zend_Controller_Action
 		$this->view->game = $game;
 		
 		$this->view->userInGame = $userInGame = $game->players->userExists($this->view->user->userID);
-		$this->view->userPlus = $userInGame->plus;
+		$this->view->userPlus = ($userInGame ? $userInGame->plus : false);
 		
 		$this->view->pastGame  = ($game->gameDate->format('U') < time() ? true : false);
 		$this->view->todayGame = ($game->gameDate->format('mdy') == date('mdy') ? true : false);
@@ -35,6 +35,8 @@ class GamesController extends Zend_Controller_Action
 		
 		$this->view->newsfeed   = $game->messages->getGameMessages($game->gameID);
 		
+		$this->view->captain = $captain = $game->isCaptain($this->view->user->userID);
+				
 		if ($userInGame) {
 			// User is in game, get post form
 			$postForm = new Application_Form_PostMessage();
@@ -44,6 +46,11 @@ class GamesController extends Zend_Controller_Action
 			
 			$dropdown = Zend_Controller_Action_HelperBroker::getStaticHelper('Dropdown');
 			$this->view->inviteButton = $dropdown->dropdownButton('invite', '', 'Invite');
+			if ($captain) {
+				// Allow captain to manage
+				$this->view->manageButton = $dropdown->dropdownButton('manage', array('Remove Player',
+																					  'Game Info'), 'Manage');
+			}
 		}
 				
 		$this->view->parkLocation = $game->park->location;

@@ -4,6 +4,7 @@ var changedCaptain = false;
 var changedName = false;
 var changedAdvanced = false;
 var confirmAction;
+var clickedCaptain;
 var rosterLimits = new Object();
 rosterLimits.basketball = {upper: 16};
 rosterLimits.soccer	    = {upper: 22};
@@ -125,11 +126,58 @@ $(function()
 		
 	});
 	
-	$('#team-manage-team-info-captain').click(function()
+	$(document).on('click', '.team-manage-team-info-captain-real',function()
 	{
 		$('#team-manage-team-info-captain-container').show();
 		$('#team-manage-team-info-confirm-container').show();
+		clickedCaptain = $(this);
 	})
+	$(document).on('mouseover', '.team-manage-team-info-captain-real,.remove-captain', function()
+	{
+		if ($(this).is('.remove-captain')) {
+			$(this).show()
+		} else {
+			$(this).next('.remove-captain').show();
+		}
+	}).on('mouseleave', '.team-manage-team-info-captain-real,.remove-captain', function()
+	{
+		if ($(this).is('.remove-captain')) {
+			$(this).hide()
+		} else {
+			$(this).next('.remove-captain').hide();
+		}
+	})
+	
+	$(document).on('click', '.remove-captain',function()
+	{
+		$(this).prev('.team-manage-team-info-captain-real').remove();
+		$(this).remove();
+		
+		$('#team-manage-team-info-confirm-container').show();
+		changedCaptain = true;
+
+	})
+	
+	$('#team-manage-team-info-add-captain').click(function()
+	{
+		"<p class='clear largest-text darkest heavy team-manage-team-info-name pointer team-manage-team-info-captain-real' >\
+									</p><span class='left header red hidden largest-text remove-captain pointer'>x</span>";
+		var newEle = document.createElement('p');
+		newEle.setAttribute('class', $('.team-manage-team-info-captain-real').attr('class'));
+		
+		var x = document.createElement('span');
+		x.setAttribute('class', $('.remove-captain').attr('class'))
+		x.innerHTML = 'x';
+		
+		$('.remove-captain').last().after(newEle);
+		$(newEle).after(x);
+		
+		$('#team-manage-team-info-captain-container').show();
+		$('#team-manage-team-info-confirm-container').show();
+		clickedCaptain = $(newEle);
+	});
+		
+	
 	
 	$('#team-manage-team-info-name').click(function()
 	{
@@ -159,10 +207,10 @@ $(function()
 	/*  edit team info hover over change team captain */
 	$('.team-manage-team-info-captain').hover(function()
 	{
-		$('#team-manage-team-info-captain').text($(this).attr('playerName'));
+		clickedCaptain.text($(this).attr('playerName'));
 	}, function()
 	{
-		$('#team-manage-team-info-captain').text($('#team-manage-team-info-captain').attr('defaultName'));
+		clickedCaptain.text(clickedCaptain.attr('defaultName'));
 	})
 	
 	/* change team captain */
@@ -176,8 +224,9 @@ $(function()
 		}
 		
 		$(this).find('.animate-opacity').addClass('clicked team-manage-team-info-captain-selected');
-		$('#team-manage-team-info-captain').attr('defaultName', $(this).attr('playerName'))
-		$('#team-manage-team-info-captain').text($(this).attr('playerName'));
+		clickedCaptain.attr('defaultName', $(this).attr('playerName'))
+					  .attr('userID', $(this).attr('userID'))
+					  .text($(this).attr('playerName'));
 		
 		changedCaptain = $(this).attr('userID');
 		alertChanged = $('.team-manage-team-info-container');
@@ -224,9 +273,13 @@ $(function()
 		
 		if (changedCaptain) {
 			// Captain was changed
-			var userID = changedCaptain;
+			var userIDs = new Array();
+			$('.team-manage-team-info-captain-real').each(function()
+			{
+				userIDs.push($(this).attr('userID'));
+			})
 
-			changeCaptain(userID, idType, typeID);
+			changeCaptains(userIDs, idType, typeID);
 		}
 		
 		if (changedName) {
@@ -251,8 +304,10 @@ $(function()
 	{
 		
 		var detailsEle = getDetailsEle();
+		var captains = detailsEle.attr('captains');
 		
-		if (detailsEle.attr('captain') == detailsEle.attr('actingUserID')) {
+		if ((captains.search(detailsEle.attr('actingUserID')) !== false) && 
+			 captains.length == 1) {
 			// User is still team captain, do not let leave without passing the torch
 			showConfirmationAlert('You must choose someone to be the new team captain (under Team Info)');
 			return;

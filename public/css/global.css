@@ -1135,7 +1135,7 @@ input.header-search-bar {
 	padding: 0;
 }
 
-.green-alert-box,.red-alert-box {
+.green-alert-box,.red-alert-box,.dark-alert-box {
 	width: 96%;
 	padding: .75em 2%;
 	float:left;
@@ -1165,6 +1165,16 @@ input.header-search-bar {
 	background-image: -ms-linear-gradient(top, #E80005, #970000);
 	background-image: -o-linear-gradient(top, #E80005, #970000);
 }
+
+.dark-alert-box  {
+	border: 1px solid #888;
+	background: #222;
+	background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#444), to(#222));
+	background-image: -webkit-linear-gradient(top, #444, #222); 
+	background-image: -moz-linear-gradient(top, #444, #222);
+	background-image: -ms-linear-gradient(top, #444, #222);
+	background-image: -o-linear-gradient(top, #444, #222);}
+
 
 .sport-icon-large {
 	width: 50px;
@@ -1525,7 +1535,7 @@ div.dropdown-menu-container-reverse:hover {
 }
 
 .alert-container,#confirm-alert {
-	position:fixed;
+	position:absolute;
 	top: 50%;
 	left: 50%;
 	max-width: 61.25em;

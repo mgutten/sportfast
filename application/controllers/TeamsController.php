@@ -20,7 +20,7 @@ class TeamsController extends Zend_Controller_Action
 		
 		$this->view->isPublic  = $isPublic = $team->isPublic();
 		$this->view->isPrivate = ($isPublic ? false : true);
-		
+	
 		$nextGame = $this->view->nextGame = $team->getNextGame();
 		
 		if ($nextGame) {
@@ -56,6 +56,7 @@ class TeamsController extends Zend_Controller_Action
 		// Current user is captain
 		$this->view->captain    = $captain = $team->isCaptain($this->view->user->userID);
 		$this->view->hasCaptain = $team->hasCaptain();
+		$this->view->isCreator  = $team->isCreator($this->view->user->userID);
 		
 		if ($captain) {
 			// Need to display "Manage" and "Invite" button

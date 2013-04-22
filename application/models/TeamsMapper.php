@@ -235,6 +235,42 @@ class Application_Model_TeamsMapper extends Application_Model_MapperAbstract
 	}
 	
 	/**
+	 * Update team's captains
+	 */
+	public function updateCaptains($savingClass)
+	{
+		$this->setDbTable('Application_Model_DbTable_TeamCaptains');
+		$table   = $this->getDbTable();
+		
+		if (!$savingClass->hasCaptain()) {
+			return false;
+		}
+		
+		$teamID  = $savingClass->teamID;
+		
+		$this->delete($savingClass);
+
+		$db = Zend_Db_Table::getDefaultAdapter();
+		
+		$insert = "INSERT INTO team_captains (teamID, userID) VALUES ";
+		
+		$counter = 0;
+		foreach ($savingClass->captains as $captain => $value) {
+			if ($counter != 0) {
+				$insert .= ',';
+			}
+			$insert .= '("' . $teamID . '","' . $captain . '")';
+			$counter++;
+		}
+		
+		$db->query($insert);
+		
+		return $savingClass;
+	}
+		
+		
+	
+	/**
 	 * get team info from db
 	 * @params ($teamID => teamID
 	 *			$savingClass => team model)
@@ -289,6 +325,10 @@ class Application_Model_TeamsMapper extends Application_Model_MapperAbstract
 		$select->setIntegrityCheck(false);	
 			
 		$select->from(array('ut' => 'user_teams'))
+			   ->joinLeft(array('tc' => 'team_captains'),
+			   			  'tc.userID = ut.userID AND tc.teamID = ut.teamID',
+						  array('userID as captain',
+						  		'creator'))
 			   ->join(array('u' => 'users'),
 			   		  'ut.userID = u.userID')
 			   ->join(array('us' => 'user_sports'),
@@ -303,8 +343,13 @@ class Application_Model_TeamsMapper extends Application_Model_MapperAbstract
 			$savingClass->addPlayer($player)
 						->getSport($player->sport)
 						->setAttribs($player);
+			
+			if ($player->captain != null) {
+				// Player is team captain
+				$savingClass->addCaptain($player->userID, $player->creator);
+			}
 				
-		}
+		}	
 		
 		// Get all games as well as players playing/played in those games
 		$select = $table->select();

@@ -238,6 +238,24 @@ class AjaxController extends Zend_Controller_Action
 	}
 	
 	/**
+	 * upload finalized profile pic
+	 */
+	public function uploadProfilePicAction()
+	{
+		$fileInfo = $this->getRequest()->getPost('fileInfo');
+		
+		if (empty($fileInfo['fileWidth']) || empty($fileInfo['fileX'])) {
+			// Spot check for failure
+			return false;
+		}
+		
+		$images = Zend_Controller_Action_HelperBroker::getStaticHelper('CreateImages');
+		
+		$images->createimages($fileInfo, $this->view->user->userID);
+	}
+	
+	
+	/**
 	 * rotate uploaded image
 	 */
 	public function rotateImageAction()
@@ -662,7 +680,6 @@ class AjaxController extends Zend_Controller_Action
 		$auth = Zend_Auth::getInstance();
 		$user = $auth->getIdentity();
 		
-		
 		if ($options['idType'] == 'teamID') {
 			// Team
 			$model = $user->teams->teamExists($options['typeID']);
@@ -671,9 +688,13 @@ class AjaxController extends Zend_Controller_Action
 			$model = new Application_Model_Group();		
 		}
 		
-		$model->captain = $options['userID'];
+		$model->captains = array();
 		
-		$model->save();
+		foreach ($options['userIDs'] as $userID) {
+			$model->addCaptain($userID);
+		}
+		
+		$model->updateCaptains();
 	}
 
 	

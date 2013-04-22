@@ -249,10 +249,15 @@ textarea.post-message {
 
 .team-manage-team-info-name-container {
 	margin-left: 2em;
-	width: 20em;
+	width: 22em;
 }
 
 .team-manage-team-info-name {
+	margin-top: -.15em;
+	width: 94%;
+}
+
+.remove-captain {
 	margin-top: -.15em;
 }
 

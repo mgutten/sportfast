@@ -35,7 +35,8 @@ class Application_View_Helper_Find
 		if (!isset($matches[0])) {
 			// No matches
 			$output .= "<p class='heavy none-text medium width-100 center largest-text'>Oh no!</p>
-							<p class='medium width-100 center larger-text'>No matches were found.</p>";
+							<p class='medium width-100 center larger-text'>No matches were found.</p>
+							<p class='light width-100 center larger-text'>Try changing the filters.</p>";
 		} else {
 			
 			$pages    = ceil($matchesCount / 6);

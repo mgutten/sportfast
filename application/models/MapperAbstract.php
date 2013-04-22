@@ -119,7 +119,7 @@ abstract class Application_Model_MapperAbstract
 		}
 		
 		$table   = $this->getDbTable();
-		
+
 		$where = $table->getAdapter()->quoteInto($savingClass->_primaryKey . ' = ?', $savingClass->_attribs[$savingClass->_primaryKey]);
 		
 		return $table->delete($where);

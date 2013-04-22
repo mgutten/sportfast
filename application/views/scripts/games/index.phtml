@@ -38,6 +38,8 @@ echo "<img src='" . $this->game->getProfilePic('large', 'parks') . "' class='rou
 
 $ratings = array('skill', 'sportsmanship', 'attendance');
 
+echo $this->narrowcolumnsection()->start(array('title' => 'Avg Ratings'));
+
 if ($this->game->players->hasValue('users')) {
 	// Players exist, show average ratings
 	echo "<div class='profile-narrow-rating-container clear'>";
@@ -51,6 +53,8 @@ if ($this->game->players->hasValue('users')) {
 	echo "<p class='width-100 left center light'>No players</p>";
 }
 
+echo $this->narrowcolumnsection()->end();
+
 
 echo "<div class='width-100 left narrow-column-calendar-container'>";
 echo 	$this->calendar()->createCalendar(array($this->game), true);
@@ -60,12 +64,18 @@ echo "</div>";
 
 $this->placeholder('narrowColumn')->captureEnd();
 
+if ($this->game->hasCaptain()) {
+	$captains = array_keys($this->game->captains);
+	$captains = implode(',',$captains);
+} else {
+	$captains = '';
+}
 // Store universal game details in hidden container
 echo "<span id='game-details' 
 			gameID='" . $this->game->gameID . "' 
 			idType='gameID' 
 			actingUserID='" . $this->user->userID . "' 
-			captain='" . $this->captain . "'
+			captains='" . $captains. "'
 			city='" . $this->game->city . "'
 			rosterLimit='" . $this->game->rosterLimit . "'
 			sport='" . $this->game->sport . "'
@@ -74,7 +84,19 @@ echo "<span id='game-details'
 ?>
 
 <?php
-if ($this->pastGame) {
+if (($this->game->recurring && $this->userInGame)) {
+	// Game is recurring 
+	$buttonID = 'game-subscribe';
+	$buttonText = '+Subscribe';
+	if ($this->game->isSubscriber($this->user->userID)) {
+		$buttonID = 'game-unsubscribe';
+		$buttonText = 'Unsubscribe';
+	}
+	echo "<div class='dark-alert-box white heavy'>
+				<span class='left inherit width-100 center'>This game happens every week.</span>
+				<span class='clear inherit button  white pointer' id='" . $buttonID . "'>" . $buttonText . "</span>
+		  </div>";
+} elseif ($this->pastGame) {
 	// This game already happened
 	echo "<div class='red-alert-box white heavy'>This game already happened!</div>";
 } elseif ($this->todayGame) {
@@ -87,7 +109,7 @@ if ($this->pastGame) {
 <?php 
 	if ($this->userInGame) {
 		?>
-    You are currently attending with 
+    You are attending with 
       <select id='game-plus'>
       	<?php
 			for ($i = 0; $i < 4; $i++) {
@@ -124,7 +146,8 @@ if ($this->pastGame) {
     </div>
 </header>
 
-<div id='profile-buttons-container'>
+
+<div id='profile-buttons-container' holder='profile-buttons-container-holder'>
     <?php
 		
 		if ($this->userInGame) {

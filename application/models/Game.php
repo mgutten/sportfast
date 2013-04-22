@@ -40,7 +40,9 @@ class Application_Model_Game extends Application_Model_ModelAbstract
 									'leagueLocationID'	=> '',
 									'players'		=> '',
 									'type'			=> '',
-									'messages'		=> ''
+									'messages'		=> '',
+									'captains'		=> '',
+									'subscribers'	=> ''
 									);
 									
 	protected $_primaryKey = 'gameID';
@@ -397,7 +399,67 @@ class Application_Model_Game extends Application_Model_ModelAbstract
 		return $players->addUser($resultRow);
 		
 	}
+	
+	public function addCaptain($userID, $creator = false)
+	{
+		if (!is_array($this->_attribs['captains'])) {
+			$this->_attribs['captains'] = array();
+		}
+		
+		$this->_attribs['captains'][$userID] = $creator;
+		return $this;
+	}
+	
+	public function addSubscriber($userID)
+	{
+		if (!is_array($this->_attribs['subscribers'])) {
+			$this->_attribs['subscribers'] = array();
+		}
+		
+		$this->_attribs['subscribers'][$userID] = true;
+		return $this;
+	}
 
+	/**
+	 * test $userID to see if user is captain of team
+	 */
+	public function isCaptain($userID)
+	{
+		if (isset($this->_attribs['captains'][$userID])) {
+			// User is captain
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	public function isCreator($userID) 
+	{
+		if ($this->_attribs['captains'][$userID]) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	public function isSubscriber($userID)
+	{
+		if (isset($this->_attribs['subscribers'][$userID])) {
+			// User is subscribed
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	public function hasCaptain()
+	{
+		if ($this->hasValue('captains')) {
+			return true;
+		} else {
+			return false;
+		}
+	}
 	
 	public function addConfirmedPlayer($userID)
 	{

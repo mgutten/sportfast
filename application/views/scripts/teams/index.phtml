@@ -102,20 +102,29 @@ $this->headScript()->prependFile($this->baseUrl() . '/js/profile.js');
 				echo 			"<input type='text' class='clear darkest heavy team-manage-team-info-name' id='team-manage-team-info-name' value='" . $this->team->teamName . "'/>";
 				echo 		"</div>";
 				echo 		"<div class='team-manage-team-info-name-container left larger-margin-top'>";
-				echo 			"<p class='left smaller-text darkest'>Team Captain</p>";
-				echo 			"<p class='clear largest-text darkest heavy team-manage-team-info-name pointer' id='team-manage-team-info-captain' defaultName='" . $this->team->players->getUser($this->team->captain)->getLimitedName('fullName',21) . "'>"
-									 . $this->team->players->getUser($this->team->captain)->getLimitedName('fullName', 21) 
-								. "</p>";
-				echo			"<div class='clear hidden' id='team-manage-team-info-captain-container'>";
 				
-				foreach ($this->team->players->getAll() as $player) {
-					echo "<div class='left pointer team-manage-team-info-captain' playerName='" . $player->getLimitedName('fullName', 21) . "' userID='" . $player->userID . "'>";
-					echo	$player->getBoxProfilePic('tiny', 'users', 'animate-opacity', 'dark-back');
-					echo "</div>";
-				}
-			echo				"<p class='margin-top medium smaller-text clear'>Note: you will not be able to access any management controls if you are no longer the captain.</p>";
-			
-			echo			"</div>";
+				echo 			"<p class='left smaller-text darkest'>Team Captain</p>";
+					// User is head honcho
+					foreach ($this->team->captains as $captain => $true) {
+						$player = $this->team->players->getUser($captain);
+						echo "<p class='clear largest-text darkest heavy team-manage-team-info-name pointer team-manage-team-info-captain-real' userID='" . $player->userID . "' id='team-manage-team-info-captain' defaultName='" . $this->team->players->getUser($captain)->getLimitedName('fullName',21) . "'>"
+										 . $player->getLimitedName('fullName', 21) . "
+									</p><span class='left header red hidden largest-text remove-captain pointer'>x</span>";
+					}
+					echo "<p class='green smaller-text clear pointer' id='team-manage-team-info-add-captain'>+ add captain</p>";
+					echo			"<div class='clear hidden' id='team-manage-team-info-captain-container'>";
+					
+					foreach ($this->team->players->getAll() as $player) {
+						if (!$this->team->isCaptain($player->userID)) {
+							echo "<div class='left pointer team-manage-team-info-captain' playerName='" . $player->getLimitedName('fullName', 21) . "' userID='" . $player->userID . "'>";
+							echo	$player->getBoxProfilePic('tiny', 'users', 'animate-opacity', 'dark-back');
+							echo "</div>";
+						}
+					}
+					echo				"<p class='margin-top medium smaller-text clear'>Note: you will not be able to access any management controls if you are no longer the captain.</p>";
+					
+					echo			"</div>";
+				
 			echo 		"</div>";
 			echo	"</div>";
 			
@@ -238,11 +247,14 @@ $this->placeholder('narrowColumn')->captureEnd();
 
 
 // Store universal team details in hidden container
+$captains = array_keys($this->team->captains);
+$captains = implode(',',$captains);
+
 echo "<span id='team-details' 
 			teamID='" . $this->team->teamID . "' 
 			idType='teamID' 
 			actingUserID='" . $this->user->userID . "' 
-			captain='" . $this->captain . "'
+			captains='" . $captains . "'
 			city='" . $this->team->city . "'
 			rosterLimit='" . $this->team->rosterLimit . "'
 			sport='" . $this->team->sport . "'

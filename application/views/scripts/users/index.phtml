@@ -53,10 +53,15 @@ $this->placeholder('narrowColumn')->captureEnd();
 </header>
 
 <div id='user-buttons-container'>
+	<?php
+	if ($this->currentUser->userID != $this->user->userID) {
+		// Not current user
+	?>
     <p class='button right' id='user-message'>
     	Message
     </p>
     <?php
+	
 		if (!$this->user->players->userExists($this->currentUser->userID)) {
 			// user is not already a friend
 			?>
@@ -68,7 +73,9 @@ $this->placeholder('narrowColumn')->captureEnd();
             	You and <?php echo $this->currentUser->firstName;?> are players.
             </p>
     <?php }
-	    echo "<div class='clear-right larger-margin-top'>" . $this->inviteButton . "</div>";
+		
+			echo "<div class='clear-right larger-margin-top'>" . $this->inviteButton . "</div>";
+		}
 	?>
 </div>
 
@@ -202,6 +209,14 @@ $this->placeholder('narrowColumn')->captureEnd();
 	// Sports section
 	echo $lowerOutput;
 	
+	
+	/*
+	echo $this->partial('partials/global/sectionHeaderPlain.phtml',array('title'   => 'Upcoming Games'));
+	
+	$games = $this->user->games->getAll();
+	for ($i = 0; $i < 3; $i++) {
+		echo "<img src='" . $games[$i]->getProfilePic('large') . "' class='left'/>";
+	}*/
 	
 	// Activity section
 	echo "<div id='user-activities-container'>";

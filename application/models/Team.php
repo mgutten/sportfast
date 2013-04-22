@@ -23,7 +23,7 @@ class Application_Model_Team extends Application_Model_ModelAbstract
 									'players'	   => '',
 									'messages'	   => '',
 									'games'		   => '',
-									'captain'	   => '',
+									'captains'	   => '',
 									'wins'		   => '',
 									'losses'	   => '',
 									'ties'		   => '',
@@ -108,6 +108,11 @@ class Application_Model_Team extends Application_Model_ModelAbstract
 		return $matchDescription;
 	}
 	
+	public function updateCaptains()
+	{
+		return $this->getMapper()->updateCaptains($this);
+	}
+	
 	
 	public function getLeague()
 	{
@@ -160,6 +165,16 @@ class Application_Model_Team extends Application_Model_ModelAbstract
 		return ucwords($this->_attribs['sport']);
 	}
 	
+	
+	public function addCaptain($userID, $creator = false)
+	{
+		if (!is_array($this->_attribs['captains'])) {
+			$this->_attribs['captains'] = array();
+		}
+		
+		$this->_attribs['captains'][$userID] = $creator;
+		return $this;
+	}
 	
 	public function addPlayer($resultRow)
 	{
@@ -287,8 +302,17 @@ class Application_Model_Team extends Application_Model_ModelAbstract
 	 */
 	public function isCaptain($userID)
 	{
-		if ($userID == $this->_attribs['captain']) {
+		if (isset($this->_attribs['captains'][$userID])) {
 			// User is captain
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	public function isCreator($userID) 
+	{
+		if ($this->_attribs['captains'][$userID]) {
 			return true;
 		} else {
 			return false;
@@ -312,7 +336,7 @@ class Application_Model_Team extends Application_Model_ModelAbstract
 	 */
 	public function hasCaptain()
 	{
-		if ($this->hasValue('captain')) {
+		if ($this->hasValue('captains')) {
 			return true;
 		} else {
 			return false;
