@@ -1,0 +1,47 @@
+<?php
+/** 
+ * controller => parks
+ * action => ratings
+ */
+$this->headTitle($this->park->parkName . ' Ratings');
+$this->headLink()->prependStylesheet($this->baseUrl() . '/css/rating.css');
+$this->headLink()->prependStylesheet($this->baseUrl() . '/css/profile.css');
+$this->headScript()->prependFile($this->baseUrl() . '/js/rating.js');
+$this->headScript()->prependFile($this->baseUrl() . '/js/profile.js');
+?>
+
+<?php
+// Narrow right column
+$this->placeholder('narrowColumn')->captureStart();
+echo "<img src='" . $this->park->getProfilePic('large') . "' class='narrow-column-picture dropshadow rounded-corners'/>";
+
+$this->placeholder('narrowColumn')->captureEnd();
+
+?>
+
+<a href='/parks/<?php echo $this->parkID;?>' class='left smaller-text medium'>&lt;&lt; Back to park</a>
+<header class='width-100 left'>
+	<p class='jumbo-text heavy darkest left'><?php echo $this->numRatings;?></p>
+    <p class='left largest-text darkest profile-header-sub'>for <?php echo $this->park->parkName;?> </p>
+    <?php echo $this->ratingStar('large', $this->ratingWidth, $this->currentURI, 'margin-top');?>
+</header>
+
+<div class='width-100 clear ratings-container'>
+	<div class='rating-container width-100 clear ratings-user-container'>
+		<a href='/users/<?php echo $this->user->userID;?>' class='left'><img src='<?php echo $this->user->getProfilePic('small');?>' class='left' /></a>
+		<div class='left rating-right'>
+			<p class='smaller-text left light'>Rate this park...</p>
+			<form method='post' action='/post/rating' id='user-rating'>
+				<?php echo $this->getHelper('ratingstar')->clickableStar('small', 'rating-user');?>
+                <textarea class='clear white-back margin-top' id='rating-comment' name='comment'></textarea>
+                <input type='hidden' name='rating' id='rating-hidden'/>
+                <input type='hidden' name='type' value='park'/>
+                <input type='hidden' name='typeID' value='<?php echo $this->parkID;?>' />
+                <input type='submit' class='button right margin-top' />
+            </form>
+		</div>
+	</div>
+	<?php
+	echo $this->ratings()->loopParkRatings($this->ratings->getAll());
+	?>
+</div>

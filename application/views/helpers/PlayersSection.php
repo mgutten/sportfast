@@ -13,7 +13,7 @@ class Application_View_Helper_PlayersSection
 	 * @params ($players => array of player object,
 	 *			$nextGame => if there is a next game, then next game object
 	 */
-	public function playerssection($players, $nextGame = false)
+	public function playerssection($players, $nextGame = false, $limited = true)
 	{
 		$output = '';
 		$counter = 0;
@@ -38,7 +38,7 @@ class Application_View_Helper_PlayersSection
 		
 		foreach ($players as $player) {
 			
-			if ($counter >= 14) {
+			if ($counter >= 14 && $limited) {
 				// Only show 14 players
 								
 				$output .= "<a href='/" . $type . "/" . $typeID . "/players' class='medium clear-right smaler-text'>" . ($totalPlayers - $counter) . " more players</a>";

@@ -84,14 +84,10 @@ echo "<span id='game-details'
 ?>
 
 <?php
-if (($this->game->recurring && $this->userInGame)) {
+if (($this->game->recurring && $this->userInGame && !$this->game->isSubscriber($this->user->userID))) {
 	// Game is recurring 
-	$buttonID = 'game-subscribe';
+	$buttonID = 'subscribe-button';
 	$buttonText = '+Subscribe';
-	if ($this->game->isSubscriber($this->user->userID)) {
-		$buttonID = 'game-unsubscribe';
-		$buttonText = 'Unsubscribe';
-	}
 	echo "<div class='dark-alert-box white heavy'>
 				<span class='left inherit width-100 center'>This game happens every week.</span>
 				<span class='clear inherit button  white pointer' id='" . $buttonID . "'>" . $buttonText . "</span>
@@ -105,25 +101,6 @@ if (($this->game->recurring && $this->userInGame)) {
 }
 ?>
 
-<p class='dark smaller-text right current-position' >
-<?php 
-	if ($this->userInGame) {
-		?>
-    You are attending with 
-      <select id='game-plus'>
-      	<?php
-			for ($i = 0; $i < 4; $i++) {
-				$selected = '';
-				if ($this->userPlus == $i) {
-					$selected = 'selected';
-				}
-				echo "<option " . $selected . ">" . $i . "</option>";
-			}
-        ?>
-      </select>
-    others.
-    <?php }?>
-</p>
 
 <header class='clear profile-name-container'>
 	<p class='profile-name heavy darkest clear'>
@@ -146,50 +123,83 @@ if (($this->game->recurring && $this->userInGame)) {
     </div>
 </header>
 
-
-<div id='profile-buttons-container' holder='profile-buttons-container-holder'>
-    <?php
-		
-		if ($this->userInGame) {
-			// You are in game
+<?php
+            
+if ($this->userInGame) {
+?>
+<div id='profile-buttons-container-holder' class='right'></div>
+<div id='profile-buttons-container' holder='profile-buttons-container-holder' class='absolute'>
+	<div class='profile-buttons-inner-container left'>
+        <div class='profile-animate-buttons light-back pointer' tooltip='Show options'>
+        	<img src='/images/global/arrows/left/medium.png' class='left' />
+        </div>
+        <div class='profile-buttons-innermost-container right'>
+        <p class='dark smaller-text right current-position' >
+        <?php 
+            if ($this->userInGame) {
+                ?>
+            You are attending with 
+              <select id='game-plus'>
+                <?php
+                    for ($i = 0; $i < 4; $i++) {
+                        $selected = '';
+                        if ($this->userPlus == $i) {
+                            $selected = 'selected';
+                        }
+                        echo "<option " . $selected . ">" . $i . "</option>";
+                    }
+                ?>
+              </select>
+            others.
+            <?php }?>
+        </p>
+        
+                <p class='red-button leave-button margin-top right clear-right-only' id='leave-button' style='margin-right:0'>
+                    Leave
+                </p>
+            <?php 	
+			if ($this->subscribed) {
+				echo "<p class='light margin-top right pointer' id='unsubscribe-button'>Unsubscribe</p>";
+				}
 			?>
-			<p class='red-button clear-right leave-button margin-top right' id='leave-button' style='margin-right:0'>
-				Leave
-			</p>
-            <div class='clear-right larger-margin-top'>
-            	<?php echo $this->inviteButton;?>
-            </div>
-    <?php } else {
-			$lower = '';
-			$class = '';
-			$text = 'Join';
-			$id    = 'join-button';
-			$tooltip = '';
-			if (!$this->isPublic) {
-				// Not sportup created team, allow any user to join without request
-				$text = 'Request to Join';
-				$id   = 'request-join-button';
-				$tooltip = "tooltip='This is a private game.'";
-			}
-			if ($this->game->minSkill > $this->user->getSport($this->game->sport)->skill) {
-				// User is not good enough for this game
-				$class = 'transparent default';
-				$id = '';
-				$lower = '<p class="light clear-right smaller-text margin-top">You must have a minimum skill of ' . $this->team->minSkill . ' to join.';
-			}
-			?>
-    		<p class='green-button clear-right larger-text join-button heavy <?php echo $class;?>' <?php echo $tooltip;?> id='<?php echo $id;?>'>
-            	<?php echo $text;?>
-            </p>
-            <?php echo $lower; ?>
-    <?php } 
-		
-		if ($this->captain) {
-			// User is captain
-			echo "<div class='larger-margin-top right profile-buttons-second-row'>" . $this->manageButton . "</div>";
-		}
-	?>
+                <div class='larger-margin-top clear-right-only right'>
+                    <?php echo $this->inviteButton;?>
+                </div>
+        <?php 
+            
+            if ($this->captain) {
+                // User is captain
+                echo "<div class='larger-margin-top right profile-buttons-second-row'>" . $this->manageButton . "</div>";
+            }
+        ?>
+        </div>
+    </div>
 </div>
+<?php
+	} elseif (!$this->userInGame) {
+                $lower = '';
+                $class = '';
+                $text = 'Join';
+                $id    = 'join-button';
+                $tooltip = '';
+                if (!$this->isPublic) {
+                    // Not sportup created team, allow any user to join without request
+                    $text = 'Request to Join';
+                    $id   = 'request-join-button';
+                    $tooltip = "tooltip='This is a private game.'";
+                }
+                if ($this->game->minSkill > $this->user->getSport($this->game->sport)->skill) {
+                    // User is not good enough for this game
+                    $class = 'transparent default';
+                    $id = '';
+                    $lower = '<p class="light clear-right smaller-text margin-top">You must have a minimum skill of ' . $this->team->minSkill . ' to join.';
+                }
+                ?>
+                <p class='green-button right larger-text join-button heavy <?php echo $class;?>' <?php echo $tooltip;?> id='<?php echo $id;?>'>
+                    <?php echo $text;?>
+                </p>
+                <?php echo $lower; ?>
+        <?php } ?>
 <!--
     <div class='clear width-100 larger-margin-top'>
     	<div class='left game-rating-box green-back rounded-corners'>

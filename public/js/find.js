@@ -178,6 +178,19 @@ $(function()
 		markers[gameIndex].setIcon('/images/global/gmap/markers/green.png');
 	})
 	
+	
+	$(document).on('mouseenter','.find-result-teams,.find-result-users',function()
+	{
+		var src = $(this).find('.find-result-img-container').children('img').attr('src').replace(/\/medium/,'/large');
+		$('.narrow-column-picture').attr('src', src);
+		
+		$(this).find('.hover').toggle();
+	})
+	$(document).on('mouseleave','.find-result-teams,.find-result-users',function()
+	{		
+		$(this).find('.hover').toggle();
+	})
+	
 	preloadImageArray.push('/images/global/gmap/markers/green.png');
 	preloadImageArray.push('/images/global/gmap/markers/green_reverse.png');
 	
@@ -548,6 +561,7 @@ function buildOptions(offset)
 	var skill = getSkillOption();
 	var age   = getAgeOption();
 	var time;
+	var looking = getLookingOption();
 	
 	
 	if ($('#timeUser').prop('checked')) {
@@ -568,9 +582,11 @@ function buildOptions(offset)
 				   skill:skill,
 				   age:age,
 				   time:time,
-				   points: points};
+				   points: points,
+				   looking: looking};
 			   
 	var type  = $.trim($('#looking-for').find('.dropdown-menu-selected').children('p').text().toLowerCase());
+
 	var orderBy = $('#find-order-by').children('.selectable-text.green-bold').text().toLowerCase();
 	
 	findMatches(options, type, orderBy, offset);
@@ -654,6 +670,20 @@ function getSkillOption()
 		var max = parent.find('#skillMax');
 		
 		returnValue = testInputs(min, max, 63, 100);
+	}
+	
+	return returnValue;
+}
+
+function getLookingOption()
+{
+	var selectedEle = $('#narrow-column-body-looking-for').find('input[type=checkbox]:checked');
+	var returnValue;
+	
+	if (selectedEle.is('#lookingAny')) {
+		returnValue = '';
+	} else if(selectedEle.is('#lookingForTeam')) {
+		returnValue = 'team';
 	}
 	
 	return returnValue;

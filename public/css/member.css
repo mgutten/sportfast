@@ -87,14 +87,19 @@
 	width: 28%;
 }
 
-.member-schedule-day-body-players-container {
-	float:left;
+.member-schedule-day-body-players-container,.member-schedule-day-body-team-players-container {
+	float:right;
 	width: 6em;
-	margin: .1em 0 0 2em;
+	margin: .3em 0 0 2em;
+}
+
+.member-schedule-day-body-team-players-container {
+	float: left;
 }
 
 .member-schedule-day-body-players-confirmed {
 	width:100%;
+	margin-top: .35em;
 }
 
 .member-teamGame-confirmed {
@@ -120,12 +125,14 @@
 	padding-top: .1em;
 }
 
-.member-schedule-day-body-players {
+.member-schedule-day-body-players,.member-schedule-day-body-players-text {
 	float:left;
 	width: 100%;
 	color:inherit;
 	font-family: inherit;
+	height: .75em;
 }
+
 
 .member-schedule-day-none {
 	margin: 3em 0 2em 0;

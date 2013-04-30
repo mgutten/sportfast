@@ -25,6 +25,11 @@ $(function()
 		$(this).stop().animate({opacity: 0}, 300);
 	})
 	
+	$('#invite,#manage').click(function()
+	{
+		$(this).parents('#profile-buttons-container').css('height', '20em');
+	});
+	
 	
 	/* request to join button */
 	$('#request-join-button').click(function()
@@ -309,7 +314,7 @@ $(function()
 		if ((captains.search(detailsEle.attr('actingUserID')) !== false) && 
 			 captains.length == 1) {
 			// User is still team captain, do not let leave without passing the torch
-			showConfirmationAlert('You must choose someone to be the new team captain (under Team Info)');
+			showConfirmationAlert('You must choose someone to be the new team captain (under Manage)');
 			return;
 		}
 		
@@ -332,6 +337,40 @@ $(function()
 		
 		var name = (typeof detailsEle.attr('teamName') == 'undefined' ? 'this game' : detailsEle.attr('teamName'));
 		populateConfirmActionAlert('leave ' + name);
+		$('#confirm-action-alert-container').show();
+		
+		var opacity = $('.alert-black-back').css('opacity');
+		$('.alert-black-back').css({display: 'block',
+								   opacity: 0})
+							  .animate({opacity: opacity}, 200);
+	});
+	
+	$('#unsubscribe-button, #subscribe-button').click(function()
+	{
+		
+		var detailsEle = getDetailsEle();
+		var subscribe = ($(this).is('#subscribe-button') ? 1 : 0);
+		
+		confirmAction = function () {
+				var detailsEle = getDetailsEle();
+				var userID = detailsEle.attr('actingUserID');
+				var idType = detailsEle.attr('idType');
+				var typeID = detailsEle.attr(idType);
+				
+				subscribeToType(userID, idType, typeID, subscribe);
+				changedAlert = $('.team-manage-remove-player-container');
+				reloadPage();
+		}
+		
+		if ($(this).is('#subscribe-button')) {
+			// Do not show confirmation for subscribing
+			showConfirmationAlert('You are now subscribed');
+			confirmAction();
+			return;
+		}
+		
+		var name = (typeof detailsEle.attr('teamName') == 'undefined' ? 'this game' : detailsEle.attr('teamName'));
+		populateConfirmActionAlert('unsubscribe');
 		$('#confirm-action-alert-container').show();
 		
 		var opacity = $('.alert-black-back').css('opacity');
@@ -366,6 +405,27 @@ $(function()
 		showConfirmationAlert('Invite sent');
 	})
 	
+	$('.profile-animate-buttons').click(function()
+	{
+		animateProfileButtons();
+	});
+		
+	
+	$(document).click(function(e)
+	{
+		if ((($(e.target).parents('.profile-buttons-innermost-container').length > 0 && !$(e.target).is('a')) ||
+			 $(e.target).is('.profile-buttons-innermost-container'))) {
+				 return false;
+		} else if (parseInt($('.profile-buttons-inner-container').css('margin-left'),10) == 0) {
+				animateProfileButtons();
+		}
+		
+		if (dropdowns.dropdownMenuDown) {
+			// Dropdown menu is down
+			$(e.target).parents('#profile-buttons-container').animate({height: '10em'},300);
+		}
+	})
+	
 	
 })
 
@@ -377,6 +437,30 @@ function getDetailsEle()
 	return ($('#team-details').length > 0 ? $('#team-details') : $('#game-details'))
 }
 
+/**
+ * unsubscribe/subscribe user from recurring game
+ * @params(userID => userID,
+ *		   idType => 'gameID',
+ *		   typeID => gameID,
+ *		   subscribe => 1 for subscribing or 0 for unsubscribing)
+ */
+function subscribeToType(userID, idType, typeID, subscribe)
+{
+	var options = new Object();
+	options.userID = userID;
+	options.idType = idType;
+	options.typeID = typeID;
+	options.subscribe = subscribe;
+	
+	
+	$.ajax({
+		url: '/ajax/subscribe-to-type',
+		type: 'POST',
+		data: {options: options},
+		success: function(data) {
+		}
+	})
+}
 
 /**
  * Add post message to team or group wall
@@ -538,7 +622,23 @@ function testAdvancedChanges()
 		})
 	})
 }
-				
+
+
+/**
+ * animate profile buttons container
+ */
+function animateProfileButtons()
+{
+	var innerEle = $('.profile-buttons-inner-container');
+	var marginLeft = parseInt(innerEle.css('margin-left'), 10);
+	
+	if (marginLeft > 0) {
+		innerEle.animate({marginLeft: 0}, 300);
+	} else {
+		var newMargin = innerEle.width() - $('.profile-animate-buttons').width();
+		innerEle.animate({marginLeft: newMargin}, 300);
+	}
+}
 			
 			
 			

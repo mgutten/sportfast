@@ -75,6 +75,29 @@ class AjaxController extends Zend_Controller_Action
 		 
 	 }
 	 
+	 /**
+	  *  subscribe/unsubscribe from game
+	  */
+	 public function subscribeToTypeAction()
+	 {
+		 $options = $this->getRequest()->getPost('options');
+		 
+		 $table = new Application_Model_DbTable_GameSubscribers();
+		 
+		
+		 if ($options['subscribe'] == '0') {
+			 // Unsubscribe
+			 $where = array('userID = ?' => $options['userID'],
+						$options['idType'] . ' = ?' => $options['typeID']);
+			 $table->delete($where);
+		 } else {
+			 // Subscribe
+			 $data = array('userID' => $options['userID'],
+			 			   $options['idType'] => $options['typeID']);
+			 $table->insert($data);
+		 }
+	 }
+	 
 	  /**
 	  * update user's "plus" category for game
 	  */
@@ -326,8 +349,10 @@ class AjaxController extends Zend_Controller_Action
 			$matches = $findMatches->getAll();
 		}
 		
+		$type = rtrim($type,'s');
+		
 		$output = array();
-		$output[0] = $this->view->find()->loopMatches($matches, 'game', $post['offset']);
+		$output[0] = $this->view->find()->loopMatches($matches, $type, $post['offset']);
 		
 		if (isset($matches[0])) {
 			// Matches exist
@@ -556,11 +581,12 @@ class AjaxController extends Zend_Controller_Action
 	{
 		$post = $this->getRequest()->getPost();
 		$options = $post['options'];
-		
+
 		if (isset($options['confirmOrDeny'])) {
 			// Confirm or deny action
 			if ($options['confirmOrDeny'] == 'confirm') {
-				// Confirm action, add to db				
+				// Confirm action, add to db		
+					
 				$mapper = new Application_Model_NotificationsMapper();
 				$mapper->notificationConfirm($options['notificationLogID'], $options['type']);
 				

@@ -8,6 +8,7 @@ abstract class Application_Model_MapperAbstract
 	
 	public function save($savingClass, $loopSave = true)
 	{			
+	
 		// reset db table in case it has been changed before
 		$this->_dbTable = null;
 		
@@ -15,6 +16,7 @@ abstract class Application_Model_MapperAbstract
 			// dbTable is set
 			$this->setDbTable($savingClass->getDbTable());
 		}
+		
 		
 		$data    = array();
 		$table   = $this->getDbTable();
@@ -25,11 +27,12 @@ abstract class Application_Model_MapperAbstract
 		foreach ($attribs as $column => $value) {
 			// Loop through savingClass attributes and determine what is an individual object
 			// and what is a valid column for this table
-			
-			if (is_object($value) && !($value instanceof DateTime)) {
+
+			if (is_object($value) && (!($value instanceof DateTime))) {
 				array_push($models, $value);
 				continue;
 			} elseif(is_array($value)) {
+				
 				@$firstValue = array_shift(array_values($value));
 				
 				if (is_object($firstValue)) {
@@ -46,12 +49,12 @@ abstract class Application_Model_MapperAbstract
 					}
 				} else {
 					// Invalid array with no objects, just values
-					throw new Exception('Invalid attribute array without being objects at: ' . $column);				
+					//throw new Exception('Invalid attribute array without being objects at: ' . $column);				
 				}
 				continue;
 			} elseif (!in_array($column, $columns)) {
 				continue;
-			} elseif ((strpos($value, 'POINT(') !== false) && (get_class($savingClass) == 'Application_Model_Location')) {
+			} elseif ((strpos($value, 'POINT(') !== false) && ($savingClass instanceof Application_Model_Location)) {
 				// This attrib is a location 
 				$data[$column] = new Zend_Db_Expr("GeomFromText('" . $value . "')");
 				continue;
@@ -80,15 +83,16 @@ abstract class Application_Model_MapperAbstract
 		$primaryColumn = $primaryColumn[1];
 		$primaryKey    = $savingClass->$primaryColumn;
 		
+		
 		if (empty($primaryKey)) {
 			// No primary key set, create row
-			$primaryVal = $this->getDbTable()->insert($data);
+			$primaryVal = $table->insert($data);
 			// Update savingClass primary key
 			$savingClass->$primaryColumn = $primaryVal;
 	
 		} else {
 			// Primary key is already set, row exists, update it
-			$this->getDbTable()->update($data, array($primaryColumn . ' = ?' => $primaryKey));
+			$table->update($data, array($primaryColumn . ' = ?' => $primaryKey));
 		}
 		
 		if ($loopSave) {
@@ -189,6 +193,18 @@ abstract class Application_Model_MapperAbstract
 		$lowerPoint = 'POINT(' . ($latitude - $rad) . ',' . ($longitude - $rad) . ')';
 		
 		return array('upper' => $upperPoint, 'lower' => $lowerPoint);
+	}
+	
+	/**
+	 * return string of where function for all points within a given area bounded by upper and lower bounds
+	 */
+	public function getAreaWhere($upper, $lower, $column)
+	{
+		return 'MBRContains(
+							LINESTRING(
+								' . $upper . ' , ' . $lower . '
+								), ' . $column . '
+								)';
 	}
 	
 	public function getColumnValue($column, $value)

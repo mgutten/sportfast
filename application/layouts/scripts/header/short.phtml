@@ -68,7 +68,7 @@ Request sent
 
     <div class='centered-body body-wrapper'>
     	<div class='header-nav-container-short'>
-        	<a href='/'><img src='/images/global/logo/small.png' id='logo-small'/> </a>
+        	<a href='/'><img src='/images/global/logo/small2.png' class='left'/> </a>
             
             <a href='/'><img src='/images/global/header/home_icon.png' id='header-home-icon' /></a>
             
@@ -81,7 +81,7 @@ Request sent
                 <div class='dropdown-back-outer' id='nav-dropdown-outer-find'>
                     <div class='dropdown-back-inner' id='nav-dropdown-inner-find'>
                         <?php 
-							$find = array('games','teams','players','tournaments');
+							$find = array('games','teams','players','parks');
 							foreach ($find as $section) {
 								echo $this->partial('partials/global/headerDropdownOption.phtml', array('controller' => 'find','section' => $section));
 							}

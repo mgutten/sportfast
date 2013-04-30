@@ -44,6 +44,11 @@ class Application_Model_Sport extends Application_Model_ModelAbstract
 		return $this->_attribs['skillCurrent'];
 	}
 	
+	public function getSport()
+	{
+		return ucwords($this->_attribs['sport']);
+	}
+	
 	/**
 	 * calculate overall rating for user
 	 */

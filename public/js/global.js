@@ -634,6 +634,10 @@ $(function()
 	$('.selectable-text').click(function() {
 		if ($(this).is('.selectable-text-one')) {
 			// Only one can be chosen at a time
+			if ($(this).siblings('.green-bold').length < 1) {
+				// Clicked currently selected text
+				return false;
+			}
 			$(this).siblings('.green-bold').removeClass('green-bold')
 		}
 		$(this).toggleClass('green-bold');
@@ -942,16 +946,13 @@ function notificationConfirmDeny(notificationLogID, confirmOrDeny, type, optiona
 	options.type = type;
 	options.confirmOrDeny = confirmOrDeny;
 	options.optionalID = optionalID;
-	
+
 	$.ajax({
 		url: '/ajax/notification-action',
 		type: 'POST',
-		data: {notificationLogID: notificationLogID,
-			   confirmOrDeny: confirmOrDeny,
-			   type: type,
-			   optionalID: optionalID},
+		data: {options: options},
 		success: function(data) {
-			
+			reloadPage();
 		}
 	})
 }
@@ -1091,7 +1092,12 @@ function dropdownMenu(dropdownEle)
 																			}
 											  }
 								);
-								
+				
+				if (dropdowns.dropdownMenuDown.parents('#profile-buttons-container').length > 0) {
+					// Is profile page, handle bug where container must be taller than the dropdowns when clicked, smaller when unclicked
+					dropdowns.dropdownMenuDown.parents('#profile-buttons-container').animate({height: '10em'}, 300);
+				}
+							
 				dropdowns.dropdownMenuDown = false;
 				return;
 			}
@@ -1544,7 +1550,7 @@ function alignAbsolute(ele)
 		// No holder element existing
 		return;
 	}
-	var top = holder.offset().top;
+	var top = holder.position().top;
 	
 	ele.css('top',top);
 }

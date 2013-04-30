@@ -192,6 +192,23 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 				
 		$router->addRoute('games', $r);
 		
+		// Parks page
+		$r = new Zend_Controller_Router_Route_Regex(
+				'parks(?:/(\d+))?(?:/(\w+))?',
+				array(
+						'action' => 'index',
+						'controller' => 'parks',
+						'module' => 'default',
+						'id'	 => '1'
+				),
+				array(
+						1 => 'id',
+						2 => 'action'
+				),
+				'parks/%d');
+				
+		$router->addRoute('parks', $r);
+		
 		
 		return $view;
 	}

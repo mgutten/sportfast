@@ -1,0 +1,79 @@
+/* overwrite */
+#profile-buttons-container {
+	height: 10em;
+}
+
+/* ratings */
+
+.park-num-ratings {
+	margin-top: 1.75em;
+	margin-left: .75em;
+}
+
+/* park details container */
+
+.park-details-tab-container {
+	margin-top: 2em;
+}
+
+.park-details-tab {
+	padding: .1em .5em;
+}
+
+.park-details-tab-selected {
+	height: 2em;
+	color: #8d8d8d;
+}
+
+.park-details-outer-container {
+	width:92%;
+	padding: 1em 4% .5em 4%;
+	margin-top: -1em;
+}
+
+.park-sport-small,.park-sport-large {
+	color: inherit;
+
+}
+
+.park-sport-small {
+	margin-top: 1em;
+	width: 5.5em;
+}
+
+.park-details-middle {
+	width: 17em;
+	margin-left: 0;
+}
+
+.park-details-review {
+	margin-top: 1em;
+}
+
+.park-details-tab:hover {
+	color: #8d8d8d;
+}
+
+.park-details-outer-container > div:first-child {
+	width: 11.2em;
+}
+
+/* nearby parks */
+.park-short-container {
+	width: auto;
+	position:relative;
+	margin: .3em 2.5em 0 0;
+}
+
+.park-short-container:last-child {
+	margin-right: 0;
+}
+
+.park-short-title {
+	position: absolute;
+	top:0;
+	left:0;
+	width: 96%;
+	background: #fff;
+	padding: .2em 2% .2em 2%;
+}

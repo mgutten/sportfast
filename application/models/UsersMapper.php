@@ -56,6 +56,142 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 	}
 	
 	/**
+	 * Get all games that match $options variable
+	 * @params ($options   => array of options including:
+	 *					sports => associative array of sport => type,
+	 *					distance => distance to look from user's location,
+	 *					time => time to look for ('user' for user availability, false for anytime),
+	 *					age => array('lower' => lower average age limit, 'upper' => upper average age limit),
+	 *					skill => array('lower' => lower average skill limit, 'upper' => upper average skill limit)
+	 *			$userClass   => user class,
+	 *		    $savingClass => games object,
+	 */
+	public function findUsers($options, $userClass, $savingClass, $limit = 200)
+	{
+		$table   = $this->getDbTable();
+		$select  = $table->select();
+		$userID  = $userClass->userID;
+		$where = array();
+		$having = array();
+		
+		$select->setIntegrityCheck(false);
+		// Default location to search near is user's home location, look for games within $distance of user's home location
+		$latitude  = $userClass->getLocation()->getLatitude();
+		$longitude = $userClass->getLocation()->getLongitude();
+		$bounds = $this->getBounds($latitude, $longitude, 20);			   
+		
+		
+		if (!empty($options['skill'])) {
+			$having[] = "us.skillCurrent >= '" . $options['skill']['lower'] . "' AND us.skillCurrent <= '" . $options['skill']['upper'] . "'";
+		}
+		
+		if (!empty($options['age'])) {
+			$having[] = "u.age >= '" . $options['age']['lower'] . "' AND u.age <= '" . $options['age']['upper'] . "'";
+		}
+		
+		if (!empty($options['looking'])) {
+			$where[] = "usf.formatID = sf.formatID";
+		}
+
+		$select->from(array('s' => 'sports'),
+					  array(new Zend_Db_Expr('SQL_CALC_FOUND_ROWS s.*')))
+			   ->join(array('us' => 'user_sports'),
+			   		 'us.sportID = s.sportID',
+					 array('skillCurrent',
+					 	   'attendance',
+						   'sportsmanship'))
+			   ->join(array('u' => 'users'),
+			   		  'u.userID = us.userID')
+			   ->join(array('ul' => 'user_locations'),
+			   				'ul.userID = u.userID',
+							array(''))
+			   ->join(array('c' => 'cities'),
+			   				'u.cityID = c.cityID')
+			   ->join(array('sf' => 'sport_formats'),
+			   		  'sf.format = "league"')
+			   ->joinLeft(array('usf' => 'user_sport_formats'),
+			   		  'usf.userID = u.userID AND usf.formatID = sf.formatID AND usf.sportID = us.sportID',
+					  array('formatID'))
+			   ->where('MBRContains(
+									  LINESTRING(
+									  ' . $bounds["upper"] . ' , ' . $bounds["lower"] . '
+									  ), ul.location
+								   )');
+	
+		$sportWhere = '';
+		$counter = 0;
+		
+		if (!empty($options['sports'])) {
+			foreach ($options['sports'] as $sport => $inner) {
+				if ($counter != 0) {
+					$sportWhere .= ' OR ';
+				}
+				
+				$sportWhere .= "(s.sport = '" . $sport . "' )";
+				$counter++;
+			}
+			
+			$where[] = $sportWhere;
+		}
+		
+		/*
+		if (!empty($options['skill'])) {
+			$having[] = "avg(us.skillCurrent) >= '" . $options['skill']['lower'] . "' AND avg(us.skillCurrent) <= '" . $options['skill']['upper'] . "'";
+		}				  
+		*/	
+					   
+		foreach ($where as $statement) {
+			$select->where($statement);
+		}
+		
+		foreach ($having as $statement) {
+			$select->having($statement);
+		}
+		
+		
+		if (isset($options['order'])) {
+			// Order by
+			if ($options['order'] == 'skill') {
+				$select->order('us.skillCurrent DESC');
+			} elseif ($options['order'] == 'activity') {
+				$select->order('u.lastActive DESC');
+			}
+		}
+		
+		$limitArray = explode(',',$limit);
+		$totalLimit = trim($limitArray[0]);
+		$offsetLimit = (isset($limitArray[1]) ? $limitArray[1] : 0);
+		
+		$select->limit($totalLimit,$offsetLimit);
+
+		$results = $table->fetchAll($select);
+		
+		$db = Zend_Db_Table::getDefaultAdapter();
+		$totalRows = $db->fetchAll('SELECT FOUND_ROWS() as totalRows');
+		$totalRows = $totalRows[0]['totalRows'];
+		
+		foreach ($results as $result) {
+		
+			$user = $savingClass->addUser($result);
+			
+			$user->getSport($result->sport)->setAttribs($result);
+			
+			if ($result->formatID !== null) {
+				// User is looking for team
+				$user->getSport($result->sport)->getFormat($result->format)->setAttribs($result);
+			}
+			
+			$city = new Application_Model_City($result);
+			$user->city = $city;
+		}
+		
+		$savingClass->totalRows = $totalRows;
+		
+		return $savingClass;
+		
+	}
+	
+	/**
      * Find all events that user is scheduled for
      *
      * @params ($savingClass => user class)
@@ -478,7 +614,7 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 					 LEFT JOIN `teams` AS `t` ON t.teamID = nl.teamID
 					 LEFT JOIN `user_ratings` AS `ur` ON ur.userRatingID = nl.ratingID 
 					 WHERE ((nl.receivingUserID = " . $userID . ") OR
-					 	(nl.actingUserID =  " . $userID . " AND n.action = 'friend') ";
+					 	(nl.actingUserID =  " . $userID . " AND n.action = 'friend' AND n.type IS NULL) ";
 		
 		$counter = 0;
 		$success = false;
@@ -544,7 +680,7 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 					 LEFT JOIN `teams` AS `t` ON t.teamID = nl.teamID
 					 LEFT JOIN `user_ratings` AS `ur` ON ur.userRatingID = nl.ratingID 
 					 WHERE ((nl.receivingUserID = " . $userID . ") OR
-					 	(nl.actingUserID =  " . $userID . " AND n.action = 'friend') ";
+					 	(nl.actingUserID =  " . $userID . " AND n.action = 'friend' AND n.type IS NULL) ";
 		
 		$counter = 0;
 		$success = false;

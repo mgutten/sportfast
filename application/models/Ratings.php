@@ -15,12 +15,54 @@ class Application_Model_Ratings extends Application_Model_ModelAbstract
 		return $rating;
 	}
 	
+	public function getRandomRating($withText = true)
+	{
+		$count = count($this->_attribs['ratings']);
+		if (!$withText) {
+			$index = mt_rand(0,$count);
+			return $this->_attribs['ratings'][$index];
+		}
+		
+		$temp = $this->getAll();
+		shuffle($temp);
+		
+		foreach ($temp as $rating) {
+			if ($rating->hasValue('comment')) {
+				return $rating;
+			}
+		}
+		
+		return false;	
+		
+	}
+	
+	public function countRatings($ucRating = true)
+	{
+		if (!$this->hasValue('ratings')) {
+			return '0 ratings';
+		}
+		
+		$count = count($this->_attribs['ratings']);
+		
+		if ($count == 1) {
+			$rating = 'rating';
+		} else {
+			$rating = 'ratings';
+		}
+		
+		if ($ucRating) {
+			$rating = ucwords($rating);
+		}
+		
+		return $count . ' ' . $rating;
+	}
+	
 	public function getAverage($attrib)
 	{
 		$total   = 0;
 		$ratings = $this->getAll();
 		$count   = count($ratings);
-		$value   = $attrib . 'Value';
+		$value   = $attrib;
 		
 		if ($count == 0) {
 			// No ratings
@@ -28,10 +70,23 @@ class Application_Model_Ratings extends Application_Model_ModelAbstract
 		}
 		
 		foreach ($ratings as $rating) {
+			if ($rating->isUser()) {
+				// Is a user rating
+				$value = $attrib . 'Value';
+			}
 			$total += $rating->$value;
 		}
 		
-		return floor($total/$count);
+		$average = $total/$count;
+		
+		if (!$rating->isUser()) {
+			// Is park
+			$average = round(($average) / .5) * .5; // Round to nearest half
+		} else {
+			$average = floor($average);
+		}
+		
+		return $average;
 	}
 	
 	/**
@@ -79,5 +134,15 @@ class Application_Model_Ratings extends Application_Model_ModelAbstract
 		}
 		
 		return $returnArray;
+	}
+	
+	public function getStarWidth($attrib)
+	{
+		$average = $this->getAverage($attrib);
+		
+		//$rounded = round($average/10);
+		$rounded = $average * 20;
+		
+		return $rounded;
 	}
 }

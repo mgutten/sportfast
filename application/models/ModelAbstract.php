@@ -92,7 +92,7 @@ abstract class Application_Model_ModelAbstract
 	 *			$maxDays => max # of days to show "x days ago" before show date)
 	 * @returns str
 	 */
-	public function getTimeFromNow($date, $maxDays)
+	public function getTimeFromNow($date, $maxDays = 14)
 	{
 		$date = strtotime($date);
 		$now  = time();
@@ -272,6 +272,7 @@ abstract class Application_Model_ModelAbstract
 	
 	public function setAttribs($resultRow)
 	{
+		
 		if (!is_array($resultRow)) {
 			$resultRow = $resultRow->toArray();
 		}
@@ -445,11 +446,9 @@ abstract class Application_Model_ModelAbstract
 		  if ($unit == "K") {
 			return ($miles * 1.609344);
 		  } else if ($unit == "N") {
-			  return ($miles * 0.8684);
-			} else {
-				return $miles;
-			  }
-		}
-
-
+			return ($miles * 0.8684);
+		  } else {
+			return $miles;
+		  }
+	}
 }

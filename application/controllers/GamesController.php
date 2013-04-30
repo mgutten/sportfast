@@ -36,6 +36,7 @@ class GamesController extends Zend_Controller_Action
 		$this->view->newsfeed   = $game->messages->getGameMessages($game->gameID);
 		
 		$this->view->captain = $captain = $game->isCaptain($this->view->user->userID);
+		$this->view->subscribed = $game->isSubscriber($this->view->user->userID);
 				
 		if ($userInGame) {
 			// User is in game, get post form
@@ -56,6 +57,29 @@ class GamesController extends Zend_Controller_Action
 		$this->view->parkLocation = $game->park->location;
 		
 	
+	}
+	
+	public function playersAction()
+	{
+		$this->view->narrowColumn = 'false';
+		
+		$gameID = $this->getRequest()->getParam('id');
+        $game = new Application_Model_Game();
+		$game->getGameByID($gameID);
+		
+		$this->view->game = $game;
+		
+		$this->view->players = $game->players->getAll();
+		
+		$gameDate = $game->gameDate->format('U');
+		$curTime  = time();
+		
+		$diff = $gameDate - $curTime;
+		$hours = floor(($diff/ 60) / 60);
+		$remaining = $diff - ($hours * 60 * 60);
+		$minutes = floor($remaining/60);
+		
+		$this->view->timeUntil = $hours . '<span class="inherit smaller-text">hr</span> ' . $minutes . '<span class="inherit smaller-text">min</span>';
 	}
 
 

@@ -48,8 +48,8 @@ class Application_Model_Location extends Application_Model_ModelAbstract
 	public function parseLocation()
 	{
 		// Location start is POINT(latitude longitude), explode by space
-		$location = explode(' ',$this->location);
-		
+		$location = explode(' ',$this->_attribs['location']);
+
 		$this->latitude  = ltrim($location[0], 'POINT(');
 		$this->longitude = rtrim($location[1], ')');
 		

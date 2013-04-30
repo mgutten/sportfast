@@ -81,6 +81,7 @@ $this->placeholder('narrowColumn')->captureEnd();
 
 <div id='user-sports-container' class='clear'>
 	<?php
+		echo $this->profilesportsections()->start($this->currentUser->sports);
 		$lowerOutput = '';
 		$count = 0;
 		foreach ($this->currentUser->sports as $sport) {
@@ -91,16 +92,6 @@ $this->placeholder('narrowColumn')->captureEnd();
 				$class = 'user-sport-container-selected';
 				$tabClass = 'user-sport-selected';
 			}
-			
-			echo "<div class='user-sport-tab-container " . $tabClass . "'>
-				  	<img src='" . $sport->getIcon('medium', 'outline') . "' class='user-sport-tab-back pointer'/>
-					<div class='user-sport-tab-selected-container'>
-						<div class='user-sport-tab-large-container rounded-corners'>
-							<img src='" . $sport->getIcon('medium',	'solid', 'medium') . "' class='user-sport-tab-selected' />
-							<p class='medium heavy left user-sport-tab-text'>" . ucwords($sport->sport) . "</p>
-						</div>
-					</div>
-				  </div>";
 			
 			$lowerOutput .= "<div class='user-sport-container rounded-corners light-back " . $class . " dropshadow-bottom'>";
 			$lowerOutput .= 	"<div class='user-sport-left-container'>";

@@ -82,6 +82,9 @@ class Application_Model_Games extends Application_Model_ModelAbstract
 	 *			$typeOfID => 'teamGameID' or 'gameID'
 	 */
 	public function gameExists($id, $typeOfID) {
+		if (!$this->hasValue('games')) {
+			return false;
+		}
 		foreach ($this->_attribs['games'] as $game) {
 			if (is_array($game)) {
 				// Game is array of sub games

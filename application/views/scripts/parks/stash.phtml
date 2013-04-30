@@ -1,0 +1,80 @@
+<?php
+/** 
+ * controller => parks
+ * action => stash
+ */
+$this->headTitle($this->park->parkName . ' - Stash');
+$this->headLink()->prependStylesheet($this->baseUrl() . '/css/stash.css');
+$this->headLink()->prependStylesheet($this->baseUrl() . '/css/profile.css');
+$this->headScript()->prependFile($this->baseUrl() . '/js/profile.js');
+?>
+
+<?php
+// Narrow right column
+$this->placeholder('narrowColumn')->captureStart();
+echo "<img src='/images/global/stash/box.jpg' class='narrow-column-picture dropshadow rounded-corners'/>";
+echo "<img src='/images/global/stash/look_like.png' class='left clear'/>";
+
+$this->placeholder('narrowColumn')->captureEnd();
+?>
+
+<a href='/parks/<?php echo $this->parkID;?>' class='left smaller-text medium'>&lt;&lt; Back to park</a>
+
+<header class='width-100 left'>
+	<p class='jumbo-text heavy darkest left'>Stash</p>
+    <p class='left largest-text darkest profile-header-sub'>for <?php echo $this->park->parkName;?> </p>
+    <div class='right'>
+        <a href='http://www.google.com/maps?q=<?php echo $this->stashLocation->latitude . ',' . $this->stashLocation->longitude;?>' class='larger-button green-button right heavy larger-text stash-location-button'>Location</a>
+    </div>
+</header>
+
+<p class='clear medium larger-margin-top'>
+	<span class='darkest'>A stash is a public, free-to-use collection of sports equipment.</span>  We are firm supporters of our users and their sporting needs, 
+    so we have donated hundreds of items (out of our own pocket) to local parks and schools in hopes that both our users and their 
+    community can enjoy the sports we love. Please, please put back all borrowed equipment so you can use it again.
+</p>
+
+
+<div class='clear stash-bodies-container width-100'>
+	<div class='stash-body-container left'>
+        <p class='left largest-text medium heavy'>Sports</p>
+        <p class='left darkest stash-question-mark pointer' tooltip='These sports can be played with the items in the stash.<br/><span class="light">Note: This only shows sports that are in the stash, not sports available at the park.</span>'>?</p>
+        <div class='stash-body left light-back'>
+        <?php 
+			foreach ($this->stash->sports as $sport) {
+				echo "<img src='" . $sport->getIcon('medium','solid') . "' class='clear margin-top'/>
+					  <p class='left medium larger-text indent heavy stash-sport'>" . $sport->sport . "</p>";
+			}
+		?>
+        <p class='clear light larger-margin-top smaller-text stash-disclaimer'>Only includes sports in the stash.</p>
+        </div>
+    </div>
+    <div class='stash-body-container left'>
+        <p class='left largest-text medium heavy'>Items</p>
+        <div class='stash-body left light-back'>
+        <?php
+			foreach ($this->stash->items as $item) {
+				echo "<p class='clear largest-text heavy medium'>" . $item->qty . "</p>";
+				echo "<p class='left larger-text heavy medium indent stash-item'>" . $item->itemName . "</p>";
+			}
+		?>
+        </div>
+    </div>
+    <div class='stash-body-container left'>
+        <p class='left largest-text medium heavy'>Instructions</p>
+        <p class='left darkest stash-question-mark pointer' tooltip='Learn how to use the equipment and the rules of play.'>?</p>
+        <div class='stash-body left light-back'>
+        <?php 
+			foreach ($this->stash->sports as $sport) {
+				echo "<a href='/sports/" . strtolower($sport->sport) . "' class='clear light larger-text margin-top'>" . $sport->sport . "</a>";
+			}
+		?>
+        </div>
+    </div>
+</div>
+
+<p class='clear light heavy larger-text larger-margin-top width-100 center'>
+We do not provide a ball or disc!
+</p>
+
+    

@@ -46,7 +46,7 @@ class UsersController extends Zend_Controller_Action
 			// Not this user
 			$this->_forward('permission', 'error', null);
 		}
-		 $this->view->narrowColumn = 'false';
+		$this->view->narrowColumn = 'false';
 	}
 
 

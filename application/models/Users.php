@@ -5,7 +5,8 @@ class Application_Model_Users extends Application_Model_ModelAbstract
 	protected $_mapperClass = 'Application_Model_UsersMapper';
 	protected $_singleClass = 'Application_Model_User';
 	
-	protected $_attribs     = array('users'	=> '');
+	protected $_attribs     = array('users'	=> '',
+									'totalRows' => '');
 	
 	
 	
@@ -15,6 +16,11 @@ class Application_Model_Users extends Application_Model_ModelAbstract
 
 		$user = $this->_attribs['users'][] = new Application_Model_User($resultRow);
 		return $user;
+	}
+	
+	public function findUsers($options, $userClass, $limit)
+	{
+		return $this->getMapper()->findUsers($options, $userClass, $this, $limit);
 	}
 	
 	public function getUser($userID)

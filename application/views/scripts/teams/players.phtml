@@ -1,0 +1,23 @@
+<?php
+/** 
+ * controller => teams
+ * action => index
+ */
+$this->headTitle($this->team->teamName);
+$this->headLink()->prependStylesheet($this->baseUrl() . '/css/profile.css');
+$this->headScript()->prependFile($this->baseUrl() . '/js/profile.js');
+?>
+
+<a href='/teams/<?php echo $this->team->teamID;?>' class='left smaller-text medium'>Back to team</a>
+
+<div class='width-100 clear' id='player-description-container'>
+    <p class='darkest jumbo-text clear heavy'><?php echo count($this->players);?> <span class='inherit smaller-text'>players</span></p>
+    
+</div>
+<div class='clear width-100'>
+<?php
+
+echo $this->playerssection($this->players, false ,false);
+?>
+</div>
+

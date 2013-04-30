@@ -1,7 +1,7 @@
 <?php
 /** 
  * controller => find
- * action => games
+ * action => teams
  */
 $this->headTitle('Find Teams');
 $this->headLink()->prependStylesheet($this->baseUrl() . '/css/find.css');
@@ -11,7 +11,7 @@ $this->headScript()->prependFile($this->baseUrl() . '/js/find.js');
 
 <?php
 $this->placeholder('narrowColumn')->captureStart();
-	echo "<div class='narrow-column-picture'></div>";
+	echo "<img src='" . $this->matches[0]->getProfilePic('large') . "' class='narrow-column-picture'/>";
 	echo "<p class='clear larger-margin-top white arial bold larger-text width-100 center dark-back'>FILTERS</p>";
 	echo $this->narrowcolumnsection()->start(array('title' => 'Sports'));
 	$counter = 0;

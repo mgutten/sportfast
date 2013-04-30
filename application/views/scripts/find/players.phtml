@@ -1,0 +1,114 @@
+<?php
+/** 
+ * controller => find
+ * action => games
+ */
+$this->headTitle('Find Players');
+$this->headLink()->prependStylesheet($this->baseUrl() . '/css/find.css');
+$this->headScript()->prependFile($this->baseUrl() . '/js/find.js');
+?>
+
+
+<?php
+
+$this->placeholder('narrowColumn')->captureStart();
+	echo "<img src='" . $this->matches[0]->getProfilePic('large') . "' class='narrow-column-picture'/>";
+	echo "<p class='clear larger-margin-top white arial bold larger-text width-100 center dark-back'>FILTERS</p>";
+	echo $this->narrowcolumnsection()->start(array('title' => 'Sports'));
+	$counter = 0;
+	foreach ($this->sports as $sport => $inner) {
+		$class = 'selectable-text selectable-text-one light pointer narrow-sport';
+		if ($counter % 2 == 0) {
+			// even
+			$class .= ' clear';
+		} else {
+			$class .= ' right';
+		}
+		if ($counter == 0) {
+			// User has this sport
+			$firstSport = $sport;
+			$class .= ' green-bold';
+		}
+		
+		echo	"<p class='" . $class . "'>" . ucwords($sport) . "</p>";
+		$counter++;
+	}
+	echo $this->narrowcolumnsection()->end();
+	
+	
+	
+	echo $this->narrowcolumnsection()->start(array('title' => 'Looking For'));
+	echo $this->checkbox->setName('lookingForAny')
+						->setAttribs(array('text' =>'Anything',
+										   'checked' => 'checked'));	echo $this->checkbox->setName('lookingForTeam')
+						->setAttribs(array('text' =>'Teams',
+										   'checked' => false));
+	echo $this->narrowcolumnsection()->end();
+	
+	
+	echo $this->narrowcolumnsection()->start(array('title' => 'Skill'));
+	/*echo $this->slider()->create(array('id' => 'skill',
+									   'valuePosition' => 'above',
+									   'valueClass'	=> 'larger-text'));*/
+	echo $this->checkbox->setName('skillAny')
+						->setAttribs(array('text' =>'Any Level',
+										   'checked' => 'checked'));
+	echo $this->checkbox->setName('skillSpecific')
+						->setAttribs(array('text' =>'Specific Level',
+										   'checked' => false,
+										   'class' => 'medium find-filter-textInput'));
+	echo "<div class='find-filter-hidden hidden'>";
+	echo $this->inputText->setLabel('min')
+					     ->setName('skillMin');
+	echo "<p class='left medium skill-separator'>-</p>";
+	echo $this->inputText->setLabel('max')
+					     ->setName('skillMax');
+	echo "</div>";
+	echo $this->narrowcolumnsection()->end();
+	
+	echo $this->narrowcolumnsection()->start(array('title' => 'Age'));
+	echo $this->checkbox->setName('ageAny')
+						->setAttribs(array('text' =>'Any Age',
+										   'checked' => 'checked',
+										   'class'	=> 'medium'));
+	echo $this->checkbox->setName('ageSpecific')
+						->setAttribs(array('text' =>'Specific Age',
+										   'checked' => false,
+										   'class' => 'medium find-filter-textInput'));
+	echo "<div class='find-filter-hidden hidden'>";
+	echo $this->inputText->setLabel('min')
+					     ->setName('ageMin');
+	echo "<p class='left medium skill-separator'>-</p>";
+	echo $this->inputText->setLabel('max')
+					     ->setName('ageMax');	
+	echo "</div>";
+	echo $this->narrowcolumnsection()->end();
+	
+
+			
+$this->placeholder('narrowColumn')->captureEnd();
+
+?>
+
+<p class='left dark indent'><span class='inherit' id='find-num-results'><?php echo $this->numMatches;?></span> players found</p>
+<?php
+$content  = "<div class='right' id='find-looking-container'>";
+$content .=		"<p class='left darkest heavy'>Looking for:</p>";
+$content .= 	"<div class='left indent'>" . $this->lookingFor . "</div>";
+$content .= "</div>";
+$content .= "<div class='left' id='find-order-by'>";
+$content .= 	"<p class='light left'>Order by:</p>";
+$content .= 	"<p class='light left pointer selectable-text selectable-text-one green-bold'>Activity</p>";
+$content .= 	"<p class='light left pointer selectable-text selectable-text-one'>Skill</p>";
+$content .= "</div>";
+echo $this->partial('partials/global/sectionHeaderBold.phtml',array('title'   => 'Results',
+																	'content' => $content));
+
+echo $this->find()->createPagination(false);
+echo "<div class='find-results-outer-container left width-100' id='find-results-outer-container'>";
+echo "<div class='find-results-outer-inner-container left width-100' id='find-results-inner-container'>";
+echo $this->find()->loopMatches($this->matches, 'player');
+echo "</div></div>";
+echo $this->find()->createPagination(true);
+
+echo "<img src='/images/global/loading.gif' id='loading' class='hidden'/>";

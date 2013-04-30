@@ -1,4 +1,169 @@
-<br /><br />
-<div id="view-content">
-	<p>View script for controller <b>Parks</b> and script/action name <b>index</b></p>
+<?php
+/** 
+ * controller => parks
+ * action => index
+ */
+$this->headTitle($this->park->parkName . ' - ' . $this->park->city);
+$this->headLink()->prependStylesheet($this->baseUrl() . '/css/park.css');
+$this->headLink()->prependStylesheet($this->baseUrl() . '/css/profile.css');
+$this->headScript()->prependFile($this->baseUrl() . '/js/park.js');
+$this->headScript()->prependFile($this->baseUrl() . '/js/profile.js');
+?>
+
+<?php
+// Narrow right column
+$this->placeholder('narrowColumn')->captureStart();
+echo "<img src='" . $this->park->getProfilePic('large') . "' class='narrow-column-picture dropshadow rounded-corners'/>";
+
+
+echo "<div class='width-100 narrow-column-calendar-container clear'>";
+echo $this->calendar()->createCalendar($this->parkGames->getAll(), true);
+echo "</div>";
+
+$this->placeholder('narrowColumn')->captureEnd();
+
+?>
+
+<span id='user-details'
+	  actingUserID='<?php echo $this->user->userID;?>'>
+</span>
+
+
+<header class='clear profile-name-container'>
+	<p class='profile-name heavy darkest clear'>
+    	<?php echo $this->park->parkName;?>
+	</p>
+    <div class='profile-city-container clear'>
+        <p class='medium clear larger-text'>
+            <?php echo $this->park->city;?>&nbsp; <a href='http://www.google.com/maps?q=<?php echo $this->parkLocation->latitude . ',' . $this->parkLocation->longitude;?>' class='inherit light'><?php echo $this->park->getDistanceFromUser($this->user->getLocation()->latitude,$this->user->getLocation()->longitude);?> miles from you</a>
+        </p> 
+        <?php echo $this->ratingStar('large', $this->parkRatingWidth, $this->currentURI . '/ratings', 'margin-top');?>
+        <a href='/parks/<?php echo $this->parkID;?>/ratings' class='left green park-num-ratings'><?php echo $this->numRatings;?></a>
+    </div>
+</header>
+
+<div id='profile-buttons-container-holder' class='right'></div>
+<div id='profile-buttons-container' holder='profile-buttons-container-holder' class='absolute'>
+	<div class='profile-buttons-inner-container left'>
+        <div class='profile-animate-buttons light-back pointer' tooltip='Show options'>
+        	<img src='/images/global/arrows/left/medium.png' class='left' />
+        </div>
+        <div class='profile-buttons-innermost-container right'>
+            <a href='http://www.google.com/maps?q=<?php echo $this->parkLocation->latitude . ',' . $this->parkLocation->longitude;?>' class='green-button clear right larger-button'>
+				Directions
+			</a>
+            <?php
+        	if ($this->parkStash->hasValue('sports')) {
+			?>
+            <a href='<?php echo $this->currentURI;?>/stash' class='green-button right profile-buttons-margin-right smaller-button' tooltip='Certain parks have "stashes" where we have placed sports equipment for your use, free of charge.'>Stash</a>
+        	<?php } ?>
+            <a href='/create/game/<?php echo $this->park->parkID;?>' class='button right larger-button larger-margin-top'>Create Game</a>
+            <a href='<?php echo $this->currentURI;?>/ratings' class='button right profile-buttons-margin-right smaller-button larger-margin-top'>Rate</a>
+            
+            
+        </div>
+    </div>
 </div>
+
+<div class='park-details-tab-container clear'>
+    <p class='park-details-tab park-details-tab-selected light-back rounded-corners light left larger-text pointer'>Sports</p>
+	<p class='park-details-tab light larger-text left pointer'>Details</p>
+</div>
+
+<div class='park-details-outer-container clear rounded-corners light-back medium' id='park-sports'>
+	<div class='left inherit'>
+   		<p class='left light'>courts and fields</p>
+        
+        <p class='park-sport-small clear '>basketball</p>
+        <p class='park-sport-large largest-text heavy left'><?php echo $this->park->totalBasketball;?></p>
+        <p class='park-sport-small clear '>tennis</p>
+        <p class='park-sport-large largest-text heavy left'><?php echo $this->park->tennis;?></p>
+        <p class='park-sport-small clear '>fields</p>
+        <p class='park-sport-large largest-text heavy left'><?php echo $this->park->field;?></p>
+        
+        
+    </div>
+    
+    <div class='left park-details-middle'>
+   		<p class='left light'>reviews</p>
+    	<p class='clear medium park-details-review'><?php echo $this->ratingText;?></p>
+    </div>
+    
+    <div class='right inherit'>
+    	<p class='left light'>sports w/ the stash</p>
+        <p class='left darkest indent pointer' tooltip='Certain parks have "stashes" where we have placed sports equipment for your use, free of charge.'>?</p>
+        <div class='clear'>
+        	<?php
+				$class = 'clear largest-text heavy medium';
+				
+				if (!$this->stashExists) {
+					echo "<p class='" . $class . "'>None</p>";
+				} else {
+					foreach ($this->parkStash->sports as $sport) {
+						echo "<img src='" . $sport->getIcon('medium','solid') . "' class='clear'/><p class='larger-text left medium larger-margin-top heavy indent'>" . $sport->sport . "</p>";
+					}
+				}
+        	?>
+        </div>
+        <?php
+        	if ($this->parkStash->hasValue('sports')) {
+			?>
+            <a href='<?php echo $this->currentURI;?>/stash' class='clear medium'>locate the stash</a>
+            <?php } ?>
+    </div>
+    
+</div>
+
+<div class='park-details-outer-container clear rounded-corners light-back medium hidden' id='park-details'>
+	<div class='left inherit'>
+   		<p class='left light'>type</p>
+        <p class='park-sport-large largest-text heavy clear'><?php echo $this->park->type;?></p>
+
+        
+    </div>
+    
+    <div class='left park-details-middle'>
+   		<p class='left light'>hours</p>
+    	<p class='medium largest-text heavy clear'><?php echo $this->park->getHours();?></p>
+    </div>
+    
+    <div class='right inherit'>
+    	<p class='left light'>cost</p>
+        <p class='park-sport-large largest-text heavy clear'><?php echo ($this->park->cost == 0 ? 'Free' : '$' . $this->park->cost);?></p>
+        
+    </div>
+    
+</div>
+
+<?php
+echo $this->partial('partials/global/sectionHeaderPlain.phtml',array('title' => 'Upcoming'));
+
+if ($this->parkGames->hasValue('games')) {
+	// There are games
+	foreach ($this->parkGames->getAll() as $game) {
+		echo $this->find()->createGame($game, false);
+	}
+} else {
+	// No games
+	echo "<p class='medium larger-text none-text clear width-100 center'>There are no upcoming games</p>";
+}
+
+
+echo $this->partial('partials/global/sectionHeaderPlain.phtml',array('title' => 'Nearby Parks'));
+
+if (!empty($this->nearbyParks[0])) {
+	// There are games
+	foreach ($this->nearbyParks as $park) {
+		echo $this->partial('partials/parks/nearbyPark.phtml', array('parkID' => $park->parkID,
+																	 'image'    => $park->getProfilePic('large'),
+																	 'parkName' => $park->parkName,
+																	 'parkDistance' => $park->getDistanceInMiles($this->parkLocation->latitude, $this->parkLocation->longitude, $park->location->latitude, $park->location->longitude)));
+	}
+} else {
+	// No games
+	echo "<p class='medium larger-text none-text clear width-100 center'>There are no nearby parks.</p>";
+}
+
+    
+    
+

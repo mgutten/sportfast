@@ -10,8 +10,29 @@
 }
 
 #user-buttons-container,#profile-buttons-container {
+	position:absolute;
+	right: 1.5em;
+	width: 15.5em;
 	float:right;
-	margin-top: .2em;
+	overflow-x:hidden;
+	height: 30em;
+	padding-right: .3em;
+	/*margin-top: .2em;*/
+}
+
+#user-buttons-container {
+	width: 17em;
+	height: 7em;
+}
+
+.profile-buttons-inner-container {
+	width: 100%;
+	margin-left: 14.5em;
+}
+
+.profile-buttons-innermost-container {
+	background:#fff;
+	width: 14.5em;
 }
 
 #profile-top-alert {
@@ -24,13 +45,36 @@
 	padding-top: 0em;
 }
 
+#unsubscribe-button {
+	font-size: .75em;
+	margin-right: 1em;
+	margin-top: .7em;
+}
+
 .current-position {
 	min-width: 1px;
 	height: 1.2em;
-	margin-top: -1.4em;
-	margin-bottom: .1em;
+	margin-top: .8em;
+	margin-bottom: .8em;
 }
 
+.profile-animate-buttons {
+	width: 1em;
+	height: 6em;
+	float:left;
+}
+
+.profile-animate-buttons > img {
+	margin: 2.5em 0 0 .1em;
+}
+
+.larger-button {
+	width: 6.3em;
+}
+
+.smaller-button {
+	width: 2.7em;
+}
 
 /*
 #user-buttons-container>p,#user-buttons-container>div,#profile-buttons-container>p,#profile-buttons-container>div {
@@ -285,4 +329,22 @@ input[type=text].profile-manage-team-info-roster-limit {
 
 .alert-cancel-button {
 	margin-top: 1.35em;
+}
+
+/* sub-players page */
+#player-description-container > p {
+	margin-top: .75em;
+	width: 33%;
+	margin-bottom: .2em;
+}
+
+#player-description-container > p:last-child {
+	text-align: right;
+}
+
+
+/* sub-page general */
+.profile-header-sub {
+	margin-top: .45em;
+	margin-left: .3em;
 }

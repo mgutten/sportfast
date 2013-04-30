@@ -186,6 +186,16 @@ class Application_Model_Game extends Application_Model_ModelAbstract
 		return ucwords($this->_attribs['sport']);
 	}
 	
+	
+	public function isGameOn()
+	{
+		if ($this->totalPlayers >= $this->minPlayers) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
 	public function isPickup()
 	{
 		if ($this->hasValue('gameID')) {

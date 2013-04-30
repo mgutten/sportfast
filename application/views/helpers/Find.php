@@ -25,6 +25,7 @@ class Application_View_Helper_Find
 	 */
 	public function loopMatches ($matches, $type, $resultCount = 0)
 	{
+	
 		$this->resultCount = $resultCount;
 		
 		$function = 'create' . ucwords($type);
@@ -166,7 +167,7 @@ class Application_View_Helper_Find
 		$output  = $this->createOuterStart($match->gameID, 'games');
 		$output .=		"<div class='left find-result-img-container'>";
 		$output .=			"<img src='" . $match->getProfilePic('medium') . "' class='left'/>";
-		$output .=			"<p class='find-result-number white green-back heavy'>" . $number . "</p>";
+		$output .=			($number ? "<p class='find-result-number white green-back heavy'>" . $number . "</p>" : '');
 		$output .= 		"</div>";
 		$output .=		"<div class='left find-result-left-container'>";
 		$output .=			"<p class='left heavy largest-text darkest'>" . $match->getGameTitle() . "</p>";
@@ -206,6 +207,75 @@ class Application_View_Helper_Find
 		$output .=		"<img src='" . $match->getMatchImage() . "' tooltip='" . $match->getMatchDescription() . "' class='left find-result-match-img'/>";	
 		$output .=		($userInGame ? "<p class='left find-results-joined smaller-text green'> You are on this team!</p>" : '');
 		$output .=		$this->createRight($match, $userInGame);
+		$output .= "</a>";
+		
+		return $output;
+	}
+
+	/**
+	 * create game container for a match (controller => find, action => games)
+	 * @params ($match => game model,
+	 *			$number => # of match in list)
+	 */
+	public function createPlayer($match, $number)
+	{
+		$sports = $match->sports;
+		$sport = reset($sports);
+		$output  = $this->createOuterStart($match->userID, 'users');
+		$output .=		"<div class='left find-result-img-container'>";
+		$output .=			"<img src='" . $match->getProfilePic('medium') . "' class='left'/>";
+		$output .=			"<p class='find-result-number white green-back heavy'>" . $number . "</p>";
+		$output .= 		"</div>";
+		$output .=		"<div class='left find-result-left-container'>";
+		$output .=			"<p class='left heavy largest-text darkest'>" . $match->shortName . "</p>";
+		$output .=			"<p class='clear darkest'>" . $match->city->city . ', ' . $match->city->state . "</p>";
+		$output .=			"<p class='clear light hover smaller-text'>last active " . $match->getLastActiveFromNow() . "</p>"; 
+		$output .=			"<div class='hidden clear hover'><p class='clear medium'>" . $match->age . " years old</p>";	
+		$output .=			"<p class='clear medium'>" . $match->getHeightInFeet() . ' ' . $match->weight . "lb</p></div>";	
+		$output .= 		"</div>";
+		$output .=		"<div class='right find-player-right-container'>";
+		$output .=			"<div class='sport-holder'><p class='left width-100 center medium smaller-text hidden hover'>" . ucwords($sport->sport) . "</p></div>";
+		$output .=			"<p class='width-100 find-player-overall white largest-text heavy left center medium-background'>" . $sport->overall . "</p>";
+		$output .=			"<p class='find-player-lower white larger-text  clear center medium-background' tooltip='Skill'>" . $sport->skillCurrent . "</p>";
+		$output .=			"<p class='find-player-lower white larger-text  left center medium-background' tooltip='Sportsmanship'>" . $sport->sportsmanship . "</p>";
+		$output .=			"<p class='find-player-lower white larger-text  left center medium-background' tooltip='Attendance'>" . $sport->attendance . "</p>";
+		$output .=		"</div>";
+		
+		if ($sport->getFormat('league')->hasValue('format')) {
+			$output .=	"<img src='/images/find/magnifying.png' class='right find-looking-for' tooltip='Looking for a league team.' />"; 
+		}
+		$output .= "</a>";
+		
+		return $output;
+	}
+	
+	/**
+	 * create park container for a match (controller => find, action => parks)
+	 * @params ($match  => park model,
+	 *			$number => # of match in list)
+	 */
+	public function createPark($match, $number)
+	{
+		$width   = '50%';
+		$rating  = $this->_view->ratingstar('small', $width, false);
+		$user    = $this->_view->user;
+		
+		
+		$output  = $this->createOuterStart($match->parkID, 'parks');
+		$output .=		"<div class='left find-result-img-container'>";
+		$output .=			"<img src='" . $match->getProfilePic('medium') . "' class='left'/>";
+		$output .=			"<p class='find-result-number white green-back heavy'>" . $number . "</p>";
+		$output .= 		"</div>";
+		$output .=		"<div class='left find-result-left-container'>";
+		$output .=			"<p class='left heavy larger-text darkest'>" . $match->parkName . "</p>";
+		$output .=			$rating;
+		$output .=			"<p class='clear darkest'>" . $match->type . "</p>";	
+		$output .=			"<p class='left larger-indent light'>" . $match->city . "</p>";		
+		$output .= 		"</div>";
+		$output .=		"<div class='right find-park-right-container'>";
+		$output .=			"<p class='largest-text darkest width-100 center heavy find-park-distance'>" . $match->getDistanceFromUser($user->location->getLatitude(), $user->location->getLongitude()) . "</p>";
+		$output .=			"<p class='clear darkest width-100 center heavy larger-text find-players'>miles</p>";
+		$output .=		"</div>";
 		$output .= "</a>";
 		
 		return $output;

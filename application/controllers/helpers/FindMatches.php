@@ -21,6 +21,16 @@ class Application_Controller_Helper_FindMatches extends Zend_Controller_Action_H
 			$teams->findTeams($options, $userClass, $limit);
 			$matches->addMatches($teams->getAll());
 			$matches->totalRows = $teams->totalRows;
+		} elseif ($type == 'players') {
+			$players = new Application_Model_Users();
+			$players->findUsers($options, $userClass, $limit);
+			$matches->addMatches($players->getAll());
+			$matches->totalRows = $players->totalRows;
+		} elseif ($type == 'parks') {
+			$parks = new Application_Model_Parks();
+			$parks->findParks($options, $userClass, $limit);
+			$matches->addMatches($parks->getAll());
+			$matches->totalRows = $parks->totalRows;
 		}
 		
 		return $matches;

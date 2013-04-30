@@ -52,7 +52,7 @@ class Application_Model_Matches extends Application_Model_ModelAbstract
 			} else {
 				$returnMatches = $matches;
 			}
-			
+		
 			return $returnMatches;
 		} else {
 			return false;
@@ -67,15 +67,39 @@ class Application_Model_Matches extends Application_Model_ModelAbstract
 			$a = -10;
 			$b = 0;
 		} else {
+			/*
+			$timeUntil = $timeUntilB = 0;
+			if ($a instanceof Application_Model_Game) {
+				// $a is a game
+				$diff = $a->gameDate->format('U') - time();
+
+				$diff = floor(($diff/60)/60); // convert to hours
+				if ($diff <= 24) {
+					// Under 24 hours until gametime, move up the list
+					$timeUntil = $diff;
+				}
+			}
+			if ($b instanceof Application_Model_Game) {
+				// $a is a game
+				$diff = $b->gameDate->format('U') - time();
+				$diff = floor(($diff/60)/60); // convert to hours
+				if ($diff <= 24) {
+					// Under 24 hours until gametime, move up the list
+					$timeUntilB = $diff;
+				}
+			}
+			*/		
+				
 			$a = $a->totalPlayers - (abs($a->skillDifference) * .7);
 			$b = $b->totalPlayers - (abs($b->skillDifference) * .7);
+			
 		}
 		
        	if ($a == $b) {
 			return 0;
 		}
 		
-		return ($a > $b ? -1 : 1);
+		return ($a < $b ? -1 : 1);
 	}
 	
 }

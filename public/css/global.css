@@ -110,6 +110,16 @@ a {
 	text-decoration: none;
 }
 
+a:hover {
+	text-decoration: underline;
+}
+
+a.button:hover,a.green-button:hover,a.red-button:hover,
+a.header-dropdown-option-cog:hover,a.header-dropdown-option:hover {
+	text-decoration: none;
+}
+
+
 img {
 	border:none;
 }
@@ -265,6 +275,10 @@ p.default,div.default {
 	clear:left;
 }
 
+.clear-right-only {
+	clear:right;
+}
+
 .left {
 	float:left;
 }
@@ -297,6 +311,7 @@ div.selected-green,img.selected-green,p.selected-green {
 	-moz-box-shadow: 2px 0px 8px 0px #bbb,-2px 0px 8px 0px #bbb;
 	box-shadow: 2px 0px 8px 0px #bbb,-2px 0px 8px 0px #bbb;
 	z-index:1;
+	min-height: 30em;
 }
 
 .none-text {
@@ -348,7 +363,7 @@ div.selected-green,img.selected-green,p.selected-green {
 
 /* narrow column declarations */
 .narrow-column-picture {
-	width: 98%;
+	/*width: 98%;*/
 	border: solid 2px #444;
 	margin-bottom: .3em;
 }
@@ -1838,6 +1853,32 @@ input.city-change-input {
 	float:left;
 	margin-top: .5em;
 }
+
+/* ratings (star form) */
+.rating-star-container-large {
+	height: 40px;
+}
+
+.rating-star-container-small {
+	height: 20px;
+}
+
+.rating-star-container-large > img,.rating-star-container-small > img  {
+	position:relative;
+	z-index: 1;
+}
+
+.rating-star-back-large,.rating-star-back-small {
+	height: inherit;
+	margin-top: -40px;
+	position:relative;
+	z-index: 0;
+}
+
+.rating-star-back-small {
+	margin-top: -20px;
+}
+
 	
 /* newsfeed section */
 .newsfeed-notification-container {
@@ -2072,4 +2113,42 @@ input[type=text].selectable-input {
 /* game title */
 .game-title-suffix {
 	
+}
+
+/* display image, text, and details for game as a result */
+.find-result-container {
+	width: 98%;
+	padding: .75em 1% .75em 1%;
+	background:#fff;
+	border-bottom: solid 1px #e9e9e9;
+}
+
+.find-result-img-container {
+	position: relative;
+}
+
+.find-result-number {
+	position:absolute;
+	top: -3px;
+	left: -3px;
+	border: 1px solid #fff;
+	float:left;
+	clear:both;
+	font-size: 1.1em;
+	padding: .25em .6em .25em .6em;
+}
+
+.find-result-left-container {
+	width: 48%;
+	margin-left: 1em;
+	
+}
+
+.find-result-match-img {
+	margin-top: .5em;
+}
+
+.find-results-joined {
+	margin-top: .9em;
+	margin-left: .4em;
 }

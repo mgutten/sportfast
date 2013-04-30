@@ -88,6 +88,18 @@ class TeamsController extends Zend_Controller_Action
 		$this->view->generalForm = $generalForm;
 		
     }
+	
+	public function playersAction()
+	{
+		$teamID = $this->getRequest()->getParam('id');
+        $team = new Application_Model_Team();
+		$team->getTeamByID($teamID);
+		
+		$this->view->team = $team;
+		
+		$this->view->players = $team->players->getAll();
+		
+	}
 
 
 }

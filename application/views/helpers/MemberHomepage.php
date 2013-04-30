@@ -215,17 +215,24 @@ class Application_View_Helper_MemberHomepage
 					}
 					
 					if ($game->isPickup()) {
+						if ($game->isGameOn()) {
+							// Enough players for game
+							$confirm = 'GAME ON';
+						} else {
+							$confirm = $game->getPlayersNeeded() . " needed";
+						}
+						
 						$output .= "<a href='/games/" . $game->gameID . "' class='member-schedule-day-body-game-container schedule-container'>";
 						$output .= "<div class='member-schedule-day-body-game-left-container'>";
-						$output .= "<p class='bold darkest larger-text'>" . $game->getGameTitle() . '</p>';
+						$output .= "<p class='bold darkest largest-text'>" . $game->getGameTitle() . '</p>';
 						$output .= "<p class='clear'>" . $game->getDay() . "</p>";
 						$output .= "<p class='clear'>" . $game->getHour() . "</p>";
 						$output .= "<p class='clear medium'>" . $game->getPark()->parkName . "</p>";
 						$output .= "</div>";
 						$output .= "<div class='member-schedule-day-body-players-container darkest bold'>";
-						$output .= "<p class='member-schedule-day-body-players larger-text center'>" . $game->totalPlayers . "/" . $game->rosterLimit . "</p>";
-						$output .= "<p class='member-schedule-day-body-players center clear'>players</p>";
-						$output .= "<p class='center clear green smaller-text member-schedule-day-body-players-confirmed'><span class='confirmed'>" . $game->countConfirmedPlayers() . "</span> confirmed</p>";
+						$output .= "<p class='member-schedule-day-body-players largest-text center'>" . $game->totalPlayers . "/" . $game->rosterLimit . "</p>";
+						$output .= "<p class='member-schedule-day-body-players-text center clear larger-text'>players</p>";
+						$output .= "<p class='center clear green smaller-text member-schedule-day-body-players-confirmed'>" . $confirm . "</p>";
 						$output .= "</div>";
 						$type	 = " type='pickupGame'";
 						$typeID  = " typeID='" . $game->gameID . "'";
@@ -240,7 +247,7 @@ class Application_View_Helper_MemberHomepage
 						$output .= "<p class='clear darkest'>" . $game->getHour() . "</p>";
 						$output .= "<p class='clear medium'>" . $game->locationName . "</p>";
 						$output .= "</div>";
-						$output .= "<div class='member-schedule-day-body-players-container darkest bold'>";
+						$output .= "<div class='member-schedule-day-body-team-players-container darkest bold'>";
 
 						$output .= "<p class='center clear darkest member-schedule-day-body-players-confirmed'>
 										<span class='confirmed larger-text heavy member-teamGame-confirmed left width-100 center'>" . $game->countConfirmedPlayers() . "</span> 
@@ -249,13 +256,15 @@ class Application_View_Helper_MemberHomepage
 						$output .= "</div>";
 						$type	 = " type='teamGame'";
 						$typeID	 = " typeID='" . $game->teamGameID . "'";
+						
+						$output .= "<div class='member-schedule-day-body-game-right-container' " . $type . $typeID . $existingID . $teamID . ">";
+						$output .= "<p class='darkest center'>Are you in, or are you out?</p>";
+						$output .= "<p class='button larger-text member-schedule-in schedule-in " . $inClass . "'>in</p>";
+						$output .= "<p class='button larger-text member-schedule-out schedule-out " . $outClass . "'>out</p>";
+						$output .= "</div>";
 					}
 
-					$output .= "<div class='member-schedule-day-body-game-right-container' " . $type . $typeID . $existingID . $teamID . ">";
-					$output .= "<p class='darkest center'>Are you in, or are you out?</p>";
-					$output .= "<p class='button larger-text member-schedule-in schedule-in " . $inClass . "'>in</p>";
-					$output .= "<p class='button larger-text member-schedule-out schedule-out " . $outClass . "'>out</p>";
-					$output .= "</div>";
+					
 					$output .= "</a>";
 				}
 				$output .= "</div></div></div>";
