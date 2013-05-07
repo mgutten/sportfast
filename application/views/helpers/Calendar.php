@@ -198,6 +198,7 @@ class Application_View_Helper_Calendar
 		$lastMonthDay = $this->firstDay - 1;
 		$nextMonthDay = 1;
 		$month = $this->month;
+		$future = false;
 
 		//create 5 weeks of month
 		for($i = 0; $i <= 5; $i++) {
@@ -237,6 +238,12 @@ class Application_View_Helper_Calendar
 						
 				} else {
 					// Within current month
+					if (!$future && ($c != $this->today)) {
+						// Past day that is not today
+						$class .= ' calendar-past';
+					} else {
+						$class .= ' calendar-selectable';
+					}
 					$day = $c;
 				}
 				
@@ -247,7 +254,8 @@ class Application_View_Helper_Calendar
 
 				$daysNumberedClass =  'dark left smaller-text indent';
 
-				if ($c == $this->today) {
+				if ($c == $this->today && $day < $this->lastMonthDays) {
+					$future = true;
 					$class .= ' calendar-today';
 					$daysNumberedClass .= ' heavy darkest';
 					$tooltip = 'tooltip="Today"';

@@ -17,6 +17,7 @@ class Application_Model_User extends Application_Model_ModelAbstract
 									'lastRead' 		=> '',
 									'active'		=> '',
 									'lastActive'    => '',
+									'lastRating'    => '',
 									'verifyHash' 	=> '',
 									'dob'			=> '',
 									'city'			=> '',
@@ -281,13 +282,8 @@ class Application_Model_User extends Application_Model_ModelAbstract
 	}
 	
 	public function getSportNames()
-	{
-		$sports = array();
-		foreach ($this->sports as $sport) {
-			$sports[] = $sport->sport;
-		}
-		
-		return $sports;
+	{	
+		return array_keys($this->sports);
 	}
 	
 	public function getSportTypes()
@@ -360,6 +356,11 @@ class Application_Model_User extends Application_Model_ModelAbstract
 		return $this->getMapper()->getUserBy($column, $value, $this);
 	}
 	
+	public function getUserByID($userID)
+	{
+		return $this->getMapper()->getUserBy('u.userID', $userID, $this);
+	}
+	
 	public function setLastReadCurrent()
 	{
 		$this->_attribs['lastRead'] = date("Y-m-d H:i:s", time());
@@ -369,6 +370,12 @@ class Application_Model_User extends Application_Model_ModelAbstract
 	public function setLastActiveCurrent()
 	{
 		$this->_attribs['lastActive'] = date("Y-m-d H:i:s", time());
+		return $this;
+	}
+	
+	public function setLastRatingCurrent()
+	{
+		$this->_attribs['lastRating'] = date("Y-m-d H:i:s", time());
 		return $this;
 	}
 	

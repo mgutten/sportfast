@@ -1,0 +1,60 @@
+<?php
+/** 
+ * controller => users
+ * action => ratings
+ */
+$this->headTitle($this->currentUser->shortName . ' Ratings');
+$this->headLink()->prependStylesheet($this->baseUrl() . '/css/rating.css');
+$this->headLink()->prependStylesheet($this->baseUrl() . '/css/profile.css');
+$this->headScript()->prependFile($this->baseUrl() . '/js/rating.js');
+$this->headScript()->prependFile($this->baseUrl() . '/js/profile.js');
+?>
+
+<?php
+// Narrow right column
+$this->placeholder('narrowColumn')->captureStart();
+echo "<img src='" . $this->currentUser->getProfilePic('large') . "' class='narrow-column-picture dropshadow rounded-corners'/>";
+
+echo "<p class='width-100 center dark clear larger-margin-top'>" . $this->sport->sport . "</p>";
+echo "<div class='width-100 clear center green bold largest-text'>" . $this->sport->getOverall() . "</div>";
+echo "<div class='width-100 clear'>";
+
+foreach ($this->ratingOrder as $rating => $label) {
+	// Create individual rating breakdown
+	echo "<div class='rating-individual-container'>";
+	echo 	"<p class='green smaller-text width-100 center clear rating-label'>" . $label . "</p>";
+	echo 	"<p class='green bold larger-text width-100 center clear'>" . $this->sport->$rating . "</p>";
+	echo "</div>";
+}
+
+echo "</div>";
+
+
+echo $this->narrowcolumnsection()->start(array('title' => 'Top Skills'));
+
+echo "<div class='clear larger-margin-top width-100'>";
+foreach ($this->ratings->getBestSkills() as $skiller => $count) {
+	echo "<p class='clear dark'>" . ucwords($skiller) . "</p>";
+	echo "<p class='right light'>" . $count . "</p>";
+}
+echo "</div>";
+
+echo $this->narrowcolumnsection()->end();
+
+
+$this->placeholder('narrowColumn')->captureEnd();
+
+?>
+
+<a href='<?php echo $this->baseURI;?>' class='left smaller-text medium'>&lt;&lt; Back to profile</a>
+<header class='width-100 left'>
+	<p class='jumbo-text heavy darkest left'><?php echo $this->numRatings;?></p>
+    <p class='left largest-text darkest profile-header-sub'>for <?php echo $this->currentUser->shortName;?> </p>
+    <div class='right larger-text' id='ratings-sports'><?php echo $this->sportButton;?></div>
+</header>
+
+<div class='width-100 clear ratings-container'>
+	<?php
+	echo $this->ratings()->loopUserRatings($this->ratings->getAll());
+	?>
+</div>

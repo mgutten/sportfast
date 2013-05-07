@@ -216,3 +216,7 @@ a.find-result-container.light-back {
 .find-park-distance {
 	letter-spacing: -2px;
 }
+
+.find-stash {
+	margin-top: .5em;
+}

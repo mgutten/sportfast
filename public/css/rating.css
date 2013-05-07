@@ -15,8 +15,9 @@
 
 .rating-container {
 	width: 96%;
-	padding: .75em 2%;
-	border-bottom: 1px solid #e9e9e9;
+	padding: .3em 2%;
+	margin: 1.2em 0;
+	/*border-bottom: 1px solid #e9e9e9;*/
 }
 
 .rating-right {
@@ -24,7 +25,7 @@
 	margin-left: 1em;
 }
 
-/* user rating */
+/* user rating (parks) */
 #rating-comment {
 	width: 98%;
 	max-width: 98%;
@@ -36,4 +37,41 @@
 .ratings-user-container {
 	border-bottom: none;
 	margin-bottom: 1em;
+}
+
+/* ratings for user page */
+#ratings-sports {
+	margin-top: 1em;
+}
+
+.rating-bar-text-container {
+	/*border-right: 1px solid #fff;*/
+	height:inherit;
+}
+
+.rating-bar-text-container:last-child {
+	border: none;
+}
+
+.rating-bar-text-container:last-child > .rating-bar-separator {
+	display:none;
+}
+
+.rating-bar-text {
+	margin-top: .1em;
+	width: 99%;
+}
+
+.rating-bar-separator {
+	height: inherit;
+	width: 1%;
+	background: #fff;
+}
+
+.rating-outer {
+	margin-top: 0;
+}
+
+#dropdown-menu-sports > a > .dropdown-menu-option-text {
+	margin-top: .25em;
 }

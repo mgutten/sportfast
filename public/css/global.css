@@ -58,6 +58,9 @@ ul {
 	font: inherit;
 }
 
+.futura {
+	font-family: "Futura-Book", Arial, Helvetic;
+}
 
 .arial {
 	font-family: Arial,Helvetica;
@@ -429,6 +432,10 @@ div.selected-green,img.selected-green,p.selected-green {
 
 .animate-opacity {
 	opacity: .55;
+}
+
+.hidden-opacity {
+	opacity: 0;
 }
 
 
@@ -803,7 +810,7 @@ a.header-dropdown-option-cog {
 
 .dropdown-back-inner#nav-dropdown-inner-cog,.dropdown-back-outer#nav-dropdown-outer-cog {
 	width: auto;
-	height: 6.8em;
+	height: 6.7em;
 	padding-right: .3em;
 }
 
@@ -921,6 +928,11 @@ input[type=text],input[type=password],textarea {
 	float:left;
 	width: 13em;
 	height: 1.4em;
+}
+
+.input-separator {
+	width: 3px;
+	height: 1px;
 }
 
 .rounded-corners {
@@ -1135,6 +1147,10 @@ input.header-search-bar {
 
 .header-section-title-container:first-child {
 	margin-top: 0;
+}
+
+.profile-section-bold-subheader {
+	margin: .7em 0 0 .4em;
 }
 
 .header-section-title,.header-section-title-plain {
@@ -1847,7 +1863,7 @@ input.city-change-input {
 }
 
 .rating-outer {
-	width: 98%;
+	width: 100%;
 	border: 1px solid #58bf12;
 	height: 1.3em;
 	float:left;

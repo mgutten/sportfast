@@ -32,17 +32,6 @@ $this->placeholder('narrowColumn')->captureStart();
 		$counter++;
 	}
 	echo $this->narrowcolumnsection()->end();
-	
-	
-	
-	echo $this->narrowcolumnsection()->start(array('title' => 'Time'));
-	echo $this->checkbox->setName('timeUser')
-						->setAttribs(array('text' =>'My Availability',
-										   'checked' => 'checked'));
-	echo $this->checkbox->setName('timeAny')
-						->setAttribs(array('text' =>'Any Time',
-										   'checked' => false));
-	echo $this->narrowcolumnsection()->end();
 			
 $this->placeholder('narrowColumn')->captureEnd();
 
@@ -56,7 +45,6 @@ $content .= 	"<div class='left indent'>" . $this->lookingFor . "</div>";
 $content .= "</div>";
 $content .= "<div class='left' id='find-order-by'>";
 $content .= 	"<p class='light left'>Order by:</p>";
-$content .= 	"<p class='light left pointer selectable-text selectable-text-one'>Players</p>";
 $content .= 	"<p class='light left pointer selectable-text selectable-text-one green-bold'>Match</p>";
 $content .= "</div>";
 echo $this->partial('partials/global/sectionHeaderBold.phtml',array('title'   => 'Results',

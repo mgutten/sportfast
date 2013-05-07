@@ -49,96 +49,110 @@ class Application_Model_ParksMapper extends Application_Model_MapperAbstract
 		$having = array();
 		
 		$select->setIntegrityCheck(false);
-		// Default location to search near is user's home location, look for games within $distance of user's home location
-		$latitude  = $userClass->getLocation()->getLatitude();
-		$longitude = $userClass->getLocation()->getLongitude();
-		$bounds = $this->getBounds($latitude, $longitude, 20);	
+
+		if (!empty($options['points'])) {
+			// Map was moved or points have been set to not be around user location
+			$bounds['upper'] = $options['points'][0];
+			$bounds['lower'] = $options['points'][1];
+		} else {
+			// Default location to search near is user's home location, look for games within $distance of user's home location
+			$latitude = $userClass->location->latitude;
+			$longitude = $userClass->location->longitude;
+			$bounds = $this->getBounds($latitude, $longitude);
+		}
+		
+		
+		if (!empty($options['courts'])) {
+			// Courts have been chosen
+			$statement = '(';
+			$counter = 0;
+			foreach ($options['courts'] as $court) {
+
+				if ($counter != 0) {
+					$statement .= ' OR ';
+				}
 				
+				$statement .= '(';
+				
+				if ($court == 'basketball') {
+					$statement .= 'p.basketballOutdoor > 0 OR p.basketballIndoor > 0';
+				} else {
+					$statement .= 'p.' . $court . ' > 0';
+				}
+				
+				$statement .= ')';
+				$counter++;
+			}
+			$statement .= ')';
+			$where[] = $statement;
+		}
+		
+		if (!empty($options['stash'])) {
+			if ($options['stash'] == 'has_stash') {
+				// Has stash
+				$where[] = 'p.stash = 1';
+			} elseif ($options['stash'] == 'no_stash') {
+				// No stash
+				$where[] = 'p.stash = 0';
+			}
+		}
+		
+		if (!empty($options['type'])) {
+			$statement = '(';
+			$counter = 0;
+			
+			if (is_array($options['type'])) {
+				// Array of options
+				foreach ($options['type'] as $type) {
+	
+					if ($counter != 0) {
+						$statement .= ' OR ';
+					}
+					
+					$statement .= '(p.type = "' . $type . '")';
+					
+					$counter++;
+				}
+				$statement .= ')';
+			} else {
+				$statement = 'p.type = "' . $options['type'] . '"';
+			}
+			$where[] = $statement;
+		}
 
 		$select->from(array('p'  => 'parks'),
 					  array(new Zend_Db_Expr('SQL_CALC_FOUND_ROWS p.*')))
 			   ->join(array('pl' => 'park_locations'),
 			   		  'pl.parkID = p.parkID',
-					  array('AsText(pl.location) as location'));
-			   /*->join(array('uus' => 'user_sports'),
-			   		 'uus.sportID = t.sportID AND uus.userID = "' . $userID . '"',
-					 array('skillCurrent as userSkill'))
-			   ->join(array('z' => new Zend_Db_Expr($zipcodeQuery)),
-			   				'z.cityID = t.cityID')
-			   ->joinLeft(array('ut' => 'user_teams'),
-			   		 'ut.teamID = t.teamID',
-					 array(''))
-			   ->joinLeft(array('us' => 'user_sports'),
-			   		 'ut.userID = us.userID AND us.sportID = t.sportID',
-					 array('avg(us.skillCurrent) as averageSkill',
-					 	   'avg(us.attendance) as averageAttendance',
-						   'avg(us.sportsmanship) as averageSportsmanship',
-						   'avg(us.skillCurrent) - (SELECT skillCurrent FROM user_sports WHERE userID = "' . $userID . '" AND sportID = t.sportID) as skillDifference',
-						   'COUNT(us.userID) as totalPlayers'
-						   ))
-			   ->where('t.public = "1"')
-			   ->where('uus.skillCurrent >= t.minSkill AND uus.skillCurrent <= t.maxSkill');
-
-
-		$sportWhere = '';
-		$counter = 0;
-		
-		foreach ($options['sports'] as $sport => $inner) {
-			if ($counter != 0) {
-				$sportWhere .= ' OR ';
-			}
-			
-			$sportWhere .= "(t.sport = '" . $sport . "' )";
-			$counter++;
-		}
-		
-		$where[] = $sportWhere;
-		
-		/*
-		if (!empty($options['skill'])) {
-			$having[] = "avg(us.skillCurrent) >= '" . $options['skill']['lower'] . "' AND avg(us.skillCurrent) <= '" . $options['skill']['upper'] . "'";
-		}				  
-		*/	
-		
-		/*			   
+					  array('AsText(pl.location) as location'))
+			   ->joinLeft(array('pr' => 'park_ratings'),
+			   		  'pr.parkID = p.parkID',
+					  array('AVG(pr.quality) as quality',
+					  		'COUNT(pr.parkRatingID) as numRatings'))
+			   ->where($this->getAreaWhere($bounds['upper'], $bounds['lower'], 'pl.location'));
+			   
+			   
 		foreach ($where as $statement) {
 			$select->where($statement);
 		}
 		
-		if (count($having) > 0) {
-			$statements = 'CASE WHEN COUNT(ug.userID) = 0 THEN 1=1 ELSE (';
-			$counter = 0;
-			foreach ($having as $statement) {
-				if ($counter != 0) {
-					$statements .= ' AND ';
-				}
-				$statements .= '(' . $statement . ')';
-				$counter++;
-			}
-			$statements .= ') END';
-			$select->having(new Zend_Db_Expr($statements));
-
-		}
-
-		
-		$select->group('t.teamID');
-			   //->order('abs(avg(us.skillCurrent) - (SELECT skillCurrent FROM user_sports WHERE userID = "' . $userID . '" AND sportID = t.sportID)) ASC');
-		
-		if (isset($options['order'])) {
-			// Order by
-			if ($options['order'] == 'players') {
-				$select->order('(COUNT(us.userID) + SUM(ug.plus)) DESC');
-			} elseif ($options['order'] == 'date') {
-				$select->order('g.date ASC');
+		$select->group('p.parkID');
+	
+		if (!empty($options['order'])) {
+			if ($options['order'] == 'distance') {
+				$select->order('GLength(
+									LineStringFromWKB(
+									  LineString(
+										pl.location, 
+										(SELECT location FROM user_locations WHERE userID = "' . $userID . '")
+									  )
+									 )
+									) ASC');
+			} elseif ($options['order'] == 'rating') {
+				$select->order('AVG(pr.quality) DESC');
 			}
 		}
 		
-		$limitArray = explode(',',$limit);
-		$totalLimit = trim($limitArray[0]);
-		$offsetLimit = (isset($limitArray[1]) ? $limitArray[1] : 0);
-		
-		$select->limit($totalLimit,$offsetLimit);
-		*/
 		$results = $table->fetchAll($select);
 		
 		$db = Zend_Db_Table::getDefaultAdapter();
@@ -146,8 +160,15 @@ class Application_Model_ParksMapper extends Application_Model_MapperAbstract
 		$totalRows = $totalRows[0]['totalRows'];
 		
 		foreach ($results as $result) {
-			$savingClass->addPark($result);
+			$park = $savingClass->addPark($result);
+			$park->ratings->setAttribs($result);
+			$park->ratings->addRating($result);
+			
 		}
+		
+		$select  = $table->select();		
+		$select->setIntegrityCheck(false);
+
 		
 		
 		$savingClass->totalRows = $totalRows;

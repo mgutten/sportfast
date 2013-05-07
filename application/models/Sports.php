@@ -3,7 +3,8 @@
 class Application_Model_Sports extends Application_Model_ModelAbstract
 {
 	protected $_mapperClass = 'Application_Model_SportsMapper';
-	protected $_singleClass = 'Application_Model_Sport';
+	
+	protected $_attribs = array('sports' => '');
 	
 	/*
 	public function save(Application_Model_DbTable_Users $guestbook)
@@ -31,9 +32,37 @@ class Application_Model_Sports extends Application_Model_ModelAbstract
 		}
 	}
 
-	public function getAllSportsInfo()
+	public function addSport($resultRow)
 	{
-		return $this->getMapper()->getAllSportsInfo();
+		if (is_object($resultRow)) {
+			$resultRow = $resultRow->toArray();
+		}
+		
+		if (isset($this->_attribs['sports'][strtolower($resultRow['sport'])])) {
+			return $this->_attribs['sports'][strtolower($resultRow['sport'])];
+		}
+		
+		$sport = $this->_attribs['sports'][strtolower($resultRow['sport'])] = new Application_Model_Sport($resultRow);
+		return $sport;
+	}
+	
+	public function getSport($sport) 
+	{
+		$sport = strtolower($sport);
+		if (!isset($this->_attribs['sports'][$sport])) {
+			$this->_attribs['sports'][$sport] = new Application_Model_Sport();
+		}
+		return $this->_attribs['sports'][$sport];
+	}
+		
+
+	/**
+	 * retrieve all sports info from db
+	 * @params ($asClasses => return the information as Sport models? boolean)
+	 */
+	public function getAllSportsInfo($asClasses = false)
+	{
+		return $this->getMapper()->getAllSportsInfo($this, $asClasses);
 	}
 	
 	public function getUserSportsInfo($userID)

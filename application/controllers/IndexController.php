@@ -29,7 +29,7 @@ class IndexController extends Zend_Controller_Action
 			$sportsParen = '('; // For use in options with games model below
 			$sportKeys   = array_keys($userSports);
 			$counter	 = 0;
-
+		
 			foreach ($userSports as $sport) {
 				// Loop through sports and create properly formatted array for dropdown
 				$sportArray = array('text'  => $sport->sport,
@@ -38,6 +38,7 @@ class IndexController extends Zend_Controller_Action
 									
 				array_push($lookingDropdownSportArray, $sportArray);
 				
+				/*
 				$sportsParen .= '"' . $sport->sport . '"';
 				
 				
@@ -48,7 +49,9 @@ class IndexController extends Zend_Controller_Action
 
 				$sportsParen .= ',';
 				$counter++;
+				*/
 			}
+			$sportsParen .= '"' . implode('","',$sportKeys) . '"';
 			
 			$sportsParen .= ')';
 			

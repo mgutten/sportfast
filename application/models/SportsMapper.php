@@ -5,7 +5,7 @@ class Application_Model_SportsMapper extends Application_Model_MapperAbstract
 	protected $_dbTableClass = 'Application_Model_DbTable_Sports';
 	
 	
-	public function getAllSportsInfo()
+	public function getAllSportsInfo($savingClass, $asClasses = false)
 	{
 		$table   = $this->getDbTable();
 		// setIntegrityCheck(false) to allow join
@@ -16,14 +16,26 @@ class Application_Model_SportsMapper extends Application_Model_MapperAbstract
                     	    's.sportID = sp.sportID')
 			   ->join(array('st' => 'sport_types'),
 			   				's.sportID = st.sportID');
-							
-		$results = $table->fetchAll($select);
-
-		$sports = array();
 		
+		$results = $table->fetchAll($select);
+		
+		if ($asClasses) {
+			// Create sport models, not array
+			foreach ($results as $result) {
+				$sport = $savingClass->addSport($result);
+				$sport->getPosition($result->positionName)->setAttribs($result);
+				$sport->getType($result->typeID)->setAttribs($result);
+			}
+			
+			return $savingClass;
+		}
+		
+				
+		$sports = array();
 		for($i = 0; $i < count($results); $i++) {
 			// Shorten current results array
 			$current = $results[$i];
+			
 			$sport = $current['sport'];
 			if (!isset($sports[$sport])) {
 				$sports[$sport] = array();
@@ -95,4 +107,24 @@ class Application_Model_SportsMapper extends Application_Model_MapperAbstract
 	}
 	*/
 	
+	/**
+	 * get sport info (minPlayers, rosterLimit, etc) for sportID
+	 * @params ($type => 'game' or 'team')
+	 */
+	public function getSportInfo($sportID)
+	{
+		$table = $this->getDbTable();		
+		$select = $table->select();
+		$select->setIntegrityCheck(false);
+			
+		
+		$select->from(array('st' => 'sport_types'),
+					  array('gameRosterLimit', 'teamRosterLimit', 'minPlayers'))
+			   ->where('st.sportID = ?', $sportID);
+		
+		
+		$result = $table->fetchRow($select);
+		
+		return $result->toArray();
+	}
 }

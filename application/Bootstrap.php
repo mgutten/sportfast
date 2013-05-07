@@ -25,7 +25,6 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 			$this->view->changeCityForm = new Application_Form_ChangeCity();
 		}
 		
-		
 		return $view;
 	}
 	
@@ -115,6 +114,9 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 		$auth = Zend_Auth::getInstance();
 		if ($auth->hasIdentity()) {
 			$id = $view->user->userID;
+			
+			$sports = $view->user->getSportNames();
+			$sport = array_shift($sports); // Get first sport from user as default
 		} else {
 			$id = 1;
 		}
@@ -124,18 +126,20 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 		
 		// Users page
 		$r = new Zend_Controller_Router_Route_Regex(
-				'users(?:/(\d+))?(?:/(\w+))?',
+				'users(?:/(\d+))?(?:/(\w+))?(?:/(\w+))?',
 				array(
 						'action' => 'index',
 						'controller' => 'users',
 						'module' => 'default',
-						'id'	 => $id
+						'id'	 => $id,
+						'sport'  => 'basketball'
 				),
 				array(
 						1 => 'id',
-						2 => 'action'
+						2 => 'action',
+						3 => 'sport'
 				),
-				'users/%d');
+				'users/%d/%w');
 				
 		$router->addRoute('users', $r);
 		

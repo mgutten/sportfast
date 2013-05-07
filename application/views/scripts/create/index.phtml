@@ -1,0 +1,23 @@
+<?php
+/** 
+ * controller => create
+ * action => index
+ */
+$this->headTitle('Create');
+$this->headLink()->prependStylesheet($this->baseUrl() . '/css/create.css');
+$this->headScript()->prependFile($this->baseUrl() . '/js/create.js');
+?>
+
+<p class='left heavy medium larger-text width-100 center create-choose-title'>What do you want to create?</p>
+
+<a href='/create/game' class='clear create-choose-container white-back animate-darker'>
+    <img src='/images/create/choose/game.png' class='left create-choose-img' />
+    <p class='clear width-100 jumbo-text medium center margin-top heavy'>Game</p>
+    <p class='clear left light width-100 center create-choose-subtext'>A pickup game, public or private.</p>
+</a>
+
+<a href='/create/team' class='left create-choose-container create-choose-container-second white-back animate-darker'>
+    <img src='/images/create/choose/team.png' class='left create-choose-img' />
+    <p class='clear width-100 jumbo-text medium center margin-top heavy'>Team</p>
+    <p class='clear left light width-100 center create-choose-subtext'>Organize your own league team.</p>
+</a>

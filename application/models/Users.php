@@ -18,6 +18,11 @@ class Application_Model_Users extends Application_Model_ModelAbstract
 		return $user;
 	}
 	
+	public function getAvailableUsers($datetime, $sportID, $location)
+	{
+		return $this->getMapper()->getAvailableUsers($datetime, $sportID, $location, $this);
+	}
+	
 	public function findUsers($options, $userClass, $limit)
 	{
 		return $this->getMapper()->findUsers($options, $userClass, $this, $limit);
@@ -30,6 +35,16 @@ class Application_Model_Users extends Application_Model_ModelAbstract
 			return $user;
 		} else {
 			return false;
+		}
+	}
+	
+	public function countUsers()
+	{
+		if (!$this->hasValue('users')) {
+			// Empty
+			return 0;
+		} else {
+			return count($this->_attribs['users']);
 		}
 	}
 	

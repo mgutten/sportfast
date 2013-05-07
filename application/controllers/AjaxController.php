@@ -29,6 +29,19 @@ class AjaxController extends Zend_Controller_Action
     }
 	
 	/**
+	 * set userRatingID to "incorrect" and to be reviewed as inaccurate rating
+	 */
+	public function flagRemovalAction()
+	{
+		$userRatingID = $this->getRequest()->getPost('userRatingID');
+		
+		$ratingsMapper = new Application_Model_RatingsMapper();
+		
+		$ratingsMapper->setUserRatingIncorrect($userRatingID);
+		
+	}
+	
+	/**
 	 * reset user's lastRead column of db to current time (ie after click on notifications button)
 	 */
 	public function resetNotificationsAction()
@@ -309,7 +322,44 @@ class AjaxController extends Zend_Controller_Action
 		echo $newPath;
 		
 	}
-
+	
+	
+	public function findParksAction()
+	{
+		$options = $this->getRequest()->getPost('options');
+		
+		$findMatches = Zend_Controller_Action_HelperBroker::getStaticHelper('FindMatches');
+		$findMatches = $findMatches->findmatches('parks', $options, $this->view->user, false);
+	
+		$matches = $findMatches->getAll();
+		
+		
+		$output = array();
+		
+		if (isset($matches[0])) {
+			// Matches exist
+			foreach ($matches as $match) {
+				if ($match instanceof Application_Model_Park) {
+					$location = $match->getLocation();
+					$output[1][] = array($location->getLatitude(), $location->getLongitude());
+					
+					$width = $match->ratings->getStarWidth('quality') . '%';
+					$star  = $this->view->ratingstar('small',$width);
+					
+					$output[2][] = array($match->parkName, $star, $match->stash);
+					
+				}
+				
+			}
+		} else {
+			$output[1][] = '';
+			$output[2][] = '';
+		}
+		
+		echo json_encode($output);
+	}
+		
+	
 	/**
 	 * get and return matches based on user's for find page
 	 */
@@ -352,7 +402,10 @@ class AjaxController extends Zend_Controller_Action
 		$type = rtrim($type,'s');
 		
 		$output = array();
+		
+
 		$output[0] = $this->view->find()->loopMatches($matches, $type, $post['offset']);
+		
 		
 		if (isset($matches[0])) {
 			// Matches exist
@@ -360,6 +413,9 @@ class AjaxController extends Zend_Controller_Action
 				if ($match instanceof Application_Model_Game) {
 					// Get latitude and longitude
 					$location = $match->getPark()->getLocation();
+					$output[1][] = array($location->getLatitude(), $location->getLongitude());
+				} elseif ($match instanceof Application_Model_Park) {
+					$location = $match->getLocation();
 					$output[1][] = array($location->getLatitude(), $location->getLongitude());
 				}
 				
@@ -374,7 +430,27 @@ class AjaxController extends Zend_Controller_Action
 		echo json_encode($output);
 	}
 
-
+	
+	/**
+	 * get number of available players in area (for create game controller)
+	 */
+	public function getAvailableUsersAction()
+	{
+		$options = $this->getRequest()->getPost('options');
+		
+		$formattedDate = $options['month'] . '-' . $options['date'] . '-' . $options['year'] . ' ' . $options['hour'];
+		
+		
+		$datetime = DateTime::createFromFormat('n-j-Y G',$formattedDate);
+		
+		
+		$users = new Application_Model_Users();
+		
+		$users->getAvailableUsers($datetime, $options['sportID'], $this->view->user->userLocation);
+		
+		echo $users->countUsers();
+	}
+	
 	
 	/**
 	 * get and return matches based on user's request/info
@@ -479,6 +555,21 @@ class AjaxController extends Zend_Controller_Action
 		}
 		
 		echo json_encode($jsonArray);
+	}
+	
+	
+	/**
+	 * get sport info
+	 */
+	public function getSportInfoAction()
+	{
+		$sportID = $this->getRequest()->getPost('sportID');
+		
+		$sportsMapper = new Application_Model_SportsMapper();
+		
+		$sportInfo = $sportsMapper->getSportInfo($sportID);
+		
+		echo json_encode($sportInfo);
 	}
 	
 	/**

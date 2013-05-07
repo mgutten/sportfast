@@ -5,7 +5,12 @@ class Application_Model_Ratings extends Application_Model_ModelAbstract
 	protected $_mapperClass = 'Application_Model_RatingsMapper';
 	
 	protected $_attribs     = array('ratings' => '',
-									'bestSkills' => '');
+									'bestSkills' => '',
+									'numRatings' => '',
+									'avgSkill'	 => '',
+									'avgSportsmanship' => '',
+									'avgAttendance'    => '',
+									'avgQuality'		=> '');
 	
 	
 	public function addRating($resultRow)
@@ -36,13 +41,29 @@ class Application_Model_Ratings extends Application_Model_ModelAbstract
 		
 	}
 	
-	public function countRatings($ucRating = true)
+	public function getAvgType($type, $additional = false)
 	{
-		if (!$this->hasValue('ratings')) {
+		if ($this->hasValue('avg' . ucwords($type))) {
+			return $this->_attribs['avg' . ucwords($type)];
+		} else {
+			return $this->getAverage($type, $additional);
+		}
+	}
+	
+	public function countRatings($ucRating = false)
+	{
+		if (!$this->hasValue('ratings') && empty($this->numRatings)) {
+			return '0 ratings';
+		} elseif ($this->numRatings == '0') {
 			return '0 ratings';
 		}
 		
 		$count = count($this->_attribs['ratings']);
+		
+		if ($this->hasValue('numRatings')) {
+			// numRatings was retrieved from db 
+			$count = $this->numRatings;
+		}
 		
 		if ($count == 1) {
 			$rating = 'rating';
@@ -57,7 +78,7 @@ class Application_Model_Ratings extends Application_Model_ModelAbstract
 		return $count . ' ' . $rating;
 	}
 	
-	public function getAverage($attrib)
+	public function getAverage($attrib, $additional = false)
 	{
 		$total   = 0;
 		$ratings = $this->getAll();
@@ -69,22 +90,34 @@ class Application_Model_Ratings extends Application_Model_ModelAbstract
 			return false;
 		}
 		
+		$user = false;
 		foreach ($ratings as $rating) {
+		
 			if ($rating->isUser()) {
 				// Is a user rating
+				$user = true;
 				$value = $attrib . 'Value';
 			}
 			$total += $rating->$value;
 		}
 		
+		if ($additional) {
+			$total += $additional;
+			$count++;
+		}
+		
 		$average = $total/$count;
 		
-		if (!$rating->isUser()) {
+
+		if (!$user) {
 			// Is park
 			$average = round(($average) / .5) * .5; // Round to nearest half
 		} else {
 			$average = floor($average);
 		}
+		
+		$combo = 'avg' . ucwords($attrib);
+		$this->$combo = $average; // Set average so do not need to run more than once
 		
 		return $average;
 	}
@@ -121,6 +154,10 @@ class Application_Model_Ratings extends Application_Model_ModelAbstract
 	
 	public function getBestSkills()
 	{
+		if ($this->hasValue('bestSkills')) {
+			return $this->_attribs['bestSkill'];
+		}
+		
 		$ratings = $this->getAll();
 		
 		$returnArray = array();

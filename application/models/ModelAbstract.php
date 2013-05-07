@@ -10,6 +10,13 @@ abstract class Application_Model_ModelAbstract
 	{
 		if ($resultRow) {
 			$this->setAttribs($resultRow);
+			/*
+			if (isset($this->_attribs['city']) && !$this instanceof Application_Model_City) {
+				// If has city attrib, set as new city
+				$city = new Application_Model_City($resultRow);
+				$this->_attribs['city'] = $city;
+			}
+			*/
 		}
 	}
 	

@@ -43,7 +43,28 @@ $(function()
 	})
 	
 	
+	$('.flag-incorrect').click(function()
+	{
+		flagRemoval($(this).attr('userRatingID'));
+	})
+	
+	
 })
+
+/**
+ * ajax flag rating for removal
+ */
+function flagRemoval(userRatingID)
+{
+	$.ajax({
+		url: '/ajax/flag-removal',
+		type: 'POST',
+		data: {userRatingID: userRatingID},
+		success: function() {
+			showConfirmationAlert('Rating will be reviewed shortly');
+		}
+	})
+}
 
 /**
  * set width of rating back

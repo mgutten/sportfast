@@ -173,7 +173,7 @@ class SignupController extends Zend_Controller_Action
 					$sportModel->sport = $sport;
 					
 					// Convert rating from slider (0-6) to meaningful rating (64-100)
-					$sportModel->skillInitial = floor(($post[$sport . 'Rating'] * 5.5) + mt_rand(64, 66)); 
+					$sportModel->skillInitial = $sportModel->convertSliderToRating($post[$sport . 'Rating']); 
 					$sportModel->skillCurrent = $sportModel->skillInitial;
 					
 					$sportModel->sportsmanship = 80;

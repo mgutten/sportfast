@@ -129,6 +129,8 @@ class Application_View_Helper_Find
 		$gameIndex = '';
 		if ($prefix == 'games') {
 			$gameIndex = " gameIndex='" . $this->resultCount . "' ";
+		} elseif ($prefix == 'parks') {
+			$gameIndex = " parkIndex='" . $this->resultCount . "' ";
 		}
 		$this->resultCount++;	
 		
@@ -256,10 +258,14 @@ class Application_View_Helper_Find
 	 */
 	public function createPark($match, $number)
 	{
-		$width   = '50%';
-		$rating  = $this->_view->ratingstar('small', $width, false);
+		$width   = $match->ratings->getStarWidth('quality') . '%';
+		$rating  = $this->_view->ratingstar('small', $width, false) . "<p class='smaller-text left indent green larger-margin-top'>" . $match->ratings->countRatings() . "</p>";
 		$user    = $this->_view->user;
 		
+		$stash = '';
+		if ($match->hasStash()) {
+			$stash = "<img src='/images/global/logo/logo/green/tiny.png' class='right find-stash' tooltip='Stash available'/>";
+		}
 		
 		$output  = $this->createOuterStart($match->parkID, 'parks');
 		$output .=		"<div class='left find-result-img-container'>";
@@ -269,13 +275,14 @@ class Application_View_Helper_Find
 		$output .=		"<div class='left find-result-left-container'>";
 		$output .=			"<p class='left heavy larger-text darkest'>" . $match->parkName . "</p>";
 		$output .=			$rating;
+		$output .=			"<p class='clear light'>" . $match->city . "</p>";			
 		$output .=			"<p class='clear darkest'>" . $match->type . "</p>";	
-		$output .=			"<p class='left larger-indent light'>" . $match->city . "</p>";		
 		$output .= 		"</div>";
 		$output .=		"<div class='right find-park-right-container'>";
-		$output .=			"<p class='largest-text darkest width-100 center heavy find-park-distance'>" . $match->getDistanceFromUser($user->location->getLatitude(), $user->location->getLongitude()) . "</p>";
+		$output .=			"<p class='largest-text darkest width-100 center heavy find-park-distance' tooltip='Miles from your home.'>" . $match->getDistanceFromUser($user->location->getLatitude(), $user->location->getLongitude()) . "</p>";
 		$output .=			"<p class='clear darkest width-100 center heavy larger-text find-players'>miles</p>";
 		$output .=		"</div>";
+		$output .=		$stash;
 		$output .= "</a>";
 		
 		return $output;

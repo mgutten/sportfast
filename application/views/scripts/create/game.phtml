@@ -1,0 +1,203 @@
+<?php
+/** 
+ * controller => create
+ * action => game
+ */
+$this->headTitle('Create Game');
+$this->headLink()->prependStylesheet($this->baseUrl() . '/css/create.css');
+//$this->headLink()->prependStylesheet($this->baseUrl() . '/css/signup.css');
+$this->headScript()->prependFile($this->baseUrl() . '/js/create.js');
+$this->headScript()->prependFile('https://maps.googleapis.com/maps/api/js?key=AIzaSyAhxSMQ-WQux2nzTW4dBoKmpfGHVQOk7r8&sensor=false');
+?>
+
+
+<?php
+$this->placeholder('narrowColumn')->captureStart();
+echo "<img src='/images/global/sports/icons/xl/solid/medium/soccer.png' class='left' id='narrow-column-pic'/>";
+
+// Sport
+echo "<p class='clear larger-margin-top darkest larger-text width-100 center'>
+		<span class='inherit larger-text' id='narrow-column-sport-typeName'></span> <span class='heavy larger-text' id='narrow-column-sport'></span> <span class='inherit larger-text' id='narrow-column-sport-typeSuffix'></span>
+	  </p>";
+// Datetime
+echo "<p class='clear darkest larger-text  width-100 center'><span id='narrow-column-time' class='inherit'></span> <span class='light' id='narrow-column-date'></span></p>";	
+// Park
+echo "<p class='clear light larger-text width-100 center' id='narrow-column-park'></p>";  
+
+
+$this->placeholder('narrowColumn')->captureEnd();
+?>
+
+<header class='left jumbo-text darkest heavy'>
+	Create <span class='medium' id='create-header-sport'></span> Game
+</header>
+
+<?php 
+echo $this->partial('partials/global/sectionHeaderBold.phtml',array('title'	=>'Sport'));
+	
+echo "<div class='width-100 clear create-section-container'>";
+$lowerOutput = '';
+foreach ($this->sports->getAll() as $sport) {
+	echo "<img src='" . $sport->getIcon('large','outline', 'medium') . "' class='left create-game-sport pointer medium-background' id='" . strtolower($sport->sport) . "' tooltip='" . $sport->sport . "' 
+			sport='" . $sport->sport . "' sportID='" . $sport->sportID . "'/>";
+	
+	if (count($sport->types) > 1) {
+		// More than 1 type
+		$lowerOutput .= "<div class='clear create-game-sport-type-container hidden' id='create-" . strtolower($sport->sport) . "-type' sport='" . strtolower($sport->sport) . "'>";
+		
+		$lowerOutput .= "<div class='clear create-game-sport-typeName-container'>";
+		$counter = 0;
+		foreach ($sport->getTypeNames() as $typeName) {
+			$class = '';
+			$post = '';
+			if ($counter == 0) {
+				$class = 'green-bold';
+				$post = "<p class='left light smaller-text create-type-or'>or</p>";
+			}
+			$lowerOutput .= "<p class='left selectable-text selectable-text-one create-game-sport-type light pointer " . $class . "'>" . $typeName . "</p>" . $post; 
+			$counter++;
+		}
+		$lowerOutput .= "</div>";
+		
+		$lowerOutput .= "<div class='clear create-game-sport-typeSuffix-container margin-top'>";
+		$counter = 0;
+		foreach ($sport->getTypeSuffixes() as $typeSuffix => $description) {
+			$class = '';
+			$post = '';
+			if ($counter == 0) {
+				$class = 'green-bold';
+				$post = "<p class='left light smaller-text create-type-or'>or</p>";
+			}
+			$lowerOutput .= "<p class='left selectable-text selectable-text-one create-game-sport-type light pointer " . $class . "' tooltip='" . $description . "'>" . $typeSuffix . "</p>" . $post;
+			$counter++;
+		}
+		$lowerOutput .= "</div>";
+		
+		
+		
+		$lowerOutput .= "</div>";
+	}
+			
+}
+
+echo $lowerOutput;
+
+echo "</div>";
+
+
+echo $this->partial('partials/global/sectionHeaderBold.phtml',array('title'	=>'When'));
+																
+echo "<div class='width-100 clear create-section-container'>";
+echo "<div class='clear create-game-when-calendar-container'>";
+echo $this->calendar()->createCalendar(array(), true, false, $selectedMonth = false, $selectedYear = false, true, true);
+echo "</div>";	
+
+echo "<div class='left create-game-time-outer-container'>"; 
+echo "<div class='left create-game-time-container hidden'>";
+echo $this->hourDropdown;
+echo $this->minDropdown;
+echo $this->ampmDropdown;
+echo "</div>";
+
+?>
+
+<div class='left larger-text larger-margin-top hidden red hidden width-100 center' id='available-players-container'>
+	<p class='inherit'>There are <span class='inherit heavy larger-text' id='available-players'></span> players available at this time. <span class='inherit smaller-text'>(typically 25% will show up)</p>
+</div>
+
+
+<?php
+echo "</div>";										
+echo "</div>";
+
+$content = "<p class='right profile-section-bold-subheader'>Select a location from below (or right click to add your own)</p>";
+
+echo $this->partial('partials/global/sectionHeaderBold.phtml',array('title'	=>'Where',
+																	'content' => $content));
+
+$userContent = $this->form->parkName;
+?>
+
+<div id='gmap'></div>
+
+<div class='clear largest-text darkest hidden width-100' id='parkName-main-container'><span class='inherit'>at </span><span class='inherit heavy' id='parkName-main'></span></div>
+<script type='text/javascript'>
+<?php 
+	   if (!empty($this->parks)) {
+		   // Matches exist
+		   ?>
+		gmapMarkers = [		<?php
+								$markerDetails = '';
+								 foreach ($this->parks as $match) {
+									 if ($match instanceof Application_Model_Park) {
+										 // Is game, create marker on map
+										 $location = $match->getLocation();
+										 echo '[' . $location->latitude . ',' . $location->longitude . '],';
+										 
+										 $markerDetails .= '["' . $match->parkName . '","' . preg_replace('/^\s+|\n|\r|\s+$/m', '', $this->ratingstar('small',$match->ratings->getStarWidth('quality') . '%')) . '", "' . $match->stash . '", "' . $match->parkID . '"],';
+									 }
+								 }?>
+					  ];
+					  
+		markerDetails = [<?php echo $markerDetails;?>];
+	<?php } ?>
+	
+
+userLocation = [<?php echo '"' . $this->user->getLocation()->latitude . '","' . $this->user->getLocation()->longitude . '"';?>];
+
+userContent = '<?php echo $userContent;?>'
+</script>
+
+
+<?php
+
+$content = '';
+
+echo $this->partial('partials/global/sectionHeaderBold.phtml',array('title'	=>'Details',
+																	'content' => $content));
+
+$class = 'left selectable-text light pointer create-details-selectable-text';
+?>
+<div class='clear width-100 create-details-container'>
+	<div class='left create-details-inner-container'>
+        <p class='clear darkest larger-margin-top'>Visibility</p>
+        <div class='clear' id='create-visibility'>
+            <?php
+                $options = array('Public' => "Anyone is welcome to play.  This game will show up in people's searches.",
+								 'Private' => 'This game is closed and only visible to those that I invite.');
+                echo $this->partial('partials/global/selectableText.phtml',array('options'	=>$options,
+                                                                                 'class' => $class,
+                                                                                 'selectableOne' => true));
+            ?>
+        </div>
+    </div>
+	
+    <div class='left create-details-inner-container'>
+        <p class='left darkest larger-margin-top center' tooltip='Does this game happen at the same time every week?'>Recurring</p>
+        <div class='clear ' id='create-recurring'>
+            <?php
+                $options = array('No' => 'One-time event.',
+								 'Yes' => 'This game happens at the same time every week.');
+                echo $this->partial('partials/global/selectableText.phtml',array('options'	=>$options,
+                                                                                 'class' => $class,
+                                                                                 'selectableOne' => true));
+            ?>
+        </div>
+    </div>
+    
+    <div class='left create-details-inner-container'>
+        <p class='left darkest larger-margin-top center'>Minimum Players</p>
+            <?php
+                echo $this->form->minPlayers;
+            ?>
+    </div>
+</div>
+
+
+
+<?php
+// All hidden inputs
+echo $this->form->parkID;
+echo $this->form->sport;
+echo $this->form->datetime;
+

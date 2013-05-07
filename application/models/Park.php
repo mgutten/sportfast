@@ -17,7 +17,9 @@ class Application_Model_Park extends Application_Model_ModelAbstract
 									'cityID'			=> '',
 									'location'			=> '',
 									'openTime'			=> '',
-									'closeTime'			=> ''
+									'closeTime'			=> '',
+									'ratings'			=> '',
+									'stash'				=> ''
 									);
 	
 	
@@ -37,6 +39,15 @@ class Application_Model_Park extends Application_Model_ModelAbstract
 		}
 		
 		return $this->_attribs['location'];
+	}
+	
+	public function getRatings()
+	{
+		if (empty($this->_attribs['ratings'])) {
+			$this->_attribs['ratings'] = new Application_Model_Ratings();
+		}
+		
+		return $this->_attribs['ratings'];
 	}
 	
 	public function getDistanceFromUser($userLat, $userLon)
@@ -102,6 +113,15 @@ class Application_Model_Park extends Application_Model_ModelAbstract
 		return ucwords($this->_attribs['type']);
 	}
 	
+	public function getCost($free = false)
+	{
+		if ($free && $this->_attribs['cost'] == 0) {
+			return 'Free';
+		} else {
+			return $this->_attribs['cost'];
+		}
+	}
+	
 	public function getHours()
 	{
 		if ($this->_attribs['type'] == 'school') {
@@ -140,6 +160,20 @@ class Application_Model_Park extends Application_Model_ModelAbstract
 		}
 		
 		return $output;
+	}
+	
+	public function getCity()
+	{
+		return ucwords($this->_attribs['city']);
+	}
+	
+	public function hasStash()
+	{
+		if (!empty($this->_attribs['stash'])) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 	
 	/**

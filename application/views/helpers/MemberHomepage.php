@@ -500,10 +500,10 @@ class Application_View_Helper_MemberHomepage
 				$ratingsOutput .= "</div>";
 			}
 			
-			$ratingsOutput .= "<div class='rating-individual-container'>";
+			/*$ratingsOutput .= "<div class='rating-individual-container'>";
 			$ratingsOutput .= "<p class='green smaller-text width-100 center clear'>skill</p>";
 			$ratingsOutput .= "<p class='green bold larger-text width-100 center clear'>" . $sport->skillCurrent . "</p>";
-			$ratingsOutput .= "</div>";
+			$ratingsOutput .= "</div>";*/
 			$ratingsOutput .= "</div></div>";
 			
 			$counter++;

@@ -41,6 +41,13 @@ class Application_Model_Sport extends Application_Model_ModelAbstract
 	
 	public function getSkill()
 	{
+		/*
+		if ($this->hasValue('ratings')) {
+			$average = $this->ratings->getAverage('skill',$this->_attribs['skillCurrent']);
+		} else {
+			$average = $this->_attribs['skillCurrent'];
+		}
+		*/
 		return $this->_attribs['skillCurrent'];
 	}
 	
@@ -102,17 +109,52 @@ class Application_Model_Sport extends Application_Model_ModelAbstract
 		return $newType;
 	}
 	
-	public function getType($type) 
+	public function getType($typeID = false) 
 	{
-		$type = strtolower($type);
+		//$type = strtolower($typeName);
+		/* CHANGED TO ALLOW FOR SEVERAL SPORT TYPES (singles => rally, singles => match)
 		if (!isset($this->_attribs['types'][$type])) {
-			$newType = $this->setType($type);
-			
+			$newType = $this->setType($type);		
 		} else {
 			$newType = $this->_attribs['types'][$type];
 		}
+		*/
+		
+		if (isset($this->_attribs['types'][$typeID])) {
+			$newType = $this->_attribs['types'][$typeID];
+		} else {
+			$newType = $this->_attribs['types'][$typeID] = new Application_Model_SportType();
+		}
 		
 		return $newType;
+	}
+	
+	public function getTypeNames()
+	{
+		$typeNames = array();
+		foreach ($this->types as $type) {
+			$typeName = ucwords($type->typeName);
+			if (in_array($typeName, $typeNames)) {
+				continue;
+			}
+			$typeNames[] = $typeName;
+		}
+		
+		return $typeNames;
+	}
+	
+	public function getTypeSuffixes()
+	{
+		$typeSuffixes = array();
+		foreach ($this->types as $type) {
+			$typeSuffix = ucwords($type->typeSuffix);
+			if (in_array($typeSuffix, $typeSuffixes)) {
+				continue;
+			}
+			$typeSuffixes[$typeSuffix] = $type->typeDescription;
+		}
+		
+		return $typeSuffixes;
 	}
 	
 	public function getPosition($position) 
@@ -140,12 +182,12 @@ class Application_Model_Sport extends Application_Model_ModelAbstract
 		return $this->_attribs['formats'][$format];
 	}
 	
-	
-	public function setAllAttribs($resultRow)
+	/**
+	 * convert slider position (ie 0, 1, 2, 3) to scale
+	 */
+	public function convertSliderToRating($rating)
 	{
-		foreach ($this->getAttribs() as $key => $attrib) {
-				$this->$attrib = $resultRow->$attrib;
-			}
+		return floor(($post[$sport . 'Rating'] * 5.5) + mt_rand(64, 66));
 	}
 		
 	

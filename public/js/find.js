@@ -40,6 +40,13 @@ $(function()
 			$(this).parents('.checkbox-container').siblings('.find-filter-hidden').hide();
 		}
 		
+		if (isParks() && $(this).is('#courtSpecific')) {
+			// show hidden court specific box
+			$('#court-specific').show();
+		} else if (isParks() && $(this).is('#courtAny')) {
+			$('#court-specific').hide();
+		}
+		
 		$(this).parents('.narrow-column-body').find('input[type=checkbox]').each(function()
 		{
 			$(this).prop('checked', false);
@@ -167,16 +174,25 @@ $(function()
 	*/
 	
 	/* map */
-	$(document).on('mouseenter','.find-result-games',function()
+	$(document).on('mouseenter','.find-result-games,.find-result-parks',function()
 	{
-		var gameIndex = $(this).attr('gameIndex');
-		markers[gameIndex].setIcon('/images/global/gmap/markers/green_reverse.png');	
+		if (isGames()) {
+			var index = $(this).attr('gameIndex');
+		} else {
+			var index = $(this).attr('parkIndex');
+		}
+		markers[index].setIcon('/images/global/gmap/markers/green_reverse.png');	
 		
 	})
-	$(document).on('mouseleave','.find-result-games',function() {
-		var gameIndex = $(this).attr('gameIndex');
-		markers[gameIndex].setIcon('/images/global/gmap/markers/green.png');
+	$(document).on('mouseleave','.find-result-games,.find-result-parks',function() {
+		if (isGames()) {
+			var index = $(this).attr('gameIndex');
+		} else {
+			var index = $(this).attr('parkIndex');
+		}
+		markers[index].setIcon('/images/global/gmap/markers/green.png');
 	})
+	
 	
 	
 	$(document).on('mouseenter','.find-result-teams,.find-result-users',function()
@@ -195,7 +211,8 @@ $(function()
 	preloadImageArray.push('/images/global/gmap/markers/green_reverse.png');
 	
 
-	if ($('#looking-for').find('.dropdown-menu-selected').children('p').text().toLowerCase() == 'games') {
+	if (isGames() ||
+		isParks()) {
 		// Map for games page
 		initializeMap(37.98, -122.5, 11, createMarkers);
 	}
@@ -364,16 +381,22 @@ function createMarkers()
 				 })
 		markers.push(marker);
 
+
 		addMarkerListeners(marker);
 		
-		if (i > ($('.find-results-inner-container').first().children('.find-result-games').length) - 1) {
+		var findGames = $('.find-results-inner-container').first().children('.find-result-games').length;
+		var findParks = $('.find-results-inner-container').first().children('.find-result-parks').length;
+		
+		if (isGames() && (i > (findGames) - 1)) {
 			marker.setVisible(false);
-		} else {
+		} else if (isParks() && (i > (findParks) - 1)) {
+			marker.setVisible(false);
+		}
 			/*bounds.extend(latLon);
 			gmap.setCenter(bounds.getCenter());
 			gmap.fitBounds(bounds);
 			*/
-		}		
+			
 
 	}
 	
@@ -400,10 +423,16 @@ function addMarkerListeners(marker)
 				   }
 			}
 			
+			if (isGames()) {
+				var classy = 'find-result-games';
+			} else {
+				// Is parks
+				var classy = 'find-result-parks';
+			}
 			$.each(index,function(key, value) {
 				
-				$('.find-result-games:eq(' + value +')').css('background','');
-				$('.find-result-games:eq(' + value +')').addClass('light-back');
+				$('.' + classy + ':eq(' + value +')').css('background','');
+				$('.' + classy + ':eq(' + value +')').addClass('light-back');
 			})
         });
 		
@@ -427,11 +456,34 @@ function addMarkerListeners(marker)
 				   }
 			}
 		
-			
+			if (isGames()) {
+				var classy = 'find-result-games';
+			} else {
+				// Is parks
+				var classy = 'find-result-parks';
+			}
 			$.each(index,function(key, value) {
-				$('.find-result-games:eq(' + value +')').removeClass('light-back');
+				$('.' + classy + ':eq(' + value +')').removeClass('light-back');
 			})
         });
+}
+
+function isGames()
+{
+	if ($('#looking-for').find('.dropdown-menu-selected').children('p').text().toLowerCase() == 'games') {
+		return true;
+	} else {
+		return false;
+	}
+}
+
+function isParks()
+{
+	if ($('#looking-for').find('.dropdown-menu-selected').children('p').text().toLowerCase() == 'parks') {
+		return true;
+	} else {
+		return false;
+	}
 }
 
 function roundLatLng(val) 
@@ -555,21 +607,6 @@ function buildOptions(offset)
 
 	offset = (typeof offset == 'undefined' ? '' : offset);
 
-	var sports = loopSelectable($('#narrow-column-body-sports'))
-	sports  = buildTypesOption(sports);
-	
-	var skill = getSkillOption();
-	var age   = getAgeOption();
-	var time;
-	var looking = getLookingOption();
-	
-	
-	if ($('#timeUser').prop('checked')) {
-		time = 'user';
-	} else if ($('#timeAny').prop('checked')) {
-		time = 'any';
-	}
-	
 	
 	if (gmap) {
 		var points = new Array();
@@ -578,12 +615,46 @@ function buildOptions(offset)
 		points[1] = 'POINT(' + bounds.getSouthWest().lat() + ',' + bounds.getSouthWest().lng() + ')';
 	}
 	
-	var options = {sports:sports,
-				   skill:skill,
-				   age:age,
-				   time:time,
-				   points: points,
-				   looking: looking};
+	if (isParks()) {
+		// Is parks page
+		var courts = getCheckedValue($('#narrow-column-body-courts-and-fields'));
+		
+		if (courts) {
+			// Specific courts are chosen
+			courts = loopSelectable($('#court-specific'));
+		}
+		
+		var stash  = getCheckedValue($('#narrow-column-body-stash'));
+		var type   = getCheckedValue($('#narrow-column-body-type'));
+		
+		var options = {courts: courts,
+					   stash: stash,
+					   type: type,
+					   points: points};
+	} else {
+		var sports = loopSelectable($('#narrow-column-body-sports'))
+		sports  = buildTypesOption(sports);
+		
+		var skill = getSkillOption();
+		var age   = getAgeOption();
+		var time;
+		var looking = getLookingOption();
+		
+		
+		if ($('#timeUser').prop('checked')) {
+			time = 'user';
+		} else if ($('#timeAny').prop('checked')) {
+			time = 'any';
+		}
+		
+		var options = {sports:sports,
+					   skill:skill,
+					   age:age,
+					   time:time,
+					   points: points,
+					   looking: looking};
+	}
+	
 			   
 	var type  = $.trim($('#looking-for').find('.dropdown-menu-selected').children('p').text().toLowerCase());
 
@@ -634,6 +705,7 @@ function buildTypesOption(sports)
 				$(this).children('.selectable-text').each(function()
 				{
 					if ($(this).is('.green-bold')) {
+						// Is selected
 						success = true;
 						typeName[$(this).text().toLowerCase()] = true;
 					}
@@ -656,6 +728,24 @@ function buildTypesOption(sports)
 	return returnArray;
 						
 }
+
+/**
+ * get value of checked box within container ele
+ */
+function getCheckedValue(containerEle)
+{
+	var checked = containerEle.find('input[type=checkbox]:checked');
+	var returnValue = checked.attr('text').toLowerCase().replace(/ /g,'_');
+	
+	if (returnValue == 'any') {
+		// Do not let sql call include this parameter in search, set to blank
+		return '';
+	}
+	
+	return returnValue;
+}
+
+
 
 function getSkillOption()
 {

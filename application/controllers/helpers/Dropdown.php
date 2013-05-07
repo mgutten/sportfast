@@ -86,9 +86,18 @@ class Application_Controller_Helper_Dropdown extends Zend_Controller_Action_Help
 				    <div dropdown-menu='" . $id . "' id='dropdown-menu-" . $id . "' class='dropdown-menu-options-container dropshadow'>";
 					
 		foreach ($options as $option) {
-			$output   .= "<div class='dropdown-menu-option-container medium animate-darker'>";
+			
+			$pre = "<div";
+			$post = "</div>";
+			if (isset($option['href'])) {
+				$pre = "<a href='" . $option['href'] . "'";
+				$post = "</a>";
+			}
+			
+			$output   .= $pre . " class='dropdown-menu-option-container medium animate-darker'>";
 			$img       = '';
 			$textClass = 'medium';
+		
 			
 			if (is_array($option)) {
 				// Option is given as array with sub-values
@@ -98,13 +107,19 @@ class Application_Controller_Helper_Dropdown extends Zend_Controller_Action_Help
 				}
 				if (isset($option['image'])) {
 					// Image to be shown
-					$img = "<img src='" . $option['image'] . "' class='dropdown-menu-option-img " . $textClass . "-background' />";
+					$background = $textClass . "-background";
+					if (strpos($option['image'], '/solid/') > 0) {
+						// solid png, do not give colored background
+						$background = '';
+					}
+					$img = "<img src='" . $option['image'] . "' class='dropdown-menu-option-img " . $background . "' />";
 				}
 				
 				if ($ucwords) {
 					// ucwords for option
 					$option['text'] = ucwords($option['text']);
 				}
+
 				
 				$text = '<p class="dropdown-menu-option-text ' . $textClass . '">' . $option['text'] . '</p>';
 			} else {
@@ -116,7 +131,7 @@ class Application_Controller_Helper_Dropdown extends Zend_Controller_Action_Help
 				$text      = '<p class="dropdown-menu-option-text ' . $textClass . '">' . $option . '</p>';
 			}
 			$output .= $text . $img;
-			$output .= "</div>";
+			$output .= $post;
 		}
 		
 		$output .= "</div></div>";

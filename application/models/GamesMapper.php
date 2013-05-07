@@ -112,7 +112,6 @@ class Application_Model_GamesMapper extends Application_Model_MapperAbstract
 		$select->group('g.gameID')
 			   ->order('abs(avg(us.skillCurrent) - (SELECT skillCurrent FROM user_sports WHERE userID = "' . $userID . '" AND sportID = t.sportID)) ASC');
 		
-
 		$results = $table->fetchAll($select);
 
 		foreach ($results as $result) {

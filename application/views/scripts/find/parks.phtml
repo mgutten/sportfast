@@ -6,41 +6,67 @@
 $this->headTitle('Find Parks');
 $this->headLink()->prependStylesheet($this->baseUrl() . '/css/find.css');
 $this->headScript()->prependFile($this->baseUrl() . '/js/find.js');
+$this->headScript()->prependFile('https://maps.googleapis.com/maps/api/js?key=AIzaSyAhxSMQ-WQux2nzTW4dBoKmpfGHVQOk7r8&sensor=false');
+
 ?>
 
 
 <?php
 $this->placeholder('narrowColumn')->captureStart();
-	//echo "<img src='" . $this->matches[0]->getProfilePic('large') . "' class='narrow-column-picture'/>";
+	echo "<div id='gmap' class='narrow-column-picture'></div>";
 	echo "<p class='clear larger-margin-top white arial bold larger-text width-100 center dark-back'>FILTERS</p>";
-	echo $this->narrowcolumnsection()->start(array('title' => 'Sports'));
+	echo $this->narrowcolumnsection()->start(array('title' => 'Courts And Fields'));
+	echo $this->checkbox->setName('courtAny')
+						->setAttribs(array('text' =>'Any',
+										   'checked' => 'checked'));
+	echo $this->checkbox->setName('courtSpecific')
+						->setAttribs(array('text' =>'Specific',
+										   'checked' => false));
+	
 	$counter = 0;
-	foreach ($this->sports as $sport => $inner) {
-		$class = 'selectable-text light pointer narrow-sport';
+	echo "<div class='hidden larger-margin-top clear width-100' id='court-specific'>";
+	foreach ($this->courts as $court) {
+		$class = 'selectable-text light pointer narrow-sport green-bold';
 		if ($counter % 2 == 0) {
 			// even
 			$class .= ' clear';
 		} else {
 			$class .= ' right';
 		}
-		if (isset($this->types[$sport])) {
-			// User has this sport
-			$class .= ' green-bold';
-		}
 		
-		echo	"<p class='" . $class . "'>" . ucwords($sport) . "</p>";
+		echo	"<p class='" . $class . "'>" . ucwords($court) . "</p>";
 		$counter++;
 	}
+	echo "</div>";
 	echo $this->narrowcolumnsection()->end();
 	
 	
 	
-	echo $this->narrowcolumnsection()->start(array('title' => 'Time'));
-	echo $this->checkbox->setName('timeUser')
-						->setAttribs(array('text' =>'My Availability',
+	echo $this->narrowcolumnsection()->start(array('title' => 'Stash'));
+	echo $this->checkbox->setName('stashAny')
+						->setAttribs(array('text' =>'Any',
 										   'checked' => 'checked'));
-	echo $this->checkbox->setName('timeAny')
-						->setAttribs(array('text' =>'Any Time',
+	echo $this->checkbox->setName('stashYes')
+						->setAttribs(array('text' =>'Has stash',
+										   'checked' => false));
+	echo $this->checkbox->setName('stashNo')
+						->setAttribs(array('text' =>'No stash',
+										   'checked' => false));
+	echo $this->narrowcolumnsection()->end();
+	
+	
+	echo $this->narrowcolumnsection()->start(array('title' => 'Type'));
+	echo $this->checkbox->setName('typeAny')
+						->setAttribs(array('text' =>'Any',
+										   'checked' => 'checked'));
+	echo $this->checkbox->setName('typePark')
+						->setAttribs(array('text' =>'Park',
+										   'checked' => false));
+	echo $this->checkbox->setName('typeSchool')
+						->setAttribs(array('text' =>'School',
+										   'checked' => false));
+	echo $this->checkbox->setName('typeGym')
+						->setAttribs(array('text' =>'Gym',
 										   'checked' => false));
 	echo $this->narrowcolumnsection()->end();
 			
@@ -70,3 +96,34 @@ echo "</div></div>";
 echo $this->find()->createPagination(true);
 
 echo "<img src='/images/global/loading.gif' id='loading' class='hidden'/>";
+
+?>
+
+<script type='text/javascript'>
+	<?php 
+	   if (!empty($this->matches)) {
+		   // Matches exist
+		   ?>
+		gmapMarkers = [		<?php
+								 $counter = 0;
+								 foreach ($this->matches as $match) {
+									 if ($match instanceof Application_Model_Park) {
+										 // Is park, create marker on map
+										 $output = '';
+										 if ($counter != 0) {
+											 $output .= ',';
+										 }
+										 $location = $match->getLocation();
+										
+										 $output .= '[' . $location->latitude . ',' . $location->longitude . ']';
+										 
+										 echo $output;
+										 $counter++;
+										 
+									 }
+								 }?>
+					  ]
+	<?php } ?>
+					
+		userLocation = [<?php echo '"' . $this->user->getLocation()->latitude . '","' . $this->user->getLocation()->longitude . '"';?>];
+</script> 

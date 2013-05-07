@@ -8,7 +8,7 @@ class Application_View_Helper_RatingStar
 		$this->_view = $view;
 	}
 	
-	public function ratingstar($size, $width, $url, $outerClass = false)
+	public function ratingstar($size, $width, $url = false, $outerClass = false)
 	{
 		$class = 'clear rating-star-container-' . $size . ' ';
 		if ($outerClass) {

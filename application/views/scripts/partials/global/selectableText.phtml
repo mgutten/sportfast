@@ -1,0 +1,20 @@
+<?php
+$class = $this->class;
+if ($this->selectableOne) {
+	$class .= ' selectable-text-one';
+}
+
+$counter = 0;
+foreach ($this->options as $option => $tooltip) {
+	$tempClass = $class;
+	if ($counter == 0) {
+		$tempClass .= ' green-bold';
+	}
+	
+	if (!empty($tooltip)) {
+		$tooltip = 'tooltip="' . $tooltip . '"';
+	}
+	
+	echo "<p class='" . $tempClass . "' " . $tooltip . ">" . $option . "</p>";
+	$counter++;
+}

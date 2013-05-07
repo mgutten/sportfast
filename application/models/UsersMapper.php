@@ -497,13 +497,15 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 		$select->from(array('ur'  => 'user_ratings'))
 			   ->join(array('r' => 'ratings'),
 			   		  'ur.sportsmanship = r.ratingID',
-					  array('r.value as sportsmanshipValue'))
+					  array('r.value as sportsmanshipValue',
+					  		'r.ratingName as sportsmanshipRatingName'))
 			   ->join(array('r2' => 'ratings'),
 			   		  'ur.attendance = r2.ratingID',
 					  array('r2.value as attendanceValue'))
 			   ->join(array('r3' => 'ratings'),
 			   		  'ur.skill = r3.ratingID',
-					  array('r3.value as skillValue'))
+					  array('r3.value as skillValue',
+					  		'r3.ratingName as skillRatingName'))
 			   ->join(array('ss' => 'sport_skills'),
 			   		  'ur.bestSkill = ss.sportSkillID',
 					  array('skiller', 'skilling'))
@@ -515,7 +517,7 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 			$sport = strtolower($result->sport);
 			$savingClass->getSport($sport)->ratings->addRating($result);
 		}
-		
+
 		return $savingClass;
 	}
 	
@@ -790,6 +792,53 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 				
 				
 	}
+	
+	
+	/**
+	 * get available users in an area at a given time
+	 * @params ($datetime => datetime object of time to look for,
+	 *			$sportID => id of sport,
+	 *			$location => location model to search near)
+	 */
+	public function getAvailableUsers($datetime, $sportID, $location, $savingClass = false)
+	{
+	 	$table   = $this->getDbTable();
+		$select  = $table->select();
+		
+		$formattedDate = $datetime->format('Y-m-d');// Format datetime into useable date format for sql (YYYY-MM-DD)
+		
+		$games = "(SELECT `us`.userID, `us`.often, `ug`.userID as backupID, `g`.sportID
+					FROM `user_sports` AS `us` 
+					LEFT JOIN `user_games` AS `ug` ON ug.userID = us.userID 
+					INNER JOIN `games` AS `g` ON g.gameID = ug.gameID 
+					WHERE g.sportID = '" . $sportID . "'
+					GROUP BY us.userID
+					HAVING MIN(ABS(DATEDIFF(g.date,'" . $formattedDate . "'))) > us.often
+					)";
+		
+		$select->setIntegrityCheck(false);
+		$select->from(array('usa'  => 'user_sport_availabilities'))
+			   ->join(array('us' => 'user_sports'),
+			   		  'usa.userID = us.userID AND usa.sportID = us.sportID')
+			   ->join(array('g' => new Zend_Db_Expr($games)),
+			   		  'g.userID = usa.userID')
+			   ->where('usa.day = ?', $datetime->format('w'))
+			   ->where('usa.hour = ?', $datetime->format('G'))
+			   ->where('usa.sportID = ?', $sportID)
+			   ->group('usa.userID');
+			   
+		$results = $table->fetchAll($select);
+		
+		foreach ($results as $result) {
+			$savingClass->addUser($result);
+		}
+		
+		return $savingClass;
+		
+	}
+			   
+		
+		
 		
 		
 		

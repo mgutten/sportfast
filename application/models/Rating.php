@@ -23,7 +23,10 @@ class Application_Model_Rating extends Application_Model_ModelAbstract
 									'skilling'		=> '',
 									'user'			=> '',
 									'userID'		=> '',
-									'parkID'		=> ''
+									'parkID'		=> '',
+									'skillRatingName' => '',
+									'sportsmanshipRatingName' => '',
+									'type'			=> ''
 									);
 									
 	protected $_primaryKey = 'userRatingID';
@@ -56,7 +59,7 @@ class Application_Model_Rating extends Application_Model_ModelAbstract
 	
 	public function isUser()
 	{
-		if (!empty($this->userRatingID)) {
+		if ($this->hasValue('userRatingID')) {
 			return true;
 		} else {
 			return false;

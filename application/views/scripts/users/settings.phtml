@@ -1,0 +1,24 @@
+<?php
+/* 
+* controller => users
+* action => settings
+*/
+
+$this->headTitle('Account Settings');
+$this->headLink()->prependStylesheet($this->baseUrl() . '/css/settings.css');
+$this->headScript()->prependFile($this->baseUrl() . '/js/settings.js');
+
+?>
+
+<header class='left jumbo-text darkest heavy'>
+	Account Settings
+</header>
+
+<div class='clear larger-margin-top'>
+    <p class='settings-tab left pointer settings-tab-selected larger-text heavy'>Account</p>
+    <p class='settings-tab left pointer larger-text heavy'>Sports</p>
+</div>
+
+<div class='clear settings-container' id='settings-account'>
+	<img src='<?php echo $this->user->getProfilePic('large');?>' class='clear'/>
+</div>

@@ -12,7 +12,7 @@ sliderSkillValues[1]  = {level:'Decent',
 						description: 'I play infrequently, or have difficulty keeping up when I do play.'};
 sliderSkillValues[2]  = {level:'Good',
 						description: 'I am an average player.  Nothing fancy, just good fundamentals.'};
-sliderSkillValues[3]  = {level:'Skilled',
+sliderSkillValues[3]  = {level:'Better',
 						description: 'I am skilled.  I am better than the average player.'};
 sliderSkillValues[4]  = {level:'Talented',
 						description: 'I am very skilled.  I am typically the best player in the game.'};
@@ -575,7 +575,7 @@ $(function()
 	
 	
 	/* fade input text on focusin and focusout */
-	$('input[type=text],input[type=password],textarea').focusin(function()
+	$(document).on('focusin', 'input[type=text],input[type=password],textarea',function()
 	{
 		$(this).parents('.nav-dropdown').trigger('mouseover');
 		fadeOutInputOverlay($(this), true);
@@ -587,11 +587,11 @@ $(function()
 		
 		
 	})
-	.keyup(function()
+	.on('keyup', 'input[type=text],input[type=password],textarea', function()
 	{
 		fadeOutInputOverlay($(this), false)
 	})
-	.focusout(function()
+	.on('focusout', 'input[type=text],input[type=password],textarea', function()
 	{
 		fadeOutInputOverlay($(this), false)
 		if (mouseoverDropdown == false) {
@@ -617,7 +617,7 @@ $(function()
 	
 	
 	/* force focus of textbox when overlay for input is clicked */
-	$('.input-container').click(function() 
+	$(document).on('click', '.input-container', function() 
 	{
 		$(this).children('input').focus();
 	});
@@ -1405,7 +1405,8 @@ function resetFadeOpacityAndClass()
 */
 function fadeOutInputOverlay(inputEle, focusIn)
 {
-	var overlayEle = inputEle.next('.input-overlay');
+	var overlayEle = inputEle.siblings('.input-overlay');
+
 	var inputVal = $.trim(inputEle.val());
 	if (inputVal !== '') {
 		inputEle.removeClass('input-fail'); // remove if problems exist in signup.js
@@ -1873,6 +1874,24 @@ function preloadImages(imageArray)
 	$(imageArray).each(function () {
         $('<img />').attr('src',this).appendTo('body').hide();
     });
+}
+
+function createMarker(latLng, map)
+{
+
+	var marker = new google.maps.Marker({
+						position: latLng,
+						map: map,
+						icon: '/images/global/gmap/markers/green.png',
+						shadow: {
+									url: 'https://maps.gstatic.com/mapfiles/ms2/micons/msmarker.shadow.png',
+									size: new google.maps.Size(59, 32),
+									origin: new google.maps.Point(0,0),
+									anchor: new google.maps.Point(15, 34)
+								},
+					
+				 })
+	return marker;
 }
 
 

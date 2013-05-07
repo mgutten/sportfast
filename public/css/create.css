@@ -1,0 +1,123 @@
+/* create.css */
+
+/* overwrite */
+.calendar-day {
+	height: 13%;
+}
+
+/* create index page where choose game or team */
+.create-choose-container {
+	margin-top: .2em;
+	width: 20em;
+	height: 23em;
+	margin-left: 8em;
+}
+
+.create-choose-container-second {
+	margin-left: .5em;
+}
+
+.create-choose-title {
+	margin-top: 5em;
+}
+
+.create-choose-img {
+	margin-top: 3em;
+	margin-left: 4.5em;
+}
+
+.create-choose-subtext {
+	margin-top: 3em;
+}
+
+/* create game */
+.create-section-container {
+	margin-top: 1em;
+}
+
+/* sport section */
+.create-game-sport {
+	margin-left: 1em;
+}
+
+.create-game-sport-selected {
+	background: #58bf12;
+}
+
+.create-game-sport-type {
+	width: 4.2em;
+}
+
+.selectable-text:nth-child(2) {
+	margin-left: .4em;
+}
+
+.create-game-sport-type-container {
+	margin-top: 1.5em;
+	margin-left: 7.8em;
+}
+
+.create-type-or {
+	margin-top: .5em;
+}
+
+/* when section */
+.create-game-when-calendar-container {
+	width: 50%;
+	height: 20em;
+}
+
+.calendar-selectable {
+	cursor: pointer;
+}
+
+.calendar-day-selected {
+	background: #58bf12;
+}
+
+.calendar-left-arrow,.calendar-right-arrow {
+	margin-top: .15em;
+}
+
+.create-game-time-container > .dropdown-menu-container {
+	width: 3.2em;
+	margin-left: .5em;
+}
+
+.create-game-time-container > .dropdown-menu-hidden-container > .dropdown-menu-options-container {
+	width: 3.8em;
+}
+
+.create-game-time-container > .dropdown-menu-container {
+	font-size: 1.5em;
+}
+
+.create-game-time-container {
+	margin: 3em 0 0 2em;
+}
+
+.create-game-time-outer-container {
+	width: 50%;
+}
+
+
+/* where section */
+#gmap {
+	width: 99.8%;
+	height: 20em;
+	float:left;
+	border:1px solid #222;
+}
+
+/* details section */
+p.create-details-selectable-text.selectable-text {
+	margin-left: 1em;
+}
+
+p.create-details-selectable-text.selectable-text:first-child {
+	margin-left: 1;
+}
+
+.create-details-inner-container {
+	width: 33%;
+}
