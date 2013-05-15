@@ -1,11 +1,13 @@
 <?php
 
-class Application_Model_Parks extends Application_Model_ModelAbstract
+class Application_Model_Parks extends Application_Model_TypesAbstract
 {
 	protected $_mapperClass = 'Application_Model_ParksMapper';
 	
 	protected $_attribs     = array('parks' 	=> '',
 									'totalRows' => '');
+									
+	protected $_primaryKey  = 'parkID';
 	
 	/**
 	 * find parks for Find controller given options

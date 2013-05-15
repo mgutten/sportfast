@@ -1,0 +1,207 @@
+<?php
+/** 
+ * controller => create
+ * action => team
+ */
+$this->headTitle('Create Team');
+$this->headLink()->prependStylesheet($this->baseUrl() . '/css/create.css');
+//$this->headLink()->prependStylesheet($this->baseUrl() . '/css/signup.css');
+$this->headScript()->prependFile($this->baseUrl() . '/js/create.js');
+?>
+
+
+<?php
+$this->placeholder('absolute')->captureStart();
+
+echo $this->partial('partials/global/alertBack.phtml');
+
+echo $this->alert()->start('avatars',"Choose your team's logo");
+
+echo "<img src='/images/teams/profile/pic/large/default.jpg' id='create-team-avatar-alert-img'/>";
+
+echo "<div class='clear margin-top'>";
+foreach ($this->avatarNames as $fileName) {
+	$class = 'left create-team-avatar pointer ';
+	if ($fileName == $this->defaultAvatar) {
+		$class .= ' create-team-avatar-selected';
+	}
+	echo "<img src='/images/teams/avatars/small/" . $fileName . "' class='" . $class . "' avatar='" . str_replace('.jpg','', $fileName) . "'/>";
+	
+	// preload large images
+	echo "<img src='/images/teams/avatars/large/" . $fileName . "' class='hidden'/>";
+}
+echo "</div>";
+
+echo $this->alert()->end();
+
+$this->placeholder('absolute')->captureEnd();
+
+
+$this->placeholder('narrowColumn')->captureStart();
+echo "<img src='/images/teams/profile/pic/large/default.jpg' class='left' id='narrow-column-pic'/>";
+
+
+// Sport
+echo "<p class='clear larger-margin-top darkest larger-text width-100 center'>
+		<span class='larger-text' id='narrow-column-sport'></span> <span class='larger-text hidden' id='narrow-column-team'>Team</span>
+	  </p>";
+	  
+// Team name
+echo "<p class='clear darkest larger-text width-100 center'>
+		<span class='larger-text heavy' id='narrow-column-teamName'></span>
+	  </p>";	  
+	  
+// Datetime
+echo "<p class='clear darkest larger-text  width-100 center'><span id='narrow-column-time' class='inherit'></span> <span class='light' id='narrow-column-date'></span></p>";	
+// Park
+echo "<p class='clear light larger-text width-100 center' id='narrow-column-park'></p>";  
+
+
+$this->placeholder('narrowColumn')->captureEnd();
+?>
+
+<?php
+if ($this->errors) {
+	// Errors occured
+	echo "<div class='red-alert-box white'><p class='white heavy left'>Please fix the following:</p>";
+	
+	echo "<ul class='clear'>";
+	foreach ($this->errors as $type => $message) {
+		echo "<li class='clear white'>" . $message . "</li>";
+	}
+	echo "</ul>";
+	echo "</div>";
+}
+?>
+
+<p class='light left'>Gone are the days of texting or emailing your players to see whether they're attending.  With automatic reminders and easy-to-navigate displays, we have streamlined the process for you, so all you need to focus on is the game.</p>
+
+<header class='left jumbo-text darkest heavy'>
+	Create <span class='medium' id='create-header-sport'></span> <span class='inherit' id='create-type'>Team</span>
+</header>
+
+<form action='/create/validateteam' method='post'>
+
+<div class='clear create-section width-100'>
+<?php 
+echo $this->partial('partials/global/sectionHeaderBold.phtml',array('title'	=>'What Sport'));
+	
+echo "<div class='width-100 clear create-section-container'>";
+
+foreach ($this->sports->getAll() as $sport) {
+	echo "<img src='" . $sport->getIcon('large','outline', 'medium') . "' class='left create-game-sport pointer medium-background' id='" . strtolower($sport->sport) . "' tooltip='" . $sport->sport . "' 
+			sport='" . $sport->sport . "' sportID='" . $sport->sportID . "'/>";
+	
+}
+
+echo "</div>";
+echo "</div>";
+
+
+echo "<div class='clear create-section width-100'>";
+echo "<div class='clear create-section-inner width-100'>";
+echo $this->partial('partials/global/sectionHeaderBold.phtml',array('title'	=>'Team Info'));
+
+echo "<img src='/images/teams/profile/pic/medium/default.jpg' class='left pointer margin-top' id='create-teamInfo-avatar'/>";
+
+echo $this->form->teamName;
+
+?>
+
+ 	<div class='clear width-100 create-details-container-first'>
+        <div class='left create-teamInfo-inner-container'>
+            <p class='left darkest'>Visibility</p>
+            <div class='clear create-selectable-text-container' id='create-visibility'>
+                <?php
+                    $class = 'left selectable-text light pointer create-details-selectable-text';
+				$options = array('Public' => "This team will show up in people's searches, but they must request to join.",
+								 'Private' => 'This team is closed and only visible to those you invite.');
+				echo $this->partial('partials/global/selectableText.phtml',array('options'	=>$options,
+																				 'class' => $class,
+																				 'selectableOne' => true));
+                ?>
+             </div>
+        </div>
+        
+        <div class='left create-teamInfo-inner-container'>
+            <div class='left'>
+              <p class='left darkest '>Roster Limit</p>
+              
+                  <?php
+                      echo $this->form->rosterLimit;
+                      
+                  ?>
+              
+            </div>
+        </div>
+        
+        <div class='left create-teamInfo-inner-container'>
+            <div class='clear create-details-checkbox'>
+                <?php
+                    echo $this->form->ageLimitCheckbox;
+                ?>
+                <div class='clear hidden' id='create-details-age-container'>
+                    <?php echo $this->form->ageLimitMin . "<p class='left create-details-separator'>-</p>" . $this->form->ageLimitMax;?>
+                </div>
+            </div>
+        </div>
+        
+        <div class='left create-teamInfo-inner-container'>
+            <div class='clear create-details-checkbox'>
+                <?php
+                    echo $this->form->skillLimitCheckbox;
+                ?>
+                <div class='clear hidden' id='create-details-skill-container'>
+                    <?php echo $this->form->skillLimitMin . "<p class='left create-details-separator'>-</p>" . $this->form->skillLimitMax;?>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+
+
+<p class='darkest clear' id='create-description'>Teams are intended for <span class='darkest heavy'>league</span> organization or play. <span class='light'>If you are unsure what a league team is, read about it <a href='/faq/league' class='medium' target='_blank'>here</a>.</span> <span class='darkest'>Invite players to join this team on the next page.</span></p> 
+ 
+<input type='submit' class='button green-button white heavy clear largest-text width-100' id='create-team-submit' value='Create Team' />  
+<p class='clear light'></p> 
+    
+<?php
+
+
+
+echo "</div>";
+echo "</div>";
+
+
+
+/*
+echo "<div class='clear create-section width-100'>";
+echo "<div class='clear create-section-inner width-100'>";
+
+$content = "<p class='larger-text darkest header left larger-margin-top'>Optional</p>";
+echo $this->partial('partials/global/sectionHeaderBold.phtml',array('title'	=>'Find a League',
+																	'content' => $content));
+
+echo "<p class='medium clear width-100'><span class='darkest'>Select one of the following leagues and we will automatically register your team when enough players have joined.</span> 
+			You no longer need to worry about collecting payments from your players; each player will submit their (adjustable) dues to your team's Pool.  
+			When the necessary funds have been added to the Pool, we will register your team.  Easy, simple, and hassle-free.</p>";
+
+echo "<div class='clear' id='create-team-leagues-container'>";
+
+echo "</div>";
+
+echo "</div>";
+echo "</div>";
+*/
+?>
+
+
+<?php
+echo $this->form->avatar;
+echo $this->form->sport;
+echo $this->form->sportID;
+echo $this->form->visibility;
+?>
+
+
+</form>

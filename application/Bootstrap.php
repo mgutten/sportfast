@@ -3,9 +3,20 @@
 class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 {
 	
+	protected function _initRouterSetup()
+	{
+		$this->bootstrap('frontController');
+		
+		$front = Zend_Controller_Front::getInstance();
+		$front->registerPlugin(new My_Plugin_Authorization());
+		
+	}
+			
+	
     protected function _initMyActionHelpers()
     {
         $this->bootstrap('frontController');
+		
         Zend_Controller_Action_HelperBroker::getStaticHelper('LoginForm');
 
     }
@@ -37,6 +48,14 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 		$view   = $this->getResource('view');
 		
 		$auth = Zend_Auth::getInstance();
+		
+		$reset = new Zend_Session_Namespace('reset');
+		if ($reset->reset) {
+			// Reset attrib has been set, clear identity and force reload
+			$auth->clearIdentity();
+			Zend_Session::namespaceUnset('reset');
+		}
+		
 		//$auth->clearIdentity();
 		if (!empty($_COOKIE['user']) || $auth->hasIdentity()) {
 			// User is logged in 

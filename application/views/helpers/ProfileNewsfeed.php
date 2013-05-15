@@ -26,14 +26,14 @@ class Application_View_Helper_ProfileNewsfeed
 		$memberHomepage = $this->_view->getHelper('memberhomepage');
 		
 		foreach ($messages->read as $message) {
-			$output .= "<div class='newsfeed-container left width-100'>";
+			//$output .= "<div class='newsfeed-container left width-100'>";
 
 			if ($message->hasValue('notification')) {
 				// Is notification
 				$output .= $memberHomepage->createNotification($message->notification, 'small');
 			} else {
 				// Is message
-				$output .= "<div class='newsfeed-notification-container'>
+				$output .= "<div class='newsfeed-notification-container clear'>
 								<a href='/users/" . $message->userID . "' class='left'>" . $message->getBoxProfilePic('small') . "</a>";
 				$output .= "<div class='profile-message-container left'>";
 				$output .= 		"<p class='light left smaller-text arial'>" . $message->userName . " said...</p>";
@@ -43,7 +43,7 @@ class Application_View_Helper_ProfileNewsfeed
 				$output .= "</div>";
 			}
 			
-			$output .= "</div>";
+			//$output .= "</div>";
 			
 		}
 		

@@ -267,7 +267,48 @@ class Application_Model_TeamsMapper extends Application_Model_MapperAbstract
 		
 		return $savingClass;
 	}
+	
+	/**
+	 * delete game
+	 */
+	public function delete($teamModel)
+	{
+		$db = Zend_Db_Table::getDefaultAdapter();
+		$teamID = $teamModel->teamID;
 		
+		
+		
+		$where = array('teamID = ?' => $teamID);
+		
+		if (empty($teamID)) {
+			// Safety check to make sure gameID is set before continuing
+			return false;
+		}
+		
+		
+		
+		$this->move($teamID);
+		
+		$db->delete('teams', $where);
+		$db->delete('team_captains', $where);
+		$db->delete('team_messages', $where);
+		
+	}
+	
+	/**
+	 * move deleted rows from active table to "old" table
+	 */
+	public function move($id)
+	{
+		$db = Zend_Db_Table::getDefaultAdapter();
+		
+		$sql = "INSERT INTO old_teams
+					(SELECT t.*, NOW()
+					FROM teams as t
+					WHERE t.teamID = '" . $id . "')";
+					
+		$db->query($sql);
+	}
 		
 	
 	/**
@@ -297,6 +338,11 @@ class Application_Model_TeamsMapper extends Application_Model_MapperAbstract
 		
 					   
 		$team = $table->fetchRow($select);
+		
+		if (empty($team['teamID'])) {
+			// No game found
+			return false;
+		}
 
 		$savingClass->setAttribs($team);
 		

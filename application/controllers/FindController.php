@@ -48,6 +48,15 @@ class FindController extends Zend_Controller_Action
 		$this->view->inputText = $form->text;
 		$this->view->checkbox  = $form->checkbox;
 		
+		$session = new Zend_Session_Namespace('findGames');
+		
+		if (empty($session->visited)) {
+			// Has not visited this page in this session
+			$this->view->topAlert = true;
+			$session->visited = true;
+		}
+		
+		
     }
 	
 	public function teamsAction()
@@ -151,6 +160,42 @@ class FindController extends Zend_Controller_Action
 		$form = new Application_Form_General();
 		$this->view->inputText = $form->text;
 		$this->view->checkbox  = $form->checkbox;
+	}
+	
+	public function searchAction()
+	{
+		$session = new Zend_Session_Namespace('searchTerm');
+		
+		$searchTerm = $session->searchTerm;
+		
+		$cityID  = $this->view->user->city->cityID;
+		
+		$search  = new Application_Model_Search();
+		$results = $search->getSearchResults($searchTerm, $cityID);
+		
+		$this->view->results = $results;
+		$this->view->searchTerm = $searchTerm;
+		
+		$form = new Application_Form_HeaderSearch();
+		$form->setName('headerSearchMain');
+		$form->headerSearchBar->setAttribs(array('class' => 'dropshadow'));
+		
+		$this->view->form = $form;
+	
+	}
+	
+	public function searchTermAction()
+	{
+		$post = $this->getRequest()->getPost();
+		if (empty($post['headerSearchBar'])) {
+			// No search term was used, redirect to home page
+			$this->_redirect('/');
+		}
+		
+		$session = new Zend_Session_Namespace('searchTerm');
+		$session->searchTerm = $post['headerSearchBar'];
+		
+		$this->_redirect('/find/search');
 	}
 
 

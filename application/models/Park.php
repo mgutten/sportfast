@@ -19,7 +19,8 @@ class Application_Model_Park extends Application_Model_ModelAbstract
 									'openTime'			=> '',
 									'closeTime'			=> '',
 									'ratings'			=> '',
-									'stash'				=> ''
+									'stash'				=> '',
+									'temporary'			=> ''
 									);
 	
 	
@@ -167,9 +168,23 @@ class Application_Model_Park extends Application_Model_ModelAbstract
 		return ucwords($this->_attribs['city']);
 	}
 	
+	public function getParkName()
+	{
+		return ucwords($this->_attribs['parkName']);
+	}
+	
 	public function hasStash()
 	{
 		if (!empty($this->_attribs['stash'])) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	public function isTemporary()
+	{
+		if ($this->_attribs['temporary'] == '1') {
 			return true;
 		} else {
 			return false;

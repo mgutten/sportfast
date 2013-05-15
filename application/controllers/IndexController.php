@@ -98,7 +98,7 @@ class IndexController extends Zend_Controller_Action
 					->addMatches($teams->teams);
 			
 			$this->view->matches = $matches->sortByMatch();
-			
+						
 		}
     }
 

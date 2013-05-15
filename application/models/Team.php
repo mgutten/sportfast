@@ -29,8 +29,12 @@ class Application_Model_Team extends Application_Model_ModelAbstract
 									'ties'		   => '',
 									'minSkill'	   => '',
 									'maxSkill'	   => '',
+									'minAge'	   => '',
+									'maxAge'	   => '',
 									'sportupCreated' => '',
-									'leagues'	   => ''
+									'leagues'	   => '',
+									'picture'	   => '',
+									'remove'	   => ''
 									);
 									
 	protected $_primaryKey = 'teamID';
@@ -38,7 +42,8 @@ class Application_Model_Team extends Application_Model_ModelAbstract
 	
 	public function getProfilePic($size, $id = false, $type = 'teams') 
 	{
-		return parent::getProfilePic($size, $this->teamID, $type);
+		return '/images/teams/avatars/' . $size . '/' . $this->picture . '.jpg';
+		//return parent::getProfilePic($size, $this->teamID, $type);
 	}
 	
 	/**
@@ -312,7 +317,7 @@ class Application_Model_Team extends Application_Model_ModelAbstract
 	
 	public function isCreator($userID) 
 	{
-		if ($this->_attribs['captains'][$userID]) {
+		if (isset($this->_attribs['captains'][$userID])) {
 			return true;
 		} else {
 			return false;

@@ -135,14 +135,28 @@ class Application_Model_NotificationsMapper extends Application_Model_MapperAbst
 		 } elseif ($type == 'team') {
 			 $query = "INSERT INTO user_teams (teamID, userID)
 			 			(SELECT nl.teamID,
-								nl.receivingUserID
+								nl.actingUserID
 							FROM notification_log as `nl`
 							WHERE nl.notificationLogID = '" . $notificationLogID . "')";
 			
 			 $query2 = "INSERT INTO notification_log (actingUserID, teamID, notificationID, dateHappened)
-			 			 (SELECT nl.receivingUserID, 
+			 			 (SELECT nl.actingUserID, 
 						 		 nl.teamID, 
 								 (SELECT notificationID FROM notifications WHERE type ='team' AND action = 'join' AND details IS NULL), 
+								 NOW()
+						 	FROM notification_log as `nl`
+							WHERE nl.notificationLogID = '" . $notificationLogID . "')";
+		 } elseif ($type == 'game') {
+			 $query = "INSERT INTO user_games (gameID, userID)
+			 			(SELECT nl.gameID,
+								nl.receivingUserID
+							FROM notification_log as `nl`
+							WHERE nl.notificationLogID = '" . $notificationLogID . "')";
+			
+			 $query2 = "INSERT INTO notification_log (actingUserID, gameID, notificationID, dateHappened)
+			 			 (SELECT nl.receivingUserID, 
+						 		 nl.gameID, 
+								 (SELECT notificationID FROM notifications WHERE type ='game' AND action = 'join' AND details IS NULL), 
 								 NOW()
 						 	FROM notification_log as `nl`
 							WHERE nl.notificationLogID = '" . $notificationLogID . "')";

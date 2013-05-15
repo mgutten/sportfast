@@ -33,6 +33,12 @@ $this->placeholder('narrowColumn')->captureEnd();
 	<p class='profile-name heavy darkest clear'>
     	<?php echo $this->park->parkName;?>
 	</p>
+    <?php
+	if ($this->park->isTemporary()) {
+		// Temporary park
+		echo "<p class='medium heavy largest-text clear' tooltip='This location has not been verified.  It was added by a user and may not be open to public use.'>Temporary location</p>";
+	} else {
+	?>
     <div class='profile-city-container clear'>
         <p class='medium clear larger-text'>
             <?php echo $this->park->city;?>&nbsp; <a href='http://www.google.com/maps?q=<?php echo $this->parkLocation->latitude . ',' . $this->parkLocation->longitude;?>' class='inherit light'><?php echo $this->park->getDistanceFromUser($this->user->getLocation()->latitude,$this->user->getLocation()->longitude);?> miles from you</a>
@@ -40,6 +46,7 @@ $this->placeholder('narrowColumn')->captureEnd();
         <?php echo $this->ratingStar('large', $this->parkRatingWidth, $this->currentURI . '/ratings', 'margin-top');?>
         <a href='/parks/<?php echo $this->parkID;?>/ratings' class='left green park-num-ratings'><?php echo $this->numRatings;?></a>
     </div>
+    <?php } ?>
 </header>
 
 <div id='profile-buttons-container-holder' class='right'></div>
@@ -53,9 +60,9 @@ $this->placeholder('narrowColumn')->captureEnd();
 				Directions
 			</a>
             <?php
-        	if ($this->parkStash->hasValue('sports')) {
+        	if ($this->stashExists) {
 			?>
-            <a href='<?php echo $this->currentURI;?>/stash' class='green-button right profile-buttons-margin-right smaller-button' tooltip='Certain parks have "stashes" where we have placed sports equipment for your use, free of charge.'>Stash</a>
+            <a href='<?php echo $this->currentURI;?>/stash' class='green-button right profile-buttons-margin-right smaller-button' tooltip='<?php echo $this->stashDescription;?>'>Stash</a>
         	<?php } ?>
             <a href='/create/game/<?php echo $this->park->parkID;?>' class='button right larger-button larger-margin-top'>Create Game</a>
             <a href='<?php echo $this->currentURI;?>/ratings' class='button right profile-buttons-margin-right smaller-button larger-margin-top'>Rate</a>
@@ -85,18 +92,18 @@ $this->placeholder('narrowColumn')->captureEnd();
     </div>
     
     <div class='left park-details-middle'>
-   		<p class='left light'>reviews</p>
+   		<a href='<?php echo $this->currentURI;?>/ratings' class='left light'>reviews</a>
     	<p class='clear medium park-details-review'><?php echo $this->ratingText;?></p>
     </div>
     
     <div class='right inherit'>
     	<p class='left light'>sports w/ the stash</p>
-        <p class='left darkest indent pointer' tooltip='Certain parks have "stashes" where we have placed sports equipment for your use, free of charge.'>?</p>
+        <p class='left darkest indent pointer' tooltip='<?php echo $this->stashDescription;?> <span class="light">These sports can be played at this park.</span>'>?</p>
         <div class='clear'>
         	<?php
 				$class = 'clear largest-text heavy medium';
 				
-				if (!$this->stashExists) {
+				if (!$this->parkStash->hasValue('sports')) {
 					echo "<p class='" . $class . "'>None</p>";
 				} else {
 					foreach ($this->parkStash->sports as $sport) {
@@ -106,7 +113,7 @@ $this->placeholder('narrowColumn')->captureEnd();
         	?>
         </div>
         <?php
-        	if ($this->parkStash->hasValue('sports')) {
+        	if ($this->stashExists) {
 			?>
             <a href='<?php echo $this->currentURI;?>/stash' class='clear medium'>locate the stash</a>
             <?php } ?>

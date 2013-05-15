@@ -5,6 +5,40 @@
 	height: 13%;
 }
 
+.input-container {
+	clear:both;
+	margin-top: .1em;
+}
+
+#headerSearchBar-container {
+	margin-top: .5em;
+}
+
+/* section containers */
+.create-section {
+	overflow:hidden;
+	margin-top: 4em;
+}
+
+.create-section:first-child {
+	margin-top: 1em;
+}
+
+.create-section-gmap {
+	width: 100.5%;
+}
+
+.create-section-inner {
+	display:none;
+}
+
+.create-section-inner-gmap {
+	display:block;
+	opacity:0;
+	position:relative;
+	z-index: -4;
+}
+
 /* create index page where choose game or team */
 .create-choose-container {
 	margin-top: .2em;
@@ -93,11 +127,25 @@
 }
 
 .create-game-time-container {
-	margin: 3em 0 0 2em;
+	margin: 8.5em 0 0 2em;
 }
 
 .create-game-time-outer-container {
 	width: 50%;
+}
+
+#available-players-container {
+	margin-top: 4em;
+}
+
+.create-similar-game-container {
+	width: 98%;
+	padding: .5em 1% .5em 1%;
+	background: #fff;
+}
+
+.create-similar-game-players {
+	margin-top: -.3em;
 }
 
 
@@ -115,9 +163,171 @@ p.create-details-selectable-text.selectable-text {
 }
 
 p.create-details-selectable-text.selectable-text:first-child {
-	margin-left: 1;
+	margin-left: 0;
 }
 
 .create-details-inner-container {
 	width: 33%;
+}
+
+.create-details-container,.create-details-container-first {
+	margin-top: .75em;
+	padding-top: .75em;
+	border-top: 1px solid #e9e9e9;
+}
+
+.create-details-container-first {
+	border:none;
+}
+
+input[type=text].create-input {
+	width: 2em;
+}
+
+.create-selectable-text-container {
+	width: 9.5em;
+}
+
+#minPlayers-container,
+#rosterLimit-container,
+#skillLimitMax-container,
+#ageLimitMax-container,
+#skillLimitMin-container,
+#ageLimitMin-container {
+	font-size: 1.1em;
+	margin-top: 0;
+}
+
+#skillLimitMax-container,
+#ageLimitMax-container {
+	clear:none;
+}
+
+.create-details-separator {
+	margin: .3em .4em 0 .2em;
+}
+
+.create-details-checkbox {
+	margin-top: .3em;
+}
+
+#create-game-submit {
+	margin-top: 2em;
+}
+
+
+/* success page */
+#create-success-container {
+	width: 30em;
+	position:absolute;
+	top: 50%;
+	left:50%;
+	margin-left: -15em;
+	margin-top: -20em;
+}
+
+#create-success-emails {
+	width: 92%;
+	max-width: 92%;
+	height: 5em;
+	max-height: 5em;
+}
+
+#userName-container {
+	width: 100%;
+	font-size: 1.05em;
+}
+
+#userName-container > input[type=text] {
+	width: 98%;
+	font-family: 'Futura-Heavy';
+}
+
+#userName-container > .input-overlay {
+	font-family: 'Futura-Heavy';
+}
+
+#create-userName-results-container {
+	width: 96%;
+}
+
+.create-userName-result {
+	padding: .5em;
+	width: 100%;
+	background:#fff;
+	border-top: 1px solid #e9e9e9;
+}
+
+.create-userName-result:first-child {
+	border:none;
+}
+
+
+/* team page */
+/* team info */
+#teamName-container {
+	font-size: 2.2em;
+	margin-top: 1em;
+	clear: none;
+	float:right;
+}
+
+#teamName-container > input[type=text] {
+	width: 14em;
+}
+
+#create-team-rosterLimit {
+	margin-top: .6em;
+}
+
+.create-teamInfo-inner-container {
+	width: 20%;
+	margin-left: 5%;
+}
+
+.create-teamInfo-inner-container:first-child {
+	width: 25%;
+	margin-left: 0;
+}
+
+#create-teamInfo-avatar {
+	margin-top: 12px;
+	margin-left: 1px;
+}
+
+#create-teamInfo-avatar:hover {
+	border: solid 1px #444;
+	margin-top: 11px;
+	margin-left: 0px;
+}
+
+
+/* alerts */
+#avatars-alert-container {
+	width: 35em;
+	margin-top: -15em;
+	margin-left: -17.5em;
+}
+
+.create-team-avatar {
+	padding: 2px 3px 2px 3px;
+}
+
+.create-team-avatar:hover,.create-team-avatar-selected {
+	border: solid 1px #58bf12;
+	margin: -1px;
+}
+	
+
+#create-team-avatar-alert-img {
+	margin: 0 auto;
+	display:block;
+}
+
+#create-team-submit {
+	margin-top: .5em;
+}
+
+#create-description {
+	margin-top: 3em;
 }

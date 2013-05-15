@@ -39,8 +39,8 @@
 	float:left;
 	clear:both;
 	display:none;
-	padding: 0 3%;
-	width: 94%;
+	padding: 0 2%;
+	width: 96%;
 	background:#fff;
 }
 
@@ -80,6 +80,7 @@
 
 .member-schedule-day-body-game-left-container {
 	float:left;
+	
 }
 
 .member-schedule-day-body-game-right-container {

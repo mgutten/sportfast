@@ -63,6 +63,7 @@ class Application_Model_GamesMapper extends Application_Model_MapperAbstract
 						   ))
 			   //->where('g.cityID = ?', $cityID)
 			   ->where('g.public = "1"')
+			   ->where('g.canceled = ?', '0')
 			   ->where('MBRContains(
 								LINESTRING(
 								' . $bounds["upper"] . ' , ' . $bounds["lower"] . '
@@ -120,9 +121,49 @@ class Application_Model_GamesMapper extends Application_Model_MapperAbstract
 		
 		return $savingClass;
 	}
+	
+	/**
+	 * Simple get query to find games that match $where parameters
+	 * @parameters ($where => non-associative array of where conditions)
+	 */
+	public function getGames($where, $userClass = false, $savingClass)
+	{
+		$table = $this->getDbTable();
+		$select = $table->select();
+		
+		$select->setIntegrityCheck(false);
+		
+		if ($userClass) {
+			$where[] = 'g.cityID IN ' . $this->getCityIdRange($userClass->city->cityID);
+		}
+		
+		$select->from(array('g' => 'games'))
+			   ->join(array('st' => 'sport_types'),
+			   		  'g.typeID = st.typeID')
+			   ->joinLeft(array('ug' => 'user_games'),
+			   		  	  'ug.gameID = g.gameID',
+						  array('COUNT(ug.userID) as totalPlayers'));
+		
+		foreach ($where as $statement) {
+			$select->where($statement);
+		}
+		
+		$select->group('g.gameID');
+		$select->order('COUNT(ug.userID) DESC');
+		
+		$games = $table->fetchAll($select);
+		
+		foreach ($games as $game) {
+			$savingClass->addGame($game);
+		}
+		
+		return $savingClass;
+	}
+		
+		
 
 	/**
-	 * Get all games that match $options variable
+	 * Get all games that match $options variable (for Find controller)
 	 * @params ($options   => array of options including:
 	 *					sports => associative array of sport => type,
 	 *					distance => distance to look from user's location,
@@ -323,6 +364,11 @@ class Application_Model_GamesMapper extends Application_Model_MapperAbstract
 				->limit(1);
 				
 		$result = $table->fetchRow($select);
+		
+		if (empty($result['gameID'])) {
+			// No game found
+			return false;
+		}
 		
 		$savingClass->setAttribs($result);
 		$savingClass->park->setAttribs($result);
@@ -535,4 +581,43 @@ class Application_Model_GamesMapper extends Application_Model_MapperAbstract
 	   		
 		return $table->update($data, $where);
 	}
+	
+	/**
+	 * delete game
+	 */
+	public function delete($gameModel)
+	{
+		$db = Zend_Db_Table::getDefaultAdapter();
+		$gameID = $gameModel->gameID;
+		
+		$where = array('gameID = ?' => $gameID);
+		
+		if (empty($gameID)) {
+			// Safety check to make sure gameID is set before continuing
+			return false;
+		}
+		
+		$this->move($gameID);
+
+		$db->delete('games', $where);
+		$db->delete('game_captains', $where);
+		$db->delete('game_messages', $where);
+		
+	}
+	
+	/**
+	 * move deleted rows from active table to "old" table
+	 */
+	public function move($id)
+	{
+		$db = Zend_Db_Table::getDefaultAdapter();
+		
+		$sql = "INSERT INTO old_games
+					(SELECT g.*, NOW(), (SELECT COUNT(ug.userID) FROM user_games as ug WHERE ug.gameID = '" . $id . "')
+					FROM games as g
+					WHERE g.gameID = '" . $id . "')";
+					
+		$db->query($sql);
+	}
+
 }

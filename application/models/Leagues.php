@@ -6,6 +6,11 @@ class Application_Model_Leagues extends Application_Model_ModelAbstract
 	protected $_attribs     = array('leagues' => '');
 	
 	
+	public function findLeagues($sports, $cityID)
+	{
+		return $this->getMapper()->findLeagues($sports, $cityID, $this);
+	}
+	
 	public function addLeague($resultRow)
 	{
 
@@ -22,5 +27,7 @@ class Application_Model_Leagues extends Application_Model_ModelAbstract
 		}
 		return false;
 	}
+	
+	
 							
 }

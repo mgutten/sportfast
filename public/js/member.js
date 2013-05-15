@@ -111,9 +111,9 @@ $(function() {
 	$('.member-schedule-pagination').click(function()
 	{
 		var page = $(this).text();
-		animateScheduleContainer(page);
+		animateScheduleContainer(page, $(this).parents('.member-schedule-day-body-container'));
 		
-		$('.member-schedule-pagination.light-back').removeClass('light-back');
+		$(this).siblings('.member-schedule-pagination.light-back').removeClass('light-back');
 		$(this).addClass('light-back');
 	})
 	
@@ -247,12 +247,14 @@ function mapMoved()
 }
 
 
-function animateScheduleContainer(page)
+function animateScheduleContainer(page, parentEle)
 {
 	/* Animate left/right (must change member-find-lower-outer-inner-container css)*/
-	var marginLeft = -1 * ($('.member-schedule-day-body-game-container').width() * (page - 1));
+	var width = parentEle.find('.member-schedule-day-body-game-container').outerWidth(true)
+	var marginLeft = -1 * (width * (page - 1));
+
 	
-	$('.member-schedule-day-body-inner-container').stop().animate({marginLeft: marginLeft}, 400);
+	parentEle.find('.member-schedule-day-body-inner-container').stop().animate({marginLeft: marginLeft}, 400);
 }
 	
 

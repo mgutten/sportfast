@@ -44,5 +44,17 @@ class Application_View_Helper_Alert
 		
 		return $output;
 	}
+	
+	public function confirmAlert()
+	{
+		$output  = $this->start('confirm-action','');
+		$output .= 	"<p class='width-100 clear center'>&nbsp;Are you sure you want to <span id='confirm-action-text'></span>?</p>";
+		$output .=	"<div class='clear width-100' id='confirm-action-postContent'></div>";
+		$output .=	"<p class='button clear' id='confirm-action'>Yes</p>";
+		$output .=	"<p class='button' id='deny-action'>No</p>";
+		$output .= $this->end();	
+		
+		return $output;
+	}
 
 }

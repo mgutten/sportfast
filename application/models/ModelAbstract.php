@@ -412,6 +412,7 @@ abstract class Application_Model_ModelAbstract
 	{
 		return $this->getMapper()->fetchAll();
 	}
+
 	
 	/**
 	 * save object
@@ -424,6 +425,11 @@ abstract class Application_Model_ModelAbstract
 		return $this;
 	}
 	
+		
+	/**
+	 * remove object from db
+	 * @params ($id => gameID, teamID, etc)
+	 */
 	public function delete()
 	{
 		return $this->getMapper()->delete($this);

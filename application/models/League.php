@@ -6,38 +6,18 @@ class Application_Model_League extends Application_Model_ModelAbstract
 	protected $_attribs     = array('leagueID' 		=> '',
 									'leagueName' 	=> '',
 									'city'			=> '',
-									'leagueLevelID' => '',
-									'leagueLevel'	=> '',
+									'leagueLevels'  => '',
 									'minSkill'		=> '',
 									'maxSkill'		=> '',
 									'sport'			=> '',
 									'sportID'		=> '',
-									'startDate'		=> '',
-									'endDate'		=> ''
 									);
-									
-	public function setStartDate($date)
-	{
-		$this->_attribs['startDate'] = DateTime::createFromFormat('Y-m-d', $date);
-		
-		return $this;
-	}
 	
-	public function setEndDate($date)
+	public function addLeagueLevel($resultRow)
 	{
-		$this->_attribs['endDate'] = DateTime::createFromFormat('Y-m-d', $date);
-		
-		return $this;
+		$leagueLevel = $this->_attribs['leagueLevels'][] = new Application_Model_LeagueLevel($resultRow);
+		return $leagueLevel;
 	}
-	
-	public function getStartFormat($format = 'F')
-	{
-		return $this->startDate->format($format);
-	}
-	
-	public function getEndFormat($format = 'F')
-	{
-		return $this->endDate->format($format);
-	}
+						
 									
 }

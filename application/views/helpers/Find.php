@@ -166,6 +166,16 @@ class Application_View_Helper_Find
 		if ($this->_view->user->games->gameExists($match->gameID, 'gameID')) {
 			$userInGame = true;
 		}
+		
+		if ($match->canceled) {
+			$matchImg = '<img class="left" src="/images/global/canceled.png" tooltip="This game has been canceled. Reason: ' . $match->getCancelReason(true) . '"/>';
+		} else {
+			$matchImg = "<img src='" . $match->getMatchImage() . "' tooltip='" . $match->getMatchDescription() . "' class='left find-result-match-img'/>" 
+					  . ($userInGame ? "<p class='left find-results-joined smaller-text green'> You are playing!</p>" : '');
+
+			
+		}
+		
 		$output  = $this->createOuterStart($match->gameID, 'games');
 		$output .=		"<div class='left find-result-img-container'>";
 		$output .=			"<img src='" . $match->getProfilePic('medium') . "' class='left'/>";
@@ -177,8 +187,7 @@ class Application_View_Helper_Find
 		$output .=			"<p class='clear darkest'>" . $match->getHour() . "</p>";		
 		$output .=			"<p class='clear darkest'>" . $match->park->parkName . "</p>";
 		$output .= 		"</div>";
-		$output .=		"<img src='" . $match->getMatchImage() . "' tooltip='" . $match->getMatchDescription() . "' class='left find-result-match-img'/>";	
-		$output .=		($userInGame ? "<p class='left find-results-joined smaller-text green'> You are playing!</p>" : '');
+		$output .=		$matchImg;
 		$output .=		$this->createRight($match, $userInGame);
 		$output .= "</a>";
 		

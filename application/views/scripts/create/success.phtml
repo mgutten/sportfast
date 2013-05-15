@@ -1,0 +1,43 @@
+<?php
+/** 
+ * controller => create
+ * action => success
+ */
+$this->headTitle(ucwords($this->type) . ' Created');
+$this->headLink()->prependStylesheet($this->baseUrl() . '/css/create.css');
+$this->headScript()->prependFile($this->baseUrl() . '/js/createsuccess.js');
+?>
+
+<div class='white-back' id='create-success-container'>
+    <header class='clear width-100 center margin-top jumbo-text heavy darkest'>
+        <?php echo ucwords($this->type);?> Created!
+    </header>
+    <a href='/<?php echo $this->type . 's';?>/<?php echo $this->typeID;?>' class='light clear width-100 center'>view <?php echo $this->type;?> page</a>
+    
+    <?php
+	echo $this->partial('partials/global/sectionHeaderBold.phtml',array('title'   => 'Invite players')); 
+	?>
+    
+    <form action='/mail/invite-type' method='post'>
+    
+    <p class='clear larger-margin-top dark heavy'>Copy and paste emails here <span class='dark'>(comma separated)</span></p>
+    <textarea class='white-back dropshadow clear' id='create-success-emails' name='emails'></textarea>
+    
+    <p class='clear width-100 center larger-text light heavy margin-top'>or</p>
+    
+    <?php echo $this->userName;?>
+    <div class='clear' id='create-userName-results-container'>
+    </div>
+    
+    <div class='clear larger-margin-top' id='userList'>
+    </div>
+    
+    <input type='submit' class='clear right green-button largest-text heavy hidden' id='create-send-invites' value='Send Invites' />
+
+    <input type='hidden' name='userIDs' id='userIDs' />
+    <input type='hidden' name='<?php echo $this->type . 'ID';?>' value='<?php echo $this->typeID;?>' />
+    
+    </form>
+    
+    
+</div>

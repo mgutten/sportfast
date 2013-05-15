@@ -43,6 +43,7 @@ class Application_Model_MessagesMapper extends Application_Model_MapperAbstract
 					   u.lastName as lastName,
 					   tm.message as message, 
 					   tm.dateHappened as dateHappened,
+					   '' as sport,
 					   '' as pictureType,
 					   'message' as type
 					   FROM team_messages as tm
@@ -55,12 +56,14 @@ class Application_Model_MessagesMapper extends Application_Model_MapperAbstract
 					   		   u.lastName as lastName,
 							   n.text as message, 
 							   nl.dateHappened as dateHappened,
+							   t.sport as sport,
 							   n.pictureType as pictureType,
 							   'notification' as type
 							   FROM notification_log as nl
 							INNER JOIN users as u ON nl.actingUserID = u.userID
 							INNER JOIN notifications as n ON n.notificationID = nl.notificationID
-							WHERE nl.teamID = '" . $teamID . "'";
+							INNER JOIN teams as t ON t.teamID = nl.teamID
+							WHERE nl.teamID = '" . $teamID . "' AND n.action != 'post'";
 							
 		$sql = $messages . " UNION " . $notifications;
 		$sql .= " ORDER BY dateHappened DESC LIMIT 10";
@@ -93,6 +96,7 @@ class Application_Model_MessagesMapper extends Application_Model_MapperAbstract
 					   u.lastName as lastName,
 					   tm.message as message, 
 					   tm.dateHappened as dateHappened,
+					   '' as sport,
 					   '' as pictureType,
 					   'message' as type
 					   FROM team_messages as tm
@@ -105,12 +109,15 @@ class Application_Model_MessagesMapper extends Application_Model_MapperAbstract
 					   		   u.lastName as lastName,
 							   n.text as message, 
 							   nl.dateHappened as dateHappened,
+							   g.sport as sport,
 							   n.pictureType as pictureType,
 							   'notification' as type
 							   FROM notification_log as nl
 							INNER JOIN users as u ON nl.actingUserID = u.userID
 							INNER JOIN notifications as n ON n.notificationID = nl.notificationID
-							WHERE nl.gameID = '" . $gameID . "'";
+							INNER JOIN games as g ON g.gameID = nl.gameID
+							WHERE nl.gameID = '" . $gameID . "' 
+								AND n.public = 1 AND n.action != 'create'";
 							
 		$sql = $notifications;
 		$sql .= " ORDER BY dateHappened DESC LIMIT 10";

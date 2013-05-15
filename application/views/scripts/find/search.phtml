@@ -1,0 +1,80 @@
+<?php
+$this->headTitle('Search For ' . $this->searchTerm);
+$this->headLink()->prependStylesheet($this->baseUrl() . '/css/find.css');
+$this->headScript()->prependFile($this->baseUrl() . '/js/find.js');
+?>
+
+<?php
+$this->placeholder('narrowColumn')->captureStart();
+	if ($this->results) {
+		echo "<img src='' class='left narrow-column-picture hidden'/>";
+	}
+$this->placeholder('narrowColumn')->captureEnd();
+?>
+
+
+<p class='left dark indent'>Searching for "<?php echo $this->searchTerm;?>" </p>
+<?php
+$content  = "<div class='right' id='find-looking-container'>";
+$content .= 	"<div class='right indent' id='find-search-main'>" . $this->form . "</div>";
+$content .= "</div>";
+
+echo $this->partial('partials/global/sectionHeaderBold.phtml',array('title'   => 'Results',
+																	  'content' => $content));
+
+if ($this->results) {
+	// There are results
+	$number = 1;												  
+	foreach ($this->results as $result) {
+		if ($result['prefix'] == 'users') {
+			// Is user
+			$name = explode(' ',trim($result['name']));
+			$model = new Application_Model_User();
+			$model->userID = $result['id'];
+			$model->city = $result['city'];
+			$model->firstName = $name[0];
+			$model->lastName  = $name[1];
+			$name = $result['name'];
+			$type = 'User';
+			$city = $model->city;
+		} elseif ($result['prefix'] == 'teams') {
+			// Is team
+			$model = new Application_Model_Team();
+			$model->teamID = $result['id'];
+			$model->city = $result['city'];
+			$model->teamName = $result['name'];
+			$model->picture = $result['picture'];
+			$name = $result['name'];
+			$type = 'Team';
+			$city = $model->city;
+		} elseif ($result['prefix'] == 'parks') {
+			// Is park
+			$model = new Application_Model_Park();
+			$model->parkID = $result['id'];
+			$model->city = $result['city'];
+			$model->parkName = $result['name'];
+			$name = $result['name'];
+			$type = 'Park';
+			$city = $model->city;
+		}
+		
+		echo "<a href='/" . $result['prefix'] . "/" . $result['id'] . "' class='clear find-search-result find-result-container animate-darker'>";
+		echo		"<div class='left find-result-img-container'>";
+		echo			"<img src='" . $model->getProfilePic('medium') . "' class='left find-img'/>";
+		echo			($number ? "<p class='find-result-number white green-back heavy'>" . $number . "</p>" : '');
+		echo 		"</div>";
+		echo	"<div class='left larger-indent'>";
+		echo		"<p class='left largest-text heavy darkest'>" . $name . "</p>";
+		echo		"<p class='clear light larger-text'>" . $city . "</p>";
+		echo	"</div>";
+		echo 	"<div class='right'>";
+		echo		"<p class='right darkest largest-text heavy'>" . $type . "</p>";
+		echo	"</div>";
+		echo "</a>";
+		
+		$number++;
+	}
+} else {
+	// No results
+	echo "<p class='width-100 clear center larger-text none-text medium'>No results were found for \"" . $this->searchTerm . "\"</p>";
+}

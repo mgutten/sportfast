@@ -4,6 +4,7 @@ class Application_Model_Location extends Application_Model_ModelAbstract
 {
 	protected $_mapperClass = 'Application_Model_ParksMapper';
 	protected $_attribs     = array('userLocationID' => '',
+									'parkLocationID' => '',
 									'parkID' 	=> '',
 									'userID'	=> '',
 									'location'	=> '',

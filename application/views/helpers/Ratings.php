@@ -47,9 +47,18 @@ class Application_View_Helper_Ratings
 			
 			$class = '';
 			
-			if ($rating->date->format('U') > $this->_view->lastRating) {
+			if ($rating->date->format('U') > $this->_view->lastRating && $this->_view->isUser) {
 				// New rating
 				$class = 'light-back';
+			}
+			
+			if ($rating->incorrect == '1') {
+				// has been flagged
+				$flagClass = 'clear-right';
+				$flagText = 'awaiting response';
+			} else {
+				$flagClass = 'clear-right pointer flag-incorrect';
+				$flagText = 'flag as incorrect';
 			}
 
 			$output .= "<div class='rating-container width-100 clear " . $class . "'>";
@@ -62,7 +71,7 @@ class Application_View_Helper_Ratings
 			$output .=			$this->_view->ratingbar($rating->skillRatingName, $availableSkillRatings, 'skill');
 			$output .=			$this->_view->ratingbar($rating->sportsmanshipRatingName, $availableSportsmanshipRatings, 'sportsmanship');
 			$output .=			"<p class='clear larger-margin-top medium'>" . $rating->getQuotedComment() . "</p>";
-			$output .=			($this->_view->isUser ? "<div class='clear-right pointer flag-incorrect' userRatingID='" . $rating->userRatingID . "'><p class='light clear-right smaller-text'>flag as incorrect</p><img src='/images/global/flag.png' class='right'/></div>" : '');
+			$output .=			($this->_view->isUser  ? "<div class='" . $flagClass . "' userRatingID='" . $rating->userRatingID . "'><p class='light clear-right smaller-text'>" . $flagText . "</p><img src='/images/global/flag.png' class='right'/></div>" : '');
 			$output .=		"</div>";
 			$output .= "</div>";
 		}

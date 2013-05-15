@@ -26,7 +26,8 @@ class Application_Model_Rating extends Application_Model_ModelAbstract
 									'parkID'		=> '',
 									'skillRatingName' => '',
 									'sportsmanshipRatingName' => '',
-									'type'			=> ''
+									'type'			=> '',
+									'incorrect'		=> ''
 									);
 									
 	protected $_primaryKey = 'userRatingID';

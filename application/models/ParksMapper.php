@@ -129,7 +129,8 @@ class Application_Model_ParksMapper extends Application_Model_MapperAbstract
 			   		  'pr.parkID = p.parkID',
 					  array('AVG(pr.quality) as quality',
 					  		'COUNT(pr.parkRatingID) as numRatings'))
-			   ->where($this->getAreaWhere($bounds['upper'], $bounds['lower'], 'pl.location'));
+			   ->where($this->getAreaWhere($bounds['upper'], $bounds['lower'], 'pl.location'))
+			   ->where('p.temporary = 0');
 			   
 			   
 		foreach ($where as $statement) {
@@ -302,7 +303,8 @@ class Application_Model_ParksMapper extends Application_Model_MapperAbstract
 			   			  'pl.parkID = p.parkID',
 						  array('AsText(pl.location) as location'))
 			   ->where($this->getAreaWhere($bounds['upper'],$bounds['lower'],'pl.location'))
-			   ->where('p.cityID IN ' . $this->getCityIDRange($cityID));
+			   ->where('p.cityID IN ' . $this->getCityIDRange($cityID))
+			   ->where('p.temporary = 0');
 			   
 		if ($parkID) {
 			$select->where('p.parkID != ?', $parkID);

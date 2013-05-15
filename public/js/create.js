@@ -22,6 +22,9 @@ var infowindow;
 var zoomChanged;
 var userMarker;
 var userContent;
+var selectedPark;
+var teamName;
+var selectedAvatar;
 
 $(function()
 {
@@ -75,6 +78,10 @@ $(function()
 			   
 		$('.create-game-time-container').fadeIn();
 		
+		if (!selectedDay) { 
+			animateNextSection($(this).parents('.create-section'))
+		}
+		
 		var monthEle = $(this).siblings('.calendar-month-container').find('.calendar-month-name')
 		var day = $(this).children('p').text();
 		var month = monthEle.attr('monthID');
@@ -99,10 +106,108 @@ $(function()
 		testDate();
 	})
 	
+	
+	$('#create-visibility,#create-recurring').find('.selectable-text').click(function()
+	{
+		var value = $(this).text().toLowerCase();
+		var id = $(this).parent().attr('id').replace(/create-/g,'');
+		var hiddenEle = $('#' + id);
+		
+		hiddenEle.val(value);
+	})
+	
+	$('#skillLimitCheckbox,#ageLimitCheckbox').change(function()
+	{
+		var hiddenInputs = $(this).parent().next();
+		if ($(this).prop('checked')) {
+			hiddenInputs.show();
+		} else {
+			hiddenInputs.hide();
+		}
+	})
+	
+	$('#skillLimitMin,#skillLimitMax,#ageLimitMin,#ageLimitMax').keyup(function()
+	{
+		if ($(this).is('#ageLimitMin,#ageLimitMax')) {
+			// Is age, limit 17 to 100
+			$(this).limitVal(17,100);
+		} else {
+			// Is skill
+			$(this).limitVal(65,100);
+		}
+	})
+	
+	$('#skillLimitMin,#skillLimitMax,#ageLimitMin,#ageLimitMax,#rosterLimit, #minPlayers').forceNumeric();
+			
+	
 	/* update narrow column park name for custom park */
 	$(document).on('keyup','#parkName',function()
 	{
 		selectPark($(this).val());
+	})
+	
+	/* update narrow column teamname on keyup */
+	$('#teamName').keyup(function()
+	{
+		var value = $(this).val();
+		$('#narrow-column-teamName').text(value);
+		
+		if (typeof teamName == 'undefined') {
+			animateNextSection($(this).parents('.create-section'));
+		}
+		
+		teamName = value;
+	})
+	
+	
+	/* show alert for create team avatar */
+	$('#create-teamInfo-avatar').click(function()
+	{
+		showAlert($('#avatars-alert-container'));
+	})
+	
+	$('.create-team-avatar').hover(function()
+	{
+		var src = $(this).attr('src').replace('/small/','/large/');
+		$('#create-team-avatar-alert-img').attr('src', src);
+	},
+	function()
+	{
+		var src = $('.create-team-avatar-selected').attr('src').replace('/small/','/large/');
+		$('#create-team-avatar-alert-img').attr('src', src);
+	})
+	.click(function()
+	{
+		$('.create-team-avatar-selected').removeClass('create-team-avatar-selected');
+		$(this).addClass('create-team-avatar-selected');
+		
+		var avatar = $(this).attr('avatar');
+		selectAvatar(avatar);
+	})
+		
+		
+	
+	/* validate form pre-submit */
+	$('#create-game-submit').click(function()
+	{
+		if ($('#parkNameHidden').val() == '') {
+			$('#parkNameHidden').val('Unnamed Location');
+		}
+		
+		$(this).parents('form').submit();
+	})
+	
+	/* validate form pre-submit */
+	$('#create-team-submit').click(function(e)
+	{
+		
+		if ($('#teamName').val() == '') {
+			showConfirmationAlert('Please enter a team name.');
+			return false;
+		}
+		
+		
+		$(this).parents('form').submit();
 	})
 	
 	
@@ -112,6 +217,27 @@ $(function()
 	}
 	
 })
+
+
+/**
+ * find leagues in same city as user
+ */
+function findLeagues(sports)
+{
+	var options = {sports: sports,
+				   limit: 6};
+	
+	$.ajax({
+		url: '/ajax/find-leagues',
+		type: 'POST',
+		data: {options: options},
+		success: function(data) {
+			data = JSON.parse(data);
+			populateLeagues(data);
+		}
+	})
+	
+}
 
 /**
  * ajax call to sport information
@@ -158,8 +284,29 @@ function getAvailableUsers(month, date, year, hour, sportID)
 												   'display': 'block'})
 										     .animate({'opacity': 1}, 300);
 		}
-	})	
-	
+	})		
+}
+
+/**
+ * ajax call to find any games that are on the same day as this one
+ */
+function getSimilarGames(month, date, year, sportID)
+{
+	var options = new Object();
+	options.month = month;
+	options.date = date;
+	options.year = year;
+	options.sportID = sportID;
+
+	$.ajax({
+		url: '/ajax/get-similar-games',
+		type: 'POST',
+		data: {options: options},
+		success: function(data) {
+			data = JSON.parse(data);
+			populateSimilarGames(data);
+		}
+	})		
 }
 
 /**
@@ -181,11 +328,11 @@ function findParks(options)
 			if (typeof data[1] != 'undefined') {
 				for (i = 0; i < data[1].length; i++) {
 					gmapMarkers.push([data[1][i][0],data[1][i][1]]);
-					markerDetails.push([data[2][i][0],data[2][i][1],data[2][i][2]]);
+					markerDetails.push([data[2][i][0],data[2][i][1],data[2][i][2],data[2][i][3]]);
 				}
 			}
 			
-			createMarkers();		
+			createMarkers();	
 			
 		}
 	})
@@ -212,6 +359,10 @@ function mapListeners()
 		markerClickListeners(userMarker, userContent, $('#parkName').text());
 		
 		new google.maps.event.trigger(userMarker, 'click');
+		
+		var parkLocation = 'POINT' + event.latLng;
+		
+		$('#parkLocation').val(parkLocation);
 		
 
 	})
@@ -374,6 +525,7 @@ function testDate()
 		var year  = selectedDay.getFullYear();
 		
 		getAvailableUsers(month, date, year, hour, sportID);
+		getSimilarGames(month, date, year, sportID);
 		
 		populateNarrowColumnTime();
 		
@@ -388,7 +540,14 @@ function testDate()
  */
 function selectSport(ele) 
 {
+	if (!sport) {
+		animateNextSection(ele.parents('.create-section'));
+	}
+	
 	sport = ele.attr('sport').toLowerCase();
+	
+	// Set hidden ele
+	$('#sport').val(sport);
 	
 	var type = false;
 	
@@ -403,19 +562,36 @@ function selectSport(ele)
 	var src = $('#narrow-column-pic').attr('src').replace(/\w+.png/,sport + '.png');
 	$('#narrow-column-pic').attr('src', src);
 	
+	$('#sportID').val(sportID);
+	
 	if (!type) {
 		$('#narrow-column-sport-typeName').text('Pickup');
 		$('#narrow-column-sport-typeSuffix').text('');
+		
+		$('#typeName').val('pickup');
+		$('#typeSuffix').val('');
 	} else {
 		var typeName = $('.create-game-sport-typeName-container').children('.selectable-text.green-bold').text();
 		var typeSuffix = $('.create-game-sport-typeSuffix-container').children('.selectable-text.green-bold').text();
 		$('#narrow-column-sport-typeName').text(typeName);
 		$('#narrow-column-sport-typeSuffix').text(typeSuffix);
+		
+		$('#typeName').val(typeName.toLowerCase());
+		$('#typeSuffix').val(typeSuffix.toLowerCase());
 	}
 	
 	$('#narrow-column-sport').text(capitalize(sport));
+	$('#narrow-column-team').show();
 	
-	mapMoved();
+	if (isGame()) {
+		mapMoved();
+	} else {
+		// Is team, would perform search for leagues
+		/*
+		var sports = new Array(sport);
+		findLeagues(sports);
+		*/
+	}
 	getSportInfo(sportID);
 }
 
@@ -424,12 +600,9 @@ function selectSport(ele)
  */
 function selectDay(day, month, year)
 {
+	
 	selectedDay = new Date(year, (month - 1), day);
 	
-	var dayOfWeek = daysOfWeek[selectedDay.getDay()];
-	
-	var monthName = selectedDay.getMonth();
-
 }
 
 /**
@@ -437,17 +610,42 @@ function selectDay(day, month, year)
  */
 function selectPark(parkName, parkID) 
 {
+	if (!selectedPark) {
+		// Park has not been selected before
+		animateNextSection($('#parkName-main-container').parents('.create-section'));
+	}
+	selectedPark = true;
+	
 	if (typeof parkID != 'undefined') {
 		// parkID is set
 		$('#parkID').val(parkID);
+		$('#parkLocation').val('');
 	} else {
+		// Not set, should be a user-added park
 		$('#parkID').val('');
 	}
 	
+	$('#parkNameHidden').val(parkName);
+		
 	$('#narrow-column-park').text(parkName);
 	$('#parkName-main').text(parkName);
 	
 	$('#parkName-main-container').show();
+}
+
+/**
+ * select avatar
+ * @ parameters (avatar => name of avatar (eg "spartan" or "trident")
+ */
+function selectAvatar(avatar)
+{
+	var largeSrc = '/images/teams/avatars/large/' + avatar + '.jpg';
+	var medSrc   = largeSrc.replace('/large/','/medium/');
+	
+	$('#narrow-column-pic').attr('src',largeSrc);
+	$('#create-teamInfo-avatar').attr('src', medSrc);
+	
+	$('#avatar').val(avatar + '.jpg');
 }
 
 
@@ -470,6 +668,7 @@ function getHour()
 	return hour;
 }
 
+
 function roundHour()
 {
 	
@@ -489,7 +688,13 @@ function roundHour()
  */
 function isGame()
 {
-	return true;
+
+	if ($('#create-type').text().toLowerCase() == 'game') {
+		return true;
+	} else {
+		// Is team
+		return false;
+	}
 }
 
 function populateNarrowColumnTime()
@@ -510,6 +715,21 @@ function populateNarrowColumnTime()
 		$('#narrow-column-time').text(text);
 		
 		$('#narrow-column-date').text(months[selectedDay.getMonth()] + ' ' + selectedDay.getDate())
+		
+		
+		var curMonth = parseInt(selectedDay.getMonth(),10) + 1; //add one to deal with array offset of function
+		var curDay   = parseInt(selectedDay.getDate(),10);
+		var curHour  = getHour();
+		var curMin   = $('#min').find('.dropdown-menu-selected').find('p').text();
+
+		curDay   = (curDay > 9 ? curDay : '0' + curDay);
+		curMonth = (curMonth > 9 ? curMonth : '0' + curMonth);
+		curHour  = (curHour > 9 ? curHour : '0' + curHour);
+		
+		var datetime = selectedDay.getFullYear() + '-' + curMonth + '-' + curDay + ' ' + curHour + ':' + curMin + ':00';
+		
+		// Hidden input ele
+		$('#datetime').val(datetime);
 	}
 }
 
@@ -529,9 +749,93 @@ function populateSportInfo(data)
 		rosterLimit = data.teamRosterLimit;
 	}
 	
+	
+	
 	$('#rosterLimit').val(rosterLimit);
 	$('#minPlayers').val(data.minPlayers);
 	
+}
+
+/**
+ * populate similar games from ajax call
+ */
+function populateSimilarGames(results)
+{
+	var output = '';
+	
+	if (results.length > 0) {
+		// Results!
+		
+		for (i = 0; i < results.length; i++) {
+			if (i > 1) {
+				// Only allow 2 results
+				break;
+			}
+			
+			var result = results[i];
+			output += "<a href='/games/" + result['gameID'] + "' class='clear create-similar-game-container animate-darker'>";
+			output += 	"<img src='/images/parks/profile/pic/medium/" + result['parkID'] + ".jpg' onerror=\"this.src='/images/parks/profile/pic/medium/default.jpg'\" class='left'/>";
+			output +=	"<div class='left larger-indent'>";
+			output +=		"<p class='left largest-text heavy darkest'>" + result['gameTitle'] + "</p>";
+			output +=		"<p class='clear darkest'>" + result['date'] + "</p>";
+			output +=		"<p class='clear darkest'>" + result['hour'] + "</p>";
+			output +=		"<p class='clear darkest'>" + result['parkName'] + "</p>";
+			output +=	"</div>";
+			output +=	"<div class='right'>";
+			output +=		"<p class='left largest-text heavy darkest width-100 center'>" + result['totalPlayers'] + "/" + result['rosterLimit'] + "</p>";
+			output +=		"<p class='clear darkest heavy larger-text width-100 center create-similar-game-players'>players</p>";
+			output +=	"</div>";
+			output += "</a>";
+		}
+		
+		
+	} else {
+		output  = "<p class='width-100 center light larger-margin-top'>There are no " + sport + " games scheduled for this day.</p>";	
+	}
+	
+	$('#create-similar-games-container').html(output);
+	$('#create-similar-games-header').show();
+}
+	
+
+/** 
+ * populate leagues section with returned ajax results
+ */
+function populateLeagues(results)
+{
+
+	var output = '';
+	if (results.length > 0) {
+		// Results!
+		
+		for (i = 0; i < results.length; i++) {
+			var result = results[i];
+			output += "<div class='clear create-team-league-container'>";
+			output +=	"<img src='/images/global/sports/icons/small/solid/medium/" + sport + ".png' class='left'/>";
+			output += 	"<p class='darkest largest-text left indent'>" + result['leagueName'] + "</p>";
+			output += "</div>";
+		}
+		
+	}
+	
+	$('#create-team-leagues-container').html(output);	
+	
+}
+
+
+/**
+ * animate next section
+ */
+function animateNextSection(curSection)
+{
+	var nextSection = curSection.next('.create-section');
+	
+	if (nextSection.is('.create-section-gmap')) {
+		// Is gmap section, undo special hiding of map
+		nextSection.children().css('z-index','1');
+	}
+	
+	animateNotShow(nextSection.children(), false, false);
 }
 		
 	

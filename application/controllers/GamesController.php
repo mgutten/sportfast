@@ -18,6 +18,14 @@ class GamesController extends Zend_Controller_Action
 		
 		$this->view->game = $game;
 		
+		if (!$game->gameID) {
+			// No game found
+			$this->view->narrowColumn = false;
+			$this->view->fail = true;
+			return;
+		}
+		
+		
 		$this->view->userInGame = $userInGame = $game->players->userExists($this->view->user->userID);
 		$this->view->userPlus = ($userInGame ? $userInGame->plus : false);
 		
@@ -33,11 +41,20 @@ class GamesController extends Zend_Controller_Action
 		$this->view->gameOn		   = ($game->totalPlayers >= $game->minPlayers ? true : false);
 		$this->view->playersNeeded = $game->getPlayersNeeded();
 		
-		$this->view->newsfeed   = $game->messages->getGameMessages($game->gameID);
 		
+		
+		$this->view->newsfeed   = $game->messages->getGameMessages($game->gameID);
+
 		$this->view->captain = $captain = $game->isCaptain($this->view->user->userID);
 		$this->view->subscribed = $game->isSubscriber($this->view->user->userID);
-				
+		
+		
+		if ($game->recurring && $userInGame && !$game->isSubscriber($this->view->user->userID)) {
+			// Show subscribe button
+			$this->view->topAlert = true;
+		}
+		
+		
 		if ($userInGame) {
 			// User is in game, get post form
 			$postForm = new Application_Form_PostMessage();
@@ -50,7 +67,8 @@ class GamesController extends Zend_Controller_Action
 			if ($captain) {
 				// Allow captain to manage
 				$this->view->manageButton = $dropdown->dropdownButton('manage', array('Remove Player',
-																					  'Game Info'), 'Manage');
+																					  'Game Info', 'Cancel Game'), 'Manage');
+					
 			}
 		}
 				

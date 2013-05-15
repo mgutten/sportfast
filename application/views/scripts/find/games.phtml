@@ -11,6 +11,24 @@ $this->headScript()->prependFile('https://maps.googleapis.com/maps/api/js?key=AI
 
 
 <?php
+$this->placeholder('absolute')->captureStart();
+
+	//echo "<div class='green-back white heavy center' id='bottom-alert'><span class='white'>Can't find anything?</span>  Try changing the filters on the right <span class='white'>(especially time and sport)</span></div>";
+
+$this->placeholder('absolute')->captureEnd();
+
+
+if ($this->topAlert) {
+	$this->placeholder('topAlert')->captureStart();
+		
+		$content = "<p class='white width-100 center'>Not enough games?  <span class='inherit heavy'>Try changing the filters on the right</span> (especially Time) or drag the map!</p>";
+	
+		echo $this->topalert('filter', $content);
+		
+	$this->placeholder('topAlert')->captureEnd();
+}
+
+
 $this->placeholder('narrowColumn')->captureStart();
 	echo "<div id='gmap' class='narrow-column-picture'></div>";
 	echo "<p class='clear larger-margin-top white arial bold larger-text width-100 center dark-back'>FILTERS</p>";

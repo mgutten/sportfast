@@ -56,6 +56,54 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 	}
 	
 	/**
+	 * test if emails exist in database, return array of info if do
+	 * @params ($emails => array of emails)
+	 */
+	public function emailsExist($emails)
+	{
+		$emails = implode('","',$emails);
+		
+		$table = $this->getDbTable();
+		$select = $table->select();
+		$db = Zend_Db_Table::getDefaultAdapter();
+		
+		
+		$select->from(array('u' => 'users'),
+					  array('userID', 'username as email'))
+			   ->where('u.username IN ("' . $emails . '")');
+			   
+		$results = $db->fetchAll($select); // Returns arrays
+		
+		return $results;
+	}
+	
+	/**
+	 * get user emails according to where statements in $where array
+	 * @params ($userIDs => array of userIDs)
+	 */
+	public function getUserEmails($userIDs, $savingClass)
+	{
+		$table = $this->getDbTable();
+		$select = $table->select();
+		$userIDs = '("' . implode('","', $userIDs) . '")';
+		
+		$select->from(array('u' => 'users'),
+					  array('username'))
+			   ->where('u.userID IN ' . $userIDs);
+			   
+		$results = $table->fetchAll($select);
+		
+		$emails = array();
+		foreach ($results as $result) {
+			$emails[] = $result->username;
+		}
+		
+		return $emails;
+		
+	}
+		
+	
+	/**
 	 * Get all games that match $options variable
 	 * @params ($options   => array of options including:
 	 *					sports => associative array of sport => type,
@@ -365,7 +413,24 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 		$results = $table->fetchAll($select);
 		
 		foreach ($results as $result) {
-			$savingClass->players->addUser($result);
+			if ($result->userID1 == $savingClass->userID) {
+				// 1 is current user, save 2
+				$userID = $result->userID2;
+				$name = $result->userName2;
+			} else {
+				$userID = $result->userID1;
+				$name = $result->userName1;
+			}
+			
+			$nameParts = explode(' ', $name);
+			$firstName = $nameParts[0];
+			$lastName = $nameParts[1];
+			
+			$array = array('userID' => $userID,
+						   'firstName' => $firstName,
+						   'lastName'  => $lastName);
+			
+			$savingClass->players->addUser($array);
 		}
 
 		return $savingClass;
@@ -589,6 +654,8 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 					 WHERE ((nl.receivingUserID = " . $userID . ") OR
 					 	(nl.actingUserID =  " . $userID . " AND n.action = 'friend')";
 						 */
+						 
+		// Group by # of players
 		$select = "(SELECT `nl`.gameID,
 							`nl`.teamID,
 							`nl`.parkID,
@@ -615,7 +682,7 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 					 LEFT JOIN `games` AS `ga` ON ga.gameID = nl.gameID
 					 LEFT JOIN `teams` AS `t` ON t.teamID = nl.teamID
 					 LEFT JOIN `user_ratings` AS `ur` ON ur.userRatingID = nl.ratingID 
-					 WHERE ((nl.receivingUserID = " . $userID . ") OR
+					 WHERE (((nl.receivingUserID = " . $userID . ") OR
 					 	(nl.actingUserID =  " . $userID . " AND n.action = 'friend' AND n.type IS NULL) ";
 		
 		$counter = 0;
@@ -643,7 +710,7 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 			$select .= ") AND (n.action != 'create' AND nl.receivingUserID IS NULL AND nl.actingUserID != " . $userID . "))";
 		} 
 		
-		$select .= " AND n.action = 'join') ";
+		$select .= ") AND n.action = 'join') ";
 		
 		
 		if ($onlyNew) {
@@ -709,7 +776,7 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 			$select .= ") AND (n.action != 'create' AND nl.receivingUserID IS NULL AND nl.actingUserID != " . $userID . "))";
 		} 
 		
-		$select .= "and n.action != 'join') ";
+		$select .= " AND n.action != 'join') ";
 		
 		
 		if ($onlyNew) {
@@ -724,6 +791,7 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 		if (!$onlyNew) {
 			$select .= " LIMIT 10";
 		}
+		
 		
 		$results = $db->fetchAll($select);
 
@@ -746,12 +814,16 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 		
 		$friends = "SELECT IF(f.userID1 = '" . $userID . "', f.userID2, f.userID1) AS `id`, 
 						   IF(f.userID1 = '" . $userID . "', f.userName2, f.userName1) AS `name`, 
-						  'users' AS `prefix` FROM `friends` AS `f` 
+						  'users' AS `prefix`,
+						  '' AS picture 
+						FROM `friends` AS `f` 
 					   WHERE (f.userID1 = '" . $userID . "' OR f.userID2 = '" . $userID . "')";
 					   
 		$teams  = "SELECT `ut`.`teamID` AS `id`, 
 						  `t`.`teamName` AS `name`, 
-						  'teams' AS `prefix` FROM `user_teams` AS `ut` 
+						  'teams' AS `prefix`,
+						  `t`.`picture` AS picture 
+						FROM `user_teams` AS `ut` 
 					INNER JOIN teams as `t` ON t.teamID = ut.teamID
 					WHERE ut.userID = '" . $userID . "'";
 					   

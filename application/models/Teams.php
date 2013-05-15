@@ -1,11 +1,13 @@
 <?php
 
-class Application_Model_Teams extends Application_Model_ModelAbstract
+class Application_Model_Teams extends Application_Model_TypesAbstract
 {
 	protected $_mapperClass = 'Application_Model_TeamsMapper';
 	
 	protected $_attribs     = array('teams' => '',
 									'totalRows' => '');
+									
+	protected $_primaryKey  = 'teamID';
 	
 	public function findUserTeams($userClass, $options = false)
 	{

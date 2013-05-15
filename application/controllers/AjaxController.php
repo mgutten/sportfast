@@ -346,7 +346,7 @@ class AjaxController extends Zend_Controller_Action
 					$width = $match->ratings->getStarWidth('quality') . '%';
 					$star  = $this->view->ratingstar('small',$width);
 					
-					$output[2][] = array($match->parkName, $star, $match->stash);
+					$output[2][] = array($match->parkName, $star, $match->stash, $match->parkID);
 					
 				}
 				
@@ -430,6 +430,90 @@ class AjaxController extends Zend_Controller_Action
 		echo json_encode($output);
 	}
 
+	/**
+	 * find leagues near user's city
+	 */
+	public function findLeaguesAction()
+	{
+		$options = $this->getRequest()->getPost('options');
+		$sports  = $options['sports'];
+		
+		if (isset($options['limit'])) {
+			// Limit has been set on number to return
+			$limit = $options['limit'];
+		} else {
+			$limit = '30';
+		}
+		
+		$leagues = new Application_Model_Leagues();
+		
+		$leagues->findLeagues($sports, $this->view->user->city->cityID);
+		
+		$output = array();
+		
+		$counter = 0;
+		foreach ($leagues->getAll() as $league) {
+			if ($counter >= $limit) {
+				break;
+			}
+			
+			$leagueLevelsArray = array();
+			foreach ($league->leagueLevels as $leagueLevel) {
+				$leagueLevelsArray[] = $leagueLevel->_attribs;
+			}
+			
+			$output[] = array('leagueID' => $league->leagueID,
+							  'leagueName' => $league->leagueName,
+							  'sportID'	   => $league->sportID,
+							  'sport'	   => $league->sport,
+							  'city'	   => $league->city,
+							  'leagueLevels' => $leagueLevelsArray);
+			}
+			
+		echo json_encode($output);
+	}
+	
+	
+	/**
+	 * get similar games on same day (for create game controller)
+	 */
+	public function getSimilarGamesAction()
+	{
+		$options = $this->getRequest()->getPost('options');
+
+		$games = new Application_Model_Games();
+		
+		$where = array();
+		if (isset($options['date'])) {
+			// date is set, search by day
+			$month = ($options['month'] < 10 ? 0 . $options['month'] : $options['month']);
+			$date  = ($options['date'] < 10 ? 0 . $options['date'] : $options['date']);
+			
+			$where[] = "DATE(g.date) = '" . $options['year'] . "-" . $month . "-" . $date . "'";
+		}
+		
+		if (isset($options['sportID'])) {
+			// Search by sport
+			$where[] = 'g.sportID = "' . $options['sportID'] . '"';
+		}		
+		
+		$games->getGamesNearUser($where, $this->view->user);	
+		
+		$output = array();
+		foreach ($games->getAll() as $game) {
+			$output[] = array('gameID' => $game->gameID,
+							  'gameTitle' => $game->getGameTitle(),
+							  'parkName' => $game->park->parkName,
+							  'parkID'	 => $game->park->parkID,
+							  'hour'   => $game->getHour(),
+							  'date'   => $game->getShortDate(),
+							  'rosterLimit' => $game->rosterLimit,
+							  'totalPlayers' => $game->totalPlayers);
+		}
+		
+		echo json_encode($output);
+		
+	}
 	
 	/**
 	 * get number of available players in area (for create game controller)
@@ -640,6 +724,7 @@ class AjaxController extends Zend_Controller_Action
 		
 		$search  = new Application_Model_Search();
 		$results = $search->getSearchResults($searchTerm, $cityID, $limit);
+		
 		echo json_encode($results);
 		
 	}
@@ -677,7 +762,6 @@ class AjaxController extends Zend_Controller_Action
 			// Confirm or deny action
 			if ($options['confirmOrDeny'] == 'confirm') {
 				// Confirm action, add to db		
-					
 				$mapper = new Application_Model_NotificationsMapper();
 				$mapper->notificationConfirm($options['notificationLogID'], $options['type']);
 				
@@ -689,6 +773,7 @@ class AjaxController extends Zend_Controller_Action
 			$mapper->notificationConfirm($options['notificationLogID'], $options['type']);	
 		}
 		
+
 		// Delete notification
 		$db = Zend_Db_Table::getDefaultAdapter();
 		$db->delete('notification_log',array('notificationLogID = ?' => $options['notificationLogID']));
@@ -826,15 +911,23 @@ class AjaxController extends Zend_Controller_Action
 		if ($options['idType'] == 'teamID') {
 			// delete user from team
 			$table = new Application_Model_DbTable_UserTeams();
+			$types = 'teams';
+			$type  = 'team';
 		} elseif($options['idType'] == 'groupID') {
 			$table = new Application_Model_DbTable_UserGroups();
+			$types = 'groups';
+			$type  = 'group';
 		} elseif($options['idType'] == 'gameID') {
 			$table = new Application_Model_DbTable_UserGames();
+			$types = 'games';
+			$type  = 'game';
 		}
 			
 		if (empty($options['typeID']) || empty($options['userID'])) {
 			return false;
 		}
+		
+		$this->view->user->$types->remove($options['typeID']);
 			
 		$where = array();
 		$where[] = $table->getAdapter()->quoteInto($options['idType'] . ' = ?', $options['typeID']);
@@ -843,6 +936,84 @@ class AjaxController extends Zend_Controller_Action
 		$table->delete($where);
 				
 	}
+	
+	/**
+	 * cancel/delete game or team
+	 */
+	public function cancelTypeAction()
+	{
+		$options = $this->getRequest()->getPost('options');
+		$idType  = $options['idType'];
+		
+		if (empty($options['typeID'])) {
+			return false;
+		}
+		
+		$array = array();
+		
+		if ($idType == 'gameID') {
+			$model  = new Application_Model_Game();
+			$model->getGameByID($options['typeID']);
+			$array['date'] = $model->gameDate->format('F j');
+			$type = 'game';
+		} elseif ($idType == 'teamID') {
+			$model  = new Application_Model_Team();
+			$model->getTeamByID($options['typeID']);
+			$type = 'team';
+		}
+		
+		$userIDs = $model->players->getIDs('users');
+		
+		$array['sport'] = $model->sport;
+		$array['userIDs'] = $userIDs;
+		
+		
+		// Set post data for email that is initiated in forward request
+		$this->_request->setPost($array);
+		
+		if (!empty($options['onceOrAlways'])) {
+			// remove recurring game just this once
+			
+			$model->canceled = '1';
+
+			if (!empty($options['cancelReason'])) {
+				$model->cancelReason = rtrim($options['cancelReason']);
+			}
+			
+			$model->save();
+			
+		} else {
+			// Mark game/team for removal
+			//$model->delete();
+			if ($type == 'game') {
+				$model->canceled = '1';
+			}
+			$model->remove   = '1';
+			
+			$model->save();
+		}
+		
+		
+		$notification = new Application_Model_Notification();
+		
+		$notification->action = 'delete';
+		$notification->type   =  $type;
+		$notification->actingUserID = $this->view->user->userID;
+		$notification->$options['idType'] = $options['typeID'];
+		$notification->cityID = $this->view->user->cityID;
+		$notification->save();
+		
+		
+		// Force bootstrap reload
+		$reset = new Zend_Session_Namespace('reset');
+		$reset->reset = true;
+		
+		$this->_forward('cancel-type','mail');
+		
+	}
+		
+		
+		
 	
 	
 	/** 

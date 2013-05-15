@@ -18,6 +18,7 @@
 
 .game-distance {
 	margin-top: .4em;
+	margin-left: .6em;
 }
 
 .game-rating-box {
@@ -41,4 +42,48 @@
 #subscribe-button {
 	margin-left: 40%;
 	margin-top: .5em;
+}
+
+#unsubscribe-button:hover {
+	text-decoration: underline;
+}
+
+/* alerts */
+#cancel-game {
+	margin-left: .3em;
+}
+
+#canceled-alert-container {
+	width: 34em;
+	margin-left: -17em;
+	margin-top: -10em;
+}
+
+#manage-cancel-alert-container {
+	width: 34em;
+	margin-left: -17em;
+	margin-top: -10em;
+}
+
+#game-cancel-subscribe {
+	margin-left: 3em;
+	margin-top: .5em;
+}
+
+#cancel-game {
+	margin-top: .5em;
+}
+
+#game-canceled-back {
+	margin-left: 8em;
+}
+
+#cancel-reason {
+	width: 78%;
+	height: 2em;
+	
+}
+
+.game-cancel-reason {
+	margin-left: 2.3em;
 }

@@ -64,13 +64,14 @@ $this->placeholder('narrowColumn')->captureEnd();
 	
 		if (!$this->user->players->userExists($this->currentUser->userID)) {
 			// user is not already a friend
+			
 			?>
-			<p class='button right profile-buttons-margin-right' id='user-player-request'>
+			<p class='button right profile-buttons-margin-right' id='user-player-request' tooltip="Connected players enjoy playing together or play together often. Connecting makes it easier to see each other's upcoming games.">
 				Player Request
 			</p>
     <?php } else {?>
-    		<p class='light center' id='user-already-friend'>
-            	You and <?php echo $this->currentUser->firstName;?> are players.
+    		<p class='button right profile-buttons-margin-right' id='user-player-cancel-request' tooltip='You are currently connected with this player.  Remove them?'>
+            	Remove Player
             </p>
     <?php }
 		

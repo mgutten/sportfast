@@ -22,6 +22,7 @@ class ParksController extends Zend_Controller_Action
 		$this->view->park = $park;
 		$this->view->parkID = $parkID;
 		
+		
 		$this->view->parkGames = $parkGames = $park->getParkGames();
 		
 		$this->view->parkRatings = $parkRatings = $park->getParkRatings();
@@ -50,6 +51,9 @@ class ParksController extends Zend_Controller_Action
 		if ($parkStash->parkStashID) {
 			// Park stash exists
 			$this->view->stashExists = true;
+			$this->view->stashDescription = 'Certain parks have "stashes" where we have placed sports equipment for your use, free of charge.';
+		} else {
+			$this->view->stashDescription = 'No stash available.';
 		}
 		if ($park->getTotalBasketball() > 0) {
 			// Basketball courts present

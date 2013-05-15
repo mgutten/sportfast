@@ -345,11 +345,11 @@ $(function()
 							  .animate({opacity: opacity}, 200);
 	});
 	
-	$('#unsubscribe-button, #subscribe-button').click(function()
+	$('#unsubscribe-button, #top-alert-subscribe').click(function()
 	{
 		
 		var detailsEle = getDetailsEle();
-		var subscribe = ($(this).is('#subscribe-button') ? 1 : 0);
+		var subscribe = ($(this).is('#top-alert-subscribe') ? 1 : 0);
 		
 		confirmAction = function () {
 				var detailsEle = getDetailsEle();
@@ -362,7 +362,7 @@ $(function()
 				reloadPage();
 		}
 		
-		if ($(this).is('#subscribe-button')) {
+		if (subscribe) {
 			// Do not show confirmation for subscribing
 			showConfirmationAlert('You are now subscribed');
 			confirmAction();
@@ -388,6 +388,11 @@ $(function()
 	$('#confirm-action').click(function()
 	{
 		confirmAction();
+	})
+	
+	$('#deny-action').click(function()
+	{
+		$(this).parents('.alert-container').find('.alert-x').trigger('click');
 	})
 	
 	$(document).on('click','.invite-search-result',function()
@@ -422,7 +427,7 @@ $(function()
 		
 		if (dropdowns.dropdownMenuDown) {
 			// Dropdown menu is down
-			$(e.target).parents('#profile-buttons-container').animate({height: '10em'},300);
+			$(e.target).parents('#profile-buttons-container').animate({height: '7em'},300);
 		}
 	})
 	
@@ -436,6 +441,32 @@ function getDetailsEle()
 {
 	return ($('#team-details').length > 0 ? $('#team-details') : $('#game-details'))
 }
+
+
+/**
+ * cancel/delete game or team
+ * @params (onceOrAlways => for recurring games, can cancel game just this week or all weeks)
+ */
+function cancelType(idType, typeID, onceOrAlways)
+{
+	onceOrAlways = (typeof onceOrAlways == 'undefined' ? '' : onceOrAlways);
+	var reason   = ($('#cancel-reason').length > 0 ? $('#cancel-reason').val() : '');
+	
+	var options = {idType: idType,
+				   typeID: typeID,
+				   onceOrAlways: onceOrAlways,
+				   cancelReason: reason};
+		   
+	$.ajax({
+		url:'/ajax/cancel-type',
+		type: 'POST',
+		data: {options: options},
+		complete: function(data) {
+			reloadPage();
+		}
+	})
+}
+
 
 /**
  * unsubscribe/subscribe user from recurring game

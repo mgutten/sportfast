@@ -1,12 +1,14 @@
 <?php
 
-class Application_Model_Users extends Application_Model_ModelAbstract
+class Application_Model_Users extends Application_Model_TypesAbstract
 {
 	protected $_mapperClass = 'Application_Model_UsersMapper';
 	protected $_singleClass = 'Application_Model_User';
 	
 	protected $_attribs     = array('users'	=> '',
 									'totalRows' => '');
+									
+	protected $_primaryKey  = 'userID';
 	
 	
 	
@@ -26,6 +28,16 @@ class Application_Model_Users extends Application_Model_ModelAbstract
 	public function findUsers($options, $userClass, $limit)
 	{
 		return $this->getMapper()->findUsers($options, $userClass, $this, $limit);
+	}
+	
+	public function getUserEmails($userIDs)
+	{
+		return $this->getMapper()->getUserEmails($userIDs, $this);
+	}
+	
+	public function emailsExist($emails)
+	{
+		return $this->getMapper()->emailsExist($emails);
 	}
 	
 	public function getUser($userID)

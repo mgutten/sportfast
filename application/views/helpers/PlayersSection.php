@@ -36,46 +36,49 @@ class Application_View_Helper_PlayersSection
 			$typeModel = $this->_view->group;
 		}
 		
-		foreach ($players as $player) {
-			
-			if ($counter >= 14 && $limited) {
-				// Only show 14 players
-								
-				$output .= "<a href='/" . $type . "/" . $typeID . "/players' class='medium clear-right smaler-text'>" . ($totalPlayers - $counter) . " more players</a>";
-				break;
-			}
-			$output .= "<a href='/users/" . $player->userID . "' class='left team-player-container'>";
-			$output .= 	$player->getBoxProfilePic('medium');
-			
-			$success = false;
-			
-			if ($nextGame) {
-				if ($nextGame->userConfirmed($player->userID)) {
-					// User is going to next game
-					$src = "/images/team/confirm/small.png";
-					$success = true;
-				} elseif ($nextGame->userNotConfirmed($player->userID)) {
-					// User is confirmed as not going
-					$src = "/images/team/deny/small.png";
-					$success = true;
+		if ($players) {
+			// Players in game
+			foreach ($players as $player) {
+				
+				if ($counter >= 14 && $limited) {
+					// Only show 14 players
+									
+					$output .= "<a href='/" . $type . "/" . $typeID . "/players' class='medium clear-right smaler-text'>" . ($totalPlayers - $counter) . " more players</a>";
+					break;
 				}
+				$output .= "<a href='/users/" . $player->userID . "' class='left team-player-container'>";
+				$output .= 	$player->getBoxProfilePic('medium');
+				
+				$success = false;
+				
+				if ($nextGame) {
+					if ($nextGame->userConfirmed($player->userID)) {
+						// User is going to next game
+						$src = "/images/team/confirm/small.png";
+						$success = true;
+					} elseif ($nextGame->userNotConfirmed($player->userID)) {
+						// User is confirmed as not going
+						$src = "/images/team/deny/small.png";
+						$success = true;
+					}
+				}
+				
+				if ($success) {
+					// User is either confirmed or not
+					$output .= "<img src='" . $src . "' class='clear team-confirm-img' />";
+				}
+				
+				$output .= 	"<div class='hover-dark profile-player-overlay-container'>";
+				$output .=		"<div class='profile-player-overlay'>";
+				$output .=			"<p class='white width-100 center left'>" . $player->shortName . "</p>";
+				$output .=			"<p class='white width-100 center left smaller-text'>age " . $player->age . "</p>";
+				$output .=			"<p class='white width-100 center left largest-text heavy'>" . $player->getSport($typeModel->sport)->overall . "</p>";
+				$output .=		"</div>";
+				$output .=	"</div>";
+				$output .= "</a>";
+				
+				$counter ++;
 			}
-			
-			if ($success) {
-				// User is either confirmed or not
-				$output .= "<img src='" . $src . "' class='clear team-confirm-img' />";
-			}
-			
-			$output .= 	"<div class='hover-dark profile-player-overlay-container'>";
-			$output .=		"<div class='profile-player-overlay'>";
-			$output .=			"<p class='white width-100 center left'>" . $player->shortName . "</p>";
-			$output .=			"<p class='white width-100 center left smaller-text'>age " . $player->age . "</p>";
-			$output .=			"<p class='white width-100 center left largest-text heavy'>" . $player->getSport($typeModel->sport)->overall . "</p>";
-			$output .=		"</div>";
-			$output .=	"</div>";
-			$output .= "</a>";
-			
-			$counter ++;
 		}
 
 		if ($typeModel instanceof Application_Model_Game) {
@@ -96,7 +99,7 @@ class Application_View_Helper_PlayersSection
 			}
 		}
 		
-		$remaining = 7 - $counter;
+		$remaining = ($typeModel->rosterLimit >= 7 ? 7 - $counter : $typeModel->rosterLimit - $counter);
 		if ($remaining > 0 && $typeModel->public == '1') {
 			// Populate remaining with empty open spots
 			$text = 'Join';

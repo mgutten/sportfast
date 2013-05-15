@@ -8,6 +8,17 @@ $this->headLink()->prependStylesheet($this->baseUrl() . '/css/team.css');
 $this->headLink()->prependStylesheet($this->baseUrl() . '/css/profile.css');
 $this->headScript()->prependFile($this->baseUrl() . '/js/team.js');
 $this->headScript()->prependFile($this->baseUrl() . '/js/profile.js');
+?>
+
+<?php
+if ($this->fail) {
+	// No team found, show failure
+	echo "<p class='larger-margin-top left jumbo-text heavy width-100 center darkest'>Team not found.</p>";
+	echo "<p class='clear largest-text heavy darkest width-100 center'>This team has been deleted.</p>";
+	echo "<a href='/' class=' larger-margin-top clear larger-text medium width-100 center'>Back to home</a>";
+	return;
+}
+
 
 
 	echo $this->placeholder('absolute')->captureStart();
@@ -66,28 +77,9 @@ $this->headScript()->prependFile($this->baseUrl() . '/js/profile.js');
 			echo $this->alert()->end();
 			
 			// Remove player alert
-			echo $this->alert()->start('manage-remove-player','Click on a player to remove from roster.');
-				echo "<div class='team-manage-remove-player-container width-100 left'>";
-				echo 	"<div class='clear margin-top'>";
-				foreach ($this->team->players->users as $player) {
-					echo "<div class='team-player-container left pointer profile-manage-remove-player' tooltip='" . $player->fullName . "' playerName='" . $player->fullName . "' userID='" . $player->userID . "'>" 
-							. $player->getBoxProfilePic('medium', 'users', 'animate-opacity', 'dark-back') 
-						. "</div>";
-				}
-				echo	"</div>";
-				echo 	"<div id='profile-manage-remove-player-confirm-container' class='hidden'>
-							<p class='clear larger-margin-top light larger-text'>Remove 
-								<span id='profile-manage-remove-player-name' class='heavy red largest-text'></span> from " 
-								. $this->team->teamName . "?</p>";
-				echo		"<div class='clear width-100 larger-margin-top'>
-								<p class='red-button profile-manage-button larger-margin-top' id='profile-manage-remove-player-remove'>Remove</p>
-								<p class='button profile-manage-button larger-margin-top' id='profile-manage-remove-player-cancel'>Cancel</p>
-							</div>";
-				echo 	"</div>";
-				echo "</div>";
-								
-			echo $this->alert()->end();
+			echo $this->removeplayeralert($this->team->players->getAll(), $this->team->teamName);
 			
+						
 			// Edit team info alert
 			echo $this->alert()->start('manage-team-info',"Click on anything to edit.");
 				echo "<div class='team-manage-team-info-container width-100 left'>";
@@ -171,11 +163,9 @@ $this->headScript()->prependFile($this->baseUrl() . '/js/profile.js');
 				
 			
 	}
-	echo $this->alert()->start('confirm-action','');
-	echo 	"<p class='width-100 clear center'>&nbsp;Are you sure you want to <span id='confirm-action-text'></span>?</p>";
-	echo	"<p class='button clear' id='confirm-action'>Yes</p>";
-	echo	"<p class='button' id='deny-action'>No</p>";
-	echo $this->alert()->end();	
+	
+	echo $this->alert()->confirmAlert();
+	
 	echo $this->placeholder('absolute')->captureEnd();
 ?>
 
@@ -238,7 +228,13 @@ if (!$this->team->leagues->hasValue('leagues')) {
 echo $this->narrowcolumnsection()->end();
 */
 
-echo "<div class='width-100 left narrow-column-calendar-container'>";
+$class = 'width-100 left narrow-column-calendar-container';
+if ($this->captain) {
+	// User is captain, make calendar clickable
+	$class .= ' calendar-captain';
+}
+
+echo "<div class='" . $class . "'>";
 echo $this->calendar()->createCalendar($this->events, true);
 echo "</div>";
 

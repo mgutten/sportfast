@@ -43,7 +43,7 @@ $(function()
 			   (val.length < lowerLength.length) ||
 			   (parseInt(val + '0',10) <= upper)) {
 				// Empty string
-				return;
+				return this;
 			}
 			
 			if (val > upper) {
@@ -51,7 +51,7 @@ $(function()
 			} else if(val < lower) {
 				this.val(lower)
 			}
-			return;
+			return this;
 	
 	  };
 	  
@@ -506,10 +506,12 @@ $(function()
 		var notificationLogID = $(this).parent().attr('notificationLogID');
 		var type = $(this).parent().attr('type');
 		
-		notificationJoin(notificationLogID, type);
-		showConfirmationAlert('You have been added to the roster');
 		var url = $(this).parents('a').attr('href');
-		window.location = url;
+		
+		notificationJoin(notificationLogID, type, url);
+		showConfirmationAlert('You have been added to the roster');
+		
+		
 	})
 	
 	/* cannot nest anchor tags, force redirect of notification-container.click (could now be changed to simple a tag) 
@@ -727,6 +729,25 @@ $(function()
 		
 	});	
 	
+	/* animate top alert down if exists */
+	if ($('.top-alert-container').length > 0) {
+		$('.top-alert-container').each(function()
+		{
+			var height = $(this).outerHeight(true);
+			$(this).css('margin-top',-height);
+			
+			$(this).click(function() {
+				$(this).animate({'margin-top':-height}, 300);
+			})
+		})
+		
+		
+		setTimeout(function() {
+			$('.top-alert-container').first().animate({'margin-top': 0}, 300);
+		}, 900);
+	}
+	
+	
 	
 	$(document).click(function(e)
 	{
@@ -849,6 +870,7 @@ function removeUserFromType(userID, idType, typeID) {
 		type: 'POST',
 		data: {options: options},
 		success: function(data) {
+			alert(data);
 		}
 	})
 }
@@ -960,11 +982,10 @@ function notificationConfirmDeny(notificationLogID, confirmOrDeny, type, optiona
 /**
  * Ajax call to confirm (eg add as friends) or deny (delete) specific notification
  * @params(notificationLogID => id of parent notificationLogID from db,
- *		   confirmOrDeny	 => "confirm" or "deny",
  *		   type				 => type (friend, game, team, group etc) retrieved from db to determine what table to add to
- *		   optionalID		 => ID for game or group if issued, but blank if not)
+ *		   url		 => where to go after finish call)
  */
-function notificationJoin(notificationLogID, type)
+function notificationJoin(notificationLogID, type, url)
 {
 	var options = new Object();
 	options.notificationLogID = notificationLogID;
@@ -974,6 +995,7 @@ function notificationJoin(notificationLogID, type)
 		type: 'POST',
 		data: {options: options},
 		success: function(data) {
+			window.location = url;
 		}
 	})
 }
@@ -1033,6 +1055,7 @@ function getCity(zipcodeOrCity, callback)
  */
 function searchDatabase(searchTerm, callback, limit)
 {
+
 	$.ajax({
 		url: '/ajax/search-db',
 		type: 'POST',
@@ -1345,6 +1368,26 @@ function animateNotShow(ele, down, fadeIn)
 
 }
 
+/**
+ * fade in alert box
+ */
+function showAlert(alertEle)
+{
+	displayToBlockHidden(alertEle);
+	displayToBlockHidden($('.alert-black-back'));
+	
+	alertEle.animate({'opacity': 1}, 300);
+	$('.alert-black-back').animate({'opacity':.85},300);
+}
+
+function displayToBlockHidden(ele)
+{
+	ele.css({'opacity': 0,
+			 'display': 'block'})
+			 
+	return ele;
+}
+
 
 
 /**
@@ -1423,7 +1466,7 @@ function fadeOutInputOverlay(inputEle, focusIn)
 
 
 /**
- * Ajax upload and retrieve picture from input[type=file]
+ * Animate nav dropdown up or down
  * @params (navEle => container element of dropdown (ie nav-back),
  			down   => is it down? (boolean))
  */
@@ -1722,9 +1765,14 @@ function getCoordinatesFromAddress(address, callbackSuccess, callbackFailure)
 /**
  * populate confirmation alert (are you sure you want to "")
  */
-function populateConfirmActionAlert(str)
+function populateConfirmActionAlert(str, postContent)
 {
 	$('#confirm-action-text').text(str);
+	
+	if (typeof postContent != 'undefined') {
+		// add post content
+		$('#confirm-action-postContent').html(postContent);
+	}
 }
 
 
@@ -1811,10 +1859,18 @@ function rgbToHex(r, g, b)
 
 function getDarkerColor(color)
 {
+	
 	var rgb = getRGB(color);
+	
+	
 	
 	for (i = 0; i < 3; i++) {
 		rgb[i] -= 25;
+		
+		if (rgb[i] < 0) {
+			// Do not allow negative numbers
+			rgb[i] = 0;
+		}
 	}
 	
 	var hex = rgbToHex(rgb[0], rgb[1], rgb[2]);

@@ -8,6 +8,7 @@ class Application_Model_Game extends Application_Model_ModelAbstract
 									'teamGameID'	=> '',
 									'park' 			=> '',
 									'parkID'		=> '',
+									'parkName'		=> '',
 									'backupParkID'  => '',
 									'backupParkName'=> '',
 									'public'		=> '',
@@ -40,9 +41,15 @@ class Application_Model_Game extends Application_Model_ModelAbstract
 									'leagueLocationID'	=> '',
 									'players'		=> '',
 									'type'			=> '',
+									'typeID'		=> '',
 									'messages'		=> '',
 									'captains'		=> '',
-									'subscribers'	=> ''
+									'subscribers'	=> '',
+									'city'			=> '',
+									'cityID'		=> '',
+									'canceled'		=> '',
+									'cancelReason'  => '',
+									'remove'		=> ''
 									);
 									
 	protected $_primaryKey = 'gameID';
@@ -58,6 +65,17 @@ class Application_Model_Game extends Application_Model_ModelAbstract
 		}
 				
 	}
+	
+	public function getSportTypeID($sportID, $typeName, $typeSuffix = false) {
+		if (!$typeSuffix) {
+			$typeSuffix = 'null';
+		} 
+	
+		return $this->getMapper()->getForeignID('Application_Model_DbTable_SportTypes', 'typeID', array('sportID' => $sportID,
+																									   'typeName' => $typeName,
+																									   'typeSuffix' => $typeSuffix));
+	}
+																			   
 	
 	public function getProfilePic($size, $id = false, $type = false)
 	{
@@ -156,6 +174,22 @@ class Application_Model_Game extends Application_Model_ModelAbstract
 		}
 		return $this->_attribs['park'];
 	}
+
+
+	/**
+	 * get reason for cancelation
+	 * @params ($text => should text be returned if nothing is stored in value?)
+	 */
+	public function getCancelReason($text = false)
+	{
+		if ($this->hasValue('cancelReason')) {
+			return ucfirst($this->_attribs['cancelReason']);
+		} elseif ($text) {
+			return 'No reason given.';
+		} else {
+			return false;
+		}
+	}
 	
 	public function getGameTitle()
 	{
@@ -184,6 +218,15 @@ class Application_Model_Game extends Application_Model_ModelAbstract
 	public function getSport()
 	{
 		return ucwords($this->_attribs['sport']);
+	}
+	
+	public function getBackupParkName()
+	{
+		if (!$this->hasValue('backupParkName')) {
+			return 'None';
+		} else {
+			return $this->_attribs['backupParkName'];
+		}
 	}
 	
 	
@@ -435,6 +478,7 @@ class Application_Model_Game extends Application_Model_ModelAbstract
 	 */
 	public function isCaptain($userID)
 	{
+
 		if (isset($this->_attribs['captains'][$userID])) {
 			// User is captain
 			return true;

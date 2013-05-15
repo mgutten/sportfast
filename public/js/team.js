@@ -282,16 +282,47 @@ $(function()
 		var val = $(this).children('p.dropdown-menu-option-text').text().toLowerCase();
 		
 		if (val == 'schedule') {
-			$('#manage-schedule-alert-container').show();
+			showAlert($('#manage-schedule-alert-container'));
 		} else if (val == 'remove player') {
-			$('#manage-remove-player-alert-container').show();
+			showAlert($('#manage-remove-player-alert-container'));
 		} else if (val == 'team info') {
-			$('#manage-team-info-alert-container').show();
+			showAlert($('#manage-team-info-alert-container'));
+		} else if (val == 'delete team') {
+			
+			confirmAction = function () {
+						var detailsEle = getDetailsEle();
+						var userID = detailsEle.attr('actingUserID');
+						var idType = detailsEle.attr('idType');
+						var typeID = detailsEle.attr(idType);
+						var actingUserID = userID;
+						var receivingUserID;
+						var action = 'delete';
+						var type   = idType.replace(/ID/, '');
+						var details;		
+						
+						//createNotification(idType, typeID, actingUserID, receivingUserID, action, type, details);
+						
+						cancelType(idType, typeID);
+						changedAlert = true;
+						//reloadPage();
+				}
+				
+				var detailsEle = getDetailsEle();
+				var text = 'delete ' + detailsEle.attr('teamName');
+				var postContent = "<p class='clear margin-top light width-100 center'>This action cannot be undone.</p>";
+				
+				populateConfirmActionAlert(text, postContent);
+				$('#confirm-action-alert-container').show();
 		}
 		
 		$('.alert-black-back').show();
 
 	});
+	
+	$('.calendar-captain').click(function()
+	{
+		showAlert($('#manage-schedule-alert-container'));
+	})
 	
 	/* show manage schedule alert when click narrow-column calendar */
 	$('.narrow-column-calendar-container').find('a.calendar-day').click(function(e)

@@ -25,6 +25,10 @@
 	height: 7em;
 }
 
+#profile-buttons-container {
+	height: 7em;
+}
+
 .profile-buttons-inner-container {
 	width: 100%;
 	margin-left: 14.5em;
@@ -327,6 +331,7 @@ input[type=text].profile-manage-team-info-roster-limit {
 
 .alert-cancel-button {
 	margin-top: 1.35em;
+	margin-right: .3em;
 }
 
 /* sub-players page */

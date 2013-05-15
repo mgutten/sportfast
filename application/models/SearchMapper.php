@@ -10,24 +10,25 @@ class Application_Model_SearchMapper extends Application_Model_MapperAbstract
 	 *		   $limit => array of types to search for (eg users, teams, etc))
 	 * 		   $savingClass => where to save the results)
 	 */
-	public function getSearchResults($searchTerm, $cityID, $limit = false, $savingClass)
+	public function getSearchResults($searchTerm, $cityID, $limit = false)
 	{
+		
 		$db 	= Zend_Db_Table::getDefaultAdapter();
 		
-		$users  = "SELECT userID as id,CONCAT(firstName, ' ', lastName) as name, 'users' as prefix, cityID FROM users 
-						WHERE (firstName LIKE '" . $searchTerm . "%' 
-							OR CONCAT(firstName, ' ',lastName) LIKE '" . $searchTerm . "%'
-							OR lastName LIKE '" . $searchTerm . "%') AND active = '1'";
+		$users  = "SELECT userID as id,CONCAT(firstName, ' ', lastName) as name, 'users' as prefix, cityID, city, '' as picture FROM users 
+						WHERE (firstName LIKE :prefix 
+							OR CONCAT(firstName, ' ',lastName) LIKE :prefix 
+							OR lastName LIKE :prefix) AND active = '1'";
 							   
-		$teams  = "SELECT teamID as id,teamName as name, 'teams' as prefix, cityID FROM teams 
-						WHERE teamName LIKE '" . $searchTerm . "%' OR
-								teamName LIKE 'The " . $searchTerm . "%'";
+		$teams  = "SELECT teamID as id,teamName as name, 'teams' as prefix, cityID, city, picture FROM teams 
+						WHERE teamName LIKE :prefix  OR
+								teamName LIKE :theprefix ";
 					
 		/*$groups = "SELECT groupID as id,groupName as name, 'groups' as prefix, cityID FROM groups 
 						WHERE groupName LIKE '" . $searchTerm . "%'";*/
 					 
-		$parks  = "SELECT parkID as id,parkName as name, 'parks' as prefix, cityID FROM parks 
-						WHERE parkName LIKE '" . $searchTerm . "%'";
+		$parks  = "SELECT parkID as id,parkName as name, 'parks' as prefix, cityID, city, '' as picture FROM parks 
+						WHERE temporary = '0' AND parkName LIKE :prefix ";
 					 
 		/*$leagues  = "SELECT leagueID as id,leagueName as name, 'leagues' as prefix, cityID FROM leagues 
 						WHERE leagueName LIKE '" . $searchTerm . "%'";
@@ -54,14 +55,29 @@ class Application_Model_SearchMapper extends Application_Model_MapperAbstract
 			$select .= $users   . ' UNION ' 
 					. $teams   . ' UNION '  
 					//. $groups  . ' UNION ' 
-					. $parks   . ' ORDER BY ABS(' . $cityID . ' - cityID)';
+					. $parks;
 		}
 		
-		$results = $db->fetchAll($select); // returned result is array, not object
+		$select .= ' ORDER BY ABS(' . $cityID . ' - cityID)';
+		
+		$prefix = $searchTerm . '%';
+		$suffix = '%' . $searchTerm;
+		
+		$statement = $db->query($select,
+							  array(':prefix' => $prefix, ':theprefix' => 'The ' . $prefix)); // returned result is array, not object
+	
+							  
+	    $results = $statement->fetchAll();
+		
+		if (count($results) == 0) {
+			// No results
+			return false;
+		}
 		
 		for ($i = 0; $i < count($results); $i++) {
 			// Capitalize name column
 			$results[$i]['name'] = ucwords($results[$i]['name']);
+			$results[$i]['city'] = ucwords($results[$i]['city']);
 		}
 		
 		return $results;

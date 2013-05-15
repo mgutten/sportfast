@@ -173,6 +173,16 @@ $(function()
 	})
 	*/
 	
+	$('.find-search-result').mouseenter(function()
+	{
+		// Change narrow column pic
+		var src = $(this).find('img.find-img').attr('src');
+		var largeSrc = src.replace('/medium/','/large/');
+		
+		$('.narrow-column-picture').attr('src',largeSrc)
+								   .fadeIn();
+	})
+	
 	/* map */
 	$(document).on('mouseenter','.find-result-games,.find-result-parks',function()
 	{

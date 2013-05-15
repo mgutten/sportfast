@@ -6,7 +6,7 @@ class Application_Form_HeaderSearch extends Zend_Form
     {
         $this->setName('headerSearchForm');
 		$this->setMethod('POST');
-		$this->setAction('/find/search');
+		$this->setAction('/find/search-term');
 		$this->setDecorators(array('FormElements', 'Form'));
 		
 		$this->addElementPrefixPath('My_Form_Decorator',

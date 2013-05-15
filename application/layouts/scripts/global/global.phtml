@@ -27,6 +27,12 @@ if (!$this->noDefaultHeadTitle) {
 echo $this->placeholder('absolute');
 echo $this->tooltip();
 
+echo $this->placeholder('topAlert');
+
+if ($this->topAlert) {
+	// top alert to be shown, place content in animatable container
+	echo "<div class='width-100 left' id='main-body-container'>";
+}
 //header layout
 echo $this->render($this->headerLayout . '.phtml'); 
 
@@ -39,6 +45,11 @@ if ($this->whiteBacking) {
 
 //footer layout
 echo  $this->render('footer.phtml') . PHP_EOL; 
+
+if ($this->topAlert) {
+	// Close animatable container
+	echo "</div>";
+}
 ?>
 </body>
 </html>

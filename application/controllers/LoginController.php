@@ -100,6 +100,15 @@ class LoginController extends Zend_Controller_Action
 			// Store user info in user session
 			/* ANY FUNCTIONS RUN ON USER HERE SHOULD BE MIMICKED IN BOOTSTRAP InitLayoutSetup*/
 			$user->login();
+			
+			$session = new Zend_Session_Namespace('postLoginURL');
+			if (!empty($session->url)) {
+				// Login was initiated from redirect in Authorization plugin (ie tried to access login-required page without being logged in)
+				// Redirect to stored URL (original attempted url)
+				$url = $session->url;
+				Zend_Session::namespaceUnset('postLoginURL');
+				return $this->_helper->redirector->goToUrl($url);
+			}
 		
 			return $this->_helper->redirector->goToUrl('/');
 		}
@@ -115,6 +124,8 @@ class LoginController extends Zend_Controller_Action
 		$auth->clearIdentity();
 		
 		Zend_Session::namespaceUnset('active');
+		
+		Zend_Session::destroy(false);
 		
 		$this->_helper->redirector->goToUrl('/');
 	}

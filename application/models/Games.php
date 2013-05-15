@@ -1,15 +1,26 @@
 <?php
 
-class Application_Model_Games extends Application_Model_ModelAbstract
+class Application_Model_Games extends Application_Model_TypesAbstract
 {
 	protected $_mapperClass = 'Application_Model_GamesMapper';
 	
 	protected $_attribs     = array('games' => '',
 									'totalRows' => '');
+									
+	protected $_primaryKey  = 'gameID';
 	
 	public function findUserGames($userClass, $options = false, $points = false, $day = false, $hour = false)
 	{
 		return $this->getMapper()->findUserGames($userClass, $this, $options, $points, $day, $hour);
+	}
+	
+	/**
+	 * get games based on $where parameters
+	 * @parameters ($where => non-associative array of where expressions to be used in query)
+	 */
+	public function getGamesNearUser($where, $userClass)
+	{
+		return $this->getMapper()->getGames($where, $userClass, $this);
 	}
 	
 	/**

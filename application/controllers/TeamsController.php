@@ -18,6 +18,14 @@ class TeamsController extends Zend_Controller_Action
 		
 		$this->view->team = $team;
 		
+		if (!$team->teamID) {
+			// No team found
+			$this->view->narrowColumn = false;
+			$this->view->fail = true;
+			return;
+		}
+		
+		
 		$this->view->isPublic  = $isPublic = $team->isPublic();
 		$this->view->isPrivate = ($isPublic ? false : true);
 	
@@ -64,7 +72,8 @@ class TeamsController extends Zend_Controller_Action
 			$this->view->inviteButton = $dropdown->dropdownButton('invite', '', 'Invite');
 			$this->view->manageButton = $dropdown->dropdownButton('manage', array('Schedule',
 																				  'Remove Player',
-																				  'Team Info'), 'Manage');
+																				  'Team Info',
+																				  'Delete Team'), 'Manage');
 			$this->view->manageScheduleTimeHour = $dropdown->dropdown('manage-schedule-time-hour', array(1,2,3,4,5,6,7,8,9,10,11,12), 7);
 			$this->view->manageScheduleTimeMinute = $dropdown->dropdown('manage-schedule-time-minute', array('00', '15', '30', '45'), '00');
 			$this->view->manageScheduleTimeAmPm = $dropdown->dropdown('manage-schedule-time-ampm', array('am', 'pm'), 'pm', false);

@@ -280,7 +280,7 @@ class Application_View_Helper_Calendar
 				if(!empty($this->scheduledDays[$month . $day . $this->year])){
 					$eventArray = $this->scheduledDays[$month . $day . $this->year];
 
-					$class  .= ' calendar-dark';
+					$class  .= ' calendar-dark animate-darker';
 					if (strpos($eventArray[1], '/games/') !== false) {
 						// Show special class for pickup games
 						$class .= ' calendar-green';

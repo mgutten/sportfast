@@ -33,6 +33,7 @@ class Application_Model_Notification extends Application_Model_ModelAbstract
 									'url'				=> '',
 									'action'			=> '',
 									'type'				=> '',
+									'details'			=> '',
 									'newsfeed'			=> false,
 									'read'				=> false,
 									'dateHappened'      => '',
@@ -43,8 +44,8 @@ class Application_Model_Notification extends Application_Model_ModelAbstract
 									);
 									
 	protected $_primaryKey = 'notificationLogID';	
+			
 	
-		
 	public function getTimeFromNow($date = false, $maxDays = 7)
 	{
 		return parent::getTimeFromNow($this->dateHappened, $maxDays);	
@@ -104,12 +105,17 @@ class Application_Model_Notification extends Application_Model_ModelAbstract
 		if ($this->newsfeed) {
 			// This notification is meant for newsfeed, give different class
 			$class = 'green heavy';
-			if ($this->gameID == $currentID) {
+			if ($this->gameID === $currentID) {
 				// On that game's page, all notifications should read "this game"
 				$possession = 'this';
 			} else {
 				$possession = 'a';
 			}
+		}
+		
+		if (strpos($this->text,'&possession') == 0) {
+			// First word of text, capitalize
+			$possession = ucfirst($possession);
 		}
 		
 		$replace = array();
@@ -118,6 +124,7 @@ class Application_Model_Notification extends Application_Model_ModelAbstract
 			
 			$pre   = '';
 			$post  = '';
+			$ucwords = false;
 			
 			$replaceVal = (isset($this->_attribs[$match]) ? $this->$match : '');
 			
@@ -163,11 +170,14 @@ class Application_Model_Notification extends Application_Model_ModelAbstract
 					// Is newsfeed, add link
 					$pre  = "<a href='/parks/" . $this->parkID . "' class='" . $class . "'>";
 					$post = "</a>";
+					$ucwords = true;
 				} else {
 					// Is notification
 					$pre  = "<span class='" . $class . "'>";
 					$post = "</span>";
+					$ucwords = true;
 				}
+				
 			} elseif ($match == 'sport') {
 				if ($this->newsfeed) {
 					// Is newsfeed, add link
@@ -177,10 +187,19 @@ class Application_Model_Notification extends Application_Model_ModelAbstract
 					$pre  = "<span class='" . $class . "'>";
 					$post = "</span>";
 				}
+				
 			} elseif ($match == 'date') {
 				$time = strtotime($replaceVal);
 				// Format date (Wednesday, Dec 31 at 4pm)
 				$replaceVal = date('l', $time) . ' <span class="light">' . date('M j', $time) . '</span> at ' . date('ga', $time);
+				
+			} elseif ($match == 'day') {
+				// Display day (wednesday, thursday)
+				$time = strtotime($this->_attribs['date']);
+				$replaceVal = date('l', $time);
+				$pre  = "<span class='" . $class . "'>";
+				$post = "</span>";
+				
 			} elseif ($match == 'teamName') {
 				if ($this->newsfeed) {
 					// Is newsfeed, add link
@@ -190,6 +209,7 @@ class Application_Model_Notification extends Application_Model_ModelAbstract
 					$pre  = "<span class='" . $class . "'>";
 					$post = "</span>";
 				} 
+				
 			} else {
 				if ($replaceVal !== '') {
 					$pre  = "<span class='" . $class . "'>";
@@ -197,6 +217,12 @@ class Application_Model_Notification extends Application_Model_ModelAbstract
 					$post = "</span>";
 				}
 			}
+			
+			if ($ucwords) {
+				// Set ucwords to true, capitalize replaceval
+				$replaceVal = ucwords($replaceVal);
+			}
+			
 			
 			$replace[] = $pre . $replaceVal . $post;
 		}
@@ -224,14 +250,19 @@ class Application_Model_Notification extends Application_Model_ModelAbstract
 	
 	public function save()
 	{
-		if (empty($this->positionID)) {
-			// Fill foreign key before save
-			$this->positionID = $this->getMapper()
-									 ->getForeignID('Application_Model_DbTable_SportPositions', 'positionID',array('sportID'    		  => $this->sportID,
-																												   'positionAbbreviation' => $this->positionAbbreviation));
-		}
+		$notificationDetails = array('action'  => $this->action,
+									 'type'	   => $this->type,
+									 'details' => $this->details);
 		
-		parent::save($this);
+		$data = array('actingUserID' => $this->actingUserID,
+					   'receivingUserID' => $this->receivingUserID,
+					   'gameID'  => $this->gameID,
+					   'teamID'  => $this->teamID,
+					   'ratingID'  => $this->ratingID,
+					   'parkID'  => $this->parkID,
+					   'cityID'	 => $this->cityID);
+					   
+		return $this->getMapper()->addNotification($notificationDetails, $data);
 	}
 	
 	

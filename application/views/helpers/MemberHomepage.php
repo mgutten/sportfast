@@ -222,9 +222,15 @@ class Application_View_Helper_MemberHomepage
 							$confirm = $game->getPlayersNeeded() . " needed";
 						}
 						
+						if ($game->canceled) {
+							$canceled = '<img class="left larger-indent" src="/images/global/canceled.png" tooltip="This game has been canceled. Reason: ' . $game->getCancelReason(true) . '"/>';
+						} else {
+							$canceled = '';
+						}
+						
 						$output .= "<a href='/games/" . $game->gameID . "' class='member-schedule-day-body-game-container schedule-container'>";
 						$output .= "<div class='member-schedule-day-body-game-left-container'>";
-						$output .= "<p class='bold darkest largest-text'>" . $game->getGameTitle() . '</p>';
+						$output .= "<p class='left bold darkest largest-text'>" . $game->getGameTitle() . '</p>' . $canceled;
 						$output .= "<p class='clear'>" . $game->getDay() . "</p>";
 						$output .= "<p class='clear'>" . $game->getHour() . "</p>";
 						$output .= "<p class='clear medium'>" . $game->getPark()->parkName . "</p>";

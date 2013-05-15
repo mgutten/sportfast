@@ -21,7 +21,8 @@ class Application_View_Helper_NarrowTeamSection
 			$results = $userClass->$section->getAll();
 				if (!($results)) {
 					// No friends, teams, groups
-					$output .=  "<p class='light clear smaller-text'>No " . $section . " have been added</p>";
+					$output .= "<p class='light clear smaller-text'>No " . $section . " have been added</p>";
+					$output .= "<a href='/find/" . $section . "' class='medium smaller-text clear-right'>Find " . $section . "</a>";
 				} else {
 					// Friends, teams, or groups exist
 					$counter = 0;
@@ -32,20 +33,23 @@ class Application_View_Helper_NarrowTeamSection
 						$class = 'box-img-container-tiny narrow-column-box-img dark-back';
 						$imgClass = 'box-img-tiny animate-opacity';
 						$text = '';
+						$limit = 12;
 					} else {
+						// teams
 						$url  = '/' . $section;
 						$single = rtrim($section,'s');
 						$name = $single . 'Name';
 						$id   = $single . 'ID';
 						$class = 'narrow-column-selectable';
 						$imgClass = '';
-						
+						$limit = 5;
 					}
+					
 					$tooltip = '';
 						foreach ($results as $result) {
-							if ($counter >= 5) {
+							if ($counter >= $limit) {
 								$diff = count($results) - $counter;
-								$output .=  "<a href='users/" . $userClass->userID . "/" . $section . "' class='medium smaller-text clear-right'>" . $diff . " other " . $section . "</a>";
+								$output .=  "<a href='users/" . $userClass->userID . "/" . $section . "' class='medium smaller-text clear-right margin-top'>" . $diff . " other " . $section . "</a>";
 								break;
 							}
 							
@@ -69,6 +73,8 @@ class Application_View_Helper_NarrowTeamSection
 							$output .=  "</a>";
 							$counter++;
 						}
+						
+						$output .=  "<a href='users/" . $userClass->userID . "/" . $section . "' class='medium smaller-text clear-right margin-top'>view all</a>";
 				}
 			$output .=  $this->_view->narrowcolumnsection()->end();
 		

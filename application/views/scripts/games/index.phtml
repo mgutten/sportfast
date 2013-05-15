@@ -11,13 +11,63 @@ $this->headScript()->prependFile($this->baseUrl() . '/js/profile.js');
 ?>
 
 <?php
+if ($this->fail) {
+	// No game found, show failure
+	echo "<p class='larger-margin-top left jumbo-text heavy width-100 center darkest'>Game not found.</p>";
+	echo "<p class='clear largest-text heavy darkest width-100 center'>This game was either deleted or has already happened.</p>";
+	echo "<a href='/' class=' larger-margin-top clear larger-text medium width-100 center'>Back to home</a>";
+	return;
+}
+
 echo $this->placeholder('absolute')->captureStart();
 	echo $this->partial('partials/global/alertBack.phtml');
-	echo $this->alert()->start('confirm-action','');
-	echo 	"<p class='width-100 clear center'>&nbsp;Are you sure you want to <span id='confirm-action-text'></span>?</p>";
-	echo	"<p class='button clear' id='confirm-action'>Yes</p>";
-	echo	"<p class='button' id='deny-action'>No</p>";
-	echo $this->alert()->end();	
+	echo $this->alert()->confirmAlert();
+	
+	
+	if ($this->captain) {
+		// user is captain
+		
+		// Remove player alert
+		echo $this->removeplayeralert($this->game->players->getAll());
+		
+		
+		// Edit game info alert
+		echo $this->alert()->start('manage-game-info',"Click on anything to edit.");
+		
+		echo $this->alert()->end();
+		
+		// Cancel game
+		echo $this->alert()->start('manage-cancel',"Cancel game.");
+			if ($this->game->recurring) {
+				// recurring game, give option to cancel forever
+				echo "<div class='width-100 left'><p class='larger-text darkest clear left' id='game-cancel-subscribe'>I want to cancel this game for </p>
+						<select class='darkest left larger-text' id='cancel-game'><option>this week</option><option>ever</option></select>
+					  </div>";
+				echo "<div class='clear width-100' id='game-cancel-subscribe-container'></div>";
+				echo "<p class='clear right button larger-margin-top' id='confirm-cancel'>Confirm</p>";
+				echo "<p class='right smaller-text alert-cancel-button medium pointer'>Cancel</p>";
+			} 
+		
+		echo $this->alert()->end();
+
+	}
+	
+	if ($this->game->canceled) {
+		// Game has been canceled
+		echo $this->alert()->start('canceled');
+			echo "<p class='largest-text darkest width-100 center heavy'>This game has been canceled.</p>";
+			
+			if ($this->game->cancelReason) {
+				// Reason was given
+				echo "<p class='light clear margin-top width-100 center'>Reason given...</p>";
+				echo "<p class='darkest width-100 center clear larger-text'>" . $this->game->cancelReason . "</p>";
+			}
+			echo "<a href='/' class='clear larger-text larger-margin-top heavy green-button white' id='game-canceled-back'>Back to homepage</a>";
+		echo $this->alert()->end();
+	}
+		
+
+	
 echo $this->placeholder('absolute')->captureEnd();
 
 // Narrow left column
@@ -84,14 +134,20 @@ echo "<span id='game-details'
 ?>
 
 <?php
-if (($this->game->recurring && $this->userInGame && !$this->game->isSubscriber($this->user->userID))) {
+if ($this->topAlert) {
 	// Game is recurring 
+	echo $this->placeholder('topAlert')->captureStart();
+		$content = "<p class='white heavy width-100 center'>This game happens every week. <span class='white'> Click here to subscribe.</span></p>";
+		echo $this->topalert('subscribe', $content);
+	echo $this->placeholder('topAlert')->captureEnd();
+	/*
 	$buttonID = 'subscribe-button';
 	$buttonText = '+Subscribe';
 	echo "<div class='dark-alert-box white heavy'>
 				<span class='left inherit width-100 center'>This game happens every week.</span>
 				<span class='clear inherit button  white pointer' id='" . $buttonID . "'>" . $buttonText . "</span>
 		  </div>";
+		  */
 } elseif ($this->pastGame) {
 	// This game already happened
 	echo "<div class='red-alert-box white heavy'>This game already happened!</div>";
@@ -114,12 +170,15 @@ if (($this->game->recurring && $this->userInGame && !$this->game->isSubscriber($
 			<?php echo $this->game->park->parkName;?>
         </a>
         <a href='http://www.google.com/maps?q=<?php echo $this->parkLocation->latitude . ',' . $this->parkLocation->longitude;?>' class='left light game-distance smaller-text'>
-        	&nbsp;&nbsp;
 			<?php echo $this->game->park->getDistanceFromUser($this->user->location->latitude, $this->user->location->longitude);?> miles from you
         </a>
-        <a href='/parks/<?php echo $this->game->backupParkID;?>' class='clear light game-location' tooltip='If <?php echo $this->game->park->parkName;?> is unavailable, go to this nearby park instead.'>
-        	Backup park: <?php echo $this->game->backupParkName;?>
-        </a> 
+        <?php 
+		if ($this->game->hasValue('backupParkName')) {
+		?>
+			<a href='/parks/<?php echo $this->game->backupParkID;?>' class='clear light game-location' tooltip='If <?php echo $this->game->park->parkName;?> is unavailable, go to this nearby park instead.'>
+				Backup park: <?php echo $this->game->backupParkName;?>
+			</a> 
+        <?php }?>
     </div>
 </header>
 
@@ -231,12 +290,9 @@ echo $this->partial('partials/global/sectionHeaderBold.phtml',array('title'   =>
 
 echo "<div id='team-players-container' class='clear width-100'>";
 
-if ($this->game->players->hasValue('users')) {
-	// Players exist
-	echo $this->playerssection($this->game->players->users);
-} else {
-	echo "<p class='none-text larger-text light width-100 center'>There are no players.</p>";
-}
+// Players exist
+echo $this->playerssection($this->game->players->users);
+
 echo "</div>";
 
 // Recent Activity section

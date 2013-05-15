@@ -91,7 +91,8 @@ class Application_Model_User extends Application_Model_ModelAbstract
 			// User has games scheduled
 			foreach ($this->games->getAll() as $game) {
 				$curDate = new DateTime();
-				if ($game->gameDate->diff($curDate)->days < 7) {
+				$days = ceil(($game->gameDate->format('U') - time())/60/60/24); // # of days difference
+				if ($days < 7) {
 					// Game is happening in next week
 					$returnArray[$game->gameDate->format('w')][] = $game;
 				}
@@ -221,6 +222,15 @@ class Application_Model_User extends Application_Model_ModelAbstract
 		return $this;
 	}
 	
+	
+	public function getHisOrHer()
+	{
+		if (strtolower($this->sex) == 'm') {
+			return 'his';
+		} else {
+			return 'her';
+		}
+	}
 	
 	public function getShortName()
 	{

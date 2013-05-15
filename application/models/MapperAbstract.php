@@ -68,10 +68,13 @@ abstract class Application_Model_MapperAbstract
 				// Password column, do not strtolower
 				$data[$column] = $savingClass->$column;
 				continue;
-			} elseif ($savingClass instanceof Application_Model_Message && $column == 'message') {
+			} elseif (($savingClass instanceof Application_Model_Message && $column == 'message') || $column == 'cancelReason') {
 				// Message column for message model should not be lower case as it is a user's post
 				$data[$column] = $savingClass->$column;
 				continue;
+			} elseif ($value instanceof DateTime) {
+				// Datetime object, convert to proper format
+				$data[$column] = $value->format('Y-m-d H:i:s');
 			}
 			
 			$data[$column] = strtolower(trim($savingClass->$column));
@@ -131,6 +134,7 @@ abstract class Application_Model_MapperAbstract
 	
 	public function getForeignID($table, $column, $whereValues)
 	{
+		$backupTable = $this->getDbTable();
 		
 		$this->setDbTable($table);
 		$table	   = $this->getDbTable();
@@ -149,6 +153,8 @@ abstract class Application_Model_MapperAbstract
 
 		
 		$result = $table->fetchRow($select);  
+		
+		$this->_dbTable = $backupTable;  //reset table
 		
 		if (!$result) {
 			return false;
