@@ -299,8 +299,28 @@ class SignupController extends Zend_Controller_Action
 		}
 		
 	}
-
 	
+	public function verifyAction()
+	{
+		$verifyHash = $this->getRequest()->getParam('verifyHash');
+		
+		$user = new Application_Model_User();
+		
+		$verified = $user->verify($verifyHash);
+		
+		
+		if ($verified) {
+			// Success
+			$auth = Zend_Auth::getInstance();
+			
+			// if success, $verified stores userID
+			$user->getUserBy('u.userID',$verified);
+			$user->login();
+			
+			$auth->getStorage()->write($user);
+		}
+	}
+
 
 }
 

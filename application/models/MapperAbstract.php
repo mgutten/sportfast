@@ -64,7 +64,7 @@ abstract class Application_Model_MapperAbstract
 			} elseif ($savingClass instanceof Application_Model_User && $column == 'cityID' && !empty($savingClass->changedLocation)) {
 				// Is user class and location has been changed temporarily, do not change cityID for user row, skip
 				continue;
-			} elseif ($column == 'password') {
+			} elseif ($column == 'password' || $column == 'verifyHash') {
 				// Password column, do not strtolower
 				$data[$column] = $savingClass->$column;
 				continue;
@@ -213,12 +213,27 @@ abstract class Application_Model_MapperAbstract
 								)';
 	}
 	
-	public function getColumnValue($column, $value)
+	public function getColumnValue($column, $value, $tableName = false, $where = false)
 	{
 		$table  = $this->getDbTable();
 		$select = $table->select($column);
-		$select->where($column . ' = ?', $value)
-			   ->limit(1);
+		
+		if ($tableName) {
+			// TableName is set, select from that
+			$select->from($tableName);
+		}
+		
+		if ($where) {
+			foreach ($where as $key => $value) {
+				$select->where($key . ' = ?', $value);
+			}
+		} else {
+			$select->where($column . ' = ?', $value);
+		}
+		
+		
+		$select->limit(1);
+		
 		$result = $table->fetchRow($select);
 		
 		return $result;

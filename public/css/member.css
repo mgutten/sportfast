@@ -336,3 +336,30 @@ div.member-find-game-date-hour {
 	display:block;
 }
 
+/* narrow column pic */
+.member-pic-container {
+	position: relative;
+}
+
+.member-narrow-column-pic-overlay {
+	position: absolute;
+	top: 0;
+	left: 0;
+	height: 162px;
+	width: 202px;
+	z-index: 1;
+}
+
+#member-narrow-column-pic-overlay-text {
+	z-index: 4;
+	opacity: 0;
+}
+
+#member-narrow-column-pic-overlay-text-bottom {
+	margin-top: 4em;
+}
+
+#narrow-column-user-picture {
+	position: relative;
+	z-index: 2;
+}

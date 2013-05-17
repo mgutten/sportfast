@@ -24,6 +24,11 @@ echo $this->placeholder('absolute')->captureStart();
 	echo $this->alert()->confirmAlert();
 	
 	
+	if (!$this->userInGame) {
+		echo $this->usersideinfo($this->game->sport);
+	}
+	
+	
 	if ($this->captain) {
 		// user is captain
 		
@@ -60,10 +65,25 @@ echo $this->placeholder('absolute')->captureStart();
 			if ($this->game->cancelReason) {
 				// Reason was given
 				echo "<p class='light clear margin-top width-100 center'>Reason given...</p>";
-				echo "<p class='darkest width-100 center clear larger-text'>" . $this->game->cancelReason . "</p>";
+				echo "<p class='darkest width-100 center clear'>" . $this->game->cancelReason . "</p>";
 			}
-			echo "<a href='/' class='clear larger-text larger-margin-top heavy green-button white' id='game-canceled-back'>Back to homepage</a>";
+			
+			echo "<a href='/' class='clear larger-text larger-margin-top heavy green-button white' id='game-canceled-back'>Back to home</a>";
+			if ($this->userInGame) {
+				echo "<p class='right larger-margin-top larger-text heavy red-button' id='game-canceled-leave'>Leave Game</p>";
+			}
 		echo $this->alert()->end();
+	}
+	
+	if (!$this->user->hasProfilePic()) {
+		echo $this->alert()->start('upload');
+			echo "<p class='darkest width-100 center heavy'>You must upload a profile picture before joining a game.</p>";
+
+			echo "<a href='/users/" . $this->user->userID . "/upload' class='clear larger-text larger-margin-top heavy green-button white' id='game-canceled-back'>Upload Now</a>";
+		echo $this->alert()->end();
+		
+		$content = "<a href='/users/" . $this->user->userID . "/upload' class='width-100 center white left heavy'>You need a profile picture to play.  <span class='white'>Click here to add one.</span></p>";
+		echo $this->topAlert('upload', $content);
 	}
 		
 
@@ -130,11 +150,12 @@ echo "<span id='game-details'
 			rosterLimit='" . $this->game->rosterLimit . "'
 			sport='" . $this->game->sport . "'
 			public='" . ($this->isPublic ? 'public' : 'private') . "'
+			picture='" . (!$this->user->hasProfilePic() ? 'true' : '') . "'
 	 </span>";
 ?>
 
 <?php
-if ($this->topAlert) {
+if ($this->topAlert && $this->userInGame) {
 	// Game is recurring 
 	echo $this->placeholder('topAlert')->captureStart();
 		$content = "<p class='white heavy width-100 center'>This game happens every week. <span class='white'> Click here to subscribe.</span></p>";
@@ -236,6 +257,7 @@ if ($this->userInGame) {
 </div>
 <?php
 	} elseif (!$this->userInGame) {
+		echo "<div class='right'>";
                 $lower = '';
                 $class = '';
                 $text = 'Join';
@@ -247,17 +269,30 @@ if ($this->userInGame) {
                     $id   = 'request-join-button';
                     $tooltip = "tooltip='This is a private game.'";
                 }
-                if ($this->game->minSkill > $this->user->getSport($this->game->sport)->skill) {
+				
+                if ($this->game->minSkill > $this->user->getSport($this->game->sport)->overall) {
                     // User is not good enough for this game
                     $class = 'transparent default';
                     $id = '';
-                    $lower = '<p class="light clear-right smaller-text margin-top">You must have a minimum skill of ' . $this->team->minSkill . ' to join.';
-                }
+                    $lower = '<p class="light clear-right smaller-text margin-top">You must have a minimum skill of ' . $this->game->minSkill . ' to join.</p>';
+                } elseif ($this->game->maxSkill < $this->user->getSport($this->game->sport)->overall) {
+					 // User is too good 
+                    $class = 'transparent default';
+                    $id = '';
+                    $lower = '<p class="light clear-right smaller-text margin-top">You must have a maximum skill of ' . $this->game->maxSkill . ' to join.</p>';
+				}
+					
+				if (!$this->user->hasProfilePic()) {
+					// User does not have profile pic, do not allow to join
+					$class = 'transparent default';
+					$tooltip = "tooltip='You must upload a picture before you can join any games.'";
+				}
                 ?>
                 <p class='green-button right larger-text join-button heavy <?php echo $class;?>' <?php echo $tooltip;?> id='<?php echo $id;?>'>
                     <?php echo $text;?>
                 </p>
                 <?php echo $lower; ?>
+           </div>
         <?php } ?>
 <!--
     <div class='clear width-100 larger-margin-top'>
@@ -302,7 +337,7 @@ if ($this->userInGame) {
 	// User is on team, allow to post
 ?>
 <div id='team-post-container' class='clear width-100'>
-	<img src='<?php echo $this->user->getProfilePic('small');?>' class='left' />
+	<?php echo $this->user->getBoxProfilePic('small');?>
     <?php echo $this->postForm;?>
 </div>
 

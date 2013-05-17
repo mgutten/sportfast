@@ -1,0 +1,37 @@
+<?php
+/** 
+ * controller => users
+ * action => inbox
+ */
+$this->headTitle('Inbox');
+$this->headLink()->prependStylesheet($this->baseUrl() . '/css/inbox.css');
+$this->headScript()->prependFile($this->baseUrl() . '/js/inbox.js');
+?>
+
+<header class='jumbo-text darkest left heavy'>
+	Inbox <span class='darkest smaller-text'><?php echo $this->countNewMessages;?> new</span>
+</header>
+
+<div class='clear larger-margin-top width-100'>
+	<?php
+		foreach ($this->messages as $message) {
+			
+			$class = 'white-background';
+			$nameClass = '';
+			if (!$message->isRead()) {
+				// Message is unread
+				$class = 'light-back';
+				$nameClass = 'heavy';
+			}
+			
+			echo "<a href='/users/" . $this->user->userID . "/inbox/" . $message->messageGroupID . "' class='clear width-100 inbox-message-group-container pointer animate-darker " . $class . "'>";
+			echo	"<img src='" . $message->getProfilePic('small') . "' class='left'/>";
+			echo	"<p class='left largest-text darkest " . $nameClass . " indent inbox-message-group-name'>" . $message->userName . "</p>";
+			echo	"<p class='left dark inbox-message-group-preview'>" . strip_tags($message->getLimitedName('message', 55)) . "</p>";
+			echo	"<p class='right light inbox-message-group-time'>" . $message->getTimeFromNow() . "</p>";
+			echo "</a>";
+		}
+	?>
+
+
+</div>

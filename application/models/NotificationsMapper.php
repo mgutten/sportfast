@@ -135,12 +135,12 @@ class Application_Model_NotificationsMapper extends Application_Model_MapperAbst
 		 } elseif ($type == 'team') {
 			 $query = "INSERT INTO user_teams (teamID, userID)
 			 			(SELECT nl.teamID,
-								nl.actingUserID
+								nl.receivingUserID
 							FROM notification_log as `nl`
 							WHERE nl.notificationLogID = '" . $notificationLogID . "')";
 			
 			 $query2 = "INSERT INTO notification_log (actingUserID, teamID, notificationID, dateHappened)
-			 			 (SELECT nl.actingUserID, 
+			 			 (SELECT nl.receivingUserID, 
 						 		 nl.teamID, 
 								 (SELECT notificationID FROM notifications WHERE type ='team' AND action = 'join' AND details IS NULL), 
 								 NOW()

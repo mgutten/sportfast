@@ -20,9 +20,21 @@ class Application_View_Helper_MemberHomepage
         if ($user->getProfilePic('large') == '/images/users/profile/pic/large/default.jpg') {
 			// No profile pic, send to upload profile pic page
 			$href .= '/upload';
+			$tooltip = 'Upload a picture';
+			$overlay = "Picture needed";
+		} else {
+			$tooltip = 'View my profile';
+			$overlay = '';
 		}
 			
-        	echo "<a href='" . $href . "'><img src='" . $user->getProfilePic('large') . "' class='narrow-column-picture dropshadow rounded-corners' id='narrow-column-user-picture'/></a>";
+        	echo "<a href='" . $href . "' class='left member-pic-container' tooltip='" . $tooltip . "'>
+					<img src='" . $user->getProfilePic('large') . "' class='narrow-column-picture dropshadow dark-back' id='narrow-column-user-picture'/>
+					<div class='member-narrow-column-pic-overlay black-back'></div>
+					<div class='member-narrow-column-pic-overlay' id='member-narrow-column-pic-overlay-text'>
+						<p class='clear width-100 center white heavy largest-text margin-top'>" . $user->shortName . "</p>
+						<p class='clear width-100 center white heavy larger-text margin-top' id='member-narrow-column-pic-overlay-text-bottom'>" . $overlay . "</p>
+					</div>
+				  </a>";
            	echo $this->_view->narrowcolumnsection()->start(array('title' => 'My Ratings'));
 				echo $this->buildUserRatings();
 			echo $this->_view->narrowcolumnsection()->end();

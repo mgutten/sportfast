@@ -24,6 +24,18 @@ if ($this->fail) {
 	echo $this->placeholder('absolute')->captureStart();
 	echo $this->partial('partials/global/alertBack.phtml');
 	
+	if ($this->team->remove) {
+		// Team has been marked for removal
+		echo $this->alert()->start('canceled');
+			echo "<p class='largest-text darkest width-100 center heavy'>This team has been deleted.</p>";
+			
+			echo "<p class='medium width-100 center'>It will be removed within a few days.</p>";
+
+			echo "<a href='/' class='clear larger-text larger-margin-top heavy green-button white' id='game-canceled-back'>Back to home</a>";
+		echo $this->alert()->end();
+	}
+
+	
 	if ($this->captain) {
 		// User is captain, show alerts for captain's management
 			echo $this->alert()->start('manage-schedule','Click on a day to add/edit schedule.');
@@ -419,7 +431,7 @@ if ($this->userOnTeam) {
 	// User is on team, allow to post
 ?>
 <div id='team-post-container' class='clear width-100'>
-	<img src='<?php echo $this->user->getProfilePic('small');?>' class='left' />
+	<?php echo $this->user->getBoxProfilePic('small');?>
     <?php echo $this->postForm;?>
 </div>
 

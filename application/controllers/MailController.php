@@ -142,6 +142,53 @@ class MailController extends Zend_Controller_Action
 		}
 		
 	}
+	
+	/**
+	 * mail new password
+	 */
+	public function forgotAction()
+	{
+		$email = $this->getRequest()->getPost('email');
+		
+		$user = new Application_Model_User();
+		$user->getUserBy('u.username', $email);
+		
+		if (!$user->userID) {
+			// Did not find user
+			$this->_redirect('/login/forgot');
+		}
+		
+		$password = '';
+		$limit = mt_rand(5,6);
+		$characters = '23456789abcdefghijkmnopqrstuvwxyzABCDEFGHIJKLMNPQRSTUVWXYZ';
+
+		for ($i = 0; $i < $limit; $i++) {
+			$password .= $characters[rand(0, strlen($characters) - 1)];
+		}
+		
+		
+		$user->password = $user->hashPassword($password);
+		
+		$user->save(false);	
+		
+		$subject  = 'Password Reset';
+		$message  = "A password reset has been requested.  Your new password is:
+						<br><br><p style='font-weight:bold;font-size:16px'>" . $password . "</p>
+						<br><br>You can set your password to something more meaningful under \"Settings\".";
+		$headers  = "MIME-Version: 1.0" . "\r\n";
+		$headers .= "Content-type: text/html; charset=iso-8859-1" . "\r\n";
+		$headers .= "From: info@sportup.com\r\n";	 
+		$headers .= "Reply-To: donotreply@sportup.com" . "\r\n";			
+				
+		mail($email, $subject, $message, $headers);
+		
+		
+		$session = new Zend_Session_Namespace('forgot');
+		$session->email = $email;
+		
+		
+		$this->_redirect('/login');
+	}
 
 
 }

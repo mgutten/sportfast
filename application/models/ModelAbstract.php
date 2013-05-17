@@ -188,6 +188,12 @@ abstract class Application_Model_ModelAbstract
 		return $jsonArray;
 	}
 	
+	public function setCurrent($attrib)
+	{
+		$this->_attribs[$attrib] = date("Y-m-d H:i:s", time());
+		return $this;
+	}
+	
 	public function setPrimaryKey($value) 
 	{
 		$this->_primaryKey = $value;
@@ -400,6 +406,11 @@ abstract class Application_Model_ModelAbstract
 			$this->setMapper($this->_mapperClass);
 		}
 		return $this->_mapper;
+	}
+	
+	public function getColumnValue($column, $value, $tableName = false)
+	{
+		return $this->getMapper()->getColumnValue($column, $value, $tableName = false);
 	}
 	
 	public function find($id, $column) 

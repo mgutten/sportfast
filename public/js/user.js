@@ -40,5 +40,38 @@ $(function()
 		showConfirmationAlert('Request sent.');
 	})
 	
+	$("#user-player-cancel-request").click(function()
+	{
+		confirmAction = function() 
+		{
+			var detailsEle = $('#user-details');
+			var actingUserID = detailsEle.attr('actingUserID');
+			var receivingUserID = detailsEle.attr('receivingUserID');
+			
+			
+			showConfirmationAlert('Player removed');
+			removeFriend(actingUserID, receivingUserID);
+		}
+		
+		populateConfirmActionAlert('remove this player');
+	})
+	
 	
 })
+
+
+/**
+ * remove friendship (connected players)
+ */
+function removeFriend(userID1, userID2)
+{
+	$.ajax({
+		url: '/ajax/remove-friend',
+		type: 'POST',
+		data: {userID1: userID1,
+			   userID2: userID2},
+		success: function(data) {
+			reloadPage()
+		}
+	})
+}

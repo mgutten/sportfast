@@ -29,8 +29,18 @@ $(function() {
 		
 		loadFind(false);
 		
-		
-		
+	})
+	
+	
+	/* overly opacity on hover narrow column pic */
+	$('.member-pic-container').hover(function()
+	{
+		$(this).children('#narrow-column-user-picture').stop().animate({opacity: '.5'}, 300);
+		$(this).children('#member-narrow-column-pic-overlay-text').stop().animate({opacity: '1'}, 300);
+	}, function()
+	{
+		$(this).children('#narrow-column-user-picture').stop().animate({opacity: '1'}, 300);
+		$(this).children('#member-narrow-column-pic-overlay-text').stop().animate({opacity: '0'}, 300);
 	})
 	
 	$('.dropdown-menu-option-container').each(function()

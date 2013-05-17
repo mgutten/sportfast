@@ -63,7 +63,12 @@ class Application_Model_Notification extends Application_Model_ModelAbstract
 			$path = $this->getProfilePic($size, $this->parkID, 'parks');
 		} elseif ($picture == 'sports') {
 			// Sports pic
-			$path = $this->getSportIcon($this->sport, $size, 'solid', 'medium');
+			if (empty($this->sport)) {
+				// Game has been deleted or for some reason does not have sport saved, default to basketball
+				$path = $this->getSportIcon('basketball', $size, 'solid', 'medium');
+			} else {
+				$path = $this->getSportIcon($this->sport, $size, 'solid', 'medium');
+			}
 		} elseif ($picture == 'teams') {
 			// Team pic
 			$path = $this->getProfilePic($size, $this->teamID, 'teams');
@@ -250,6 +255,8 @@ class Application_Model_Notification extends Application_Model_ModelAbstract
 	
 	public function save()
 	{
+		$this->setCurrent('dateHappened');
+		
 		$notificationDetails = array('action'  => $this->action,
 									 'type'	   => $this->type,
 									 'details' => $this->details);
@@ -260,7 +267,8 @@ class Application_Model_Notification extends Application_Model_ModelAbstract
 					   'teamID'  => $this->teamID,
 					   'ratingID'  => $this->ratingID,
 					   'parkID'  => $this->parkID,
-					   'cityID'	 => $this->cityID);
+					   'cityID'	 => $this->cityID,
+					   'dateHappened' => $this->dateHappened);
 					   
 		return $this->getMapper()->addNotification($notificationDetails, $data);
 	}

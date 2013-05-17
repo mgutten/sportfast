@@ -52,3 +52,32 @@ input.dropdown-login-submit {
 	font-size: 1.2em;
 }
 
+
+/* forgot password */
+#login-forgot-back {
+	width: 20em;
+}
+
+#email-container {
+	font-size: 1.1em;
+}
+
+#email {
+	width: 16em;
+}
+
+#valid, #invalid {
+	margin: .75em 0 0 .2em;
+}
+
+#submit {
+	float:right;
+	margin-top: .5em;
+}
+
+#forgot-alert-container {
+	margin-top: -10em;
+	margin-left: -17em;
+	width: 34em;
+}
+	

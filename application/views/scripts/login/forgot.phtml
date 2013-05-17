@@ -1,0 +1,25 @@
+<?php
+/* 
+* controller => login
+* action => index
+*/
+$this->headTitle('Forgot Password');
+$this->headLink()->prependStylesheet($this->baseUrl() . '/css/login.css');
+$this->headScript()->prependFile($this->baseUrl() . '/js/login.js');
+?>
+<div id='login-form-container'>
+	<p class='bold darkest' id='login-header'>
+    	FORGOT PASSWORD
+    </p>
+    <img src='/images/login/runner.png' id='login-header-img' />
+    <div id="login-forgot-back" class='white-back dropshadow clear'>
+    	<form name='forgot' id='forgotForm' action='/mail/forgot' method='POST'>
+    	<p class='left darkest'>Please enter your username/email below:</p>
+			<?php echo $this->form->email;?>
+            <img src='/images/team/confirm/medium.png' class='hidden left' id='valid'/>
+            <img src='/images/team/deny/medium.png' class='hidden left' id='invalid'/>
+        <p class='light clear'>An email will be sent with the new password.</p>
+        <?php echo $this->form->submit;?>
+        </form>
+    </div>
+</div>

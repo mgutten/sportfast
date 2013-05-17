@@ -312,10 +312,9 @@ $(function()
 				var postContent = "<p class='clear margin-top light width-100 center'>This action cannot be undone.</p>";
 				
 				populateConfirmActionAlert(text, postContent);
-				$('#confirm-action-alert-container').show();
+				
 		}
 		
-		$('.alert-black-back').show();
 
 	});
 	
@@ -334,7 +333,15 @@ $(function()
 			$('#manage-schedule-alert-container,.alert-black-back').show();
 		}
 	})
+	
+	if ($('#canceled-alert-container').length > 0) {
+		// Team has been deleted
+		showAlert($('#canceled-alert-container'));
 		
+		$('.alert-black-back,.alert-x').unbind('click.default');
+		
+		$('.alert-x').hide();
+	}
 	
 
 	addAnimateDarkerToManageCalendar()

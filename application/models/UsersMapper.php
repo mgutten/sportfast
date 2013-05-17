@@ -11,10 +11,10 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 		$select->setIntegrityCheck(false);
 		
 		$select->from(array('u' => 'users'))
-               ->join(array('c' => 'cities'),
+               ->joinLeft(array('c' => 'cities'),
                       'u.cityID = c.cityID',
 					  array('cityID', 'city', 'state'))
-			   ->join(array('ul' => 'user_locations'),
+			   ->joinLeft(array('ul' => 'user_locations'),
 			   		  'ul.userID = u.userID',
 					   array('AsText(location) as location'))
 			   ->where($column . ' = ?', $value)
@@ -262,7 +262,7 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 			   ->where('ug.userID = ?', $savingClass->userID)
 			   ->where('g.date > CURDATE()')
 			   ->group('ug.gameID');
-		
+
 		
 		$results = $table->fetchAll($select);
 		
@@ -435,6 +435,56 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 
 		return $savingClass;
 		
+	}
+	
+	/**
+	 * remove friend
+	 */
+	public function removeFriend($userID1, $userID2)
+	{
+		$db = Zend_Db_Table::getDefaultAdapter();
+		
+		if (empty($userID1) || empty($userID2)) {
+			// Protect against empty variables
+			return false;
+		}
+		
+		$delete = 'DELETE 
+					FROM friends
+					WHERE (friends.userID1 = :userID1 AND friends.userID2 = :userID2) 
+						OR (friends.userID1 = :userID2 AND friends.userID2 = :userID1)';
+					
+		return $db->query($delete,
+							array(':userID1' => $userID1, 
+								  ':userID2' => $userID2));
+	}
+	
+	/**
+	 * verify hash for user on signup
+	 * @params ($savingClass => user model)
+	 */
+	public function verify($hash)
+	{
+		$table = $this->getDbTable();
+		$select = $table->select();
+		
+		$select->from(array('u' => 'users'))
+			   ->where('u.verifyHash = ?', $hash);
+			   
+		$result = $table->fetchRow($select);
+		
+		if ($result) {
+			// Successful verification, change status to active
+			$data = array('active' => 1);
+			$where = array('userID = ?' => $result['userID']);
+			
+			$table->update($data, $where);
+			
+			return $result['userID'];
+		} else {
+			// Failed verification
+			return false;
+		}
 	}
 	
 	

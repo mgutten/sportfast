@@ -7,10 +7,20 @@ $this->headTitle($this->currentUser->shortName);
 $this->headLink()->prependStylesheet($this->baseUrl() . '/css/user.css');
 $this->headLink()->prependStylesheet($this->baseUrl() . '/css/profile.css');
 $this->headScript()->prependFile($this->baseUrl() . '/js/user.js');
+$this->headScript()->prependFile($this->baseUrl() . '/js/profile.js');
 ?>
 
 
 <?php
+$this->placeholder('absolute')->captureStart();
+
+echo $this->partial('partials/global/alertBack.phtml');
+echo $this->alert()->confirmAlert();
+
+
+$this->placeholder('absolute')->captureEnd();
+
+
 // Narrow right column
 $this->placeholder('narrowColumn')->captureStart();
 echo "<img src='" . $this->currentUser->getProfilePic('large') . "' class='narrow-column-picture dropshadow rounded-corners'/>";
@@ -57,9 +67,9 @@ $this->placeholder('narrowColumn')->captureEnd();
 	if ($this->currentUser->userID != $this->user->userID) {
 		// Not current user
 	?>
-    <p class='button right' id='user-message'>
+    <a href='/users/<?php echo $this->user->userID;?>/group/<?php echo $this->currentUser->userID;?>' class='button right' id='user-message'>
     	Message
-    </p>
+    </a>
     <?php
 	
 		if (!$this->user->players->userExists($this->currentUser->userID)) {
@@ -183,7 +193,7 @@ $this->placeholder('narrowColumn')->captureEnd();
 			if ($numRatings == 1) {
 				$str = 'rating';
 			}
-			$lowerOutput .=				"<a href='/users/" . $this->currentUser->userID . "/ratings' class='green clear-right user-sport-num-ratings'>" 
+			$lowerOutput .=				"<a href='/users/" . $this->currentUser->userID . "/ratings/" . strtolower($sport->sport) . "' class='green clear-right user-sport-num-ratings'>" 
 										. $numRatings . " " . $str
 										. "</a>";
 			$lowerOutput .= 		"</div>";

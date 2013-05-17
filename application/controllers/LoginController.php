@@ -14,7 +14,13 @@ class LoginController extends Zend_Controller_Action
     {
 
 		$this->view->whiteBacking = false;
-        $this->view->test = $this->getRequest()->getPost('username');
+		
+		$session = new Zend_Session_Namespace('forgot');
+		if ($session->email) {
+			// Forgot password was invoked, show alert
+			$this->view->email = $session->email;
+			Zend_Session::namespaceUnset('forgot');
+		}
 		
 		$form     = $this->getForm();
 		$username = $form->getElement('username');
@@ -128,6 +134,14 @@ class LoginController extends Zend_Controller_Action
 		Zend_Session::destroy(false);
 		
 		$this->_helper->redirector->goToUrl('/');
+	}
+	
+	public function forgotAction()
+	{
+		$this->view->whiteBacking = false;
+		
+		$this->view->form = new Application_Form_ForgotPassword();
+		
 	}
 	
 	

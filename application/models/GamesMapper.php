@@ -383,8 +383,14 @@ class Application_Model_GamesMapper extends Application_Model_MapperAbstract
 		$select->from(array('ug' => 'user_games'))
 			   ->join(array('u' => 'users'),
 			   		  'ug.userID = u.userID')
-			   ->join(array('us' => 'user_sports'),
-			   		  'ug.userID = us.userID AND us.sportID = "' . $sportID . '"')
+			   ->joinLeft(array('us' => 'user_sports'),
+			   		  'ug.userID = us.userID AND us.sportID = "' . $sportID . '"',
+					  array('us.sportID',
+					  		'us.skillInitial',
+							'us.often',
+							'us.skillCurrent',
+							'us.attendance',
+							'us.sportsmanship'))
 			   ->join(array('s' => 'sports'),
 			   		  's.sportID = ' . $sportID)
 			   ->joinLeft(array('gs' => 'game_subscribers'),
@@ -398,6 +404,17 @@ class Application_Model_GamesMapper extends Application_Model_MapperAbstract
 		$players = $table->fetchAll($select);
 
 		foreach ($players as $player) {
+			
+			if ($player->fake == '1') {
+				// Fake player
+				$middleSkill = round(($savingClass->maxSkill + $savingClass->minSkill)/2);
+				$skill = mt_rand($middleSkill - 2, $middleSkill + 2);
+				
+				$player->skillCurrent = $skill;
+				$player->attendance   = '90';
+				$player->sportsmanship = '80';
+			}
+			
 			$savingClass->addPlayer($player)
 						->getSport($player->sport)
 						->setAttribs($player);

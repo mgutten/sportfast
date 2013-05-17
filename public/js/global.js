@@ -870,7 +870,6 @@ function removeUserFromType(userID, idType, typeID) {
 		type: 'POST',
 		data: {options: options},
 		success: function(data) {
-			alert(data);
 		}
 	})
 }
@@ -1773,6 +1772,8 @@ function populateConfirmActionAlert(str, postContent)
 		// add post content
 		$('#confirm-action-postContent').html(postContent);
 	}
+	
+	showAlert($('#confirm-action-alert-container'));
 }
 
 

@@ -17,6 +17,12 @@ class UsersController extends Zend_Controller_Action
 		
 		$user = new Application_Model_User();
 		$user->getUserBy('u.userID', $userID);
+		
+		if ($user->fake) {
+			
+			$this->_redirect('/error/permission');
+		}
+		
 		$user->getUserSportsInfo();
 		$user->getUserFriendsGroupsTeams();
 		$user->getUserRatings();
@@ -42,11 +48,13 @@ class UsersController extends Zend_Controller_Action
 	
 	function uploadAction()
 	{
-		if ($this->view->user->userID != $this->getRequest()->getParam('id')) {
-			// Not this user
-			$this->_forward('permission', 'error', null);
-		}
+		$this->permission();
 		$this->view->narrowColumn = 'false';
+		
+		$session = new Zend_Session_Namespace('goToURL');
+		if ($session->url) {
+			$this->view->goToURL = $session->url;
+		}
 	}
 	
 	public function ratingsAction()
@@ -58,6 +66,11 @@ class UsersController extends Zend_Controller_Action
 		
 		$userID = $this->getRequest()->getParam('id');
 		$sport  = $this->getRequest()->getParam('sport');
+		
+		if (!$sport) {
+			$this->_redirect($this->view->currentURI . '/basketball');
+		}
+		
         $user = new Application_Model_User();
 		$user->getUserByID($userID);
 		$user->getUserSportsInfo();
@@ -101,13 +114,98 @@ class UsersController extends Zend_Controller_Action
 	
 	public function settingsAction()
     {
-		if ($this->view->user->userID != $this->getRequest()->getParam('id')) {
-			// Not this user
-			$this->_forward('permission', 'error', null);
-		}
+		$this->permission();
 		$this->view->narrowColumn = 'false';
 	}
 
+
+	public function inboxAction()
+	{
+		$this->permission();	
+		$this->view->narrowColumn = 'false';
+		
+		$groupMessageID = $this->getRequest()->getParam('sport'); // Bootstrap user route has "sport" saved as third parameter, use that
+		
+		if ($groupMessageID) {
+			$this->_forward('message');
+		}
+		
+		$messages = new Application_Model_UserMessages();
+		
+		$messages->getUserMessageGroups($this->view->user->userID);
+		
+		$this->view->messages = $messages->read;
+		$this->view->numConversations = count($messages->read);
+	}
+	
+	public function messageAction()
+	{
+		$this->permission();
+		$messageGroupID = $this->getRequest()->getParam('sport'); // Bootstrap user route has "sport" saved as third parameter, use that
+		
+		if (!$messageGroupID) {
+			$this->_redirect('/users/' . $this->view->user->userID . '/inbox');
+		}
+		
+		$messages = new Application_Model_UserMessages();
+		$messages->getMessageGroup($messageGroupID);
+		
+		$otherUserID = $messages->getOtherUserID($this->view->user->userID);
+		
+		$otherUser = new Application_Model_User();
+		$otherUser->getUserByID($otherUserID);
+		
+		$this->view->otherUserName = $otherUser->shortName;
+		
+		$this->view->messages = $messages->read;
+		
+		
+		$postForm = new Application_Form_PostMessage();
+		$postForm->setAction('/post/message');
+		$postForm->login->setName('submitPostMessage');
+		$postForm->messageType->setValue('user');
+		$postForm->messageGroupID->setValue($messageGroupID);
+		$postForm->receivingUserID->setValue($messages->getOtherUserID($this->view->user->userID));
+		$this->view->postForm = $postForm;
+		
+		if ($messages->hasValue('read')) {
+			foreach ($messages->read as $message) {
+				
+				if ($message->userID == $this->view->user->userID) {
+					continue;
+				}
+				$message->read = '1';
+				
+				$message->save();
+			}
+		}
+		
+	}
+	
+	/**
+	 * check if message group exists and redirect to appropriate page (from "Message" button on user profile)
+	 */
+	public function groupAction()
+	{
+		$receivingUserID = $this->getRequest()->getParam('sport');
+		$userID = $this->view->user->userID;
+		
+		$messages = new Application_Model_Messages();
+		
+		$messageGroupID = $messages->messageGroupExists($receivingUserID, $userID);
+		
+		$this->_redirect('/users/' . $userID . '/inbox/' . $messageGroupID);
+		
+	}
+	
+	public function permission()
+	{
+		if ($this->view->user->userID != $this->getRequest()->getParam('id')) {
+			// Not this user
+			return $this->_forward('permission', 'error', null);
+		}
+		
+	}
 
 }
 

@@ -132,6 +132,116 @@ class Application_Model_MessagesMapper extends Application_Model_MapperAbstract
 		return $savingClass;
 	 }	
 	 
+	 /**
+	  * get user message groups where user received a message
+	  */
+	 public function getUserMessageGroups($userID, $savingClass)
+	 {
+		$db = Zend_Db_Table::getDefaultAdapter();
+		
+		$select = "SELECT `m`.* FROM 
+						(SELECT * FROM messages as m2 
+							INNER JOIN users as u ON (u.userID = m2.sendingUserID)
+							WHERE (receivingUserID = '" . $userID . "')
+							ORDER BY m2.`dateHappened` desc) AS `m` 
+					GROUP BY m.messageGroupID ORDER BY m.dateHappened DESC";
+		
+		/* if want to normalize to message_groups table
+		SELECT `m`.* FROM 
+						(SELECT m2.*,u.* FROM messages as m2 
+							INNER JOIN users as u ON (u.userID = m2.sendingUserID)
+							INNER JOIN message_groups as mg ON (mg.messageGroupID = m2.messageGroupID)
+							WHERE (mg.userID1 = '1' OR mg.userID2 = '1') AND m2.sendingUserID != '1'
+							ORDER BY m2.`dateHappened` desc) AS `m` 
+					GROUP BY m.messageGroupID ORDER BY m.dateHappened DESC
+		*/
+		
+		$results = $db->fetchAll($select);
+		
+		foreach ($results as $result) {
+			$savingClass->addMessage($result, true);
+		}
+		
+		return $savingClass;
+		
+	 }
+	 
+	 /**
+	  * get all messages in message group
+	  */
+	 public function getMessageGroup($messageGroupID, $savingClass)
+	 {
+		 $table = $this->getDbTable();
+		 $select = $table->select();
+		 $select->setIntegrityCheck(false);
+		 
+		 $select->from(array('mg' => 'message_groups'))
+		 		->where('mg.messageGroupID = ?', $messageGroupID)
+				->limit(1);
+			
+		 $results = $table->fetchAll($select);
+		 
+		 foreach ($results as $result) {
+			 $savingClass->setAttribs($result);
+		 }
+		 
+		 $select = $table->select();
+		 $select->setIntegrityCheck(false);
+		 
+		 $select->from(array('m' => 'messages'))
+		 		->join(array('u' => 'users'),
+					   'u.userID = m.sendingUserID')
+		 		->where('m.messageGroupID = ?', $messageGroupID)
+				->order('m.dateHappened DESC')
+				->limit('30');
+				
+		 $messages = $table->fetchAll($select);
+		 
+		 foreach ($messages as $message) {
+			 $savingClass->addMessage($message, true);
+		 }
+		 
+		 return $savingClass;
+	 }
+		 
+	 
+	 /**
+	  * test if messageGroupExists, if not, add it
+	  */
+	 public function messageGroupExists($userID1, $userID2)
+	 {
+		 $db = Zend_Db_Table::getDefaultAdapter();
+		 
+		 $select = "SELECT mg.messageGroupID 
+		 				FROM message_groups as mg
+						WHERE (mg.userID1 = :userID1 AND mg.userID2 = :userID2)
+							OR (mg.userID1 = :userID2 AND mg.userID2 = :userID1)
+						LIMIT 1";
+							
+		$statement = $db->query($select,
+							  array(':userID1' => $userID1, ':userID2' => $userID2)); // returned result is array, not object
+	
+							  
+	    $results = $statement->fetchAll();
+		
+		if ($results) {
+			foreach ($results as $result) {
+				return $result['messageGroupID'];
+			}
+		} else {
+			// No message group exists, insert it
+			$data = array('userID1' => $userID1,
+						  'userID2' => $userID2);
+			$db->insert('message_groups', $data);
+			
+			return $db->lastInsertID();
+		}
+		
+	 }
+			
+						
+		
+	 
 }
 		
 			   

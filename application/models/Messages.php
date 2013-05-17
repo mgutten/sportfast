@@ -9,13 +9,17 @@ class Application_Model_Messages extends Application_Model_ModelAbstract
 									
 	protected $_parent;
 	
-	public function addMessage($resultRow)
+	/**
+	 * add message to appropriate attrib
+	 * @params ($ignoreRead => if true, ignore read column of resultRow so everything automatically goes to default Read pile)
+	 */
+	public function addMessage($resultRow, $ignoreRead = false)
 	{
 		// Result row from getOldUserNotifications and getNewUserNotifications is array, not object
 		if (!is_array($resultRow)) {
 			$resultRow = $resultRow->toArray();
 		}
-		if (isset($resultRow['read'])) {
+		if (isset($resultRow['read']) && !$ignoreRead) {
 			// Read column exists, test it
 			if ($resultRow->read == '0') {
 				// New notification
@@ -44,6 +48,13 @@ class Application_Model_Messages extends Application_Model_ModelAbstract
 		}
 		return $message;
 	}
+	
+	
+	public function messageGroupExists($userID1, $userID2)
+	{
+		return $this->getMapper()->messageGroupExists($userID1, $userID2);
+	}
+	
 	
 	public function countNewUserMessages($userID)
 	{

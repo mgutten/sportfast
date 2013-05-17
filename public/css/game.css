@@ -53,11 +53,17 @@
 	margin-left: .3em;
 }
 
+/* ON PROFILE.CSS 
 #canceled-alert-container {
 	width: 34em;
 	margin-left: -17em;
 	margin-top: -10em;
 }
+
+#game-canceled-back {
+	margin-left: 8em;
+}
+*/
 
 #manage-cancel-alert-container {
 	width: 34em;
@@ -74,9 +80,14 @@
 	margin-top: .5em;
 }
 
-#game-canceled-back {
-	margin-left: 8em;
+#upload-alert-container {
+	margin-top: -10em;
+	margin-left: -16em;
+	width: 32em;
+	height: 15em;
 }
+
+
 
 #cancel-reason {
 	width: 78%;

@@ -1,0 +1,51 @@
+<?php
+/** 
+ * controller => users
+ * action => inbox
+ */
+$this->headTitle('Messages with ' . $this->otherUserName);
+$this->headLink()->prependStylesheet($this->baseUrl() . '/css/inbox.css');
+$this->headLink()->prependStylesheet($this->baseUrl() . '/css/profile.css');
+$this->headScript()->prependFile($this->baseUrl() . '/js/inbox.js');
+?>
+
+<a href='/users/<?php echo $this->user->userID;?>/inbox' class='left smaller-text medium'>&lt;&lt; Back to inbox</a>
+
+
+<header class='jumbo-text darkest heavy clear' id='message-header'>
+	<?php echo 'Messages with ' . $this->otherUserName;?>
+</header>
+
+
+<?php
+
+if ($this->messages) {
+	for ($i = (count($this->messages) - 1); $i >= 0; $i--) {
+		// Backwards loop to show most recent messages on the bottom of page
+		$message = $this->messages[$i];
+		
+		$name = $message->getUserName();
+		if ($message->userID == $this->user->userID) {
+			$name = 'You';
+		}
+		
+		
+		echo "<div class='clear message-container'>";
+		echo	"<a href='/users/" . $message->sendingUserID . "' class='left'><img src='" . $message->getProfilePic('small') . "' class='left'/></a>";
+		echo	"<div class='inbox-message-right-container left'>";
+		echo		"<p class='left smaller-text light'>" . $name . " said...</p>";
+		echo		"<p class='clear margin-top darkest'>" . $message->getMessage(true) . "</p>";
+		echo	"</div>";
+		echo	"<p class='right light smaller-text'>" . $message->getTimeFromNow() . "</p>"; 
+		echo "</div>";
+	}
+}
+
+?>
+
+
+    <div class='clear message-container' id='inbox-post-message'>
+        <img src='<?php echo $this->user->getProfilePic('small');?>' class='left'/>
+        <?php echo $this->postForm;?>
+    
+    </div>

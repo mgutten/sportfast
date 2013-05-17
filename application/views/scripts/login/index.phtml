@@ -5,8 +5,26 @@
 */
 $this->headTitle('Login');
 $this->headLink()->prependStylesheet($this->baseUrl() . '/css/login.css');
-//$this->headScript()->prependFile($this->baseUrl() . '/js/how.js');
+$this->headScript()->prependFile($this->baseUrl() . '/js/login.js');
 ?>
+
+<?php
+
+if ($this->email) {
+	// Forgot password invoked
+	$this->placeholder('absolute')->captureStart();
+	echo $this->partial('partials/global/alertBack.phtml');
+	
+	echo $this->alert()->start('forgot');
+		
+		echo "<p class='darkest width-100 center'>An email has been sent to <span class='larger-text darkest heavy'>" . $this->email . "</span>.";
+		
+	echo $this->alert()->end();
+	
+	$this->placeholder('absolute')->captureEnd();
+}
+?>
+
 <div id='login-form-container'>
 	<p class='bold darkest' id='login-header'>
     	LOGIN TO YOUR ACCOUNT

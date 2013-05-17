@@ -54,7 +54,7 @@ $(function()
 	})
 	
 	/* join */
-	$('#join-button').click(function()
+	$('#join-button').bind('click.join',function()
 	{
 		var detailsEle = getDetailsEle();
 		var idType = detailsEle.attr('idType');
@@ -304,17 +304,37 @@ $(function()
 		showConfirmationAlert('Changes saved');
 	});
 	
+	
+	$('#game-canceled-leave').click(function()
+	{
+		var detailsEle = getDetailsEle();
+		var userID = detailsEle.attr('actingUserID');
+		var idType = detailsEle.attr('idType');
+		var typeID = detailsEle.attr(idType);
+		var actingUserID = userID;
+		var receivingUserID;
+		var action = 'leave';
+		var type   = idType.replace(/ID/, '');
+		var details;		
+		
+		createNotification(idType, typeID, actingUserID, receivingUserID, action, type, details);
+		removeUserFromType(userID, idType, typeID);
+		changedAlert = $('.team-manage-remove-player-container');
+		reloadPage();
+	})
+	
 	/* user willingly leaves team */
 	$('#leave-button').click(function()
 	{
 		
 		var detailsEle = getDetailsEle();
+		var type = getType();
 		var captains = detailsEle.attr('captains');
 		
-		if ((captains.search(detailsEle.attr('actingUserID')) !== false) && 
+		if ((captains.search(detailsEle.attr('actingUserID')) !== -1) && 
 			 captains.length == 1) {
 			// User is still team captain, do not let leave without passing the torch
-			showConfirmationAlert('You must choose someone to be the new team captain (under Manage)');
+			showConfirmationAlert('You must choose someone to be the new ' + type + ' captain (under Manage)');
 			return;
 		}
 		
@@ -337,12 +357,7 @@ $(function()
 		
 		var name = (typeof detailsEle.attr('teamName') == 'undefined' ? 'this game' : detailsEle.attr('teamName'));
 		populateConfirmActionAlert('leave ' + name);
-		$('#confirm-action-alert-container').show();
 		
-		var opacity = $('.alert-black-back').css('opacity');
-		$('.alert-black-back').css({display: 'block',
-								   opacity: 0})
-							  .animate({opacity: opacity}, 200);
 	});
 	
 	$('#unsubscribe-button, #top-alert-subscribe').click(function()
@@ -371,12 +386,6 @@ $(function()
 		
 		var name = (typeof detailsEle.attr('teamName') == 'undefined' ? 'this game' : detailsEle.attr('teamName'));
 		populateConfirmActionAlert('unsubscribe');
-		$('#confirm-action-alert-container').show();
-		
-		var opacity = $('.alert-black-back').css('opacity');
-		$('.alert-black-back').css({display: 'block',
-								   opacity: 0})
-							  .animate({opacity: opacity}, 200);
 	});
 	
 	
@@ -420,9 +429,12 @@ $(function()
 	{
 		if ((($(e.target).parents('.profile-buttons-innermost-container').length > 0 && !$(e.target).is('a')) ||
 			 $(e.target).is('.profile-buttons-innermost-container'))) {
+				 // For animating div on games page
 				 return false;
 		} else if (parseInt($('.profile-buttons-inner-container').css('margin-left'),10) == 0) {
 				animateProfileButtons();
+		} else if ($(e.target).parents('#profile-buttons-container').length > 0) {
+				return false;
 		}
 		
 		if (dropdowns.dropdownMenuDown) {
@@ -440,6 +452,17 @@ $(function()
 function getDetailsEle()
 {
 	return ($('#team-details').length > 0 ? $('#team-details') : $('#game-details'))
+}
+
+/**
+ * get type ("team", "game")
+ */
+function getType()
+{
+	var detailsEle = getDetailsEle();
+	var type = detailsEle.attr('idType').replace('ID','');
+	
+	return type;
 }
 
 

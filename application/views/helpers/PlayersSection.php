@@ -108,7 +108,7 @@ class Application_View_Helper_PlayersSection
 				// No need to show join spots for users on team already
 				$text = 'Open';
 				$class = 'profile-open-player-container default';
-			}	
+			}
 			
 			for ($i = 0; $i < $remaining; $i++) {
 				$output .= "<div class='left " . $class . " light animate-opacity'>" . $text . "</div>";

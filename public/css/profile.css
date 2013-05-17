@@ -151,7 +151,7 @@
 	width: 88%;
 	height: 5.8em;
 	font-size: 1em;
-	margin: 0 0 0 .5em;
+	margin: 0 0 0 1.15em;
 }
 
 #input-overlay-postMessage {
@@ -334,6 +334,16 @@ input[type=text].profile-manage-team-info-roster-limit {
 	margin-right: .3em;
 }
 
+#canceled-alert-container {
+	width: 34em;
+	margin-left: -17em;
+	margin-top: -10em;
+}
+
+#game-canceled-back {
+	margin-left: 9.5em;
+}
+
 /* sub-players page */
 #player-description-container > p {
 	margin-top: .75em;
@@ -350,4 +360,13 @@ input[type=text].profile-manage-team-info-roster-limit {
 .profile-header-sub {
 	margin-top: .45em;
 	margin-left: .3em;
+}
+
+/* user side info */
+#user-side-info-container {
+	right:0;
+	top: 20%;
+	position: fixed;
+	padding: .5em .5em .5em .5em;
+	z-index: 10;
 }

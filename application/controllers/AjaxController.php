@@ -729,6 +729,27 @@ class AjaxController extends Zend_Controller_Action
 		
 	}
 	
+	/**
+	 * check if email exists as a user
+	 */
+	public function emailExistsAction()
+	{
+		$email = $this->getRequest()->getPost('email');
+		
+		if (empty($email)) {
+			return false;
+		}
+		
+		$users = new Application_Model_Users();
+		
+		$results = $users->emailsExist(array($email));
+		
+		if ($results) {
+			// Email exists
+			echo 'true';
+		}
+	}
+	
 	/** 
 	 * search db for league location specifically
 	 */
@@ -935,6 +956,26 @@ class AjaxController extends Zend_Controller_Action
 		
 		$table->delete($where);
 				
+	}
+	
+	/**
+	 * remove friendship
+	 */
+	public function removeFriendAction()
+	{
+		$post = $this->getRequest()->getPost();
+		$userID1 = $post['userID1'];
+		$userID2 = $post['userID2'];
+		
+		if ($userID1 == $this->view->user->userID) {
+			// Userid1 is current user, $otherUser is userID2
+			$otherUserID = $userID2;
+		} else {
+			$otherUserID = $userID1;
+		}
+		
+		
+		$this->view->user->removeFriend($otherUserID);
 	}
 	
 	/**

@@ -1,5 +1,6 @@
 // JavaScript Document
 var jcropAPI;
+var goToURL;
 var fileInfo = new Object();
 
 $(function()
@@ -91,7 +92,11 @@ function uploadProfilePic()
 		type: 'POST',
 		data: {fileInfo: fileInfo},
 		success: function(data) {
-			window.location = '/';
+			var location = '/';
+			if (goToURL) {
+				location = goToURL;
+			}
+			window.location = location;
 		}
 	})
 }

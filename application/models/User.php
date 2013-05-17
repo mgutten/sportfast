@@ -31,7 +31,8 @@ class Application_Model_User extends Application_Model_ModelAbstract
 									'players'		=> '',
 									'changedLocation' => '',
 									'messages'		=> '',
-									'plus'			=> ''
+									'plus'			=> '',
+									'fake'			=> ''
 									);
 
 	protected $_primaryKey = 'userID';	
@@ -431,7 +432,26 @@ class Application_Model_User extends Application_Model_ModelAbstract
 		$this->getMapper()->resetHomeLocation($this);
 	}
 	
-		/**
+	
+	/**
+	 * remove friend both in db and in players category
+	 */
+	public function removeFriend($friendUserID)
+	{
+		$this->players->remove($friendUserID);
+		
+		return $this->getMapper()->removeFriend($friendUserID, $this->userID);
+	}
+	
+	/**
+	 * verify user based on input hash (for signup verifyHash)
+	 */
+	public function verify($hash)
+	{
+		return $this->getMapper()->verify($hash);
+	}
+	
+	/**
      * Create a hash (encrypt) of a plain text password.
      *
      * @param string $password Plain text user password to hash

@@ -151,7 +151,7 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 						'controller' => 'users',
 						'module' => 'default',
 						'id'	 => $id,
-						'sport'  => 'basketball'
+						'sport'  => ''
 				),
 				array(
 						1 => 'id',
@@ -231,6 +231,22 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 				'parks/%d');
 				
 		$router->addRoute('parks', $r);
+		
+		// Signup page
+		$r = new Zend_Controller_Router_Route_Regex(
+				'signup/verify(?:/(.*))?',
+				array(
+						'action' => 'verify',
+						'controller' => 'signup',
+						'module' => 'default',
+						'verifyHash' => ''
+				),
+				array(
+						1 => 'verifyHash'
+				),
+				'signup/verify/%s');
+				
+		$router->addRoute('verify', $r);
 		
 		
 		return $view;

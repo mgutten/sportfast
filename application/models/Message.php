@@ -5,6 +5,7 @@ class Application_Model_Message extends Application_Model_ModelAbstract
 	protected $_mapperClass = 'Application_Model_MessagesMapper';
 	
 	protected $_attribs     = array('teamMessageID' => '',
+									'messageID'		=> '',
 									'teamID'		=> '',
 									'groupID'		=> '',
 									'userID'		=> '',
@@ -12,7 +13,12 @@ class Application_Model_Message extends Application_Model_ModelAbstract
 									'dateHappened'  => '',
 									'firstName'		=> '',
 									'lastName'		=> '',
-									'notification'  => ''
+									'notification'  => '',
+									'sendingUserID' => '',
+									'receivingUserID' => '',
+									'read'			=> '',
+									'messageGroupID'  => '',
+									'type'			  => ''
 									);
 									
 	protected $_primaryKey = 'teamMessageID';
@@ -25,6 +31,9 @@ class Application_Model_Message extends Application_Model_ModelAbstract
 			// Group message, change db table and primary key
 			$this->_dbTable = 'Application_Model_DbTable_GroupMessages';
 			$this->_primaryKey = 'groupMessageID';
+		} elseif ($this->isUserMessage()) {
+			$this->_dbTable = 'Application_Model_DbTable_Messages';
+			$this->_primaryKey = 'messageGroupID';
 		}
 		
 		return parent::save();
@@ -39,6 +48,32 @@ class Application_Model_Message extends Application_Model_ModelAbstract
 		return false;
 	}
 	
+	public function isUserMessage()
+	{
+		if ($this->hasValue('messageGroupID')) {
+			return true;
+		}
+		return false;
+	}
+	
+	public function isRead()
+	{
+		if ($this->read == '0') {
+			return false;
+		} else {
+			return true;
+		}
+	}
+	
+	public function getMessage($nl2br = false)
+	{
+		if ($nl2br) {
+			return nl2br($this->_attribs['message']);
+		} else {
+			return $this->_attribs['message'];
+		}
+	}
+	
 	public function getBoxProfilePic($size, $id = false, $type = 'users', $class = '', $outerClass = '')
 	{
 		if ($this->hasValue('notification')) {
@@ -46,7 +81,7 @@ class Application_Model_Message extends Application_Model_ModelAbstract
 			$notification = $this->notification;
 			if ($notification->picture == 'users') {
 				// Show user picture
-				$id = $this->notification->actingUserID;
+				$id = $this->notification->userID;
 			} else {
 				// Show team picture
 				$id = $this->teamID;

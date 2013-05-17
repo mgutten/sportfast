@@ -25,6 +25,15 @@ class GamesController extends Zend_Controller_Action
 			return;
 		}
 		
+		if (!$this->view->user->hasProfilePic()) {
+			// No profile pic, set this page as go to url if upload
+			$session = new Zend_Session_Namespace('goToURL');
+			$session->url = '/games/' . $gameID;
+			
+			$this->view->topAlert = true;
+		} else {
+			$session = Zend_Session::namespaceUnset('goToURL');
+		}
 		
 		$this->view->userInGame = $userInGame = $game->players->userExists($this->view->user->userID);
 		$this->view->userPlus = ($userInGame ? $userInGame->plus : false);

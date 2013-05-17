@@ -31,6 +31,21 @@ class Application_Form_PostMessage extends Zend_Form
 				'class'			=> 'profile-post-button button'
 
       			));  
+				
+		$this->addElement('hidden', 'messageType', array(
+				'required'		=> false,
+				'decorators'	=> array('Hidden'),
+				));
+				
+		$this->addElement('hidden', 'messageGroupID', array(
+				'required'		=> false,
+				'decorators'	=> array('Hidden'),
+				));
+				
+		$this->addElement('hidden', 'receivingUserID', array(
+				'required'		=> false,
+				'decorators'	=> array('Hidden'),
+				));
 
 													
     }

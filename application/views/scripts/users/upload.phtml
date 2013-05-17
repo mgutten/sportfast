@@ -43,3 +43,14 @@ $this->headScript()->prependFile($this->baseUrl() . '/js/plugins/jform.js');
         
     </div>
 </div>
+
+<?php
+	if ($this->goToURL) {
+		// send user back to referring address
+?>
+<script type='text/javascript'>
+	goToURL = "<?php echo $this->goToURL;?>";
+</script>
+<?php
+	}
+?>

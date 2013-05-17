@@ -53,16 +53,14 @@ $(function() {
 				var text = (typeof detailsEle.attr('teamName') == 'undefined' ? 'cancel this game' : 'delete' + detailsEle.attr('teamName'));
 				
 				populateConfirmActionAlert(text, postContent);
-				$('#confirm-action-alert-container').show();
+				
 			}
 		} else if (val == 'remove player') {
 			
-				showAlert($('#manage-remove-player-alert-container'));
+			showAlert($('#manage-remove-player-alert-container'));
 		} else if (val == 'team info') {
 			showAlert($('#manage-team-info-alert-container'));
 		}
-		
-		$('.alert-black-back').show();
 
 	});
 	
@@ -105,6 +103,15 @@ $(function() {
 		
 		//reloadPage();
 	})
+	
+	/* override join capability */
+	if (getDetailsEle().attr('picture') != '') {
+		$('#join-button').unbind('click.join')
+		.click(function()
+		{
+			showAlert($('#upload-alert-container'));
+		})
+	}
 	
 	if ($('#canceled-alert-container').length > 0) {
 		// Game has been canceled

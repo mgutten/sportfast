@@ -182,6 +182,10 @@ a.header-dropdown-option-cog:hover,a.header-dropdown-option:hover {
 	padding:.5em 1em;
 }
 
+.white-background {
+	background: #fff;
+}
+
 .light-back {
 	background: #eee;
 }
@@ -196,6 +200,10 @@ a.header-dropdown-option-cog:hover,a.header-dropdown-option:hover {
 
 .dark-back {
 	background:#222;
+}
+
+.black-back {
+	background:#000;
 }
 
 .dark-red-back {
@@ -332,6 +340,10 @@ div.selected-green,img.selected-green,p.selected-green {
 
 .larger-margin-top {
 	margin-top: .5em;
+}
+
+.negative-margin-top {
+	margin-top: -.2em;
 }
 
 .indent {
@@ -542,7 +554,7 @@ div#header-bar-short {
 	width: auto;
 }
 
-.header-nav-location-text:hover {
+.location:hover {
 	text-decoration: underline;
 }
 
@@ -575,6 +587,10 @@ div.nav-back:hover {
 .nav {
 	font-family:"nevis";
 	font-size: 1.063em;
+}
+
+.nav:hover {
+	text-decoration: none;
 }
 
 .nav-out,.nav-out-short {
@@ -1011,7 +1027,7 @@ div#password-container {
 
 .checkbox-text {
 	float:left;
-	margin:-0.2em 0 0 .3em;
+	margin:-0.15em 0 0 .3em;
 }
 
 input.dropdown-login-submit {
@@ -1030,7 +1046,7 @@ input.dropdown-login-submit {
 #dropdown-forgot-password {
 	float:left;
 	clear:both;
-	margin:0 0 0 0.2em;
+	margin:.15em 0 0.2em;
 	font-size:.9em;
 }
 
