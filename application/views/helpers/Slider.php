@@ -26,8 +26,19 @@ class Application_View_Helper_Slider
 			$valueClass .= ' ' . $options['valueClass'];
 		}
 		$valueEle   = "<p class='" . $valueClass . "'></p>";
-				
-		$slider     = "<div class='signup-skill-slider' id='slider-" . $id . "'></div>";
+		
+		$sliderClass = 'signup-skill-slider ';
+		if (!empty($options['sliderClass'])) {
+			// Add class to slider container
+			$sliderClass .= $options['sliderClass'];
+		}
+		
+		if (!empty($options['type'])) {
+			// Type (ie skill, sportsmanship) used in js to determine value/description var
+			$sliderClass .= ' slider-' . $options['type'];
+		}
+			
+		$slider     = "<div class='" . $sliderClass . "' id='slider-" . $id . "'></div>";
 		
 		switch ($options['valuePosition']) {			
 			case 'below':
@@ -40,7 +51,7 @@ class Application_View_Helper_Slider
 		
 		if (!empty($options['desc'])) {
 			// Description to be included below all values
-			$descClass  = 'center medium slider-text-description';
+			$descClass  = 'center medium slider-text-description width-100 clear';
 			if (!empty($options['descClass'])) {
 				$descClass .= ' ' . $options['descClass'];
 			}

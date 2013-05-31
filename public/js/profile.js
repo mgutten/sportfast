@@ -25,7 +25,7 @@ $(function()
 		$(this).stop().animate({opacity: 0}, 300);
 	})
 	
-	$('#invite,#manage').click(function()
+	$('#invite,#manage,#invite-to').click(function()
 	{
 		$(this).parents('#profile-buttons-container').css('height', '20em');
 	});
@@ -374,7 +374,7 @@ $(function()
 				
 				subscribeToType(userID, idType, typeID, subscribe);
 				changedAlert = $('.team-manage-remove-player-container');
-				reloadPage();
+			
 		}
 		
 		if (subscribe) {
@@ -396,6 +396,7 @@ $(function()
 	
 	$('#confirm-action').click(function()
 	{
+		
 		confirmAction();
 	})
 	
@@ -451,7 +452,20 @@ $(function()
  */
 function getDetailsEle()
 {
-	return ($('#team-details').length > 0 ? $('#team-details') : $('#game-details'))
+	var ele;
+	
+	if ($('#team-details').length > 0) {
+		// Team page
+		ele = $('#team-details');
+	} else if ($('#game-details').length > 0) {
+		// Game page
+		ele = $('#game-details');
+	} else if ($('#user-details').length > 0) {
+		// User page
+		ele = $('#user-details')
+	}
+	
+	return ele;
 }
 
 /**
@@ -512,6 +526,7 @@ function subscribeToType(userID, idType, typeID, subscribe)
 		type: 'POST',
 		data: {options: options},
 		success: function(data) {
+			reloadPage();
 		}
 	})
 }

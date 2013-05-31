@@ -197,18 +197,23 @@ class Application_View_Helper_Find
 	/**
 	 * create game container for a match (controller => find, action => games)
 	 * @params ($match => team model,
-	 *			$number => # of match in list)
+	 *			$number => # of match in list,
+	 *			$showMatch => show whether user is on team as well as match)
 	 */
-	public function createTeam($match, $number)
+	public function createTeam($match, $number = false, $showMatch = true)
 	{
 		$userInGame = false;
 		if ($this->_view->user->teams->teamExists($match->teamID)) {
 			$userInGame = true;
 		}
+		
+		if ($number) {
+			$number = "<p class='find-result-number white green-back heavy'>" . $number . "</p>";
+		}
 		$output  = $this->createOuterStart($match->teamID, 'teams');
 		$output .=		"<div class='left find-result-img-container'>";
 		$output .=			"<img src='" . $match->getProfilePic('medium') . "' class='left'/>";
-		$output .=			"<p class='find-result-number white green-back heavy'>" . $number . "</p>";
+		$output .=			$number;
 		$output .= 		"</div>";
 		$output .=		"<div class='left find-result-left-container'>";
 		$output .=			"<p class='left heavy largest-text darkest'>" . $match->teamName . "</p>";
@@ -216,7 +221,7 @@ class Application_View_Helper_Find
 		$output .=			"<p class='clear light'>" . $match->city . "</p>";		
 		$output .= 		"</div>";
 		$output .=		"<img src='" . $match->getMatchImage() . "' tooltip='" . $match->getMatchDescription() . "' class='left find-result-match-img'/>";	
-		$output .=		($userInGame ? "<p class='left find-results-joined smaller-text green'> You are on this team!</p>" : '');
+		$output .=		($userInGame ? "<p class='left find-results-joined smaller-text green'> You're on this team!</p>" : '');
 		$output .=		$this->createRight($match, $userInGame);
 		$output .= "</a>";
 		

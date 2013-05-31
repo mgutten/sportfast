@@ -175,6 +175,12 @@ if ($this->fail) {
 				
 			
 	}
+
+	if ($this->team->sportupCreated && !$this->userOnTeam && $this->topAlert) {
+		// Show alert box
+		$content = "<p class='white heavy left width-100 center'>This is a Sportup-created " . $this->team->sport . " team.</p>";
+		echo $this->topAlert('sportup-team', $content);
+	}
 	
 	echo $this->alert()->confirmAlert();
 	
@@ -255,8 +261,12 @@ $this->placeholder('narrowColumn')->captureEnd();
 
 
 // Store universal team details in hidden container
-$captains = array_keys($this->team->captains);
-$captains = implode(',',$captains);
+if ($this->team->hasValue('captains')) {
+	$captains = array_keys($this->team->captains);
+	$captains = implode(',',$captains);
+} else {
+	$captains = '';
+}
 
 echo "<span id='team-details' 
 			teamID='" . $this->team->teamID . "' 
@@ -269,15 +279,6 @@ echo "<span id='team-details'
 			public='" . ($this->isPublic ? 'public' : 'private') . "'
 			teamName='" . $this->team->teamName . "'>
 	 </span>";
-?>
-
-<?php
-if ($this->team->sportupCreated && !$this->userOnTeam) {
-	// Show alert box
-	echo "<div class='green-alert-box green' id='profile-top-alert'>";
-	echo	"This is a Sportup-created " . $this->team->sport . " team.
-		 </div>";
-}
 ?>
 
 <header class='clear profile-name-container'>

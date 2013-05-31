@@ -14,6 +14,9 @@ $this->headScript()->prependFile($this->baseUrl() . '/js/inbox.js');
 
 <div class='clear larger-margin-top width-100'>
 	<?php
+	if (!$this->messages) {
+		echo "<p class='clear width-100 none-text medium center'>You have no messages.</p>";
+	} else {
 		foreach ($this->messages as $message) {
 			
 			$class = 'white-background';
@@ -31,6 +34,7 @@ $this->headScript()->prependFile($this->baseUrl() . '/js/inbox.js');
 			echo	"<p class='right light inbox-message-group-time'>" . $message->getTimeFromNow() . "</p>";
 			echo "</a>";
 		}
+	}
 	?>
 
 

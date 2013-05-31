@@ -689,7 +689,7 @@ function roundHour()
 function isGame()
 {
 
-	if ($('#create-type').text().toLowerCase() == 'game') {
+	if (($('#create-type').text().toLowerCase() == 'game') || pageType == 'game') {
 		return true;
 	} else {
 		// Is team
@@ -727,7 +727,7 @@ function populateNarrowColumnTime()
 		curHour  = (curHour > 9 ? curHour : '0' + curHour);
 		
 		var datetime = selectedDay.getFullYear() + '-' + curMonth + '-' + curDay + ' ' + curHour + ':' + curMin + ':00';
-		
+
 		// Hidden input ele
 		$('#datetime').val(datetime);
 	}

@@ -154,9 +154,6 @@ class Application_Controller_Helper_Dropdown extends Zend_Controller_Action_Help
 				    <div dropdown-menu='" . $id . "' id='dropdown-menu-" . $id . "' class='dropdown-menu-options-container  dropdown-menu-options-container-dark invite dropshadow'>";
 		
 		
-		$pre 	 = "<div class='dropdown-menu-option-container animate-darker invite medium smaller-text'>
-						<p class='dropdown-menu-option-text medium'>";
-		$post    = "</p></div>";
 		$sections = array('games','teams');
 		
 		foreach ($sections as $section) {
@@ -164,22 +161,31 @@ class Application_Controller_Helper_Dropdown extends Zend_Controller_Action_Help
 			if ($user->$section->hasValue($section)) {
 				// This section has values, display as options for invite
 				$output .= "<p class='smaller-text clear dark dropdown-menu-invite-section heavy default'>My " . ucwords($section) . "</p>";	
+				$post    = "</p></div>";
 				
 				foreach ($user->$section->getAll() as $model) {
 					if (($model->rosterLimit == $model->totalPlayers) && !$model instanceof Application_Model_Group) {
 						// Team/Game is full do not show, exclude Group from this as it does not have a roster limit
 						continue;
 					}
+					
 					if ($section == 'games') {
 						// Game
-						$output .= $pre . $model->sport . ' <span class="light">' . date('M j, ga', strtotime($model->date)) . '</span>' . $post;
+						$pre 	 = "<div class='dropdown-menu-option-container animate-darker invite medium smaller-text' idType='gameID' gameID='" . $model->gameID . "'>
+										<p class='dropdown-menu-option-text medium'>";
+						
+						$content = $model->sport . ' <span class="light">' . date('M j, ga', strtotime($model->date)) . '</span>';
 					} elseif ($section == 'teams') {
 						// Team
-						$output .= $pre . $model->getLimitedName('teamName', 23) . $post;
-					} elseif ($section == 'groups') {
+						$pre 	 = "<div class='dropdown-menu-option-container animate-darker invite medium smaller-text' idType='teamID' teamID='" . $model->teamID . "'>
+										<p class='dropdown-menu-option-text medium'>";
+						$content = $model->getLimitedName('teamName', 23);
+					} /*elseif ($section == 'groups') {
 						// Group
 						$output .= $pre . $model->getLimitedName('groupName', 23) . $post;
-					}
+					}*/
+					
+					$output .= $pre . $content . $post;
 				}
 			} else {
 				$output .= "<p class='smaller-text clear light'>You have no " . $section . ".</p>";

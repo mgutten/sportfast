@@ -27,7 +27,7 @@ class Application_View_Helper_RatingBar
 				$class = '';
 			}
 			
-			if (strtolower($chosen) == $rating['ratingName']) {
+			if (strtolower($chosen) == strtolower($rating['ratingName'])) {
 				$found = true;
 				$textClass = 'white';
 			}

@@ -1,4 +1,21 @@
-
+<?php
+	if ($this->rateGame) {
+		// Popup to rate users/park from last game		
+		
+		echo $this->alert()->ratingAlert($this->rateGame);
+		echo $this->partial('partials/global/alertBack.phtml');
+		
+		
+       	echo "<script type='text/javascript'>";
+	   	$counter = 0;
+		foreach ($this->rateGameDescriptions as $rating) {
+			echo "sliderSkillValues[" . $counter . "]['description'] = '" . $rating['ratingDescription'] . "';";
+			$counter++;
+		}
+		echo "</script>";
+		
+	}
+?>
 
 <div class='header-bar' id='header-bar-short'>
 </div>

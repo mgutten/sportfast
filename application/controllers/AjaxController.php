@@ -42,6 +42,94 @@ class AjaxController extends Zend_Controller_Action
 	}
 	
 	/**
+	 * rate user or park
+	 */
+	public function rateTypeAction()
+	{
+		$post = $this->getRequest()->getPost();
+		$options = $post['options'];
+		$type = $post['type'];
+		
+		$notification = new Application_Model_Notification();
+		$notification->actingUserID = $this->view->user->userID;
+		$notification->action = 'rate';
+		$notification->cityID = $this->view->user->cityID;
+		
+		
+		if ($type == 'user') {
+			// Is user rating
+			$rating = new Application_Model_Rating();
+			$rating->receivingUserID = $options['userID'];
+			$rating->givingUserID = $this->view->user->userID;
+			$rating->sport = $options['sport'];
+			$rating->sportID = $rating->getMapper()->getSportID($options['sport']);
+			$rating->setCurrent('dateHappened');
+			$rating->gameID = $options['gameID'];
+			
+			$rating->attendance = 1;
+			$rating->skill = $rating->getMapper()
+									->getForeignID('Application_Model_DbTable_Ratings','ratingID',array('type' => 'user',
+																									   'ratingType' => 'skill',
+																									   'ratingName' => $options['skill']));
+			$rating->sportsmanship = $rating->getMapper()
+											->getForeignID('Application_Model_DbTable_Ratings','ratingID',array('type' => 'user',
+																											   'ratingType' => 'sportsmanship',
+																											   'ratingName' => $options['sportsmanship']));
+																										   
+			$rating->bestSkill = $rating->getMapper()
+										->getForeignID('Application_Model_DbTable_SportSkills','sportSkillID',array('sport' => $options['sport'],
+																													'skilling' => $options['bestSkill']));
+																													
+			$rating->save(false);
+			
+			$notification->receivingUserID = $options['userID'];
+			$notification->type = 'user';
+			$notification->ratingID = $rating->userRatingID;
+			
+			$notification->save();
+			
+			$user = new Application_Model_User();
+			$user->userID = $options['userID'];
+			$user->setUserRating('skill', $rating->sportID);
+			$user->setUserRating('sportsmanship', $rating->sportID);
+		} elseif ($type == 'park') {
+			// Park rating
+			$rating = new Application_Model_Rating();
+			$rating->parkID = $options['parkID'];
+			$rating->userID = $this->view->user->userID;
+			$rating->sport = $options['sport'];
+			$rating->sportID = $rating->getMapper()->getSportID($options['sport']);
+			$rating->setCurrent('dateHappened');
+			$rating->gameID = $options['gameID'];
+			$rating->success = $options['success'];
+			$rating->quality = $options['quality'];
+			$rating->comment = $options['comment'];
+			
+			$rating->setPark();
+			
+			if ($rating->success == '0') {
+				// Unsucessful game, only allow one unsuccessful rating per game
+
+				if ($rating->getUnsuccessfulParkRating($options['parkID'], $options['gameID'])) {
+					// Was already rated for this game, return
+					return;
+				}
+			}
+																												
+			$rating->save(false);
+			
+			$notification->type = 'park';
+			$notification->parkID = $options['parkID'];
+			
+			$notification->save();
+			
+		}
+		
+		
+		
+	}
+	
+	/**
 	 * reset user's lastRead column of db to current time (ie after click on notifications button)
 	 */
 	public function resetNotificationsAction()
@@ -284,7 +372,7 @@ class AjaxController extends Zend_Controller_Action
 			// Spot check for failure
 			return false;
 		}
-		
+
 		$images = Zend_Controller_Action_HelperBroker::getStaticHelper('CreateImages');
 		
 		$images->createimages($fileInfo, $this->view->user->userID);
@@ -781,6 +869,8 @@ class AjaxController extends Zend_Controller_Action
 
 		if (isset($options['confirmOrDeny'])) {
 			// Confirm or deny action
+			$options['confirmOrDeny'] = strtolower($options['confirmOrDeny']);
+
 			if ($options['confirmOrDeny'] == 'confirm') {
 				// Confirm action, add to db		
 				$mapper = new Application_Model_NotificationsMapper();
@@ -921,6 +1011,24 @@ class AjaxController extends Zend_Controller_Action
 	}
 
 	
+	/**
+	 * remove player's sport info
+	 */
+	public function removeSportFromUserAction()
+	{
+		$options = $this->getRequest()->getPost('options');
+		
+		//$sport = new Application_Model_Sport();
+		//$sportID = $sport->getSportIDByName($options['sport']);
+		
+		if (empty($options['userID']) || empty($options['sport'])) {
+			echo 'Error: Could not remove sport information.  Empty values given.';
+		}
+		
+		$this->view->user->removeSport($options['sport']);
+		
+		
+	}
 	
 	/*
 	 * remove player from group or team

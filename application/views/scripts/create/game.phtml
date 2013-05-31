@@ -173,7 +173,7 @@ $userContent = $this->form->parkName;
 	   if (!empty($this->parks)) {
 		   // Matches exist
 		   ?>
-		gmapMarkers = [		<?php
+		gmapMarkers = [<?php
 								$markerDetails = '';
 								 foreach ($this->parks as $match) {
 									 if ($match instanceof Application_Model_Park) {
@@ -183,8 +183,7 @@ $userContent = $this->form->parkName;
 										 
 										 $markerDetails .= '["' . $match->parkName . '","' . preg_replace('/^\s+|\n|\r|\s+$/m', '', $this->ratingstar('small',$match->ratings->getStarWidth('quality') . '%')) . '", "' . $match->stash . '", "' . $match->parkID . '"],';
 									 }
-								 }?>
-					  ];
+								 }?>];
 					  
 		markerDetails = [<?php echo $markerDetails;?>];
 	<?php } ?>

@@ -74,7 +74,7 @@ class Application_View_Helper_NarrowTeamSection
 							$counter++;
 						}
 						
-						$output .=  "<a href='users/" . $userClass->userID . "/" . $section . "' class='medium smaller-text clear-right margin-top'>view all</a>";
+						$output .=  "<a href='/users/" . $userClass->userID . "/" . $section . "' class='medium smaller-text clear-right margin-top'>view all</a>";
 				}
 			$output .=  $this->_view->narrowcolumnsection()->end();
 		

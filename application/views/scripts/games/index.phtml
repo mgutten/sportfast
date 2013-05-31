@@ -68,10 +68,17 @@ echo $this->placeholder('absolute')->captureStart();
 				echo "<p class='darkest width-100 center clear'>" . $this->game->cancelReason . "</p>";
 			}
 			
-			echo "<a href='/' class='clear larger-text larger-margin-top heavy green-button white' id='game-canceled-back'>Back to home</a>";
+			$leaveButton = '';
+			$class = '';
 			if ($this->userInGame) {
-				echo "<p class='right larger-margin-top larger-text heavy red-button' id='game-canceled-leave'>Leave Game</p>";
+				$leaveButton = "<p class='right larger-margin-top larger-text heavy red-button' id='game-canceled-leave'>Leave Game</p>";
+				$class = 'game-canceled-first';
 			}
+			
+			echo $leaveButton; 
+			echo "<a href='/' class='right larger-text larger-margin-top heavy green-button white " . $class . "' id='game-canceled-back'>Back to home</a>";
+			
+			
 		echo $this->alert()->end();
 	}
 	

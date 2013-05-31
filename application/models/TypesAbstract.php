@@ -39,6 +39,13 @@ class Application_Model_TypesAbstract extends Application_Model_ModelAbstract
 		return false;
 	}
 	
+	public function random()
+	{
+		$array = $this->getAll();
+		
+		return $array[array_rand($array)];
+	}
+	
 	/**
 	 * get type name of the model
 	 */

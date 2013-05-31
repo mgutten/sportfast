@@ -32,7 +32,8 @@ class Application_Model_User extends Application_Model_ModelAbstract
 									'changedLocation' => '',
 									'messages'		=> '',
 									'plus'			=> '',
-									'fake'			=> ''
+									'fake'			=> '',
+									'joined'		=> ''
 									);
 
 	protected $_primaryKey = 'userID';	
@@ -71,6 +72,14 @@ class Application_Model_User extends Application_Model_ModelAbstract
 		return $this;
 	}
 	
+	/**
+	 * get last game that user played in that is in the past week
+	 */
+	public function getLastGame()
+	{
+		return $this->getMapper()->getLastGame($this->userID);
+	}
+	
 	
 	/**
 	 * get shorthand (name and id) for user's friends, groups, and teams
@@ -84,6 +93,11 @@ class Application_Model_User extends Application_Model_ModelAbstract
 	{
 		return $this->getMapper()->getUserRatings($this);
 	}
+	
+	public function getSubscribedGames()
+	{
+		return $this->getMapper()->getSubscribedGames($this->userID);
+	}
 
 	public function getNextWeekScheduledGames()
 	{
@@ -93,7 +107,7 @@ class Application_Model_User extends Application_Model_ModelAbstract
 			foreach ($this->games->getAll() as $game) {
 				$curDate = new DateTime();
 				$days = ceil(($game->gameDate->format('U') - time())/60/60/24); // # of days difference
-				if ($days < 7) {
+				if ($days <= 7) {
 					// Game is happening in next week
 					$returnArray[$game->gameDate->format('w')][] = $game;
 				}
@@ -142,6 +156,21 @@ class Application_Model_User extends Application_Model_ModelAbstract
 	public function getUserFriends()
 	{
 		return $this->getMapper()->getUserFriends($this);
+	}
+	
+	/**
+	 * Set user rating (skill, sportsmanship, etc) to avg of ratings and initial value (if skill))
+	 */
+	public function setUserRating($rating, $sportIDOrSportName)
+	{
+		if (!is_numeric($sportIDOrSportName)) {
+			// Is not sportID already
+			$sportID = $this->getSport($sportIDOrSportName)->sportID;
+		} else {
+			$sportID = $sportIDOrSportName;
+		}
+		
+		return $this->getMapper()->setUserRating($rating, $sportID, $this->userID);
 	}
 	
 	/**
@@ -233,6 +262,15 @@ class Application_Model_User extends Application_Model_ModelAbstract
 		}
 	}
 	
+	public function getHimOrHer()
+	{
+		if (strtolower($this->sex) == 'm') {
+			return 'him';
+		} else {
+			return 'her';
+		}
+	}
+	
 	public function getShortName()
 	{
 		return $this->firstName . ' ' . $this->lastName[0];
@@ -246,11 +284,21 @@ class Application_Model_User extends Application_Model_ModelAbstract
 	
 	public function getHeightInFeet()
 	{
+		$height = $this->getHeightFeet();
+		$feet = $height['feet'];
+		$inches = $height['inches'];
+		
+		return $feet . "' " . $inches . "\"";
+	}
+	
+	public function getHeightFeet()
+	{
 		$heightInches = $this->height;
 		$feet = floor($heightInches/12);
 		$inches = ($heightInches - ($feet * 12));
 		
-		return $feet . "' " . $inches . "\"";
+		return array('feet' => $feet,
+					 'inches' => $inches);
 	}
 	
 	public function getSexFull()
@@ -264,6 +312,24 @@ class Application_Model_User extends Application_Model_ModelAbstract
 		
 		return $sex;
 	}
+	
+	public function setAgeFromDob()
+	{
+		$dob = $this->getDobDate();
+		$now = new DateTime();
+		$interval = $now->diff($dob);
+		
+		$this->_attribs['age'] = $interval->y;
+	}
+	
+	public function setHeightFromFeetAndInches($feet, $inches)
+	{
+		$total = $feet * 12;
+		$total += $inches;
+		
+		return $this->height = $total;
+	}
+		
 	
 	public function setFirstName($firstName)
 	{
@@ -294,7 +360,20 @@ class Application_Model_User extends Application_Model_ModelAbstract
 	
 	public function getSportNames()
 	{	
-		return array_keys($this->sports);
+		$returnArray = array();
+		
+		foreach ($this->sports as $sportName => $model) {
+			if ($model->sportID) {
+				$returnArray[] = $sportName;
+			}
+		}
+		
+		return $returnArray;
+	}
+	
+	public function getDobDate()
+	{
+		return DateTime::createFromFormat('Y-m-d', $this->dob);
 	}
 	
 	public function getSportTypes()
@@ -399,6 +478,17 @@ class Application_Model_User extends Application_Model_ModelAbstract
 		}
 	}
 	
+	public function hasSport($sport)
+	{
+		$sport = strtolower($sport);
+		
+		if (isset($this->_attribs['sports'][$sport])) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
 	public function getProfilePic($size, $userID = false, $type = 'users') 
 	{
 		return parent::getProfilePic($size, $this->userID, $type);
@@ -432,6 +522,18 @@ class Application_Model_User extends Application_Model_ModelAbstract
 		$this->getMapper()->resetHomeLocation($this);
 	}
 	
+	/**
+	 * remove sport from db
+	 */
+	public function removeSport($sportName, $andGames = true)
+	{
+		$sport = $this->getSport($sportName);
+		$sportID = $sport->sportID;
+		
+		unset($this->_attribs['sports'][$sportName]);
+		
+		$this->getMapper()->removeSport($this->userID, $sportID, $andGames);
+	}
 	
 	/**
 	 * remove friend both in db and in players category

@@ -28,6 +28,7 @@ class PostController extends Zend_Controller_Action
 			$rating->setPark();
 			$rating->quality = $post['rating'];
 			$rating->parkID  = $post['typeID'];
+			$rating->success = '1';
 		}
 		
 		$rating->save();

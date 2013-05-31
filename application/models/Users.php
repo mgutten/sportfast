@@ -20,6 +20,11 @@ class Application_Model_Users extends Application_Model_TypesAbstract
 		return $user;
 	}
 	
+	public function getUsersInArea($userID, $latitude, $longitude, $lastActive = false)
+	{
+		return $this->getMapper()->getUsersInArea($userID, $latitude, $longitude, $lastActive);
+	}
+	
 	public function getAvailableUsers($datetime, $sportID, $location)
 	{
 		return $this->getMapper()->getAvailableUsers($datetime, $sportID, $location, $this);

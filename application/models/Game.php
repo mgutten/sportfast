@@ -239,6 +239,24 @@ class Application_Model_Game extends Application_Model_ModelAbstract
 		}
 	}
 	
+	public function isPublic()
+	{
+		if ($this->_attribs['public'] == 1) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	public function isRecurring()
+	{
+		if ($this->_attribs['recurring'] == 1) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
 	public function isPickup()
 	{
 		if ($this->hasValue('gameID')) {

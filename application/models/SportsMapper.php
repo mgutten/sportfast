@@ -58,6 +58,32 @@ class Application_Model_SportsMapper extends Application_Model_MapperAbstract
 		return $sports;
 	}
 	
+	/**
+	 * get skills (shooter/shooting, quick/quickness, etc) from db
+	 * @returns associative array of skiller and skilling
+	 */
+	public function getSkills($sportID)
+	{
+		$table = $this->getDbTable();
+		$select = $table->select();
+		$select->setIntegrityCheck(false);
+		
+		$select->from('sport_skills')
+			   ->where('sportID = ?', $sportID);
+			   
+		$results = $table->fetchAll($select);
+		
+		$returnArray = array();
+		foreach ($results as $result) {
+			$returnArray[$result->sportSkillID] = array('skiller' => $result->skiller,
+														'skilling' => $result->skilling);
+		}
+		
+		return $returnArray;
+	}
+			   
+		
+	
 	/* used in usersMapper
 	public function getUserSportsInfo($userID, $modelClass)
 	{

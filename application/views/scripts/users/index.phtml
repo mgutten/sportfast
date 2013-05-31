@@ -62,7 +62,7 @@ $this->placeholder('narrowColumn')->captureEnd();
     </div>
 </header>
 
-<div id='user-buttons-container'>
+<div id='profile-buttons-container'>
 	<?php
 	if ($this->currentUser->userID != $this->user->userID) {
 		// Not current user
@@ -80,7 +80,7 @@ $this->placeholder('narrowColumn')->captureEnd();
 				Player Request
 			</p>
     <?php } else {?>
-    		<p class='button right profile-buttons-margin-right' id='user-player-cancel-request' tooltip='You are currently connected with this player.  Remove them?'>
+    		<p class='right medium smaller-text pointer action profile-buttons-margin-right' id='user-player-cancel-request' tooltip='You are currently connected with this player.  Remove them?'>
             	Remove Player
             </p>
     <?php }
@@ -92,13 +92,19 @@ $this->placeholder('narrowColumn')->captureEnd();
 
 <div id='user-sports-container' class='clear'>
 	<?php
-		echo $this->profilesportsections()->start($this->currentUser->sports);
+		echo $this->profilesportsections()->start($this->currentUser->sports, $this->selectedSport);
 		$lowerOutput = '';
 		$count = 0;
 		foreach ($this->currentUser->sports as $sport) {
 			
 			$class = $tabClass = '';
-			if ($count == 0) {
+			if ($this->selectedSport) {
+				// Sport selected in controller
+				if (strtolower($sport->sport) == strtolower($this->selectedSport)) {
+					$class = 'user-sport-container-selected';
+					$tabClass = 'user-sport-selected';
+				}
+			} elseif ($count == 0) {
 				// First sport, show box
 				$class = 'user-sport-container-selected';
 				$tabClass = 'user-sport-selected';
@@ -110,12 +116,14 @@ $this->placeholder('narrowColumn')->captureEnd();
 			
 			// Positions
 			$counter = 0;
-			foreach ($sport->positions as $position) {
-				$lowerOutput .= $position->positionName;
-				if ($counter !== count($sport->positions) - 1) {
-					$lowerOutput .= '/';
+			if ($sport->hasValue('positions')) {
+				foreach ($sport->positions as $position) {
+					$lowerOutput .= $position->positionName;
+					if ($counter !== count($sport->positions) - 1) {
+						$lowerOutput .= '/';
+					}
+					$counter++;
 				}
-				$counter++;
 			}
 			
 			// Best skill
@@ -141,7 +149,7 @@ $this->placeholder('narrowColumn')->captureEnd();
 			$lowerOutput .= 			"<p class='clear dark user-sport-want-looking'> Looking for:</p>";
 			$lowerOutput .= 			"<div class='user-sport-want-inner-container left'>";
 			foreach ($sport->formats as $format) {
-				$lowerOutput .=				"<p class='darkest clear'>" . ucwords($format) . "</p>";
+				$lowerOutput .=				"<p class='darkest clear'>" . ucwords($format->format) . "</p>";
 			}
 
 			// Array of types, display

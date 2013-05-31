@@ -76,7 +76,6 @@ class Application_View_Helper_Calendar
 	}
 	
 	public function setScheduledDays($eventsArray, $tooltips = true) {
-			
 			if (empty($eventsArray)) {
 				return false;
 			}
@@ -123,14 +122,28 @@ class Application_View_Helper_Calendar
 					$this->scheduledDays[$eventDate] = array($tooltip, $url, $winOrLoss);
 				} else {
 					// No tooltips wanted, store necessary info into element itself (if need for game, not teamgame, then add code)
-					$winOrLoss = " winOrLoss='" . $event->winOrLoss . "'";
-					$opponent  = " opponent='" . $event->opponent . "'";
-					$time	   = " time='" . $date->format('g:ia') . "'";
-					$location  = " location='" . $event->locationName . "'";
-					$id		   = " typeID='" . $event->teamGameID . "'";
-					$type	   = " type='teamGame'";
-					$address   = " address='" . $event->streetAddress . "'";
-					$leagueLocationID = " leagueLocationID='" . $event->leagueLocationID . "'";
+					if (!empty($event->_attribs['teamGameID'])) {
+						// Is team game
+						$winOrLoss = " winOrLoss='" . $event->winOrLoss . "'";
+						$opponent  = " opponent='" . $event->opponent . "'";
+						$time	   = " time='" . $date->format('g:ia') . "'";
+						$location  = " location='" . $event->locationName . "'";
+						$id		   = " typeID='" . $event->teamGameID . "'";
+						$type	   = " type='teamGame'";
+						$address   = " address='" . $event->streetAddress . "'";
+						$leagueLocationID = " leagueLocationID='" . $event->leagueLocationID . "'";
+					} elseif (!empty($event->_attribs['gameID'])) {
+						// Is game
+						$winOrLoss = "";
+						$opponent  = "";
+						$time	   = '/games/' . $event->gameID;  // used below to search for/determine whether is game or not
+						$location  = "";
+						$id		   = "";
+						$type	   = "";
+						$address   = "";
+						$leagueLocationID = "";
+					}
+					
 					
 					$this->scheduledDays[$eventDate] = array($opponent, $time, $winOrLoss, $location, $id, $type, $address, $leagueLocationID);
 				}
@@ -197,19 +210,20 @@ class Application_View_Helper_Calendar
 		//date function's array (0-6 = days of week)
 		$lastMonthDay = $this->firstDay - 1;
 		$nextMonthDay = 1;
-		$month = $this->month;
 		$future = false;
 
 		//create 5 weeks of month
 		for($i = 0; $i <= 5; $i++) {
 			//create 7 days of week
-
+			
 			for($b=0; $b<7; $b++) {
 				
+				$month = $this->month;
 				$blank = false;
 				$class = 'calendar-day';
 				$inner = '';
 				$tooltip = '';
+				$lastMonth = false;
 				
 				//if it's the first week and before first
 				//day or after last day of month, create blanks
@@ -219,6 +233,13 @@ class Application_View_Helper_Calendar
 						$day = $this->lastMonthDays - $lastMonthDay;
 						$lastMonthDay--;
 						$class .= ' calendar-last-month';
+						$month = $month - 1;
+						$lastMonth = true;
+						if ($month == 0) {
+							$month = 12;
+						}
+						$month = ($month <= 9 ? '0' . $month : $month);
+						
 					}
 					//else its next month and should start at 1
 					else {
@@ -228,6 +249,9 @@ class Application_View_Helper_Calendar
 						if ($nextMonthDay == 2) {
 							// Only increase month once
 							$month = $month + 1;
+							if ($month == 13) {
+								$month = 1;
+							}
 							$month = ($month <= 9 ? '0' . $month : $month);
 						}
 
@@ -238,6 +262,11 @@ class Application_View_Helper_Calendar
 						
 				} else {
 					// Within current month
+					if ($this->month > date('m') || (date('m') == '12' && $this->month == '01')) {
+						// Handle future month special case
+						$future = true;
+					}
+					
 					if (!$future && ($c != $this->today)) {
 						// Past day that is not today
 						$class .= ' calendar-past';
@@ -245,6 +274,7 @@ class Application_View_Helper_Calendar
 						$class .= ' calendar-selectable';
 					}
 					$day = $c;
+					
 				}
 				
 				//if first day of week, start it on a new line		
@@ -254,7 +284,7 @@ class Application_View_Helper_Calendar
 
 				$daysNumberedClass =  'dark left smaller-text indent';
 
-				if ($c == $this->today && $day < $this->lastMonthDays) {
+				if ($c == $this->today && !$lastMonth) {
 					$future = true;
 					$class .= ' calendar-today';
 					$daysNumberedClass .= ' heavy darkest';
@@ -294,7 +324,7 @@ class Application_View_Helper_Calendar
 						// Display custom attributes as stored from setScheduledDays
 						$tooltip = implode(' ', $eventArray);
 						$eventArray[1] = ''; // prevent url from being used below
-						if (preg_match("/ winOrLoss='([a-zA-Z || ?]+)'/", $eventArray[2], $matches)) {;
+						if (preg_match("/ winOrLoss='([a-zA-Z || ?]+)'/", $eventArray[2], $matches)) {
 							$eventArray[2] = $matches[1];
 						}
 					}
@@ -309,12 +339,12 @@ class Application_View_Helper_Calendar
 						$class .= ' calendar-no-select';
 					}
 					
-					$output .= "<a href='" . $eventArray[1] . "' class='".$class."' id='calendar-".$id."' " . $tooltip . ">";					
+					$output .= "<a href='" . $eventArray[1] . "' class='" . $class . "' id='calendar-".$id."' " . $tooltip . ">";					
 					$output .= $inner;
 					$output .= "</a>";
 				} else {
 
-					$output .= "<div class='".$class."' id='calendar-".$id."' " . $tooltip . ">";					
+					$output .= "<div class='" . $class . "' id='calendar-" . $id . "' " . $tooltip . ">";					
 					$output .= $inner;
 					$output .= "</div>";
 				}

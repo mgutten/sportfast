@@ -149,6 +149,21 @@ $(function() {
 		$(this).addClass('green-back');
 	});
 	
+	if ($('#first-time-alert-container').length > 0) {
+		// First visit
+		showAlert($('#first-time-alert-container'));
+		
+		$('.member-first-time-button').click(function() {
+			$('.alert-black-back').trigger('click');
+		})
+	}
+	
+	if ($('#more-users-alert-container').length > 0) {
+		// First visit
+		showAlert($('#more-users-alert-container'));
+		
+	}
+	
 	preloadImageArray.push('/images/global/gmap/markers/green.png');
 	preloadImageArray.push('/images/global/gmap/markers/green_reverse.png');
 	

@@ -132,6 +132,9 @@ class SignupController extends Zend_Controller_Action
 				// Set lastRead to curdate
 				$user->setLastReadCurrent();
 				
+				// Set joined
+				$user->setCurrent('joined');
+				
 				// Convert dob inputs to db format
 				$post['dobYear'] = ($post['dobYear'] < date('y') ? '20' : '19') . $post['dobYear'];
 				$post['dob'] = $post['dobYear'] . '-' . $post['dobMonth'] . '-' . $post['dobDay'];
@@ -318,6 +321,13 @@ class SignupController extends Zend_Controller_Action
 			$user->login();
 			
 			$auth->getStorage()->write($user);
+			
+			$session = new Zend_Session_Namespace('first_visit');
+			$session->firstVisit = true;
+			
+			$this->_redirect('/');
+		} else {
+			$this->view->narrowColumn = false;
 		}
 	}
 

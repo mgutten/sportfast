@@ -7,18 +7,195 @@
 $this->headTitle('Account Settings');
 $this->headLink()->prependStylesheet($this->baseUrl() . '/css/settings.css');
 $this->headScript()->prependFile($this->baseUrl() . '/js/settings.js');
+$this->headScript()->prependFile($this->baseUrl() . '/js/signup.js');
+$this->headScript()->prependFile($this->baseUrl() . '/js/plugins/smartslider.js');
+$this->headScript()->prependFile($this->baseUrl() . '/js/profile.js');
+$this->headScript()->prependFile('https://maps.googleapis.com/maps/api/js?key=AIzaSyAhxSMQ-WQux2nzTW4dBoKmpfGHVQOk7r8&sensor=false');
+
 
 ?>
 
-<header class='left jumbo-text darkest heavy'>
-	Account Settings
+<?php
+$this->placeholder('absolute')->captureStart();
+	echo $this->partial('partials/global/alertBack.phtml');
+	echo $this->alert()->confirmAlert();
+$this->placeholder('absolute')->captureEnd();
+?>
+<div id='test'></div>
+<header class='width-100 left jumbo-text darkest heavy'>
+	<?php echo $this->user->shortName;?>'s Settings
 </header>
+    
 
-<div class='clear larger-margin-top'>
-    <p class='settings-tab left pointer settings-tab-selected larger-text heavy'>Account</p>
-    <p class='settings-tab left pointer larger-text heavy'>Sports</p>
+<div class='left' id='settings-left-container'>
+	<?php
+		$tabs = array('Account Info',
+					  'Sports',
+					  'Games');
+		
+		$counter = 0;
+		foreach ($tabs as $tab) {
+			$class = '';
+			if ($counter == 0) {
+				$class = 'settings-tab-selected';
+			}
+			echo "<p class='larger-text pointer clear settings-tab light " . $class . "'>" . $tab . "</p>";
+			$counter++;
+		}
+		
+	?>
+
+
 </div>
 
-<div class='clear settings-container' id='settings-account'>
-	<img src='<?php echo $this->user->getProfilePic('large');?>' class='clear'/>
+
+<div class='right' id='settings-right-container'>
+	<div class='settings-container left' id='account-info-container'>
+    	
+        <form action='/users/update-info' method='POST'>
+    	 <p class='heavy larger-text darkest width-100 clear settings-sub-header'>User Info</p>
+        
+        <div class='left'>
+            <div class='clear width-100'>
+                <?php 
+                echo $this->signupForm->firstName->setValue($this->user->firstName);
+                
+                echo "<div class='left settings-separate'>" . $this->signupForm->lastName->setValue($this->user->lastName) . "</div>";
+                
+                ?>
+            </div>
+            <div class='clear width-100'>
+                <?php 
+                echo "<div class='left settings-small'>" . $this->signupForm->dobMonth->setValue($this->user->getDobDate()->format('m')) . "</div>";
+                echo "<p class='settings-separator left'>/</p>";
+                echo "<div class='left settings-small'>" . $this->signupForm->dobDay->setValue($this->user->getDobDate()->format('d')) . "</div>";
+                echo "<p class='settings-separator left'>/</p>";
+                echo "<div class='left settings-small'>" . $this->signupForm->dobYear->setValue($this->user->getDobDate()->format('y')) . "</div>";
+                ?>
+                
+                <div class='left' id='settings-height-container'>
+                <?php 
+				$height = $this->user->getHeightFeet();
+                echo "<div class='left settings-small'>" . $this->signupForm->heightFeet->setValue($height['feet']) . "</div>";
+                echo "<p class='settings-separator left'>'</p>";
+                echo "<div class='left settings-small'>" . $this->signupForm->heightInches->setValue($height['inches']) . "</div>";
+                echo "<p class='settings-separator left'>\"</p>";
+                echo "<div class='left settings-small'>" . $this->signupForm->weight->setValue($this->user->weight) . "</div>";
+				echo "<p class='settings-separator left'>lb</p>";
+                ?>
+                </div>
+            </div>
+            
+            <div id='signup-account-zipcode-city' class='left'></div>
+            <div class='clear width-100' id='street-container'>
+				<?php echo $this->signupForm->streetAddress->setValue($this->user->streetAddress);?>
+                <?php echo "<div class='left settings-separate'>" . $this->signupForm->zipcode . "</div>";?>
+            </div>
+        </div>
+        <a href='/users/<?php echo $this->user->userID;?>/upload' class='right' id='settings-profile-pic-container' tooltip='Upload new profile picture'>
+        	<img src='<?php echo $this->user->getProfilePic('medium');?>' class='right' id='settings-profile-pic'/>
+       	</a>
+    	
+    	<p class='heavy larger-text darkest width-100 clear settings-sub-header'>Login Info</p>
+        <?php 
+		echo $this->signupForm->email->setDecorators(array('Overlay'))->setValue($this->user->username);
+		?>
+        <div class='clear width-100'>
+			<?php
+            echo $this->signupForm->signupPassword->setLabel('New Password');
+            
+            echo "<div class='left settings-separate'>" . $this->signupForm->signupPassword->setLabel('Reenter New Password')->setName('signupReenterPassword') . "</div>";
+            
+			echo $this->signupForm->userLocation;
+            ?>
+        </div>
+       
+        <div class='clear-right larger-margin-top hidden' id='info-save-changes-container'> 
+            <p class='green-button right largest-text heavy' id='info-save-changes'>Save Changes</p>
+        </div>
+        </form>
+    </div>
+    
+    
+	<div class='settings-container left hidden' id='sports-container'>
+    	<p class='heavy larger-text darkest clear settings-sub-header'>Click an icon to add/edit each sport</p>
+    	<div class='left settings-sports-indicator-container'>
+        	<div class='settings-sports-indicator left green-back'></div>
+            <p class='left green indent smaller-text'>You play</p>
+            <div class='settings-sports-indicator left medium-background'></div>
+            <p class='left light indent smaller-text'>You don't play</p>
+        </div>
+        <div class='clear width-100 margin-top'>
+		<?php
+			//$lowerOutput = '';
+			foreach ($this->sports->getAll() as $sport) {
+				
+				if (in_array(strtolower($sport->sport), $this->userSports)) {
+					// User plays sport
+					$class = 'green-back settings-user-sport';
+					$xClass = '';
+					$userSport = true;
+				} else {
+					$class = 'medium-back';
+					$userSport = false;
+					$xClass = 'hidden';
+				}
+				echo "<img src='" . $sport->getIcon('medium') . "' class='left " . $class . " settings-sport-icon larger-indent pointer' sport='" . strtolower($sport->sport) . "' id='settings-sports-icon-" . strtolower($sport->sport) . "' tooltip='" . $sport->sport . "'/>";
+				
+				/*
+				$lowerOutput .= "<div class='clear width-100 settings-sport-container hidden larger-margin-top' id='" . strtolower($sport->sport) . "-container'>";
+				$lowerOutput .=		"<p class='darkest clear larger-text heavy width-100 center'>" . $sport->sport . "</p>";
+				$lowerOutput .=		"<p class='darkest clear red width-100 center pointer'>remove</p>";
+				
+				if (!$userSport) {
+				}
+					
+				
+				$lowerOutput .=	"</div>";
+				*/
+			}
+			
+			echo "<form action='/users/update-sports' method='POST' id='sports-form'>";
+			echo $this->signupSportForm()->loop($this->sportsArray, $this->user->sports);
+			echo "</form>";
+			
+			//echo $lowerOutput;
+		?>
+        </div>
+        
+        <div class='clear-right larger-margin-top hidden' id='sports-save-changes-container'> 
+            <p class='green-button right largest-text heavy' id='sports-save-changes'>Save Changes</p>
+        </div>
+    </div>
+    
+    
+    <div class='settings-container left hidden' id='games-container'>
+    	<p class='heavy larger-text darkest width-100 clear settings-sub-header'>Subscribed Games</p>
+		<?php
+			if (!$this->subscribedGames->hasValue('games')) {
+				echo "<p class='medium clear none-text width-100 center'>No subscribed games</p>";
+			} else {
+				foreach ($this->subscribedGames->getAll() as $game) {
+					echo "<a href='/games/" . $game->gameID . "' class='clear find-result-container animate-darker' gameID='" . $game->gameID . "'>";
+					echo	"<img src='" . $game->getProfilePic('medium') . "' class='left'/>";
+					echo	"<div class='left find-result-left-container'>";
+					echo		"<p class='darkest largest-text heavy clear'>" . $game->gameTitle . "</p>";
+					echo		"<p class='darkest clear'>" . $game->getHour() . "</p>";
+					echo		"<p class='darkest clear'>Every " . $game->gameDate->format('l') . "</p>";
+					echo		"<p class='light clear'>" . $game->park->parkName . "</p>";
+					echo	"</div>";
+					echo	"<div class='right find-result-right-container'>";
+					echo		"<p class='settings-x red jumbo-text header right' tooltip='Unsubscribe from this game'>x</p>";
+					echo	"</div>";
+					echo "</a>";
+				}
+			}
+		?>
+    </div>
+	
+</div>
+
+
+<div id='details-ele'
+	 actingUserID='<?php echo $this->user->userID;?>'>
 </div>

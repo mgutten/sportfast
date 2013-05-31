@@ -48,6 +48,47 @@ class Application_Model_RatingsMapper extends Application_Model_MapperAbstract
 	}
 	
 	/**
+	 * check to see if there was already an unsucessful (success = 0) rating for a park from a particular game (only allow 1 unsucessful rating per game)
+	 */
+	public function getUnsuccessfulParkRating($parkID, $gameID)
+	{
+		$table = $this->getDbTable();
+		$select = $table->select();
+		$select->setIntegrityCheck(false);
+		
+		$select->from(array('pr' => 'park_ratings'))
+			   ->where('pr.parkID = ?', $parkID)
+			   ->where('pr.gameID = ?', $gameID)
+			   ->where('pr.success = ?', '0');
+			   
+		$results = $table->fetchRow($select);
+		
+		return $results;
+	}
+	
+	/**
+	 * retrieve number value of rating level
+	 * @params ($level => 'beginner', 'good', etc
+	 *			$type => 'user', 'park',
+	 *			$ratingType => 'skill', 'sportsmanship'
+	 */
+	public function getValueFromRating($level, $type, $ratingType)
+	{
+		$table = $this->getDbTable();
+		$select = $table->select();
+		$select->setIntegrityCheck(false);
+		
+		$select->from('ratings')
+			   ->where('type = ?', $type)
+			   ->where('ratingType = ?', $ratingType)
+			   ->where('ratingName = ?', $level);
+			   
+		$result = $table->fetchRow($select);
+		
+		return $result['value'];
+	}
+	
+	/**
 	 * set userRatingID to incorrect to be reviewed
 	 */
 	public function setUserRatingIncorrect($userRatingID)

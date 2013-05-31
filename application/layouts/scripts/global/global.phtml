@@ -16,8 +16,16 @@ if (!$this->noDefaultHeadTitle) {
 		//echo $this->headMeta() . PHP_EOL;
  		echo $this->headTitle() . PHP_EOL;
  		echo $this->headLink()->prependStylesheet($this->baseUrl() . '/css/global.css') . PHP_EOL;
-		echo $this->headScript()->prependFile($this->baseUrl() . '/js/global.js')
-								->prependFile($this->baseUrl() . '/js/jquery-1.9.1.min.js') . PHP_EOL;
+		
+		$this->headScript()->prependFile($this->baseUrl() . '/js/global.js');
+		
+		if ($this->rateGame) {
+		// Popup to rate users/park from last game
+			$this->headScript()->prependFile($this->baseUrl() . '/js/rategame.js');
+			$this->headScript()->prependFile($this->baseUrl() . '/js/rating.js');
+			$this->headScript()->prependFile($this->baseUrl() . '/js/plugins/smartslider.js');
+		}
+		echo $this->headScript()->prependFile($this->baseUrl() . '/js/jquery-1.9.1.min.js') . PHP_EOL;
 								
  ?>
 </head>

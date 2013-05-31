@@ -13,14 +13,20 @@ class Application_View_Helper_ProfileSportSections
 		return $this;
 	}
 	
-	public function start($sports)
+	public function start($sports, $selectedSport = false)
 	{
 		$output = '';
 		$count = 0;
 		foreach ($sports as $sport) {
 			
 			$class = $tabClass = '';
-			if ($count == 0) {
+			if ($selectedSport) {
+				// Sport selected in controller
+				if (strtolower($sport->sport) == strtolower($selectedSport)) {
+					$class = 'user-sport-container-selected';
+					$tabClass = 'user-sport-selected';
+				}
+			} elseif ($count == 0) {
 				// First sport, show box
 				$class = 'user-sport-container-selected';
 				$tabClass = 'user-sport-selected';

@@ -54,6 +54,9 @@
         <controllerFile controllerName="Mail">
           <actionMethod actionName="index"/>
         </controllerFile>
+        <controllerFile controllerName="Settings">
+          <actionMethod actionName="index"/>
+        </controllerFile>
       </controllersDirectory>
       <formsDirectory>
         <formFile formName="Login"/>
@@ -128,6 +131,9 @@
             <viewScriptFile forActionName="index"/>
           </viewControllerScriptsDirectory>
           <viewControllerScriptsDirectory forControllerName="Mail">
+            <viewScriptFile forActionName="index"/>
+          </viewControllerScriptsDirectory>
+          <viewControllerScriptsDirectory forControllerName="Settings">
             <viewScriptFile forActionName="index"/>
           </viewControllerScriptsDirectory>
         </viewScriptsDirectory>
@@ -212,6 +218,9 @@
             <testApplicationActionMethod forActionName="index"/>
           </testApplicationControllerFile>
           <testApplicationControllerFile forControllerName="Mail">
+            <testApplicationActionMethod forActionName="index"/>
+          </testApplicationControllerFile>
+          <testApplicationControllerFile forControllerName="Settings">
             <testApplicationActionMethod forActionName="index"/>
           </testApplicationControllerFile>
         </testApplicationControllerDirectory>

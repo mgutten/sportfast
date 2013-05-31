@@ -272,8 +272,10 @@ div.signup-narrow-column-img-container {
 	
 }
 
-#signup-sports-hidden {
+.signup-sports-hidden {
 	margin-top: .5em;
+	position:relative;
+	z-index: 1;
 }
 
 .signup-sports-form-section {
@@ -289,8 +291,7 @@ div.signup-narrow-column-img-container {
 }
 
 .signup-skill-slider {
-	position:relative;
-	z-index:1;
+
 	width:40em;
 	height: 1em;
 	margin: .3em 0 0em 0;

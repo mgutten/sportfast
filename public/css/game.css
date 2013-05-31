@@ -98,3 +98,10 @@
 .game-cancel-reason {
 	margin-left: 2.3em;
 }
+
+/* edit game page */
+.create-section-inner-gmap {
+	margin-top: 0;
+	z-index: 2;
+	opacity: 1;
+}

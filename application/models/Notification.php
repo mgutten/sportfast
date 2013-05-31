@@ -99,7 +99,6 @@ class Application_Model_Notification extends Application_Model_ModelAbstract
 	
 	public function getFormattedText($currentID = false)
 	{
-		
 		// match %sign holders in text (eg %name has joined the %sport game)
 		preg_match_all('/(?:%)[a-zA-Z]+/', $this->text, $matches);
 		

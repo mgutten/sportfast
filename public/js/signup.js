@@ -339,24 +339,8 @@ $(function()
 		
 	})
 	
-	
-	/* slider */
-	var width = $('.signup-skill-slider').width();
-	// strackbar requires element to not be hidden (offset().left)
 	$('.signup-sports-form').show();
-	$('.signup-skill-slider').strackbar({callback: updateSkillHiddenInput, 
-									     defaultValue: 2,
-									     minValue: 0,
-									     maxValue: 6,
-									     sliderHeight: 4,
-									     sliderWidth: width,
-									     style: 'style1', 
-									     animate: false, 
-									     ticks: false, 
-									     labels: false, 
-									     trackerHeight: 20, 
-									     trackerWidth: 19 })
-	// Hide element again
+	buildSliders($('.signup-skill-slider'), updateSkillHiddenInput);
 	$('.signup-sports-form').hide();
 												 
 	
@@ -389,16 +373,28 @@ $(function()
 		updateSportHiddenInputSelectable(sectionEle);
 	})
 	
+	$('.signup-sports-what').find('.selectable-text').click(function()
+	{
+		if ($(this).text().toLowerCase() == 'league w/ refs' && $(this).is('.green-bold')) {
+			// Show positions
+			$(this).parents('.signup-sports-form').find('.signup-sports-position').show();
+		} else if ($(this).text().toLowerCase() == 'league w/ refs' && !$(this).is('.green-bold')) {
+			// Hide positions
+			$(this).parents('.signup-sports-form').find('.signup-sports-position').hide();
+		}
+	})
 	
 	/* availability calendar section */
 	$('.availability').mousedown(function()
 	{
 		// Make text unselectable while mouse is down
 		makeTextSelectable(false);
+		
+		$('#tooltip').hide();
 
 		$('.availability').bind('mouseenter.availability',function()
 		{
-			// If mousedown still and mouseenter availability, toggle
+			// If mousedown still and mouseenter .availability, toggle
 			toggleGreenBackground($(this), false);
 		
 			var dayEle = $(this).parents('.availability-calendar-day-container');
@@ -411,7 +407,7 @@ $(function()
 		updateAvailabilityHiddenInput(dayEle);
 	})
 	
-	$(document).mouseup(function()
+	$(document).bind('mouseup.availability',function()
 	{
 		// Remove bound mouseenter created by mousedown event on availability
 		$('.availability').unbind('mouseenter.availability');
@@ -421,11 +417,13 @@ $(function()
 	
 	
 	/* copy one sport's availability to another */
-	$(document).on('click','#sports-copyable>.dropdown-menu-hidden-container>.dropdown-menu-options-container>.dropdown-menu-option-container',function()
+	//$(document).on('click','#sports-copyable>.dropdown-menu-hidden-container>.dropdown-menu-options-container>.dropdown-menu-option-container',function()
+	$(document).on('click','#dropdown-menu-hidden-container-sports-copyable>.dropdown-menu-options-container>.dropdown-menu-option-container',function()
 	{
 		var sport  	     = $(this).children('p').text().toLowerCase();
 		var receivingEle = $(this).parents('.signup-sports-availability').children('.availabilty-calendar-container');
 		var copiedEle	 = $('#availability-calendar-container-' + sport);
+		
 		
 		copyAvailabilities(receivingEle, copiedEle);
 		
@@ -452,35 +450,38 @@ $(function()
 		$(this).parents('form').submit();
 	})
 	
+	
 	/* ajax submit of import profile pic */
-	$('#upload-profile-pic').ajaxForm({success: function(data) {
-													if (data == 'errorFormat') {
-														alert('The file you submitted is in the wrong format. Please select a jpg, png, or gif.');
-														return false;
-													} else if(data == 'errorUpload') {
-														alert('An error occurred, please try again later.');
-														return false;
+	if (isSignup()) {
+		$('#upload-profile-pic').ajaxForm({success: function(data) {
+														if (data == 'errorFormat') {
+															alert('The file you submitted is in the wrong format. Please select a jpg, png, or gif.');
+															return false;
+														} else if(data == 'errorUpload') {
+															alert('An error occurred, please try again later.');
+															return false;
+														}
+														if (jcropAPI) {
+															jcropAPI.destroy()
+														}
+														$('#fileName').val(data);
+														$('#signup-import-main-img,.narrow-column-picture').attr('src',data)
+														$('#signup-import-alert-img').attr('src',data)
+																					 .maintainRatio()
+																					 .Jcrop({aspectRatio: 1.26,
+																							 setSelect: [0,0,200,200],
+																							 onSelect: updateProfilePic
+																							 },function(){
+																								jcropAPI = this;
+																								})
+														
+														$('.signup-alert-rotate').show();				
+														$('#signup-import-alert-accept').show();
+																					 
+														
 													}
-													if (jcropAPI) {
-														jcropAPI.destroy()
-													}
-													$('#fileName').val(data);
-													$('#signup-import-main-img,.narrow-column-picture').attr('src',data)
-													$('#signup-import-alert-img').attr('src',data)
-																				 .maintainRatio()
-																				 .Jcrop({aspectRatio: 1.26,
-																				 		 setSelect: [0,0,200,200],
-																						 onSelect: updateProfilePic
-																						 },function(){
-       																						jcropAPI = this;
-																							})
-													
-													$('.signup-alert-rotate').show();				
-													$('#signup-import-alert-accept').show();
-																				 
-													
-												}
-	})
+		})
+	}
 	
 	$('.signup-alert-rotate').click(function()
 	{
@@ -495,18 +496,21 @@ $(function()
 	$('input[type=text],input[type=password]').blur(function()
 	{
 		// When focusout of input, check its value
+		
 		$(this).trigger('keyup');
 	})
 	
 		
 	/* test all inputs onload */
-	$('.input-container').children('input').each(function()
-	{
-		if( $(this).val() !== '' && !$(this).is('.input-fail')) {
-			// Input has value and input is not initiated with fail (ie failed zend form validation), run test
-			$(this).trigger('keyup');
-		}
-	})
+	if (isSignup()) {
+		$('.input-container').children('input').each(function()
+		{
+			if( $(this).val() !== '' && !$(this).is('.input-fail')) {
+				// Input has value and input is not initiated with fail (ie failed zend form validation), run test
+				$(this).trigger('keyup');
+			}
+		})
+	}
 	
     
 	/* FINAL JAVASCRIPT VALIDATION BEFORE SUBMIT FORM */
@@ -631,6 +635,7 @@ function testGeocode()
 		})
 	}
 }
+
 		
 /**
  * populate city name with return value of getCity
@@ -663,11 +668,11 @@ function setUserLocation()
 	$('#userLocation').val(value);
 }
 
-/**
+/** USED ON GLOBAL.JS
 * function to fade out or hide overlay text for input
 * @params (inputEle => input type element
 *		   focusIn  => true/false if input is focusin or focusout)
-*/
+
 function fadeOutInputOverlay(inputEle, focusIn)
 {
 	var overlayEle = inputEle.next('.input-overlay');
@@ -683,7 +688,7 @@ function fadeOutInputOverlay(inputEle, focusIn)
 			overlayEle.animate({'opacity':'1'},200);
 		}
 	}
-}
+}*/
 
 
 /**
@@ -705,8 +710,9 @@ function submitFormTestSports()
 	{
 		var sport = getSportName($(this).children());
 		var section;
-		
+
 		if (!loopSportsSections($(this))) {
+			
 			scrollToEle = $(this)
 			return false;
 		}
@@ -735,12 +741,13 @@ function loopSportsSections(formEle) {
 		
 		if ((section = formEle.find('.signup-sports-' + sections[i])).length > 0) {
 			// Category is present, test for selected values
-			
 			if (!testIfValues(section, sport)) {
+				
 				scrollToEle = formEle;
 			}
 		}
 	}
+	
 	
 	if (scrollToEle) {
 		return false;
@@ -756,12 +763,12 @@ function loopSportsSections(formEle) {
  */
 function testIfValues(section, sport)
 {
-	var sectionTitle = section.attr('class').replace(/signup-sports-form-section/,'');
-	sectionTitle     = capitalize($.trim(sectionTitle.replace(/signup-sports-/,'')));
+	var sectionTitle = capitalize($.trim(section.attr('section')));
 	var id           = sport + sectionTitle //e.g. basketballRating
 	var hiddenInput  = $('#' + id);
 	var titleEle     = section.children('.signup-sports-form-section-title');
 	var fail		 = false;
+
 	
 	if (sectionTitle == 'Availability') {
 		// Special case for availability section
@@ -783,7 +790,7 @@ function testIfValues(section, sport)
 		}		
 		
 	}
-
+	
 	if (sectionTitle == 'Type' && sport == 'tennis') {
 		// Require tennis to have at least one typeName and typeSuffix selected
 		var value = hiddenInput.val();
@@ -800,7 +807,10 @@ function testIfValues(section, sport)
 		titleEle.addClass('red');
 		return false;
 	}
-				
+	
+	if (section.css('display') == 'none') {
+		return true;
+	}
 	
 	// Rest of sections test if input has any values
 	if (hiddenInput.val().length < 1) {
@@ -984,10 +994,10 @@ function animateNarrowColumnBody(ele)
  */
 function changeInputBackground(ele, isValid)
 {
-	
 	if (!isValid) {
 		// Failed validity test
 		ele.removeClass('input-success').addClass('input-fail');
+
 	} else {
 		// Correct input
 		ele.removeClass('input-fail').addClass('input-success');
@@ -1172,4 +1182,15 @@ function copyAvailabilities(receivingEle, copiedEle)
 
 }
 
+/**
+ * test if page is signup page or settings page
+ */
+function isSignup()
+{
+	if ($('#upload-profile-pic').length > 0) {
+		return true;
+	} else {
+		return false;
+	}
+}
 

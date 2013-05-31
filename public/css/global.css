@@ -113,7 +113,7 @@ a {
 	text-decoration: none;
 }
 
-a:hover {
+a:hover,.action:hover {
 	text-decoration: underline;
 }
 
@@ -143,7 +143,7 @@ a.header-dropdown-option-cog:hover,a.header-dropdown-option:hover {
 	color:#8d8d8d;
 }
 
-.medium-background {
+.medium-background,.medium-back {
 	background: #8d8d8d;
 }
 
@@ -1297,6 +1297,10 @@ input.header-search-bar {
 	background: url(/images/global/slider/tracker.png) 0px 0px no-repeat;
 }
 
+.signup-skill-slider {
+	margin-top: .4em;
+}
+
 /* end slider */
 
 /* availability calendar */
@@ -1599,6 +1603,7 @@ div.dropdown-menu-container-reverse:hover {
 	float:left;
 	font-size: 1.1em;
 	margin-left: 5px;
+	width: 90%;
 }
 
 .alert-x {
@@ -1737,6 +1742,10 @@ div.dropdown-menu-container-reverse:hover {
 .red-button:hover {
 	background: #970000;
 	color: #ddd;
+}
+
+.button-small {
+	width: 3em;
 }
 
 .import-button {
@@ -2206,4 +2215,88 @@ input[type=text].selectable-input {
 	float:left;
 	width:96%;
 	padding: .25em 2%;
+}
+
+/* ratings alert */
+#rateGame-alert-container {
+	margin-top: -15em;
+	margin-left: -16em;
+	width: 28.2em;
+}
+
+#rateGame-alert-container > .alert-body-container {
+	width: 13em;
+	float:left;
+	clear:none;
+	margin-left: .2em;
+}
+
+#rateGame-alert-container > .alert-body-container.clear {
+	clear:both;
+}
+
+#rateGame-alert-container > .alert-body-container.right {
+	float:right;
+}
+
+#rateGame-alert-container > .alert-body-container:first-child {
+	margin-left: 0;
+}
+
+.rating-main-container {
+	margin-top: .3em;
+	margin-left: .3em;
+	width: 200px;
+}
+
+.rating-remember-yes,.rating-remember-no {
+	margin-left: 1em;
+}
+
+.rating-section-container {
+	padding: .5em 0 .5em;
+	position:relative;
+	background:#fff;
+}
+
+.rating-sportsmanship-header {
+	margin-top: 1em;
+}
+
+.rating-submit {
+	width: 8.4em;
+	margin-left: .3em;
+}
+
+#comment-container {
+	width: 100%;
+	font-size: .9em;
+	height: 5.5em;
+}
+
+#comment-container > .input-overlay {
+	margin-top: -3.9em;
+}
+
+.rateGame-comment {
+	min-height: 5em;
+}
+
+/* overlay text */
+.overlay-container {
+	position:relative;
+}
+
+.overlay-pic {
+	width:100%;
+	opacity: 0;
+	position:absolute;
+	top:0;
+	left:0;
+	z-index: 2;
+	width: 100%;
+}
+
+.overlay-pic-large {
+	height: 160px;
 }

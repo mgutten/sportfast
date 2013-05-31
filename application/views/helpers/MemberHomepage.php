@@ -13,7 +13,58 @@ class Application_View_Helper_MemberHomepage
 	public function memberHomepage() 
 	{
 		$user = $this->_view->user;
+		
+		if ($this->_view->firstVisit) {
+			// First visit
+			$this->_view->placeholder('absolute')->captureStart();
+			
+			echo $this->_view->alert()->start('first-time', 'Welcome to your dashboard!');
+			
+			echo "<img src='/images/global/logo/logo/green/medium.png' class='left'/>";
+			echo "<div class='left member-first-time-overview'>";
+			echo "<p class='clear darkest heavy'>Your dashboard is your home while at Sportup.  From it, you can: </p>
+					<ul class='clear margin-top heavy green'>
+						<li>Find games or teams</li> 
+						<li>View your upcoming schedule</li> 
+						<li>Access your profile</li></ul>";
+			echo "</div>";
+			
+			
+			echo "<p class='clear smaller-text member-first-time-sub larger-margin-top darkest'>We will automatically notify you when a game is created matching your preferences.</p>";
+			echo "<p class='clear larger-margin-top medium'>Then again, maybe you're here to   
+					<a href='/create' class='darkest'> organize your own game or team.</a></p>";
+			
+			echo "<p class='button clear heavy member-first-time-button'>Continue to dashboard</p>";
+			
+			echo $this->_view->alert()->end();
+			echo $this->_view->partial('partials/global/alertBack.phtml');
+			
+			$this->_view->placeholder('absolute')->captureEnd();
+		}
+		
+		if ($this->_view->usersInArea) {
+			// Not enough users in area, let user know
+			$this->_view->placeholder('absolute')->captureStart();
+			
+			$newUsers = ($this->_view->usersInArea['newUsers'] == 0 ? '1' : $this->_view->usersInArea['newUsers']);
+			
+			$users = ($newUsers == 1 ? 'user has' : 'users have');
+			
+			echo $this->_view->alert()->start('more-users', 'Welcome back!');
+			
+			echo "<p class='clear dark'>We are working hard to get our name out there, but it takes time.</p>";
+			echo "<p class='clear width-100 center larger-text darkest heavy'>Since you last visited, 
+					<span class='largest-text inherit'>" . $newUsers . "</span> " . $users . " joined in your area.</p>";
+			echo "<p class='clear dark larger-margin-top'>We won't make any games until there are enough users to show up.</p>";
+			echo "<p class='clear dark larger-margin-top'>Your word is stronger than ours, so tell your friends and let's get some games together!</p>";
+			
+			echo $this->_view->alert()->end();
+			echo $this->_view->partial('partials/global/alertBack.phtml');
+			
+			$this->_view->placeholder('absolute')->captureEnd();
+		}
 
+		
 		$this->_view->placeholder('narrowColumn')->captureStart();
 		
 		$href = '/users/' . $user->userID;
@@ -377,7 +428,7 @@ class Application_View_Helper_MemberHomepage
 			} elseif ($match instanceof Application_Model_Team) {
 				// Match is a team
 				$type	  = 'Team';
-				$dateHTML = $match->getLimitedName('city', 8);
+				$dateHTML = $match->getLimitedName('city', 10);
 				$location = $match->getLimitedName('teamName',25);
 				$id		  = $match->teamID;
 				$dateDesc = $match->city;

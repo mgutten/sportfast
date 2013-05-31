@@ -56,6 +56,21 @@ $(function()
 		populateConfirmActionAlert('remove this player');
 	})
 	
+	$('#dropdown-menu-hidden-container-invite-to').find('.dropdown-menu-option-container').click(function()
+	{
+		var detailsEle = getDetailsEle();
+		var idType = $(this).attr('idType');
+		var typeID = $(this).attr(idType);
+		var receivingUserID = detailsEle.attr('receivingUserID');
+		var actingUserID = detailsEle.attr('actingUserID');
+		var action = 'invite';
+		var type   = idType.replace('ID', '');
+		var details;
+		
+		createNotification(idType, typeID, actingUserID, receivingUserID, action, type, details);
+		showConfirmationAlert('Invite sent');
+	})
+	
 	
 })
 

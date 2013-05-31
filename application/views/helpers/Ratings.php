@@ -71,7 +71,7 @@ class Application_View_Helper_Ratings
 			$output .=			$this->_view->ratingbar($rating->skillRatingName, $availableSkillRatings, 'skill');
 			$output .=			$this->_view->ratingbar($rating->sportsmanshipRatingName, $availableSportsmanshipRatings, 'sportsmanship');
 			$output .=			"<p class='clear larger-margin-top medium'>" . $rating->getQuotedComment() . "</p>";
-			$output .=			($this->_view->isUser  ? "<div class='" . $flagClass . "' userRatingID='" . $rating->userRatingID . "'><p class='light clear-right smaller-text'>" . $flagText . "</p><img src='/images/global/flag.png' class='right'/></div>" : '');
+			$output .=			($this->_view->isUser  ? "<div class='" . $flagClass . "' userRatingID='" . $rating->userRatingID . "'><p class='light clear-right smaller-text action'>" . $flagText . "</p><img src='/images/global/flag.png' class='right'/></div>" : '');
 			$output .=		"</div>";
 			$output .= "</div>";
 		}

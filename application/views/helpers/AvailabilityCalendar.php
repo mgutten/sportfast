@@ -15,7 +15,12 @@ class Application_View_Helper_AvailabilityCalendar
 		return $this;
 	}
 	
-	public function create($sport)
+	/**
+	 * create availability calendar
+	 * @params ($sport => array of sport values,
+	 *			$userSport => this user's Sport Model for $sport
+	 */
+	public function create($sport, $userSport = false)
 	{
 		$output    = "<div class='availabilty-calendar-container' id='availability-calendar-container-" . $sport . "'>";
 		$startHour = 8;
@@ -60,6 +65,13 @@ class Application_View_Helper_AvailabilityCalendar
 					if ($outerCounter % 2 == 0) {
 						// Even
 						$class .= ' availability-light-background';
+					}
+					
+					if ($userSport) {
+						if (isset($userSport->availabilities[$outerCounter - 1][$counter])) {
+							// User has selected this previously
+							$class .= ' selected-green';
+						}
 					}
 					
 					$tooltipHourStart = $this->convertTime($counter);

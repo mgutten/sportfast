@@ -7,6 +7,7 @@ class Application_Model_Rating extends Application_Model_ModelAbstract
 	protected $_attribs     = array('userRatingID'  => '',
 									'parkRatingID'	=> '',
 									'quality'		=> '',
+									'crowd'			=> '',
 									'success'		=> '',
 									'dateHappened'  => '',
 									'date'			=> '',
@@ -19,10 +20,14 @@ class Application_Model_Rating extends Application_Model_ModelAbstract
 									'attendanceValue'	 => '',
 									'sport'			=> '',
 									'sportID'		=> '',
+									'gameID'		=> '',
 									'skiller'		=> '',
 									'skilling'		=> '',
+									'bestSkill'		=> '',
 									'user'			=> '',
 									'userID'		=> '',
+									'receivingUserID' => '',
+									'givingUserID'	  => '',
 									'parkID'		=> '',
 									'skillRatingName' => '',
 									'sportsmanshipRatingName' => '',
@@ -44,6 +49,23 @@ class Application_Model_Rating extends Application_Model_ModelAbstract
 		$this->user = $user;
 		
 		parent::__construct($resultRow);
+	}
+	
+	/**
+	 * retrieve number value of rating level
+	 * @params ($level => 'beginner', 'good', etc
+	 *			$type => 'user', 'park',
+	 *			$ratingType => 'skill', 'sportsmanship'
+	 */
+	public function getValueFromRating($level, $type, $ratingType)
+	{
+		return $this->getMapper()->getValueFromRating($level, $type, $ratingType);
+	}
+	
+	public function getUnsuccessfulParkRating($parkID, $gameID)
+	{
+		return $this->getMapper()->getUnsuccessfulParkRating($parkID, $gameID);
+
 	}
 	
 	public function setPark()

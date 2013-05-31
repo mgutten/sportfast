@@ -56,5 +56,180 @@ class Application_View_Helper_Alert
 		
 		return $output;
 	}
+	
+	/**
+	 * alert for post-game ratings of users or park that game was played at
+	 * @params ($game => game model with stored park and players)
+	 */
+	public function ratingAlert($game)
+	{
+		$ratings = $this->getRandomRatings($game);
+		$details = "You recently played " . $game->sport . " on " . $game->gameDate->format('l') . ".  <span class='white'>Please rate some of the other players.</span>";
+		$output  = $this->start('rateGame', $details);
+		
+		$form = $this->_view->rateGameForm;
+		
+		$output .= "<span id='rateGame-details' gameID='" . $game->gameID . "'></span>";
+		
+		$counter = 0;
+		foreach ($ratings as $rating) {
+			
+			if ($counter > 0) {
+				$output .= "<div class='alert-body-container'>";
+			}
+			
+			$user = $park = false;
+			if ($rating->userID) {
+				// Is user
+				$name = $rating->shortName;
+				$user = true;
+				$typeClass = 'user';
+			} else {
+				// Is park
+				$name = $rating->parkName;
+				$park = true;
+				$typeClass = 'park';
+			}
+			
+			$output .= "<div class='left overlay-container indent'>";
+			$output .= 	"<img src='" . $rating->getProfilePic('large') . "' class='left overlay-trigger'/>";
+			$output .=	"<div class='clear overlay-pic overlay-pic-large black-back'>
+						 </div>
+						 <div class='left overlay-pic overlay-pic-large'>
+							<p class='clear width-100 center white heavy largest-text margin-top'>" . $name . "</p>
+						 </div>";
+			$output .= "</div>";
+			$output .= "<div class='clear rating-main-container margin-top " . $typeClass . "'>";
+			
+			if ($user) {
+				// Attendance
+				$output .=	"<div class='clear width-100 rating-section-container rating-attendance'>";
+				$output .=		"<p class='clear width-100 medium light-back'>Do you remember " . $rating->getHimOrHer() . "?</p>";
+				$output .=		"<p class='clear button pointer button-small larger-margin-top rating-animate-trigger rating-remember-yes'>Yes</p>";
+				$output .=		"<p class='left button pointer button-small larger-margin-top rating-remember-no'>No</p>";
+				$output .= 	"</div>";
+				
+				// Skill
+				$output .=	"<div class='clear width-100 rating-section-container hidden'>";
+				$output .=		"<p class='clear width-100 medium light-back rating-section-header'>How skilled?</p>";
+				$output .=		"<div class='clear width-100 larger-margin-top'>"
+								. $this->_view->slider()->create(array('id'    		=> 'skill-rating',
+																		'desc'			=> true,
+																		'valuePosition' => 'above',
+																		'valueClass'	=> 'green-bold',
+																		'descClass'		=> 'smaller-text',
+																		'sliderClass'	=> 'rating-animate-trigger',
+																		'type'			=> 'skill'))
+								. "</div>";
+				$output .=	"";
+				
+				// Sportsmanship
+				$output .=	"";
+				$output .=		"<p class='clear width-100 medium light-back rating-section-header rating-sportsmanship-header'>Sportsmanship?</p>";
+				$output .=		"<div class='clear width-100 larger-margin-top'>"
+								. $this->_view->slider()->create(array('id'    		=> 'sportsmanship-rating',
+																	'desc'			=> true,
+																	'valuePosition' => 'above',
+																	'valueClass'	=> 'green-bold',
+																	'descClass'		=> 'smaller-text',
+																	'sliderClass'	=> 'rating-animate-trigger',
+																	'type'			=> 'sportsmanship'))
+								. "</div>";
+				
+				// Good at?				
+				$output .=		"<p class='clear width-100 medium light-back rating-section-header rating-sportsmanship-header'>Good at?</p>";
+				$output .=		"<div class='clear width-100 larger-margin-top'>";
+				$output .=			"<select class='clear rating-dropdown darkest'>";
+				
+				foreach ($this->_view->rateGameSkills as $array) {
+					$output .=	"<option>" . ucwords($array['skilling']) . "</option>";
+				}
+				$output .=				"<option>None</option>";
+				$output .=			"</select>";
+				$output .=		"</div>";				
+				
+				$output .=	"</div>";
+
+				$output .=	$form->skill;
+				$output .=	$form->sportsmanship;
+				$output .=	$form->id->setValue($rating->userID);
+
+			} elseif ($park) {
+				// Crowdedness
+				$output .=	"<div class='clear width-100 rating-section-container rating-attendance'>";
+				$output .=		"<p class='clear width-100 medium light-back'>Did the game happen here?</p>";
+				$output .=		"<p class='clear button pointer button-small larger-margin-top rating-animate-trigger rating-remember-yes'>Yes</p>";
+				$output .=		"<p class='left button pointer button-small larger-margin-top rating-remember-no'>No</p>";
+				$output .= 	"</div>";
+				
+				// Quality
+				$output .=	"<div class='clear width-100 rating-section-container hidden'>";
+				$output .=		"<p class='clear width-100 medium light-back rating-section-header'>Quality?</p>";
+				$output .=		"<div class='clear width-100 larger-margin-top'>"
+								. $this->_view->getHelper('ratingstar')->clickablestar('large')
+								. "</div>";
+				$output .=		"<div class='clear width-100 larger-margin-top'>";
+				$output .=			$form->comment;
+				$output .=		"</div>";
+				$output .=	"</div>";
+				
+				$output .=	$form->id->setValue($rating->parkID);
+				$output .= "<input type='hidden' id='rating-hidden'/>";
+			}
+			
+			$output .=	$form->sport;
+			
+			$output .= "</div>";
+			
+			$output .= "</div>"; // alert-body-container close
+			
+			$counter++;
+		}
+		
+		$output .= "<div class='alert-body-container margin-top clear hidden'>";
+		$output .=		"<p class='button rating-submit larger-text'>Submit</p>";
+		$output .= "</div>";
+		
+		$output .= "<div class='alert-body-container margin-top hidden right'>";
+		$output .=		"<p class='button rating-submit larger-text'>Submit</p>";
+		$output .= "</div>";
+		
+		$output .= "</div>";
+		
+		return $output;
+		
+	}
+	
+	public function getRandomRatings($game)
+	{
+	
+		$ratings = array();
+		$chosen = array($this->_view->user->userID);
+		$park = false;
+		$b = 0;
+		
+		for ($i = 0; $b < 2; $i++) {
+			$random = mt_rand(1,10);
+			
+			if ($random > 9 && !$park) {
+				// Choose to rate park 10% of the time
+				$ratings[] = $game->park;
+				$park = true;
+				$b++;
+			} else {
+				// Choose random user
+				$player = $game->players->random();
+				if (in_array($player->userID, $chosen)) {
+					// Already been chosen
+					continue;
+				}
+				$chosen[] = $player->userID;
+				$ratings[] = $player;
+				$b++;
+			}
+		}
+		
+		return $ratings;
+	}
 
 }

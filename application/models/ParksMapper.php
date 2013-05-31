@@ -15,12 +15,11 @@ class Application_Model_ParksMapper extends Application_Model_MapperAbstract
 			   		  'pl.parkID = p.parkID',
 					  array('AsText(pl.location) as location'))
 			   ->joinLeft(array('pr' => 'park_ratings'),
-			   			  'pr.parkID = p.parkID',
+			   			  'pr.parkID = p.parkID AND pr.success = 1',
 						  array('avg(pr.quality) as quality',
 						  		'count(pr.parkID) as totalRatings'))
 			   ->where('p.parkID = ?', $parkID);				
-				
-		
+			
 		$park = $table->fetchRow($select);
 		
 		$savingClass->setAttribs($park);
@@ -130,7 +129,8 @@ class Application_Model_ParksMapper extends Application_Model_MapperAbstract
 					  array('AVG(pr.quality) as quality',
 					  		'COUNT(pr.parkRatingID) as numRatings'))
 			   ->where($this->getAreaWhere($bounds['upper'], $bounds['lower'], 'pl.location'))
-			   ->where('p.temporary = 0');
+			   ->where('p.temporary = 0')
+			   ->where('pr.success = ?', '1');
 			   
 			   
 		foreach ($where as $statement) {
@@ -237,6 +237,7 @@ class Application_Model_ParksMapper extends Application_Model_MapperAbstract
 			   ->joinLeft(array('u' => 'users'),
 			   		  'u.userID = pr.userID')
 			   ->where('pr.parkID = ?', $parkID)
+			   ->where('pr.success = ?', '1')
 			   ->order('pr.dateHappened DESC');
 		   
 		$results = $table->fetchAll($select);
@@ -303,7 +304,7 @@ class Application_Model_ParksMapper extends Application_Model_MapperAbstract
 			   			  'pl.parkID = p.parkID',
 						  array('AsText(pl.location) as location'))
 			   ->where($this->getAreaWhere($bounds['upper'],$bounds['lower'],'pl.location'))
-			   ->where('p.cityID IN ' . $this->getCityIDRange($cityID))
+			   //->where('p.cityID IN ' . $this->getCityIDRange($cityID))
 			   ->where('p.temporary = 0');
 			   
 		if ($parkID) {

@@ -18,6 +18,14 @@ sliderSkillValues[4]  = {level:'Talented',
 						description: 'I am very skilled.  I am typically the best player in the game.'};
 sliderSkillValues[5]  = {level:'Unstoppable',
 						description: 'I played (or should play) on a professional level.'};
+
+var sliderSportsmanshipValues = [];
+sliderSportsmanshipValues[0] = {level:'Bad',
+								description: 'Poor sportsmanship.  Not fun to play with.'};
+sliderSportsmanshipValues[1] = {level:'Good',
+								description: 'Fine sportsmanship.  A typical player.'};
+sliderSportsmanshipValues[2] = {level:'Excellent',
+								description: 'Made the game more enjoyable with excellent attitude.'};
 						
 var mouseoverColor;
 var dropdowns = new Array();
@@ -159,6 +167,13 @@ $(function()
 			  
 	})( jQuery );
 	
+	$(document).on('click','.dropdown-menu-option-text',function()
+	{
+		if ($(this).parent().is('a')) {
+			// Option is nested in an anchor tag, redirect to anchor tag (fixes bug where would not fire anchor href onclick)
+			window.location = $(this).parent().attr('href');
+		}
+	})
 	
 	$(document).on('click','.dropdown-menu-selected',function(e)
 	{
@@ -580,6 +595,7 @@ $(function()
 	$(document).on('focusin', 'input[type=text],input[type=password],textarea',function()
 	{
 		$(this).parents('.nav-dropdown').trigger('mouseover');
+		
 		fadeOutInputOverlay($(this), true);
 		
 		// Tooltip
@@ -621,7 +637,7 @@ $(function()
 	/* force focus of textbox when overlay for input is clicked */
 	$(document).on('click', '.input-container', function() 
 	{
-		$(this).children('input').focus();
+		$(this).children('input,textarea').focus();
 	});
 	
 	
@@ -636,7 +652,7 @@ $(function()
 	$('.selectable-text').click(function() {
 		if ($(this).is('.selectable-text-one')) {
 			// Only one can be chosen at a time
-			if ($(this).siblings('.green-bold').length < 1) {
+			if ($(this).is('.green-bold')) {
 				// Clicked currently selected text
 				return false;
 			}
@@ -691,6 +707,16 @@ $(function()
 		curMonthEle.hide();
 		newMonthEle.show();
 		
+	})
+	
+	/* animate overlay (with dark back) on mouseover */
+	$('.overlay-container').hover(function()
+	{
+		$(this).children('.overlay-pic').first().stop().animate({opacity: .5}, 300); // animate black back to mostly opaque
+		$(this).children('.overlay-pic').last().stop().animate({opacity: 1}, 300);
+	}, function()
+	{
+		$(this).children('.overlay-pic').stop().animate({opacity: 0}, 300);
 	})
 	
 	
@@ -796,6 +822,7 @@ $(function()
 			$('#header-search-results-container').hide();
 		}
 	});
+	
 	
 	
 		
@@ -994,6 +1021,7 @@ function notificationJoin(notificationLogID, type, url)
 		type: 'POST',
 		data: {options: options},
 		success: function(data) {
+
 			window.location = url;
 		}
 	})
@@ -1092,6 +1120,36 @@ function setUserLocation(cityID)
 	});
 }
 
+/**
+ * create sliders
+ */
+function buildSliders(ele, callback, options)
+{
+	/* slider */
+	var width = $('.signup-skill-slider').width();
+	
+	if (typeof options == 'undefined') {
+		options = {defaultValue: 2,
+				   minValue: 0,
+				   maxValue: 6,
+				   sliderHeight: 4,
+				   sliderWidth: width,
+				   style: 'style1', 
+				   animate: false, 
+				   ticks: false, 
+				   labels: false, 
+				   trackerHeight: 20, 
+				   trackerWidth: 19 }
+	}
+	
+	options.callback = callback;
+	
+	// strackbar requires element to not be hidden (offset().left)
+
+	ele.strackbar(options)
+
+}
+
 
 /** 
  * test dropdown menu for animation up or down
@@ -1149,15 +1207,24 @@ function populateSliderText(sliderEle, value)
 {
 	
 	var containerEle   = sliderEle.parents('.slider-container');
-	var valueEle 	   = containerEle.children('.slider-text-value');
-	var descriptionEle = containerEle.children('.slider-text-description');
-	var textValue	   = sliderSkillValues[value]['level'];
+	var valueEle 	   = containerEle.find('.slider-text-value');
+	var descriptionEle = containerEle.find('.slider-text-description');
+	var valueArray;
+	
+	if (sliderEle.is('.slider-sportsmanship')) {
+		// Is sportsmanship bar, get sportsmanship values
+		valueArray = sliderSportsmanshipValues;
+	} else {
+		valueArray = sliderSkillValues;
+	}
+	
+	var textValue	   = valueArray[value]['level'];
 	
 	valueEle.html(textValue);
 	
 	if (descriptionEle.length > 0) {
 		// Description ele exists, populate
-		var descriptionValue = sliderSkillValues[value]['description'];
+		var descriptionValue = valueArray[value]['description'];
 		descriptionEle.html(descriptionValue);
 	}
 	
@@ -1337,7 +1404,7 @@ function animateNotShow(ele, down, fadeIn)
 	
 	if (down) {	
 		// Hidden element is down, animate it up
-		ele.stop().animate({marginTop: -height}, {duration:400, complete: function() {
+		ele.stop().animate({marginTop: -height}, {duration:300, complete: function() {
 																			$(this).hide()
 																			}
 		});
@@ -1354,9 +1421,9 @@ function animateNotShow(ele, down, fadeIn)
 			
 		} else {
 			// Fade in after animation is complete
-			ele.stop().animate({marginTop: 0}, {duration:400, complete: function() {
-				
-																			$(this).animate({opacity: 1}, {duration:400})
+			ele.stop().css({'display': 'block'})
+					  .animate({marginTop: 0}, {duration:300, complete: function() {
+																			$(this).animate({opacity: 1}, {duration:300})
 																		}
 			});
 		}
@@ -1376,7 +1443,7 @@ function showAlert(alertEle)
 	displayToBlockHidden($('.alert-black-back'));
 	
 	alertEle.animate({'opacity': 1}, 300);
-	$('.alert-black-back').animate({'opacity':.85},300);
+	$('.alert-black-back').first().animate({'opacity':.85},300);
 }
 
 function displayToBlockHidden(ele)
@@ -1451,7 +1518,7 @@ function fadeOutInputOverlay(inputEle, focusIn)
 
 	var inputVal = $.trim(inputEle.val());
 	if (inputVal !== '') {
-		inputEle.removeClass('input-fail'); // remove if problems exist in signup.js
+		//inputEle.removeClass('input-fail'); // remove if problems exist in signup.js
 		overlayEle.hide();
 	} else {
 		overlayEle.show();
@@ -1750,10 +1817,12 @@ function getCoordinatesFromAddress(address, callbackSuccess, callbackFailure)
 		geocoder.geocode(gcReq, function(results,status){
 		if (status == google.maps.GeocoderStatus.OK) {
 			// Results were found
+			
 			userLocation[0]  = results[0].geometry.location.lat();
 			userLocation[1]  = results[0].geometry.location.lng();
 			callbackSuccess();
 		} else {
+			
 			// No results found
 			callbackFailure();
 		}

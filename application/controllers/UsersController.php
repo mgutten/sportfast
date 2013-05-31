@@ -30,6 +30,17 @@ class UsersController extends Zend_Controller_Action
 		
 		$this->view->currentUser = $user;
 
+		$session = new Zend_Session_Namespace('userSport');
+		if ($session->sport) {
+			if (!$this->view->currentUser->hasSport($session->sport)) {
+				// User does not play sport that was saved in session
+				$this->view->selectedSport = false;
+			} else {
+				$this->view->selectedSport = $session->sport;
+			}
+		}
+		
+
         $dropdown = Zend_Controller_Action_HelperBroker::getStaticHelper('Dropdown');
 		$this->view->inviteButton = $dropdown->dropdownButton('invite-to', '', 'Invite to');
 		
@@ -46,7 +57,7 @@ class UsersController extends Zend_Controller_Action
 		
     }
 	
-	function uploadAction()
+	public function uploadAction()
 	{
 		$this->permission();
 		$this->view->narrowColumn = 'false';
@@ -65,7 +76,7 @@ class UsersController extends Zend_Controller_Action
 		$this->view->baseURI    = preg_replace('/\/ratings(\/\w+)?/','',$this->view->currentURI);
 		
 		$userID = $this->getRequest()->getParam('id');
-		$sport  = $this->getRequest()->getParam('sport');
+		$sport  = $this->view->sport = $this->getRequest()->getParam('sport');
 		
 		if (!$sport) {
 			$this->_redirect($this->view->currentURI . '/basketball');
@@ -112,10 +123,234 @@ class UsersController extends Zend_Controller_Action
 		
 	}
 	
+	public function teamsAction()
+	{
+		$this->view->narrowColumn = 'right';
+		
+		$userID = $this->getRequest()->getParam('id');
+		
+		$user = new Application_Model_User();
+		$user->getUserBy('u.userID', $userID);
+		$user->getUserTeams();
+		
+		$this->view->currentUser = $user;
+
+	}
+	
 	public function settingsAction()
     {
 		$this->permission();
-		$this->view->narrowColumn = 'false';
+		$this->view->narrowColumn = false;
+		
+		$session = new Zend_Session_Namespace('goToURL');
+		$session->url = '/users/' . $this->view->user->userID . '/settings';
+		
+		$signupForm = new Application_Form_Signup();
+		$this->view->signupForm = $signupForm;
+		
+		$this->view->signupSportForm = new Application_Form_SignupSportForm();
+		
+		$this->view->subscribedGames = $this->view->user->getSubscribedGames();
+		
+		$sports = new Application_Model_Sports();
+		$this->view->sports = $sports->getAllSportsInfo(true);
+		$this->view->sportsArray = $sports->getAllSportsInfo();
+		$this->view->userSports = $this->view->user->getSportNames();
+		
+	}
+	
+	public function updateInfoAction()
+	{
+		$post = $this->getRequest()->getPost();
+		
+		$user = $this->view->user;
+		
+		$post['dobYear'] = ($post['dobYear'] < date('y') ? '20' : '19') . $post['dobYear'];
+		$post['dob'] = $post['dobYear'] . '-' . $post['dobMonth'] . '-' . $post['dobDay'];
+		
+		$user->username  = $post['email'];
+		$user->firstName = $post['firstName'];
+		$user->lastName = $post['lastName'];
+		$user->dob = $post['dob'];
+		$user->weight = $post['weight'];
+		$user->setHeightFromFeetAndInches($post['heightFeet'], $post['heightInches']);
+		$user->setAgeFromDob();
+		
+		
+		
+		if (!empty($post['signupPassword'])) {
+			if ($post['signupPassword'] == $post['signupReenterPassword']) {
+				// Passwords match
+				$user->password = $user->hashPassword($post['signupPassword']);
+			}
+		}
+		
+		if (!empty($post['userLocation'])) {
+			// Change userLocation
+			$location = new Application_Model_Location();
+			$location->location = $post['userLocation'];
+			$location->userLocationID = $user->userLocation->userLocationID;
+			$location->userID = $user->userLocation->userID;
+
+			$user->userLocation = $location;
+			
+			$user->cityID = $user->getCity()
+								 ->getCityFromZipcode($post['zipcode'])
+							 	 ->cityID;
+			
+			$city = new Application_Model_City();
+			$city->setAttribs($user->getCity()->_attribs); // Store user city model to reinstate after save			 
+			
+			$user->streetAddress = $post['streetAddress'];
+			$user->city = $user->getCity()->city;
+			
+			$user->userLocation->save();
+		}
+		
+		
+		$user->save(false);
+		
+		$user->city = $city;
+		
+		
+		$this->_redirect('/users/' . $user->userID . '/settings');
+	}
+	
+	
+	public function updateSportsAction()
+	{
+		$post = $this->getRequest()->getPost();
+		
+		$sportModel = new Application_Model_Sport();
+		
+		$sports = new Application_Model_Sports();
+		$sportsArray = $sports->getAllSportsInfo();
+		
+		$user = $this->view->user;
+		
+		foreach ($sportsArray as $sport => $section) {
+			if ($post[$sport] !== 'true') {
+				// Sport was not selected
+				continue;
+			}
+			
+			$sportModel = $user->getSport($sport);
+			
+			$sportModel->userID = $user->userID;
+			
+			if ($sportModel->hasValue('sportID')) {
+				// Sport was already in user model
+				$skillInitial = $sportModel->skillInitial;
+				$skillCurrent = $sportModel->skillCurrent;
+				$attendance = $sportModel->attendance;
+				$sportsmanship = $sportModel->sportsmanship;
+				
+				$user->removeSport($sport, false);
+				
+				$sportModel = $user->getSport($sport);
+				$sportModel->userID = $user->userID;
+				$sportModel->skillInitial = $skillInitial;
+				$sportModel->skillCurrent = $skillCurrent;
+				$sportModel->attendance = $attendance;
+				$sportModel->sportsmanship = $sportsmanship;
+				
+			}
+			
+			$sportModel->often = $post[$sport . 'Often'];
+			$sportModel->sport = $sport;
+			
+			// Convert rating from slider (0-6) to meaningful rating (64-100)
+			if (!empty($post[$sport . 'Rating'])) {
+				$sportModel->skillInitial = $sportModel->convertSliderToRating($post[$sport . 'Rating']); 
+				$sportModel->skillCurrent = $sportModel->skillInitial;
+			
+				$sportModel->sportsmanship = 80;
+				$sportModel->attendance	   = 100;
+			}
+			
+			$formats = explode(',', $post[$sport . 'What']);
+			
+			foreach	($formats as $format) {
+				// Loop through and create user format selection (e.g. Pickup, League, Weekend Tournament)
+				 $formatModel = $sportModel->getFormat($format);
+				 $formatModel->format = strtolower($format);
+
+			}
+
+			
+			if (!empty($post[$sport . 'Type'])) {
+				// Type is set
+				$types = explode(',', $post[$sport . 'Type']);
+				$typeNames = array();
+				foreach ($types as $type) {	
+					// Loop through types and create models
+					$type = strtolower($type);
+					if (!empty($sportsArray[$sport]['type'][$type])) {
+						// $type is typeName
+						$typeNames[] = $type;
+						//$typeModel   = $sportModel->getType($type);
+						//$typeModel->typeName = $type;
+					} else {
+						// $type is typeSuffix
+						$typeSuffixes[] = $type;
+					}
+				}
+				
+				foreach ($typeNames as $typeName) {
+					foreach ($typeSuffixes as $typeSuffix) {
+						// Create new type model foreach typeName/typeSuffix combo
+						$typeModel = $sportModel->getType($typeName);
+						$typeModel->typeName   = $typeName;
+						$typeModel->typeSuffix = $typeSuffix;
+					}
+				}
+			} else {
+				// No type set, create type for base type of "pickup"
+				$typeModel = $sportModel->getType('pickup');
+				$typeModel->typeName = 'pickup';
+			}
+			
+			
+			if (!empty($post[$sport . 'Position'])) {
+				// Position is set
+				$positions = explode(',', $post[$sport . 'Position']);
+				foreach ($positions as $position) {	
+					// Loop through types and create models
+					$positionModel = $sportModel->getPosition($position);
+					$positionModel->positionAbbreviation = $position;
+				}
+
+			} else {
+				// No position set, create base position "null" for sportID
+				$positionModel = $sportModel->getPosition('null');
+			}
+			
+			
+			for ($i = 0; $i < 6; $i++) {
+				if (empty($post[$sport . 'Availability' . $i])) {
+					// Day has no availabilities saved
+					continue;
+				}
+				$hours = explode(',', $post[$sport . 'Availability' . $i]);
+										
+				foreach ($hours as $hour) {
+					$availabilityModel = $sportModel->setAvailability($i, $hour);
+					$availabilityModel->day  = $i;
+					$availabilityModel->hour = $hour;
+				}
+				
+			}
+			
+			$sportModel->save();
+			
+			$user->setUserRating('skill',$sport);
+			$user->setUserRating('attendance',$sport);
+			$user->setUserRating('sportsmanship',$sport);
+			
+		}
+		
+		$this->_redirect('/users/' . $user->userID . '/settings');
+
 	}
 
 

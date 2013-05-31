@@ -13,6 +13,16 @@ class Application_Model_Ratings extends Application_Model_ModelAbstract
 									'avgQuality'		=> '');
 	
 	
+	
+	/**
+	 * get ratings and descriptions from db
+	 * @returns array of ratings and corresponding descriptions
+	 */
+	public function getAvailableRatings($type, $rating)
+	{
+		return $this->getMapper()->getAvailableRatings($type, $rating);
+	}
+	
 	public function addRating($resultRow)
 	{
 
@@ -154,21 +164,24 @@ class Application_Model_Ratings extends Application_Model_ModelAbstract
 	
 	public function getBestSkills()
 	{
-		if ($this->hasValue('bestSkills')) {
-			return $this->_attribs['bestSkill'];
-		}
 		
 		$ratings = $this->getAll();
 		
 		$returnArray = array();
 		
 		foreach ($ratings as $rating) {
+			if ($rating->skiller == '') {
+				continue;
+			}
+			
 			if (!isset($returnArray[$rating->skiller])) {
 				$returnArray[$rating->skiller] = 0;
 			}
 			
 			$returnArray[$rating->skiller] += 1;
 		}
+		
+		arsort($returnArray); // Sort array from highest to lowest
 		
 		return $returnArray;
 	}

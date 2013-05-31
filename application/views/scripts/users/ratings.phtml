@@ -49,8 +49,7 @@ $this->placeholder('narrowColumn')->captureEnd();
 <a href='<?php echo $this->baseURI;?>' class='left smaller-text medium'>&lt;&lt; Back to profile</a>
 <header class='width-100 left'>
 	<p class='jumbo-text heavy darkest left'><?php echo $this->numRatings;?></p>
-    <p class='left largest-text darkest profile-header-sub'>for <?php echo $this->currentUser->shortName;?> </p>
-    <div class='right larger-text' id='ratings-sports'><?php echo $this->sportButton;?></div>
+    <p class='left largest-text darkest profile-header-sub'>for <div class='left larger-text' id='rating-sports'><?php echo $this->sportButton;?></div> </p>
 </header>
 
 <div class='width-100 clear ratings-container'>

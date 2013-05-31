@@ -58,8 +58,6 @@ $(function() {
 		} else if (val == 'remove player') {
 			
 			showAlert($('#manage-remove-player-alert-container'));
-		} else if (val == 'team info') {
-			showAlert($('#manage-team-info-alert-container'));
 		}
 
 	});

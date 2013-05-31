@@ -25,6 +25,8 @@ class TeamsController extends Zend_Controller_Action
 			return;
 		}
 		
+		$session = new Zend_Session_Namespace('userSport');
+		$session->sport = $team->sport;		
 		
 		$this->view->isPublic  = $isPublic = $team->isPublic();
 		$this->view->isPrivate = ($isPublic ? false : true);
@@ -92,6 +94,10 @@ class TeamsController extends Zend_Controller_Action
 		$this->view->totalPlayers = $team->totalPlayers;
 		$this->view->rosterLimit  = $team->rosterLimit;
 		$this->view->newsfeed	  = $team->messages->getTeamMessages($team->teamID);
+		
+		if ($team->sportupCreated && !$userOnTeam) {
+			$this->view->topAlert = true;
+		}
 		
 		$generalForm = new Application_Form_General();
 		$this->view->generalForm = $generalForm;

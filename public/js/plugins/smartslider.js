@@ -125,7 +125,7 @@
 
                 ltracker.mouseup(function(e) {
                     mousecaptured = false;
-                    $(this).css('cursor', 'default');
+                    $(this).css('cursor', 'pointer');
 					/** ALTERED BY Marshall...
 					* re-enable selection of text after sliding
 					*/

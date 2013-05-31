@@ -77,6 +77,8 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 			if (!isset($session->active)) {
 				// Only update user "lastActive" attrib once per session (save on db updates)
 				$session->active = true;
+				
+				$this->view->lastActive = $user->lastActive;
 
 				$user->setLastActiveCurrent()
 				 	 ->save(false);
@@ -85,6 +87,33 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 				$user->setLastActiveCurrent();
 				$user->getUserInfo();
 			}
+			
+			$session = new Zend_Session_Namespace('rating');
+			if (!isset($session->rating)) {
+				// Only show ratings popups once per session
+				$game = $user->getLastGame();
+				if ($game) {
+					if ($game->players->hasValue('users')) {
+						// Game happened in the last week that user played in, make rate 2 users or park and users
+						$this->view->rateGame = $game;
+						
+						$sport = new Application_Model_Sport();
+						$sport->sportID = $game->sportID;
+						$sport->sport   = $game->sport;
+						$this->view->rateGameSkills = $sport->getSkills();
+						
+						$ratings = new Application_Model_Ratings();
+						$this->view->rateGameDescriptions = $ratings->getAvailableRatings('user','skill');
+						
+						$form = new Application_Form_RateGame();
+						$form->sport->setValue($game->sport);
+						$this->view->rateGameForm = $form;
+						
+					}
+				}
+			}
+			//$session->rating = true;
+				
 			
 			$user->resetNewNotifications()
 				 ->getNewUserNotifications();
@@ -96,7 +125,7 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 			// Renew user cookie
 			setcookie('user', $user->userID, time() + (60*60*24*14), '/');
 
-			
+			/*
 			if (!file_exists(PUBLIC_PATH . '/images/users/profile/pic/large/' . $user->userID . '.jpg')) {
 				// No profile photo saved, set to default
 				$user->photo = 'no_profile_male.jpg';
@@ -104,6 +133,7 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 				// Profile pic is saved
 				$user->photo = $user->userID;
 			}
+			*/
 			
 			//$this->view->notifications    = $notifications;
 			$this->view->user			  = $user;
@@ -200,7 +230,7 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 		
 		// Games page
 		$r = new Zend_Controller_Router_Route_Regex(
-				'games(?:/(\d+))?(?:/(\w+))?',
+				'games(?:/(\d+))?(?:/(.+))?',
 				array(
 						'action' => 'index',
 						'controller' => 'games',

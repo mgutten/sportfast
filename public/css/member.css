@@ -39,8 +39,8 @@
 	float:left;
 	clear:both;
 	display:none;
-	padding: 0 2%;
-	width: 96%;
+	padding: 0;
+	width: 100%;
 	background:#fff;
 }
 
@@ -67,8 +67,8 @@
 .member-schedule-day-body-game-container {
 	float:left;
 	clear:none;
-	width: 16.66%;
-	padding: .3em .1em;
+	width: 16%;
+	padding: .3em .33%;
 
 }
 
@@ -362,4 +362,30 @@ div.member-find-game-date-hour {
 #narrow-column-user-picture {
 	position: relative;
 	z-index: 2;
+}
+
+/* alerts */
+#first-time-alert-container {
+	width: 36em;
+	margin-top: -10em;
+	margin-left: -18em;
+}
+
+.member-first-time-overview {
+	width: 80%;
+}
+
+.member-first-time-button {
+	margin: 2em 0 0 10em;
+}
+
+.member-first-time-sub {
+	margin-left: 7.7em;
+	margin-top: .6em;
+}
+
+#more-users-alert-container {
+	width: 36em;
+	margin-top: -10em;
+	margin-left: -18em;
 }

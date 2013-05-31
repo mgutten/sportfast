@@ -2,6 +2,11 @@
 
 /* top user info section */
 
+#profile-buttons-container {
+	width: 17em;
+	padding-right: .6em;
+}
+
 #user-buttons-container>.dropdown-menu-holder {
 	margin-right: 0;
 }
@@ -14,6 +19,10 @@
 
 #user-message {
 	width: 5em;
+}
+
+#user-player-cancel-request {
+	margin-top: .5em;
 }
 
 /* sports section */
@@ -86,11 +95,11 @@
 	width: 45%;
 }
 
-.user-sport-tab-container:first-child > .user-sport-tab-back {
+.user-sport-selected > .user-sport-tab-back {
 	display:none;
 }
 
-.user-sport-tab-container:first-child > .user-sport-tab-selected-container {
+.user-sport-selected > .user-sport-tab-selected-container {
 	display:block;
 }
 

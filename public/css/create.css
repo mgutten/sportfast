@@ -5,6 +5,16 @@
 	height: 13%;
 }
 
+.calendar-past > p {
+	opacity: .5;
+}
+
+.calendar-today {
+	-webkit-box-shadow: none;
+	box-shadow: none;
+	-moz-box-shadow: none;
+}
+
 .input-container {
 	clear:both;
 	margin-top: .1em;

@@ -21,6 +21,27 @@ class IndexController extends Zend_Controller_Action
 			// Member homepage
 			$this->view->narrowColumn = 'right';
 			
+			$this->view->user->getMapper()->getCityIdRange('984');
+					
+			$session = new Zend_Session_Namespace('first_visit');
+			if ($session->firstVisit) {
+				// First time logging in
+				Zend_Session::namespaceUnset('first_visit');
+				$this->view->firstVisit = true;
+				//$session->firstVisit = false;
+			} elseif ($this->view->lastActive) {
+				// Not first visit on site
+				$users = new Application_Model_Users();
+				$usersInArea = $users->getUsersInArea($this->view->user->userID, $this->view->user->userLocation->latitude, $this->view->user->userLocation->longitude, $this->view->lastActive);
+				
+				if ($usersInArea) {
+					// There are insufficient users in area, notify user
+					$this->view->usersInArea = $usersInArea;
+				}
+				
+			}
+			
+			
 			$this->view->userSports = $this->view->user->getSportNames();
 			
 			$userSports  = $this->view->user->sports;

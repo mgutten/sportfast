@@ -39,6 +39,16 @@ class Application_Model_Sport extends Application_Model_ModelAbstract
 		parent::save();
 	}
 	
+	/**
+	 * get skills (ball handler, shooting, etc) from db
+	 * @returns array of skiller and skilling
+	 */
+	public function getSkills()
+	{
+		return $this->getMapper()->getSkills($this->sportID);
+	}
+	
+	
 	public function getSkill()
 	{
 		/*
@@ -49,6 +59,11 @@ class Application_Model_Sport extends Application_Model_ModelAbstract
 		}
 		*/
 		return $this->_attribs['skillCurrent'];
+	}
+	
+	public function getSportIDByName($name)
+	{
+		return $this->getMapper()->getForeignID('Application_Model_DbTable_Sports', 'sportID', array('sport = "' . $name . '"'));
 	}
 	
 	public function getSport()
@@ -176,6 +191,7 @@ class Application_Model_Sport extends Application_Model_ModelAbstract
 	
 	public function getFormat($format) 
 	{
+		$format = strtolower($format);
 		if (!isset($this->_attribs['formats'][$format])) {
 			$this->_attribs['formats'][$format] = new Application_Model_SportFormat();
 		}
@@ -187,7 +203,7 @@ class Application_Model_Sport extends Application_Model_ModelAbstract
 	 */
 	public function convertSliderToRating($rating)
 	{
-		return floor(($post[$sport . 'Rating'] * 5.5) + mt_rand(64, 66));
+		return floor(($rating * 5.5) + mt_rand(64, 66));
 	}
 		
 	

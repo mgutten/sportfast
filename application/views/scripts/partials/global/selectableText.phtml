@@ -7,7 +7,11 @@ if ($this->selectableOne) {
 $counter = 0;
 foreach ($this->options as $option => $tooltip) {
 	$tempClass = $class;
-	if ($counter == 0) {
+	if ($this->selected) {
+		if (strtolower($option) == strtolower($this->selected)) {
+			$tempClass .= ' green-bold';
+		}
+	} elseif ($counter == 0) {
 		$tempClass .= ' green-bold';
 	}
 	

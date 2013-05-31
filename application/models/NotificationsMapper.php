@@ -27,14 +27,15 @@ class Application_Model_NotificationsMapper extends Application_Model_MapperAbst
 						  ga.parkID, 
 						  ga.date, 
 						  t.teamName, 
-						  gr.groupName
+						  p.parkName,
+						  p.parkID
 					 FROM `notification_log` AS `nl`
 					 INNER JOIN `notifications` AS `n` ON n.notificationID = nl.notificationID
 					 LEFT JOIN `users` AS `u` ON u.userID = nl.actingUserID
 					 LEFT JOIN `users` AS `u2` ON u2.userID = nl.receivingUserID
 					 LEFT JOIN `games` AS `ga` ON ga.gameID = nl.gameID
 					 LEFT JOIN `teams` AS `t` ON t.teamID = nl.teamID
-					 LEFT JOIN `groups` AS `gr` ON gr.groupID = nl.groupID
+					 LEFT JOIN `parks` AS `p` ON p.parkID = nl.parkID
 					 LEFT JOIN `user_ratings` AS `ur` ON ur.userRatingID = nl.ratingID 
 					 WHERE (nl.cityID = " . $cityID . ") 
 						AND n.public = '1' ";
@@ -114,6 +115,7 @@ class Application_Model_NotificationsMapper extends Application_Model_MapperAbst
 	 */
 	 public function notificationConfirm($notificationLogID, $type)
 	 {
+		 
 		 if ($type == 'friend') {
 			 $query = "INSERT INTO friends (userID1, userID2, userName1, userName2)
 			 			(SELECT nl.actingUserID, 
@@ -133,19 +135,21 @@ class Application_Model_NotificationsMapper extends Application_Model_MapperAbst
 						 	FROM notification_log as `nl`
 							WHERE nl.notificationLogID = '" . $notificationLogID . "')";
 		 } elseif ($type == 'team') {
+			 
 			 $query = "INSERT INTO user_teams (teamID, userID)
 			 			(SELECT nl.teamID,
-								nl.receivingUserID
+								COALESCE(nl.receivingUserID,nl.actingUserID)
 							FROM notification_log as `nl`
 							WHERE nl.notificationLogID = '" . $notificationLogID . "')";
 			
 			 $query2 = "INSERT INTO notification_log (actingUserID, teamID, notificationID, dateHappened)
-			 			 (SELECT nl.receivingUserID, 
+			 			 (SELECT COALESCE(nl.receivingUserID,nl.actingUserID), 
 						 		 nl.teamID, 
 								 (SELECT notificationID FROM notifications WHERE type ='team' AND action = 'join' AND details IS NULL), 
 								 NOW()
 						 	FROM notification_log as `nl`
 							WHERE nl.notificationLogID = '" . $notificationLogID . "')";
+							
 		 } elseif ($type == 'game') {
 			 $query = "INSERT INTO user_games (gameID, userID)
 			 			(SELECT nl.gameID,

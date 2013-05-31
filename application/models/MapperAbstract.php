@@ -68,7 +68,9 @@ abstract class Application_Model_MapperAbstract
 				// Password column, do not strtolower
 				$data[$column] = $savingClass->$column;
 				continue;
-			} elseif (($savingClass instanceof Application_Model_Message && $column == 'message') || $column == 'cancelReason') {
+			} elseif (($savingClass instanceof Application_Model_Message && $column == 'message') || 
+						$column == 'cancelReason' ||
+						$column == 'comment') {
 				// Message column for message model should not be lower case as it is a user's post
 				$data[$column] = $savingClass->$column;
 				continue;
@@ -132,6 +134,11 @@ abstract class Application_Model_MapperAbstract
 		return $table->delete($where);
 	}
 	
+	public function getSportID($sportName)
+	{
+		return $this->getForeignID('Application_Model_DbTable_Sports', 'sportID', array('sport' => $sportName));
+	}
+	
 	public function getForeignID($table, $column, $whereValues)
 	{
 		$backupTable = $this->getDbTable();
@@ -172,10 +179,42 @@ abstract class Application_Model_MapperAbstract
 	{
 		$output = '(';
 		
+		$table = $this->getDbTable();
+		$select = $table->select();
+		$select->setIntegrityCheck(false);
+		
+		// Get cityIDs that are within 15 miles of city
+		$select->from(array('z' => 'zipcodes'),
+					  array('cityID'))
+			   ->where('GLength(LineStringFromWKB(
+								  LineString(
+									(SELECT location FROM zipcodes WHERE cityID = "' . $cityID . '" ORDER BY RAND() LIMIT 1), 
+									z.location
+									)
+								)
+							) * (5/8 * 100) < 12') // Multiply by 100 to get km, 5/8 to convert to miles
+			   ->group('z.cityID')
+			   ->order('GLength(LineStringFromWKB(
+								  LineString(
+									(SELECT location FROM zipcodes WHERE cityID = "' . $cityID . '" ORDER BY RAND() LIMIT 1), 
+									z.location
+									)
+								)
+							) ASC')
+			   ->limit('12');
+		
+		$results = $table->fetchAll($select);
+		
 		$idArray = array();
+		foreach ($results as $result) {
+			$idArray[] = $result->cityID;
+		}
+		
+		/*
 		for ($i = ($cityID - 6); $i <= ($cityID + 6); $i++) {
 			$idArray[] = $i;
 		}
+		*/
 		
 		$output .= implode(',', $idArray);
 		

@@ -16,7 +16,8 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 					  array('cityID', 'city', 'state'))
 			   ->joinLeft(array('ul' => 'user_locations'),
 			   		  'ul.userID = u.userID',
-					   array('AsText(location) as location'))
+					   array('AsText(location) as location',
+					   		 'userLocationID'))
 			   ->where($column . ' = ?', $value)
 			   ->where('u.active = ?', 1)
 			   ->limit(1);   
@@ -437,6 +438,48 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 		
 	}
 	
+	
+	/**
+	 * remove all sport info for user
+	 * @params ($andGames => remove user from games as well)
+	 */
+	public function removeSport($userID, $sportID, $andGames = true)
+	{
+		$db = Zend_Db_Table::getDefaultAdapter();
+		
+		if (empty($userID) || empty($sportID)) {
+			return false;
+		}
+		
+		$where = array('userID = ?' => $userID,
+					   'sportID = ?' => $sportID);
+		
+		// Delete from user_sports
+		
+		$db->delete('user_sports', $where);
+		$db->delete('user_sport_availabilities', $where);
+		$db->delete('user_sport_formats', $where);
+		
+		$sql = "DELETE user_sport_positions FROM user_sport_positions INNER JOIN sport_positions ON sport_positions.positionID = user_sport_positions.positionID 
+					WHERE user_sport_positions.userID='" . $userID . "' AND sport_positions.sportID='" . $sportID . "'";
+		$db->query($sql);
+		
+		$sql = "DELETE user_sport_types FROM user_sport_types INNER JOIN sport_types ON sport_types.typeID = user_sport_types.typeID 
+					WHERE user_sport_types.userID='" . $userID . "' AND sport_types.sportID='" . $sportID . "'";
+		$db->query($sql);
+		
+		// Delete user_games
+		if ($andGames) {
+			$sql = "DELETE user_games FROM user_games INNER JOIN games ON games.gameID = user_games.gameID WHERE user_games.userID='" . $userID . "' AND games.sportID='" . $sportID . "'";
+			echo $sql;
+			return;
+			$db->query($sql);
+		}
+		
+		return true;
+		
+	}
+	
 	/**
 	 * remove friend
 	 */
@@ -581,11 +624,16 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 				   ->where('usf.sportID = ?', $sportID);
 				   
 			$formats = $table->fetchAll($select);
-			$formatArray = array();
+			/*$formatArray = array();
 			foreach ($formats as $format) {
 				$formatArray[] = $format->format;
 			}
 			$sportModel->formats = $formatArray;
+			*/
+			
+			foreach ($formats as $format) {
+				$sportModel->getFormat($format->format)->setAttribs($format);
+			}
 			
 
 			//$sportModel->getType($result->typeName)->setAttribs($result);
@@ -621,10 +669,11 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 			   		  'ur.skill = r3.ratingID',
 					  array('r3.value as skillValue',
 					  		'r3.ratingName as skillRatingName'))
-			   ->join(array('ss' => 'sport_skills'),
+			   ->joinLeft(array('ss' => 'sport_skills'),
 			   		  'ur.bestSkill = ss.sportSkillID',
 					  array('skiller', 'skilling'))
-			   ->where('ur.receivingUserID = ?', $savingClass->userID);
+			   ->where('ur.receivingUserID = ?', $savingClass->userID)
+			   ->order('ur.dateHappened DESC');
 		
 		$results = $table->fetchAll($select);
 		
@@ -960,10 +1009,146 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 	}
 			   
 		
+	/** 
+	 * get subscribed games for user
+	 */
+	public function getSubscribedGames($userID)
+	{
+		$table = $this->getDbTable();
+		$select = $table->select();
+		$select->setIntegrityCheck(false);
+		
+		$select->from(array('gs' => 'game_subscribers'))
+			   ->join(array('g' => 'games'),
+			   		  'gs.gameID = g.gameID')
+			   ->join(array('st' => 'sport_types'),
+			   		  'st.typeID = g.typeID')
+			   ->where('gs.userID = ?', $userID);
+			   
+		$results = $table->fetchAll($select);
+		
+		$games = new Application_Model_Games();
+		
+		foreach ($results as $result) {
+			$games->addGame($result);
+		}
+		
+		return $games;
+	}
+	
+	public function getLastGame($userID)
+	{
+		$table = $this->getDbTable();
+		$select = $table->select();
+		$select->setIntegrityCheck(false);
+		
+		$select->from(array('g' => 'games'))
+			   ->join(array('ug' => 'user_games'),
+			   		  'g.gameID = ug.gameID')
+			   ->where('g.date > (now() - INTERVAL 1 WEEK) AND g.date < now()')
+			   ->where('g.canceled = ?', 0)
+			   ->where('ug.userID = ?', $userID)
+			   ->order('g.date desc')
+			   ->limit(1);
+				 
+		$result = $table->fetchRow($select);
+		
+		if (!$result) {
+			return false;
+		}
+		
+		$game = new Application_Model_Game($result);
+		$gameID = $game->gameID;
+
+		// Test if user has already rated for this game
+		$select = $table->select();
+		$select->setIntegrityCheck(false);
+		
+		$select->from(array('ur' => 'user_ratings'))
+			   ->where('ur.givingUserID = ?', $userID)
+			   ->where('ur.gameID = ?', $gameID);
+			   
+		$result = $table->fetchRow($select);
+		
+		if ($result) {
+			// Rating was found
+			return false;
+		}
 		
 		
+		// Get all players
+		/*
+		$select = $table->select();
+		$select->setIntegrityCheck(false);
+
+		$select->from(array('ug' => 'user_games'))
+			   ->join(array('u' => 'users'),
+			   		  'ug.userID = u.userID')
+			   ->where('ug.gameID = ?', $gameID)
+			   ->where('u.fake != ?', 1);
+		*/
+		// Only get players that user has not rated recently
+		$sql = "SELECT `ug`.*, `u`.* 
+					FROM `user_games` AS `ug` 
+					INNER JOIN `users` AS `u` ON ug.userID = u.userID 
+					WHERE (ug.gameID = '53') 
+						AND (u.fake != 1) 
+						AND u.userID != '" . $userID . "'
+						AND u.userID NOT IN (SELECT receivingUserID 
+												FROM user_ratings 
+												WHERE givingUserID = '" . $userID . "' 
+													AND dateHappened > NOW() - INTERVAL 1 MONTH
+													AND sportID = '" . $game->sportID . "'
+											)";
+		
+		$db = Zend_Db_Table::getDefaultAdapter();
+		$results = $db->query($sql);
+		
+		foreach ($results as $result) {
+			$game->addPlayer($result);
+		}
+		
+		return $game;
+	}
 		
 		
+	/**
+	 * set skillCurrent, sportsmanship, or attendance based on all reviews
+	 */
+	public function setUserRating($rating, $sportID, $userID)
+	{
+		
+		$db = Zend_Db_Table::getDefaultAdapter();
+		
+		if (empty($sportID) || empty($userID)) {
+			return false;
+		}
+		
+		$rating = strtolower($rating);
+		if ($rating == 'skill') {
+			$pre = '+ us.skillInitial';
+			$final = 'skillCurrent';
+			$post = 'skill';
+			$plus = '+ 1';
+		} else {
+			$post = $final = $rating;
+			$plus = $pre = '';
+		}
+	
+		
+		$sql = "UPDATE user_sports as us
+				INNER JOIN (SELECT FLOOR((SUM(r.value)" . $pre . ")/(COUNT(ur." . $post . ")" . $plus . ")) as ratingValue,
+									us.userSportID 
+					FROM user_sports us 
+						INNER JOIN user_ratings ur ON us.userID = ur.receivingUserID AND us.sportID = ur.sportID 
+						INNER JOIN ratings r ON r.ratingID = ur." . $post . " 
+					WHERE us.userID = '" . $userID . "' AND us.sportID = '" . $sportID . "') as us2 ON us.userSportID = us2.userSportID 
+					SET us." . $final . " = us2.ratingValue WHERE us.userID = '" . $userID . "' AND us.sportID = '" . $sportID . "'";
+	
+		$results = $db->query($sql);		
+		
+	}
+	
 	
 	/**
      * Reset user class to home location
@@ -993,6 +1178,56 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 		$savingClass->location = $location;
 		
 		return $savingClass;
+	}
+	
+	/**
+	 * get number of users in given area as well as # of people who joined since user was last active
+	 * @returns associative array of totalUsers and newUsers
+	 */
+	public function getUsersInArea($userID, $latitude, $longitude, $lastActive = false)
+	{
+		$table = $this->getDbTable();
+		$select = $table->select();
+		$select->setIntegrityCheck(false);
+		
+		$bounds = $this->getBounds($latitude, $longitude, 12);
+		
+		$select->from(array('ul' => 'user_locations'),
+					  array(''))
+			   ->join(array('u' => 'users'),
+			   		  'ul.userID = u.userID',
+					  array('COUNT(u.userID) as totalUsers'))
+			   ->where($this->getAreaWhere($bounds['upper'], $bounds['lower'], 'ul.location'));
+		
+		$result = $table->fetchRow($select);
+		
+		if ($result['totalUsers'] > 100) {
+			// More than 90 users in given area, minimum alert limit has been reached
+			return false;
+		}
+		
+		$returnArray = array();
+		$returnArray['totalUsers'] = $result['totalUsers'];
+		
+		if ($lastActive) {
+			$select = $table->select();
+			$select->setIntegrityCheck(false);
+			
+			$select->from(array('ul' => 'user_locations'),
+						  array(''))
+				   ->join(array('u' => 'users'),
+						  'ul.userID = u.userID',
+						  array('COUNT(u.userID) as newUsers'))
+				   ->where($this->getAreaWhere($bounds['upper'], $bounds['lower'], 'ul.location'))
+				   ->where('u.joined > "' . $lastActive . '"');
+			
+			$result = $table->fetchRow($select);
+			
+			$returnArray['newUsers'] = $result['newUsers'];
+		}
+		
+		return $returnArray;
+		
 	}
 
 		
