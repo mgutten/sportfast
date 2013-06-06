@@ -193,7 +193,7 @@ class GamesController extends Zend_Controller_Action
 	
 	public function playersAction()
 	{
-		$this->view->narrowColumn = 'false';
+		$this->view->narrowColumn = false;
 		
 		$gameID = $this->getRequest()->getParam('id');
         $game = new Application_Model_Game();
@@ -212,6 +212,20 @@ class GamesController extends Zend_Controller_Action
 		$minutes = floor($remaining/60);
 		
 		$this->view->timeUntil = $hours . '<span class="inherit smaller-text">hr</span> ' . $minutes . '<span class="inherit smaller-text">min</span>';
+	}
+	
+	public function statsAction()
+	{
+		
+		$gameID = $this->getRequest()->getParam('id');
+        $game = new Application_Model_Game();
+		$game->getGameByID($gameID);
+		
+		$this->view->game = $game;
+		
+		$history = $game->getHistoryData();
+		
+		$this->view->history = $history;
 	}
 
 

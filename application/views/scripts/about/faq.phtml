@@ -1,0 +1,168 @@
+<?php
+/** 
+ * controller => about
+ * action => faq
+ */
+$this->headTitle('FAQ');
+$this->headLink()->prependStylesheet($this->baseUrl() . '/css/about.css');
+$this->headScript()->prependFile($this->baseUrl() . '/js/about.js');
+?>
+
+<?php
+$this->placeholder('narrowColumn')->captureStart();
+
+echo "<p class='heavy darkest width-100 center clear larger-text larger-margin-top'>Have a question that isn't answered here?</p>";
+echo "<a href='/contact' class='button larger-margin-top larger-text' id='faq-contact'>Contact Us</a>";
+
+$this->placeholder('narrowColumn')->captureEnd();
+
+?>
+
+<header class='clear jumbo-text darkest heavy'>
+    Frequently Asked Questions
+</header>
+
+<p class='clear largest-text darkest heavy larger-margin-top'>
+	General
+</p>
+
+<?php
+$question = "I can't find any games.  Should I create one?";
+$answer   = "Our system analyzes users' preferences (as well as local events like weather) and determines whether there are enough people to play a game.
+				If there aren't, then we will hold off on creating one until there are enough players.  Nothing is worse than showing up
+				only to see that there aren't enough people to play a game.  You can <a href='/create/game/' class='medium underline'>create one</a> if 
+				have a pre-arranged group that you are trying to manage, but we recommend leaving the creation of games to our system,
+				so you don't run into issues of not enough players.";
+				
+echo $this->faq()->create($question, $answer);
+
+
+$question = "Why can't I see all of the games in my area from my dashboard?";
+$answer   = "The dashboard is designed for quick browsing based on your sport preferences specified under \"Account Settings\".
+				The most common reasons you can't see a particular game is because <strong>you are already in it</strong>, <strong>
+				your search parameters are set incorrectly</strong>, or <strong>the game is not a good match for you</strong>.
+				Change the search parameters next to the \"Find\" section on your dashboard, or try looking under the \"Find\" dropdown in the navigation.";
+				
+echo $this->faq()->create($question, $answer);
+
+
+$question = "How do you determine if a game/team is a good or bad match for me?";
+$answer   = "Matching is based on two key factors: <strong>skill</strong> and <strong>age</strong>.
+				While there is much more to determining whether a game/team is a good match for you, 
+				these are generally good indicators of how competitive the game will be.";
+				
+echo $this->faq()->create($question, $answer);
+
+$question = "Why do I need a profile picture?";
+$answer   = "If you want to receive ratings, a picture is essential.  Most people are terrible with names (we are), so a picture helps to identify people.
+				Pictures also give a personal touch to an otherwise anonymous situation.  Try to choose pictures that are easily recognizable.";
+				
+echo $this->faq()->create($question, $answer);
+
+$question = "I received an email that my profile/team is to be deleted.";
+$answer   = "In order to maintain an up-to-date system, inactive players and teams are removed on a regular basis.  Typically if a player or team has been inactive
+				for longer than 2 months, their profile will be set to inactive and the user/manager will have to contact our support (support@sportup.com) in order
+				to reactivate.";
+				
+echo $this->faq()->create($question, $answer);
+
+?>
+
+<p class='clear largest-text darkest heavy larger-margin-top'>
+	Account
+</p>
+
+<?php
+$question = "How do I change my password?";
+$answer   = "Click the cog in top navigation and select \"Account Settings\" from the dropdown.  Look for the box labeled \"New Password\" and enter
+				a new password and reenter it into the box next to it.  Save changes and you've got a new password!";
+				
+echo $this->faq()->create($question, $answer);
+
+$question = "I am unable to log in.  Why is my username invalid?";
+$answer   = "Either we have a different email than the one you are entering as your username, or your account is inactive.  Accounts must be verified via email
+				in order to activate.  Accounts are deactivated when they have been inactive for 2 months in order to prevent a system full of inactive users.
+				If you wish to reactivate, please <a href='/contact' class=' medium underline'>contact us</a> at support@sportup.com and we will gladly bring you back online.";
+				
+echo $this->faq()->create($question, $answer);
+
+$question = "How do I change my sports preferences?";
+$answer   = "Click the cog in top navigation and select \"Account Settings\" from the dropdown.  On the left will be a tab labeled \"Sports\".  Click that.
+				Here you can see which sports are included in your profile and which are inactive.  Click on an icon to edit your preferences.";
+				
+echo $this->faq()->create($question, $answer);
+?>
+
+<p class='clear largest-text darkest heavy larger-margin-top'>
+	Games
+</p>
+
+<?php
+$question = "Why can't I join a certain game?";
+$answer   = "Some games have a specific skill requirement to help keep ridiculously skilled players from playing with beginners.  That wouldn't be fun for anyone.
+				The game may also be private, in which case only those who are invited by the creator can join.";
+				
+echo $this->faq()->create($question, $answer);
+
+$question = "How can I edit the game that I created?";
+$answer   = "If you go to your game's page, there will be a small arrow in the top right of the page that, when clicked, will show some options.  One of those options is
+				a dropdown that says \"Manage\".  In that dropdown you can either \"Remove Players\", \"Cancel Game\", or \"Edit Details\".";
+				
+echo $this->faq()->create($question, $answer);
+
+$question = "Everyone can see my rating.  What gives?";
+$answer   = "People want to know who they are playing with.  Plain and simple.  A big part of that is your skill.  They're going to see how good you are when you 
+				show up to play, so why worry?  We're here to get some exercise!";
+				
+echo $this->faq()->create($question, $answer);
+
+?>
+
+<p class='clear largest-text darkest heavy larger-margin-top'>
+	Teams
+</p>
+
+<?php
+$question = "How do I register my team with a league?";
+$answer   = "We are working hard to find and organize all of the local leagues in your area to make it easy for you to register.  Unfortunately, we are not there yet.
+				For now, <bold>there is no way to register your team through Sportup</bold>.  The system can still be used to organize your team, but you must find and register 
+				in the league of your choosing.";
+				
+echo $this->faq()->create($question, $answer);
+
+
+$question = "How can I edit my schedule?";
+$answer   = "On your team's page, there is a dropdown labeled \"Manage\".  In that dropdown you will see \"Schedule\" and from there you can add games, edit games, or
+				select the outcome of your past games (wins, losses, or ties).";
+				
+echo $this->faq()->create($question, $answer);
+
+$question = "I can't find any teams.  Should I create one?";
+$answer   = "League teams are tricky.  They require a little bit of effort on behalf of the creator/team captain to get together and organize.  You are more than welcome
+				to create a team of your own, but if you are relying entirely on our system to locate players, then you are better off waiting.  Like games, our system 
+				matches players based on skill, age, and position to create a suitable, competitive team.  Once enough players are found, the team will be 
+				created and you will be offered a spot on the team.  When the team comes together, it is time for registration.  Read about leagues <a href='/about/leagues' class='medium underline'>
+				here</a>.";
+				
+echo $this->faq()->create($question, $answer);
+
+
+$question = "I've never played in a league.  What's it like?";
+$answer   = "You can read about leagues <a href='/about/leagues' class='medium underline'>here</a>.  A league is a group of teams that play against one another
+				in an organized set of games with refs, scoreboards, and (naturally) registration fees.";
+				
+echo $this->faq()->create($question, $answer);
+
+$question = "Can I create a team and not join a league?";
+$answer   = "Sure!  Our team system is purely an organizational tool to help you organize and coordinate groups of people.  It was designed for league teams, but
+				there is nothing stopping you from using it in some other fashion.";
+				
+echo $this->faq()->create($question, $answer);
+
+
+$question = "How do I add/edit my team captains?";
+$answer   = "Team captains are the managers of your team page.  They can do everything that the creator can (e.g. remove players, edit the schedule, etc).  Under your
+				\"Manage\" dropdown on your team's page, you will see \"Team Info\".  The popup that appears will allow you to edit all kinds of information about
+				your team, including who is a team captain.";
+				
+echo $this->faq()->create($question, $answer);

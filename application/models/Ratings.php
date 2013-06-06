@@ -10,7 +10,10 @@ class Application_Model_Ratings extends Application_Model_ModelAbstract
 									'avgSkill'	 => '',
 									'avgSportsmanship' => '',
 									'avgAttendance'    => '',
-									'avgQuality'		=> '');
+									'avgQuality'		=> '',
+									'skillInitial'		=> '',
+									'sportsmanship'		=> '',
+									'attendance'		=> '');
 	
 	
 	
@@ -21,6 +24,93 @@ class Application_Model_Ratings extends Application_Model_ModelAbstract
 	public function getAvailableRatings($type, $rating)
 	{
 		return $this->getMapper()->getAvailableRatings($type, $rating);
+	}
+	
+	/**
+	 * get user ratings for use with chart on ratings page
+	 * @params ($rating => type of rating to retrieve values for ('overall', 'skill', etc),
+	 *			$interval => # of months back to retrieve information (e.g. get 4 months of data separated by month)
+	 * @returns array of month => value
+	 */
+	public function getUserRatingsForChart($userID, $sportID, $rating, $interval = 4)
+	{
+		$chartRatings = $this->getMapper()->UserRatingsForChart($userID, $sportID, $rating, $interval);
+		
+		
+	}
+	
+	public function getRatingsForChart($rating, $interval = 4)
+	{
+		$returnArray = array();
+		$nullCount = 0;
+		for ($i = ($interval - 1); $i >= 0; $i--) {
+			
+			if ($rating == 'overall') {
+				$skill = $this->getAverage('skill', $this->skillInitial, $i);
+				$sportsmanship = $this->getAverage('sportsmanship', false, $i);
+				$attendance = 100;
+				
+				if (!$skill) {
+					// No ratings found
+					$nullCount++;
+					$return = 0;
+				} else {
+					$return = $this->getOverall($sportsmanship, $attendance, $skill);
+				}
+				
+				if ($i == 0 && $nullCount == $interval) {
+					// No ratings found at all, return overall with skill
+					$skill = $this->skillInitial;
+					$return = $this->getOverall($this->sportsmanship, $this->attendance, $skill);
+				}
+			} else {
+				// Skill, sportsmanship
+				if ($rating == 'skill') {
+					$additional = $this->skillInitial;
+				} else {
+					$additional = false;
+				}
+				$average = $this->getAverage($rating, $additional, $i);
+				
+				if (!$average) {
+					// No ratings, return preset value
+					$return = 0;
+					$nullCount++;
+				}
+				
+				if ($i == 0 && $nullCount == $interval) {
+					// No ratings found at all, return
+					$return = ($rating == 'skill' ? $this->skillInitial : $this->$rating);
+				} else {
+					$return = $average;
+				}
+			}
+			
+			$returnArray[] = array('month' => date('M', strtotime('-' . $i . ' months')), 
+								   'value' => $return);
+		}
+		
+		return $returnArray;
+	}
+
+	
+	/**
+	 * calculate overall rating for user
+	 */
+	public function getOverall($sportsmanship, $attendance, $skillCurrent)
+	{
+		
+		$weight = array('sportsmanship' => .1,
+						'attendance'	=> .1,
+						'skillCurrent'	=> .8);
+		
+		$sportsmanship = $weight['sportsmanship'] * $sportsmanship;
+		$attendance    = $weight['attendance'] * $attendance;
+		$skill		   = $weight['skillCurrent'] * $skillCurrent;
+		
+		$overall = $sportsmanship + $attendance + $skill;
+		
+		return ceil($overall);
 	}
 	
 	public function addRating($resultRow)
@@ -60,12 +150,20 @@ class Application_Model_Ratings extends Application_Model_ModelAbstract
 		}
 	}
 	
-	public function countRatings($ucRating = false)
+	public function countRatings($ucRating = false, $withRating = true)
 	{
 		if (!$this->hasValue('ratings') && empty($this->numRatings)) {
-			return '0 ratings';
+			if ($withRating) {
+				return '0 ratings';
+			} else {
+				return '0';
+			}
 		} elseif ($this->numRatings == '0') {
-			return '0 ratings';
+			if ($withRating) {
+				return '0 ratings';
+			} else {
+				return '0';
+			}
 		}
 		
 		$count = count($this->_attribs['ratings']);
@@ -75,32 +173,41 @@ class Application_Model_Ratings extends Application_Model_ModelAbstract
 			$count = $this->numRatings;
 		}
 		
-		if ($count == 1) {
-			$rating = 'rating';
+		if ($withRating) {
+			if ($count == 1) {
+				$rating = 'rating';
+			} else {
+				$rating = 'ratings';
+			}
+			
+			if ($ucRating) {
+				$rating = ucwords($rating);
+			}
+			return $count . ' ' . $rating;
 		} else {
-			$rating = 'ratings';
+			return $count;
 		}
 		
-		if ($ucRating) {
-			$rating = ucwords($rating);
-		}
-		
-		return $count . ' ' . $rating;
 	}
 	
-	public function getAverage($attrib, $additional = false)
+	/**
+	 * calculate average of attrib
+	 * @params ($additional => add some ammount to the total, (skillInitial?)
+	 */
+	public function getAverage($attrib, $additional = false, $month = false)
 	{
 		$total   = 0;
 		$ratings = $this->getAll();
 		$count   = count($ratings);
 		$value   = $attrib;
-		
-		if ($count == 0) {
+
+		if (!$ratings) {
 			// No ratings
 			return false;
 		}
 		
 		$user = false;
+		$count = 0;
 		foreach ($ratings as $rating) {
 		
 			if ($rating->isUser()) {
@@ -108,7 +215,29 @@ class Application_Model_Ratings extends Application_Model_ModelAbstract
 				$user = true;
 				$value = $attrib . 'Value';
 			}
+			
+			if ($month) {
+				// Selected ratings from certain month
+				$date = new DateTime();
+				$sub = new DateInterval('P' . $month . 'M');
+				$date->sub($sub);
+				
+				$ratingDate = $rating->date;
+				
+				$interval = $date->diff($ratingDate);
+				if ($interval->format('%R') == '+' && $interval->format('%m') != 0) {
+					// Rating happened after (in time) the cutoff month
+					continue;
+				}
+			}
+				
 			$total += $rating->$value;
+			$count++;
+		}
+		
+		if ($month && $count == 0) {
+			// No ratings selected for this month
+			return false;
 		}
 		
 		if ($additional) {

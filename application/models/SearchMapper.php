@@ -91,9 +91,12 @@ class Application_Model_SearchMapper extends Application_Model_MapperAbstract
 		$db 	= Zend_Db_Table::getDefaultAdapter();
 		
 		$cityIDRange = $this->getCityIdRange($cityID);
-				   
+		
+		/* does not include temporary 
 		$leagueLocations  = "SELECT leagueLocationID as id,locationName as name, streetAddress as address, cityID FROM league_locations 
-								WHERE temporary = '0' AND cityID IN " . $cityIDRange . " AND (";
+								WHERE temporary = '0' AND cityID IN " . $cityIDRange . " AND (";*/
+		$leagueLocations  = "SELECT leagueLocationID as id,locationName as name, streetAddress as address, cityID FROM league_locations 
+								WHERE cityID IN " . $cityIDRange . " AND (";
 		
 		$success = false;			
 		if (!empty($locationName)) {

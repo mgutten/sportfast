@@ -10,7 +10,7 @@
 
 /* ratings */
 #rating-sports {
-	margin: 1.1em 0 0 .7em;
+	margin: 0em 0 0 .7em;
 }
 
 .ratings-container {
@@ -20,8 +20,8 @@
 .rating-container {
 	width: 96%;
 	padding: .3em 2%;
-	margin: 1.2em 0;
-	/*border-bottom: 1px solid #e9e9e9;*/
+	margin: .2em 0;
+	border-bottom: 1px solid #e9e9e9;
 }
 
 .rating-right {
@@ -75,4 +75,17 @@
 
 #dropdown-menu-sports > a > .dropdown-menu-option-text {
 	margin-top: .25em;
+}
+
+/* rating chart */
+.rating-chart-option {
+	margin-left: .5em;
+}
+
+.rating-chart-option:first-child {
+	margin-left: 0;
+}
+
+.rating-chart-option.light {
+	margin-top: .95em;
 }

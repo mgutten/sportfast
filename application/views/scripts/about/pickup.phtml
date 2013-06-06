@@ -1,0 +1,118 @@
+<?php
+/** 
+ * controller => about
+ * action => pickup
+ */
+$this->headTitle('About Pickup Games');
+$this->headLink()->prependStylesheet($this->baseUrl() . '/css/about.css');
+$this->headScript()->prependFile($this->baseUrl() . '/js/about.js');
+?>
+
+<header class='jumbo-text darkest heavy clear'>
+	About Pickup Games
+</header>
+
+<div class='clear width-100 margin-top'>
+<img src='/images/about/pickup/pickup.jpg' class='larger-indent' align='right'/>
+    <p class='darkest larger-text'>
+		Pickup games are as old as time.  Any sport that requires more than one player can be played as a pickup game.  There are many
+        different types of pickup games, but they all have one thing in common:  <span class='heavy'>a pickup game is played with more than one player
+        where teams are made on the spot.</span>  In essence, it is a less formal, more spontaneous form of playing.  It is social, competitive, 
+        and fun!
+        <br>
+        <br>
+    </p>    
+    
+</div>
+
+
+<p class='clear jumbo-text darkest heavy'>
+	How does it work?
+</p>
+<div class='clear'>
+    <p class='darkest larger-text'>
+    	Pickup games are shockingly simple.  You have a time and a place.  You show up, other people show up, you agree on some basic rules, and you play!
+        You can leave whenever you want, and if a game is currently going on you can typically wait until it is over and join the next game.  Rules vary slightly
+        from game to game, but the basics of the game never change.  If you've never played before, don't be afraid to ask your fellow players questions.  If you 
+        know what sport you want to play, more specific information can be found at one of the following links:</p>
+     <br>
+</div>
+<div class='clear'>
+        <?php
+		$counter = 1;
+		foreach ($this->sports as $sport => $inner) {
+			
+			if ($counter % 2 == 0) {
+				// Even
+				$class = 'left pickup-right';
+			} else {
+				$class = 'clear pickup-left';
+			}
+			echo "<a href='/sports/" . $sport . "' class='margin-top largest-text medium heavy " . $class . "'>" . ucwords($sport) . "</a>";
+			
+			$counter++;
+		}
+		?>
+</div>
+<div class='clear'>
+    <p class='darkest larger-text'>
+    	<br>
+        Unfortunately,
+        organizing pickup games has always been a hassle.  What if no one shows up?  What if the court/field is occupied?  Luckily, we have taken that guesswork
+        out of the equation.
+        <br>
+        <br>
+    </p>
+    <p class='darkest larger-text'>
+    	With Sportup, pickup games are easy.  Let's say you used Sportup and joined a basketball game for this Tuesday at 12:30pm at Awesome Park.  Sweet!  
+        What a cool park name.  Now, before you ever gear up and head to the park, you're going to want to check back on the game's page and make sure there are
+        enough players.  How many is enough?  Well, fortunately each game has a "Minimum Players Required" limit that must be reached.  If that number is reached by 2
+        hours before start time, then the game is on!  If not, then the game will be canceled and an email will be sent to everyone.  So be sure to check before you go!
+        Here are some key notes for all pickup games:  
+        <br>
+       	<br>
+    </p>
+</div>
+<ul class='clear medium heavy larger-text' id='pickup-notes'>
+    <li>Make sure the game is not canceled before showing up</li>
+    <li>Check if there is a "Backup Park" <span class='light'>if the original park is not available, fall back to this park</span></li>
+	<li>Arrive on time</li>
+    <li>Bring your equipment <span class='light'>shoes, ball, disc, raquet, etc</span></li>
+    <li>Call your own fouls <span class='light'>know the basic rules by reading the articles above</span></li>
+    <li>Be safe, have fun </li>
+    <br>
+    <br>
+</ul>
+
+
+
+<p class='clear jumbo-text darkest heavy'>
+	Why pickup?
+</p>
+<div class='clear'>
+    <p class='darkest larger-text'>
+    	The focus of pickup is twofold: exercise and competition.  In terms of exercise, sports are invaluable for keeping you fit and healthy.
+        There is a reason professional athletes look so ridiculously fit.  Depending on the sport, your level of activity and exercise can change
+        dramatically.  However, sports tend to give your entire body a workout, as opposed to, say, a bicep curl which targets a very specific 
+        muscle group.  Since sports require so much movement and action, your forced to work the smaller muscles as well as the larger ones.  Oh,
+        and did we mention that it's a game?  Games are fun!  There's no counting your reps or how many miles you've run.  The focus is on something 
+        enjoyable and the exercise is secondary.
+        <br>
+        <br>
+    </p>
+    <p class='darkest larger-text'>
+    	Now, the other benefit of pickup games (and sports in general) is the competition.  Every sport has some way to win.  Some sports you need to score
+        more points, while others your score fewer.  But no matter what, there is always a way to win.  And who doesn't like to win?  The competition
+        factor of pickup can be exhilarating, and can drive you to better your game.
+        <br>
+        <br>
+    </p>
+    <p class='darkest larger-text'>
+    	That being said, winning is not everything.  In fact, obsessing over victory (especially in a pickup game) is going to backfire and 
+        get you all worked up over nothing.  Let us reiterate: it's a game.  No one is going to give you a trophy for making that last shot or scoring
+        the winning touchdown.  Though that does not mean you should not enjoy the competitive atmosphere!  Just keep your emotions in line and
+        you, as well as everyone around you, will be much, much happier.
+        <br>
+        <br>
+    </p>
+</div>

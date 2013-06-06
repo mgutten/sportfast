@@ -1,0 +1,90 @@
+<?php
+/** 
+ * controller => games
+ * action => history
+ */
+$this->headTitle('Game Stats');
+$this->headLink()->prependStylesheet($this->baseUrl() . '/css/history.css');
+$this->headScript()->prependFile($this->baseUrl() . '/js/history.js');
+$this->headScript()->prependFile('https://www.google.com/jsapi');
+?>
+
+<?php
+$this->placeholder('narrowColumn')->captureStart();
+
+echo "<img src='" . $this->game->getProfilePic('large', 'parks') . "' class='rounded-corners narrow-column-picture dropshadow'/>";
+
+echo "<div class='clear larger-margin-top larger-text'>";
+echo	"<p class='clear heavy'>" . $this->game->getGameTitle() . "</p>";
+echo	"<p class='clear'>" . $this->game->gameDate->format('l') . "s at " . $this->game->gameDate->format('ga') . "</p>";
+echo	"<p class='clear light'>" . $this->game->park->parkName . "</p>";
+echo "</div>";
+
+echo "<div class='clear larger-text width-100 light-back' id='history-current-players-container'>";
+echo	"<p class='clear medium width-100 center smaller-text'>This Week:</p>";
+echo	"<p class='largest-text medium heavy clear width-100 center'>" . $this->game->players->countUsers() . " <span class='smaller-text medium'>players</p></p>";
+echo "</div>";
+$this->placeholder('narrowColumn')->captureEnd();
+?>
+
+<a href='/games/<?php echo $this->game->gameID;?>' class='left smaller-text medium'>&lt;&lt;Back to game</a>
+
+<header class='clear jumbo-text darkest heavy'>
+    Game Stats
+</header>
+
+<div class='clear' id='history-chart-header'>
+    <p class='left pointer green-bold largest-text history-option'>Players</p>
+    <p class='left pointer light history-option'>Success</p>
+    <p class='left pointer light history-option'>Stats</p>
+</div>
+
+<div class='clear' id='history-charts-container'>
+	<div class='clear' id='history-charts-inner-container'>
+        <div class='clear chart players' id='history-chart'>
+        </div>
+        
+        <div class='left chart success' id='pie-chart'>
+        </div>
+        
+        <div class='left chart width-100 stats' id='history-stats-container'>
+            <div class='clear margin-top'>
+                <p class='clear medium history-stat-header'>Total Games</p>
+                <p class='clear jumbo-text darkest heavy'><?php echo $this->history['totalGames'];?></p>
+            </div>
+            <div class='left margin-top'>
+                <p class='clear medium history-stat-header'>Most Players</p>
+                <p class='clear jumbo-text darkest heavy'><?php echo $this->history['maxPlayers'];?></p>
+            </div>
+            <div class='left margin-top'>
+                <p class='clear medium history-stat-header'>First Game</p>
+                <p class='clear largest-text darkest heavy'><?php echo $this->history['firstGame']->format('F d, Y');?></p>
+            </div>
+            
+        </div>
+    </div>
+</div>
+
+<script type='text/javascript'>
+chartData = [['Week', 'Players','No Game'],<?php 
+			foreach ($this->history['games'] as $game) {
+				if ($game->isGameOn()) {
+					// successful game, first series
+					$first = $game->totalPlayers;
+					$second = 0;
+				} else {
+					$first = 0;
+					$second = $game->totalPlayers;
+				}
+				echo "['" . $game->gameDate->format('m/j') . "'," . $first . "," . $second . "],";
+				//echo "[new Date(" . $game->gameDate->format('Y') . "," . $game->gameDate->format('m') . "," . $game->gameDate->format('d') ."), " . $first . "," . $second . "],";
+			}
+			?>];
+			
+pieChartData = [
+          ['Type', 'Total'],
+          ['Successful Game',<?php echo $this->history['successGames'];?> ],
+          ['Failed Game', <?php echo $this->history['failedGames'];?>],
+        ]
+			
+</script>

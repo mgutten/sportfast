@@ -156,10 +156,11 @@ input.input-success, div.input-success {
 	border: 1px solid #58bf12;
 }
 
+/* on global.css 
 input.input-fail, div.input-fail {
 	background: #EDA9A9;
 	border: 1px solid #C60000;
-}
+}*/
 
 #signup-password-reqs {
 	float:left;

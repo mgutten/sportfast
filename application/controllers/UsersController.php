@@ -85,7 +85,6 @@ class UsersController extends Zend_Controller_Action
         $user = new Application_Model_User();
 		$user->getUserByID($userID);
 		$user->getUserSportsInfo();
-	
 		
 		$this->view->currentUser = $user;
 		$this->view->userID = $userID;
@@ -105,8 +104,25 @@ class UsersController extends Zend_Controller_Action
 		}
 		
 		$this->view->ratings = $ratings = $user->getUserRatings()->getSport($sport)->ratings;
-		$this->view->numRatings = $ratings->countRatings();
+		$this->view->numRatings = $ratings->countRatings(false, false);
 		$this->view->ratingWidth = $ratings->getStarWidth('quality') . '%';
+		
+		$ratings->skillInitial = $this->view->sport->skillInitial;
+		$ratings->attendance = $this->view->sport->attendance;
+		$ratings->sportsmanship = $this->view->sport->sportsmanship;
+		
+		// Chart data
+		$chartRatings = $ratings->getRatingsForChart('overall', '6');
+		$this->view->chartRatingsOverall = $chartRatings;
+		$chartRatings = $ratings->getRatingsForChart('skill', '6');
+		$this->view->chartRatingsSkill = $chartRatings;
+		$chartRatings = $ratings->getRatingsForChart('sportsmanship', '6');
+		$this->view->chartRatingsSportsmanship = $chartRatings;
+		
+		// Narrow column data
+		$oldData = $this->view->sport->getUserSportData($user->userID);
+		$this->view->sportStats = $oldData;
+		
 		
 		$dropdown = Zend_Controller_Action_HelperBroker::getStaticHelper('Dropdown');
 		

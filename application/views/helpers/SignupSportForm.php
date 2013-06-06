@@ -34,7 +34,10 @@ class Application_View_Helper_SignupSportForm
 				// User sports set
 				$remove = "<p class='clear width-100 center red pointer settings-sport-remove' tooltip='Remove this sport from my account'>remove</p>";
 				if (isset($userSports[strtolower($sport['sport'])])) {
-					$userSport = $userSports[strtolower($sport['sport'])];
+					if ($userSports[strtolower($sport['sport'])]->sportID) {
+						// Protect against getSport accidentally setting blank sport
+						$userSport = $userSports[strtolower($sport['sport'])];
+					}
 				}
 			}
 			

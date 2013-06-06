@@ -279,6 +279,24 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 		$router->addRoute('verify', $r);
 		
 		
+		// Cron jobs
+		$r = new Zend_Controller_Router_Route_Regex(
+				'cron(?:/([a-z-]*))?(?:/(.*))?',
+				array(
+						'action' => 'index',
+						'controller' => 'cron',
+						'module' => 'default',
+						'pass'   => ''
+				),
+				array(
+						1 => 'action',
+						2 => 'pass'
+				),
+				'cron/%s/%s');
+				
+		$router->addRoute('cron', $r);
+		
+		
 		return $view;
 	}
 	

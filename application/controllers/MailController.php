@@ -189,7 +189,43 @@ class MailController extends Zend_Controller_Action
 		
 		$this->_redirect('/login');
 	}
-
+	
+	
+	/**
+	 * mail to support form internal contact form
+	 */
+	public function contactAction()
+	{
+		$this->view->narrowColumn = false;
+		
+		$post = $this->getRequest()->getPost();
+		
+		$form = new Application_Form_Contact();
+		
+		if ($form->isValid($post)) {
+			// Success
+			$subject  = 'Contact Form';
+			$message  = $post['question'];
+			$headers  = "MIME-Version: 1.0" . "\r\n";
+			$headers .= "Content-type: text/html; charset=iso-8859-1" . "\r\n";
+			$headers .= "From: contact@sportup.com\r\n";	 
+			$headers .= "Reply-To: " . $post['email'] . "\r\n";			
+					
+			mail("support@sportup.com", $subject, $message, $headers);
+		} else {
+			// Fail
+			$errors = array();
+			foreach ($form->getMessages() as $section => $errorType) {
+				foreach ($errorType as $val) {
+					$errors[$section] = str_replace('Value', ucwords($section), $val);
+				}
+			}
+			$this->_helper->FlashMessenger->addMessage($errors, 'contactError');
+			
+			$this->_redirect('/contact');
+		}
+			
+	}
 
 }
 

@@ -271,6 +271,7 @@ abstract class Application_Model_ModelAbstract
 	public function setDbTable($dbTable)
 	{
 		$this->_dbTable = $dbTable;
+		return $this;
 	}
 
 	

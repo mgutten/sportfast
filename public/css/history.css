@@ -1,0 +1,49 @@
+/* CSS Document */
+#history-current-players-container {
+	margin-top: 1.5em;
+}
+
+#history-chart-header {
+	margin-top: 1em;
+}
+
+#history-chart {
+	height: 250px;
+	width: 33.333%;
+}
+
+#pie-chart {
+	height: 250px;
+	width: 33.333%;
+}
+
+#history-stats-container {
+
+	width: 33.333%;
+}
+
+.history-stat-header {
+	margin-bottom: -.3em;
+	width: 8em;
+}
+
+.history-option {
+	margin-left: .5em;
+}
+
+.history-option:first-child {
+	margin-left: 0;
+}
+
+.history-option.light {
+	margin-top: .95em;
+}
+
+#history-charts-container {
+	width: 100%;
+	overflow:hidden;
+}
+
+#history-charts-inner-container {
+	width: 300%;
+}

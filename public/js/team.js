@@ -1,6 +1,7 @@
 // Team profile page js
 var clickedDay;
 var teamID;
+var typing;
 
 $(function()
 {
@@ -123,11 +124,14 @@ $(function()
 		var address = $('#teamManageScheduleAddress').val();
 		var name	= $('#teamManageScheduleLocation').val();
 		
-		if ($(this).val() < 3) {
+		if ($(this).val().length < 3) {
 			return;
 		}
+		clearTimeout(typing);
 		
-		searchDbForLeagueLocation(name, address, populateLeagueLocationResults);
+		typing = setTimeout(function() {
+			searchDbForLeagueLocation(name, address, populateLeagueLocationResults);
+		}, 200);
 	});
 	
 
@@ -205,6 +209,11 @@ $(function()
 		clickedDay.removeClass('calendar-dark')
 				  .css('background','')
 				  .attr('color','');
+				  
+		var teamGameID = (typeof clickedDay.attr('typeID') !== 'undefined' ? clickedDay.attr('typeID') : '');
+		
+		removeTeamGame(teamGameID);
+		changedAlert = $('#manage-schedule-alert-container');
 				 
 	})
 	
@@ -350,6 +359,19 @@ $(function()
 })
 
 /**
+ * remove team game from db
+ */
+function removeTeamGame(teamGameID)
+{
+	$.ajax({
+		url: '/ajax/remove-team-game',
+		type: 'POST',
+		data: {teamGameID: teamGameID},
+		success: function(data) {
+		}
+	})
+}
+/**
  * add animate darker to all calendar days (within manage alert)
  */
 function addAnimateDarkerToManageCalendar()
@@ -414,7 +436,6 @@ function addGameToDb(teamGameID, opponent, time, month, day, year, location, add
  */
 function searchDbForLeagueLocation(name, address, callback)
 {
-
 	$.ajax({
 		url: '/ajax/search-db-for-league-location',
 		type: 'POST',
@@ -422,6 +443,7 @@ function searchDbForLeagueLocation(name, address, callback)
 			   address: address},
 		success: function(locations) {
 					locations = JSON.parse(locations);
+					
 					callback(locations);
 				}
 	})

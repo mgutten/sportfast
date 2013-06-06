@@ -8,10 +8,10 @@
             	Help &amp; Info
             </p>
             <?php 
-			$links = array('FAQ' 		 => array('controller' => 'info',
+			$links = array('FAQ' 		 => array('controller' => 'about',
 											 	  'action'	   => 'faq'),
-						   'Sport Rules' => array('controller' => 'info',
-											 	  'action'	   => 'rules'));
+						   'Sport Rules' => array('controller' => 'sports',
+											 	  'action'	   => 'index'));
 			echo $this->footer($links); 
 			?>
         </div>
@@ -30,15 +30,15 @@
             	The Company
             </p>
             <?php 
-			$links = array('About Us' 		 		=> array('controller' => 'info',
-											 	  			 'action'	  => 'about'),
-						   'Contact' 				=> array('controller' => 'info',
-											 	  			 'action'	  => 'contact'),
-						   'Jobs'				 	=> array('controller' => 'info',
+			$links = array('About Us' 		 		=> array('controller' => 'about',
+											 	  			 'action'	  => 'index'),
+						   'Contact' 				=> array('controller' => 'contact',
+											 	  			 'action'	  => 'index'),
+						   'Jobs'				 	=> array('controller' => 'about',
 											 	  			 'action'	  => 'jobs'),
-						   'Privacy Policy' 		=> array('controller' => 'info',
+						   'Privacy Policy' 		=> array('controller' => 'about',
 											 	  			 'action'	  => 'privacy'),
-						   'Terms &amp; Conditions' => array('controller' => 'info',
+						   'Terms &amp; Conditions' => array('controller' => 'about',
 											 	  			 'action'	  => 'terms'));
 			echo $this->footer($links); 
 			?>

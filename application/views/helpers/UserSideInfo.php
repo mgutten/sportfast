@@ -12,7 +12,7 @@ class Application_View_Helper_UserSideInfo
 	{
 		$user = $this->_view->user;
 		
-		if ($user->getSport($sport)->overall == '0') {
+		if (!$user->hasSport($sport)) {
 			$add = "<a href='/users/" . $user->userID . "/settings' class='clear medium smaller-text user-side-info-add center'>Add " . $sport . " to your profile</a>";
 			$overall = '0';
 		} else {

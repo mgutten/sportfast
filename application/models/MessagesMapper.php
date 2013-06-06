@@ -90,7 +90,7 @@ class Application_Model_MessagesMapper extends Application_Model_MapperAbstract
 		$select  = $table->select();
 		$select->setIntegrityCheck(false);
 		
-		$messages = "SELECT tm.teamID as teamID, 
+		$messages = "SELECT tm.gameID as gameID, 
 					   tm.userID as userID, 
 					   u.firstName as firstName,
 					   u.lastName as lastName,
@@ -99,9 +99,9 @@ class Application_Model_MessagesMapper extends Application_Model_MapperAbstract
 					   '' as sport,
 					   '' as pictureType,
 					   'message' as type
-					   FROM team_messages as tm
+					   FROM game_messages as tm
 					INNER JOIN users as u ON tm.userID = u.userID
-					WHERE tm.teamID = '" . $gameID . "'";
+					WHERE tm.gameID = '" . $gameID . "'";
 				
 		$notifications = "SELECT nl.gameID as gameID, 
 							   nl.actingUserID as userID, 
@@ -119,7 +119,7 @@ class Application_Model_MessagesMapper extends Application_Model_MapperAbstract
 							WHERE nl.gameID = '" . $gameID . "' 
 								AND n.public = 1 AND n.action != 'create'";
 							
-		$sql = $notifications;
+		$sql = $messages . " UNION " . $notifications;
 		$sql .= " ORDER BY dateHappened DESC LIMIT 10";
 		
 		$messages = $db->fetchAll($sql);

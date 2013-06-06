@@ -1,0 +1,57 @@
+<?php
+/** 
+ * controller => about
+ * action => pickup
+ */
+$this->headTitle('Choose a Sport');
+?>
+
+<style>
+.sport-left,.sport-right {
+	width: 14em;
+	margin-left: 2em;
+	padding: .1em 0;
+}
+
+.sport-right {
+	margin-left: 1em;
+}
+
+#sports-container {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	height: 40em;
+	width: 40em;
+	margin-top: -20em;
+	margin-left: -20em;
+}
+	
+</style>
+
+<div id='sports-container'>
+<header class='jumbo-text darkest heavy clear width-100 center'>
+	Which sport?
+</header>
+
+<div class='clear larger-text larger-margin-top width-100 rounded-corners white-back'>
+ <?php
+		$counter = 1;
+		foreach ($this->sports as $sport) {
+			$sportName = strtolower($sport->sport);
+			if ($counter % 2 == 0) {
+				// Even
+				$class = 'left sport-right';
+			} else {
+				$class = 'clear sport-left';
+			}
+			echo "<a href='/sports/" . $sportName . "' class='margin-top white-background animate-darker " . $class . "'>";
+			echo	"<img src='" . $sport->getIcon('large', 'solid', 'medium') . "' class='left' />";
+			echo	"<p class='left indent largest-text medium heavy'>" . $sport->sport . "</p>";
+			echo "</a>";
+			
+			$counter++;
+		}
+		?>
+</div>
+</div>

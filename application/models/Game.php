@@ -75,6 +75,25 @@ class Application_Model_Game extends Application_Model_ModelAbstract
 																									   'typeName' => $typeName,
 																									   'typeSuffix' => $typeSuffix));
 	}
+	
+	/**
+	 * get history data for chart of subscribe game
+	 * @returns array of game models in order of most recent to least recent
+	 */
+	public function getHistoryData($interval = 6)
+	{
+		$gameID = $this->gameID;
+		if ($this->recurring != '1') {
+			// Not recurring
+			return false;
+		}
+		
+		$data = $this->getMapper()->getHistoryData($gameID, $interval);
+		
+		return $data;
+	}
+		
+		
 																			   
 	
 	public function getProfilePic($size, $id = false, $type = false)

@@ -506,6 +506,57 @@ class Application_Model_GamesMapper extends Application_Model_MapperAbstract
 	}
 	
 	/**
+	 * get history data for chart of subscribe game
+	 * @params ($interval => how many months to look back)
+	 */
+	public function getHistoryData($gameID, $interval = 6)
+	{
+		$table = $this->getDbTable();
+		$select = $table->select();
+		$select->setIntegrityCheck(false);
+		
+		$select->from(array('og' => 'old_games'))
+			   ->where('og.gameID = ?', $gameID)
+			   ->where('og.date > (now() - INTERVAL 6 MONTH)')
+			   ->order('og.date ASC');
+			   
+		$results = $table->fetchAll($select);
+		
+		$games = array();
+		foreach ($results as $result) {
+			$game = new Application_Model_Game($result);
+			$games[] = $game;
+		}
+		
+		// Get other individual values for this game
+		$select = $table->select();
+		$select->setIntegrityCheck(false);
+		
+		$select->from(array('og' => 'old_games'),
+					  array('MAX(og.totalPlayers) as maxPlayers',
+					  		'COUNT(og.gameID) as totalGames',
+							'MIN(og.date) as firstGame',
+							'SUM(IF(og.minPlayers > og.totalPlayers, 1, 0)) AS failedGames'))
+			   ->where('og.gameID = ?', $gameID);
+		
+		$result = $table->fetchRow($select);
+		
+		$returnArray = array();
+		
+		$returnArray['games'] = $games;
+		$returnArray['maxPlayers'] = $result['maxPlayers'];
+		$returnArray['totalGames'] = $result['totalGames'];
+		$returnArray['failedGames'] = $result['failedGames'];
+		$returnArray['successGames'] = $result['totalGames'] - $result['failedGames'];
+		
+		$date = DateTime::createFromFormat('Y-m-d H:i:s', $result['firstGame']);
+		$returnArray['firstGame'] = $date;
+		
+		
+		return $returnArray;
+	}
+	
+	/**
 	 * check db for league location based on either locationName or address
 	 * @params ($locationName => name of location,
 	 *			$address	  => address of location)
@@ -605,20 +656,35 @@ class Application_Model_GamesMapper extends Application_Model_MapperAbstract
 	public function delete($gameModel)
 	{
 		$db = Zend_Db_Table::getDefaultAdapter();
-		$gameID = $gameModel->gameID;
-		
-		$where = array('gameID = ?' => $gameID);
-		
-		if (empty($gameID)) {
-			// Safety check to make sure gameID is set before continuing
-			return false;
+		if (!$gameModel->isTeamGame()) {
+			// Not team game
+			$gameID = $gameModel->gameID;
+			
+			$where = array('gameID = ?' => $gameID);
+			
+			if (empty($gameID)) {
+				// Safety check to make sure gameID is set before continuing
+				return false;
+			}
+			
+			$this->move($gameID);
+	
+			$db->delete('games', $where);
+			$db->delete('game_captains', $where);
+			$db->delete('game_messages', $where);
+		} else {
+			// Is team game
+			$gameID = $gameModel->teamGameID;
+			
+			$where = array('teamGameID = ?' => $gameID);
+			
+			if (empty($gameID)) {
+				// Safety check to make sure gameID is set before continuing
+				return false;
+			}
+	
+			$db->delete('team_games', $where);
 		}
-		
-		$this->move($gameID);
-
-		$db->delete('games', $where);
-		$db->delete('game_captains', $where);
-		$db->delete('game_messages', $where);
 		
 	}
 	

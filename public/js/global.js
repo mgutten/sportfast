@@ -591,12 +591,26 @@ $(function()
 	})
 	
 	
+	/* Safari bug fix where hover over parent a tag causes all children to get text-underline*/
+	$(document).on('mouseenter','a',function()
+	{
+		if ($(this).find('p').length > 0) {
+			// There are paragraph eles
+			$(this).css('text-decoration', 'none');
+		}
+	});
+		
+	
 	/* fade input text on focusin and focusout */
 	$(document).on('focusin', 'input[type=text],input[type=password],textarea',function()
 	{
 		$(this).parents('.nav-dropdown').trigger('mouseover');
 		
 		fadeOutInputOverlay($(this), true);
+		
+		if ($(this).is('.input-fail')) {
+			$(this).removeClass('input-fail');
+		}
 		
 		// Tooltip
 		if($(this).parents('.input-container').attr('tooltip')) {
@@ -1400,7 +1414,12 @@ function toggleGreenBackground(ele, removeOld)
 */
 function animateNotShow(ele, down, fadeIn)
 {
+	
+	ele.show();
 	var height = ele.outerHeight();
+	if (!down) {
+		ele.hide();
+	}
 	
 	if (down) {	
 		// Hidden element is down, animate it up
@@ -1412,9 +1431,10 @@ function animateNotShow(ele, down, fadeIn)
 		// Hidden element is up, animate it down
 		ele.css({marginTop: -height,
 				 opacity: 0})
-
+		
 		if (!fadeIn) {
 			// Do not fade in
+			
 			ele.stop().css({'opacity': 1,
 							'display': 'block'})
 					  .animate({marginTop: 0}, 400);

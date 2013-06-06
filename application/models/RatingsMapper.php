@@ -47,6 +47,43 @@ class Application_Model_RatingsMapper extends Application_Model_MapperAbstract
 		return $returnArray;
 	}
 	
+	
+	/**
+	 * get user ratings for use with chart on ratings page
+	 * @params ($interval => # of months back to retrieve information (e.g. get 4 months of data separated by month)
+	 * @returns array of month => value
+	 */
+	public function getUserRatingsForChart($userID, $sportID, $interval = 4)
+	{
+		$table = $this->getDbTable();
+		
+		//for ($i = $interval; $i > 0; $i--) {
+		$select = $table->select();
+		$select->setIntegrityCheck(false);
+		
+		$select->from(array('us' => 'user_sports'))
+			   ->joinLeft(array('ur' => 'user_ratings'),
+						  'us.userID = ur.receivingUserID AND us.sportID = ur.sportID')
+			   ->where('us.userID = ?', $userID)
+			   ->where('us.sportID = ?' , $sportID)
+			   ->where('DATE_FORMAT(ur.dateHappened, %m) >= DATE_FORMAT((now() - INTERVAL ' . $interval . ' MONTHS), %m)');
+			   
+		$results = $table->fetchAll($select);
+		
+		$ratings = new Application_Model_Ratings();
+		foreach ($results as $result) {
+			$ratings->skillInitial = $result->skillInitial;
+			$ratings->addRating($result);
+		}
+		
+		return $ratings;
+		//}
+	}
+	 
+			
+				   
+	
+	
 	/**
 	 * check to see if there was already an unsucessful (success = 0) rating for a park from a particular game (only allow 1 unsucessful rating per game)
 	 */

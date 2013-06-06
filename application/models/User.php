@@ -376,6 +376,11 @@ class Application_Model_User extends Application_Model_ModelAbstract
 		return DateTime::createFromFormat('Y-m-d', $this->dob);
 	}
 	
+	public function getJoinedDate()
+	{
+		return DateTime::createFromFormat('Y-m-d H:i:s', $this->joined);
+	}
+	
 	public function getSportTypes()
 	{
 		$returnArray = array();
@@ -483,7 +488,13 @@ class Application_Model_User extends Application_Model_ModelAbstract
 		$sport = strtolower($sport);
 		
 		if (isset($this->_attribs['sports'][$sport])) {
-			return true;
+			if (!empty($this->getSport($sport)->sportID)) {
+				// Sport is set AND has a sportID (wasn't accidentally set with getSport
+				return true;
+			} else {
+				$this->unsetSport($sport);
+				return false;
+			}
 		} else {
 			return false;
 		}
@@ -522,15 +533,23 @@ class Application_Model_User extends Application_Model_ModelAbstract
 		$this->getMapper()->resetHomeLocation($this);
 	}
 	
+	
+	public function unsetSport($sportName) 
+	{
+		$sportName = strtolower($sportName);
+		unset($this->_attribs['sports'][$sportName]);
+	}
+	
 	/**
 	 * remove sport from db
 	 */
 	public function removeSport($sportName, $andGames = true)
 	{
+		$sportName = strtolower($sportName);
 		$sport = $this->getSport($sportName);
 		$sportID = $sport->sportID;
 		
-		unset($this->_attribs['sports'][$sportName]);
+		$this->unsetSport($sportName);
 		
 		$this->getMapper()->removeSport($this->userID, $sportID, $andGames);
 	}

@@ -9,6 +9,7 @@ class Application_Model_TypesAbstract extends Application_Model_ModelAbstract
 		if (($type = $this->exists($id, true)) !== false) {
 			// id is located within stored values, remove it
 			unset($this->_attribs[$this->getTypeOfModel()][$type]);
+			return $this;
 		} else {
 			return false;
 		}
@@ -44,6 +45,18 @@ class Application_Model_TypesAbstract extends Application_Model_ModelAbstract
 		$array = $this->getAll();
 		
 		return $array[array_rand($array)];
+	}
+	
+	public function count()
+	{
+		$type = $this->getTypeOfModel();
+		
+		if (!$this->hasValue($type)) {
+			// Empty
+			return 0;
+		} else {
+			return count($this->_attribs[$type]);
+		}
 	}
 	
 	/**

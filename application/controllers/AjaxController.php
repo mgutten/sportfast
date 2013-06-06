@@ -279,13 +279,18 @@ class AjaxController extends Zend_Controller_Action
 		 $options = $this->getRequest()->getPost('options');
 		 
 		 $messageArray = array();
-		 $messageArray[$options['idType']] = $options['typeID'];
+		 $messageArray[$options['idType']] = $options['typeID'];		 
 		 $messageArray['userID'] = $options['actingUserID'];
 		 $messageArray['message'] = $options['message'];
 		 $date = new DateTime('now');
 		 $messageArray['dateHappened'] = $date->format('Y-m-d H:i:s');
 		 
 		 $message = new Application_Model_Message($messageArray);
+		 
+		 if ($options['idType'] == 'gameID') {
+			 // Is game
+			 $message->setGameMessage();
+		 }
 		 
 		 $message->save();
 
@@ -1010,7 +1015,33 @@ class AjaxController extends Zend_Controller_Action
 		$model->updateCaptains();
 	}
 
-	
+	/**
+	 * remove team game
+	 */
+	public function removeTeamGameAction()
+	{
+		$teamGameID = $this->getRequest()->getPost('teamGameID');
+		
+		if (!$teamGameID) {
+			return false;
+		}
+		
+		
+		$games = $this->view->user->games;
+		$game = $games->setPrimaryKey('teamGameID')
+					  ->exists($teamGameID);
+		
+		if ($game) {
+			$game->delete();
+			
+		}
+		
+		$games->setPrimaryKey('teamGameID')
+			  ->remove($teamGameID)
+			  ->setPrimaryKey('gameID');
+	}
+			  
+		
 	/**
 	 * remove player's sport info
 	 */

@@ -61,7 +61,12 @@ class Application_Model_Users extends Application_Model_TypesAbstract
 			// Empty
 			return 0;
 		} else {
-			return count($this->_attribs['users']);
+			$count = 0;
+			foreach ($this->_attribs['users'] as $user) {
+				$count += 1 + $user->plus;
+			}
+			
+			return $count;
 		}
 	}
 	

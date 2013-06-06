@@ -207,8 +207,8 @@ textarea.post-message {
 
 .profile-message {
 	width: auto;
-	border: 1px solid #bbb;
-	padding: .2em 1em;
+	/*border: 1px solid #bbb;*/
+	padding: .4em .6em;
 }
 
 .newsfeed-notification-text-container {

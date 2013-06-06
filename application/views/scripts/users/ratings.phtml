@@ -8,7 +8,12 @@ $this->headLink()->prependStylesheet($this->baseUrl() . '/css/rating.css');
 $this->headLink()->prependStylesheet($this->baseUrl() . '/css/profile.css');
 $this->headScript()->prependFile($this->baseUrl() . '/js/rating.js');
 $this->headScript()->prependFile($this->baseUrl() . '/js/profile.js');
+$this->headScript()->prependFile('https://www.google.com/jsapi');
 ?>
+<script type='text/javascript'>
+
+
+</script>
 
 <?php
 // Narrow right column
@@ -30,9 +35,10 @@ foreach ($this->ratingOrder as $rating => $label) {
 echo "</div>";
 
 
+// Top skills
 echo $this->narrowcolumnsection()->start(array('title' => 'Top Skills'));
 
-echo "<div class='clear larger-margin-top width-100'>";
+echo "<div class='clear width-100'>";
 foreach ($this->ratings->getBestSkills() as $skiller => $count) {
 	echo "<p class='clear dark'>" . ucwords($skiller) . "</p>";
 	echo "<p class='right light'>" . $count . "</p>";
@@ -41,19 +47,93 @@ echo "</div>";
 
 echo $this->narrowcolumnsection()->end();
 
+// Stats
+echo $this->narrowcolumnsection()->start(array('title' => $this->sport->sport . ' Stats'));
+
+echo "<p class='clear light'>Games played:</p>";
+echo "<p class='right dark'>" . $this->sportStats['totalGames'] . "</p>";
+
+echo "<p class='clear light margin-top' tooltip='Total number of " . strtolower($this->sport->sport) . " ratings given.'>
+		Ratings given:
+	  </p>";
+echo "<p class='right dark margin-top'>" . $this->sportStats['totalRatings'] . "</p>";
+
+echo "<p class='clear light margin-top' tooltip='Total number of different players you have played " . strtolower($this->sport->sport) . " with.'>
+		Different players:
+	  </p>";
+echo "<p class='right dark margin-top'>" . $this->sportStats['totalPlayers'] . "</p>";
+
+
+echo "<p class='clear light margin-top' tooltip='You have played the most " . strtolower($this->sport->sport) . " games with this player.'>Most games with:</p>";
+foreach ($this->sportStats['mostPlayer'] as $player) {
+	
+	if (empty($player['name'])) {
+		// No most played with player
+		$player = 'None';
+	} else {
+		$player = $player['name'] . " <span class='right dark'>" . $player['times'] . "";
+	}
+	
+	echo "<p class='clear width-100 dark'>" . $player . "</p>";
+}
+echo $this->narrowcolumnsection()->end();
 
 $this->placeholder('narrowColumn')->captureEnd();
 
 ?>
 
 <a href='<?php echo $this->baseURI;?>' class='left smaller-text medium'>&lt;&lt; Back to profile</a>
+<div class='right larger-text' id='rating-sports'><?php echo $this->sportButton;?></div>
+
+<div class='clear width-100' id='chart-container'>
+	<div class='clear width-100'>
+    	<?php
+		$ratings = array('Overall', 'Skill', 'Sportsmanship');
+		$counter = 0;
+		foreach ($ratings as $rating) {
+			$class = 'light rating-chart-option';
+			if ($counter == 0) {
+				$class = 'green-bold largest-text rating-chart-option';
+			}
+			echo "<p class='left pointer " . $class . "'>" . $rating . "</p>";
+			$counter++;
+		}
+		?>
+        
+    </div>
+    <div id='chart' class='left width-100' style='height: 250px'>
+    </div>
+</div>
+
 <header class='width-100 left'>
-	<p class='jumbo-text heavy darkest left'><?php echo $this->numRatings;?></p>
-    <p class='left largest-text darkest profile-header-sub'>for <div class='left larger-text' id='rating-sports'><?php echo $this->sportButton;?></div> </p>
+	<p class='jumbo-text heavy darkest left larger-margin-top'><?php echo $this->numRatings . ' ' . strtolower($this->sport->sport) . ($this->numRatings == 1 ? ' rating' : ' ratings');?></p>
+    <!--<p class='left largest-text darkest profile-header-sub'>for <div class='left larger-text' id='rating-sports'><?php echo $this->sportButton;?></div> </p>-->
 </header>
+
 
 <div class='width-100 clear ratings-container'>
 	<?php
 	echo $this->ratings()->loopUserRatings($this->ratings->getAll());
 	?>
 </div>
+
+<script type='text/javascript'>
+sportID = '<?php echo $this->sport->sportID;?>';
+userID = '<?php echo $this->currentUser->userID;?>';
+<?php
+	foreach ($ratings as $rating) {
+		echo '
+		chartData["' . strtolower($rating) . '"] = [["Month", "' . $rating . '"],';
+		$valuesName = 'chartRatings' . $rating;
+		foreach ($this->$valuesName as $month) {
+			if ($month['value'] == 0) {
+				$month['value'] = 'null';
+			}
+			echo "['" . $month['month'] . "', " . $month['value'] . "],";
+		}
+		
+		echo '];';
+	}
+?>
+		
+</script>

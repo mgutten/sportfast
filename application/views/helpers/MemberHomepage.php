@@ -42,11 +42,11 @@ class Application_View_Helper_MemberHomepage
 			$this->_view->placeholder('absolute')->captureEnd();
 		}
 		
-		if ($this->_view->usersInArea) {
+		if ($this->_view->usersInArea && !$this->_view->rateGame) {
 			// Not enough users in area, let user know
 			$this->_view->placeholder('absolute')->captureStart();
 			
-			$newUsers = ($this->_view->usersInArea['newUsers'] == 0 ? '1' : $this->_view->usersInArea['newUsers']);
+			$newUsers = ($this->_view->usersInArea['newUsers'] == 0 ? mt_rand(0,1) : $this->_view->usersInArea['newUsers']);
 			
 			$users = ($newUsers == 1 ? 'user has' : 'users have');
 			
@@ -558,7 +558,7 @@ class Application_View_Helper_MemberHomepage
 			$iconsOutput   .= "<img src='" . $sport->getIcon('small', 'outline') . "' class='medium-background member-narrow-rating-icon pointer " . $class . "' />";
 			$ratingsOutput .= "<div class='member-narrow-rating-container'>";
 			$ratingsOutput .= "<p class='width-100 clear center'>" . ucwords($sport->sport) . "</p>";
-			$ratingsOutput .= "<a href='/users/" . $this->_view->user->userID . "/ratings' class='width-100 clear center green bold largest-text'>" . $sport->getOverall() . "</a>";
+			$ratingsOutput .= "<a href='/users/" . $this->_view->user->userID . "/ratings/" . strtolower($sport->sport) . "' class='width-100 clear center green bold largest-text'>" . $sport->getOverall() . "</a>";
 			$ratingsOutput .= "<div class='width-100 clear'>";
 			
 			foreach ($ratingOrder as $rating => $label) {

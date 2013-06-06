@@ -1,6 +1,8 @@
 // rating.js
 var ratingClicked;
-
+var chartData = new Object();
+var data;
+var lineChart;
 
 $(function()
 {
@@ -42,12 +44,35 @@ $(function()
 		}
 	})
 	
+	$('.rating-chart-option').click(function()
+	{
+		if ($(this).is('.green-bold')) {
+			// Already selected
+			return false;
+		}
+		
+		$('.rating-chart-option.green-bold').removeClass('largest-text green-bold')
+											.addClass('light');
+											
+		$(this).addClass('largest-text green-bold')
+			   .removeClass('light');
+			   
+		var value = $(this).text().toLowerCase();
+		
+		createLineChart(chartData[value]);
+			   
+		
+	})
 	
 	$('.flag-incorrect').click(function()
 	{
 		flagRemoval($(this).attr('userRatingID'));
 	})
+   
 	
+
+   	google.load("visualization", "1", {"callback" : createInitialChart,
+ 						   			   "packages" :["corechart"]});
 	
 })
 
@@ -62,9 +87,145 @@ function flagRemoval(userRatingID)
 		data: {userRatingID: userRatingID},
 		success: function() {
 			showConfirmationAlert('Rating will be reviewed shortly');
+			reloadPage();
 		}
 	})
 }
+
+/**
+ * ajax to retrieve ratings and then create chart
+ 
+function getRatingsForChart(userID, sportID, rating)
+{
+	var options = {userID: userID,
+				   sportID: sportID,
+				   rating: rating};
+	$.ajax({
+		url: '/ajax/get-ratings-for-chart',
+		type: 'POST',
+		data: {options: options},
+		success: function(data) {
+			alert(data);
+		}
+	})
+}*/
+
+// bug fix to allow callback in document.ready "google.load(..." line
+function createInitialChart()
+{
+	chart = new google.visualization.LineChart(document.getElementById('chart')); 
+	data = new google.visualization.DataTable();
+	
+	
+	var tempArray = new Array();
+	
+	for (i = 0; i < chartData['overall'].length; i++) {
+		if (i == 0) {
+			tempArray[i] = chartData['overall'][i];
+		} else {
+			var value = null;
+			if (chartData['overall'][i][1] !== null) {
+				value = 60;
+			}
+				
+			tempArray[i] = [chartData['overall'][i][0], value];
+		}
+	}
+	
+	var listener = google.visualization.events.addListener(chart, 'ready',
+						  function() {
+						   google.visualization.events.removeListener(listener)
+						   setTimeout(function() {
+							   createLineChart(chartData['overall'], false, 1000)
+						   }, 100);
+						   
+						  });
+	
+	createLineChart(tempArray, true);
+
+	
+	
+	
+}
+
+function clearData() {
+	
+	if (data.getNumberOfRows() > 0) {
+		var numRows = data.getNumberOfRows()
+		data.removeRows(0, (numRows))
+	}
+	
+}
+
+/**
+ * create line chart
+ * @params (initial => inital load of chart? (boolean),
+ *			animation => (optional) duration for animation transition)
+ */
+function createLineChart(dataArray, initial, animation)
+{
+	
+	clearData();
+	
+	for (i = 0; i < dataArray.length; i++) {
+		if (i == 0) {
+			// First array, columns
+			if (initial) {
+				data.addColumn('string', dataArray[i][0]);
+				data.addColumn('number', dataArray[i][1]);
+			} else {
+				data.removeColumn(1);
+				data.addColumn('number', dataArray[i][1]);
+			}
+			
+		} else {
+			// Not first array, rows
+			data.addRow(dataArray[i]);
+			
+		}
+	}
+	
+	if (typeof animation == 'undefined') {
+		animation = 600;
+	}
+		
+    	//data = google.visualization.arrayToDataTable(dataArray);
+
+        var options = {
+		  backgroundColor: '#222',
+		  chartArea:{left:50,top:15,width:"100%",height:"80%"},
+		  colors:['#58bf12'],
+		  fontName: 'Futura-Heavy',
+		  hAxis: {minorGridlines: {color:'#000'},
+		  		  textStyle: {color: '#666',
+				  			  fontSize: 14},
+				  slantedText: true,
+				  slantedTextAngle: 30},
+		  isHtml: true,
+		  lineWidth: 4,
+		  pointSize: 8,
+		  animation:{duration: animation,
+					 easing: 'out'},
+		  tooltip: {textStyle: {color: '#58bf12', 
+		  						fontName: 'Futura-Heavy'}, 
+		  			showColorCode: false},
+		  legend: {position: 'none'},
+		  vAxis: {gridlines: {color: '#3f3f3f'},
+		  		  minorGridlines: {color:'#3f3f3f',
+		  					  	   count: 0},
+		  		  textStyle: {color: '#666',
+				  			  fontSize: 14},
+				  baselineColor: '#3f3f3f',
+				  maxValue: 100,
+				  minValue: 60
+				  },
+		  
+        };
+
+        //chart = new google.visualization.LineChart(document.getElementById('chart')); 
+        chart.draw(data, options);
+}
+
 
 /**
  * set width of rating back

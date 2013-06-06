@@ -153,4 +153,113 @@ class Application_Model_SportsMapper extends Application_Model_MapperAbstract
 		
 		return $result->toArray();
 	}
+	
+	/**
+	 * get user's old data for sport including total games played
+	 */
+	public function getUserSportData($userID, $sportID)
+	{
+		$table = $this->getDbTable();		
+		$select = $table->select();
+		$select->setIntegrityCheck(false);
+		
+		// Total games
+		$select->from(array('oug' => 'old_user_games'),
+					  array('COUNT(oug.oldUserGameID) as totalGames'))
+			   ->join(array('og' => 'old_games'),
+			   		  'og.oldGameID = oug.oldGameID',
+					  array(''))
+			   ->where('og.sportID = ?', $sportID)
+			   ->where('oug.userID = ?', $userID);
+			   
+		$result = $table->fetchRow($select);
+		
+		$returnArray = array();
+		$returnArray['totalGames'] = $result['totalGames'];
+		
+		
+		// Total ratings
+		$select = $table->select();
+		$select->setIntegrityCheck(false);
+		
+		$select->from(array('ur' => 'user_ratings'),
+					  array('COUNT(ur.userRatingID) as totalRatings'))
+			   ->where('ur.givingUserID = ?', $userID)
+			   ->where('ur.sportID = ?', $sportID);
+			   
+		$result = $table->fetchRow($select);
+		$returnArray['totalRatings'] = $result['totalRatings'];
+		
+		
+		// Most played with player
+		$select = $table->select();
+		$select->setIntegrityCheck(false);
+		
+		$select->from(array('oug' => 'old_user_games'),
+					  array('oug.userID, COUNT(oug.userID) as times'))
+			   ->join(array('u' => 'users'),
+			   		  'u.userID = oug.userID',
+					  array('u.firstName',
+					  		'u.lastName'))
+			   ->where('oug.oldGameID IN (SELECT oug.oldGameID FROM old_user_games oug
+			   								INNER JOIN old_games og ON og.oldGameID = oug.oldGameID
+											WHERE oug.userID = "' . $userID . '"
+												AND og.sportID = "' . $sportID . '")')
+			   ->where('oug.userID != ?', $userID)
+			   ->group('oug.userID')
+			   ->order('COUNT(oug.userID) DESC')
+			   ->limit('3');
+			   
+		$results = $table->fetchAll($select);
+		
+		if (count($results) == 0) {
+			$returnArray['mostPlayer'][]['name'] = false;
+		} else {
+			foreach ($results as $result) {
+				if (!$result) {
+					continue;
+				} else {
+					$returnArray['mostPlayer'][] = array('name' => ucwords($result['firstName']) . ' ' . ucwords($result['lastName'][0]),
+														 'times' => $result['times']);
+					
+				}
+			}
+		}
+		
+		// Number of different players
+		/*
+		$select = $select2 = $table->select();
+		$select->setIntegrityCheck(false);
+		$select2->setIntegrityCheck(false);
+		
+		$select2->from(array('oug' => 'old_user_games'),
+					   array('COUNT(*) as times'))
+			    ->where('oug.oldGameID IN (SELECT oldGameID FROM old_user_games WHERE userID = "' . $userID . '")')
+			    ->where('oug.userID != ?', $userID)
+			    ->group('oug.userID')
+			    ->order('COUNT(oug.oldUserGameID) DESC')
+			    ->limit('1');
+		*/
+		
+		$select = "SELECT COUNT(*) as players
+					FROM (SELECT '1' 
+							FROM `old_user_games` AS `oug`
+							INNER JOIN old_games og ON oug.oldGameID = og.oldGameID
+							WHERE (oug.oldGameID IN (SELECT oldGameID FROM old_user_games WHERE userID = '" . $userID . "')) 
+								AND (oug.userID != '1')
+								AND og.sportID = '" . $sportID . "' 
+							GROUP BY `oug`.`userID` 
+							ORDER BY COUNT(oug.oldUserGameID) DESC) t";
+						
+		$db = Zend_Db_Table::getDefaultAdapter();
+		
+		$result = $db->fetchRow($select);
+		
+		$returnArray['totalPlayers'] = $result['players'];
+
+		
+		return $returnArray;
+
+			
+	}
 }

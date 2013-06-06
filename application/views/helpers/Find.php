@@ -171,7 +171,7 @@ class Application_View_Helper_Find
 			$matchImg = '<img class="left" src="/images/global/canceled.png" tooltip="This game has been canceled. Reason: ' . $match->getCancelReason(true) . '"/>';
 		} else {
 			$matchImg = "<img src='" . $match->getMatchImage() . "' tooltip='" . $match->getMatchDescription() . "' class='left find-result-match-img'/>" 
-					  . ($userInGame ? "<p class='left find-results-joined smaller-text green'> You are playing!</p>" : '');
+					  . ($userInGame ? "<p class='left find-results-joined smaller-text green'> You're playing!</p>" : '');
 
 			
 		}

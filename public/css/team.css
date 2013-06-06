@@ -146,6 +146,7 @@
 
 .save-button,.delete-button {
 	margin: .3em 0 ;
+	padding-bottom: .1em;
 }
 
 .delete-button {

@@ -100,7 +100,7 @@ echo $this->placeholder('absolute')->captureEnd();
 // Narrow left column
 $this->placeholder('narrowColumn')->captureStart();
 
-if ($this->userInGame) {
+//if ($this->userInGame) {
 	// User is attending, show quick stats
 	if ($this->gameOn) {	
 		echo "<div class='green-back white heavy narrow-overlay-container dropshadow'>" . $this->totalPlayers . " " . ($this->totalPlayers == 1 ? 'player' : 'players') . "</div>";
@@ -109,9 +109,15 @@ if ($this->userInGame) {
 			 . $this->playersNeeded  . " needed
 			 </div>";
 	}
-}
+//}
 
 echo "<img src='" . $this->game->getProfilePic('large', 'parks') . "' class='rounded-corners narrow-column-picture dropshadow'/>";
+
+if ($this->game->isRecurring()) {
+	// Recurring game, show historical data
+	echo "<a class='narrow-column-header clear darkest' href='/games/" . $this->game->gameID . "/stats'>Game Stats</a>";
+}
+
 
 $ratings = array('skill', 'sportsmanship', 'attendance');
 

@@ -848,7 +848,8 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 					 LEFT JOIN `teams` AS `t` ON t.teamID = nl.teamID
 					 LEFT JOIN `user_ratings` AS `ur` ON ur.userRatingID = nl.ratingID 
 					 WHERE ((nl.receivingUserID = " . $userID . ") OR
-					 	(nl.actingUserID =  " . $userID . " AND n.action = 'friend' AND n.type IS NULL) ";
+					 	(nl.actingUserID =  " . $userID . " AND ((n.action = 'friend' AND n.type IS NULL)
+							OR (n.action = 'join' AND n.type = 'team'))) "; // include case when user requests to join team and is accepted, notify user they were accepted
 		
 		$counter = 0;
 		$success = false;
@@ -1091,6 +1092,7 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 		$sql = "SELECT `ug`.*, `u`.* 
 					FROM `user_games` AS `ug` 
 					INNER JOIN `users` AS `u` ON ug.userID = u.userID 
+					INNER JOIN `user_sports` AS `us` ON us.sportID = '" . $game->sportID . "' AND us.userID = ug.userID
 					WHERE (ug.gameID = '53') 
 						AND (u.fake != 1) 
 						AND u.userID != '" . $userID . "'

@@ -121,13 +121,14 @@ abstract class Application_Model_MapperAbstract
 
 	}
 	
-	public function delete($savingClass) {
+	public function delete($savingClass) 
+	{
 		if ($savingClass->getDbTable()) {
 			// dbTable is set
 			$this->setDbTable($savingClass->getDbTable());
 		}
 		
-		$table   = $this->getDbTable();
+		$table = $this->getDbTable();
 
 		$where = $table->getAdapter()->quoteInto($savingClass->_primaryKey . ' = ?', $savingClass->_attribs[$savingClass->_primaryKey]);
 		
@@ -201,7 +202,7 @@ abstract class Application_Model_MapperAbstract
 									)
 								)
 							) ASC')
-			   ->limit('12');
+			   ->limit(20);
 		
 		$results = $table->fetchAll($select);
 		

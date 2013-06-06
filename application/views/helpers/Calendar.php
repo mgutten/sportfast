@@ -246,14 +246,14 @@ class Application_View_Helper_Calendar
 						$day = $nextMonthDay;
 						$nextMonthDay++;
 						$class .= ' calendar-next-month';
-						if ($nextMonthDay == 2) {
+						//if ($nextMonthDay == 2) {
 							// Only increase month once
 							$month = $month + 1;
 							if ($month == 13) {
 								$month = 1;
 							}
 							$month = ($month <= 9 ? '0' . $month : $month);
-						}
+						//}
 
 					}
 					
@@ -352,7 +352,7 @@ class Application_View_Helper_Calendar
 				
 				//if we are dealing with a blank day, do not 
 				//increment our running day var $c
-				if($blank === true)
+				if ($blank === true)
 					continue;
 
 				$c++;

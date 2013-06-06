@@ -61,6 +61,11 @@ class Application_Model_Sport extends Application_Model_ModelAbstract
 		return $this->_attribs['skillCurrent'];
 	}
 	
+	public function getUserSportData($userID)
+	{
+		return $this->getMapper()->getUserSportData($userID, $this->sportID);
+	}
+	
 	public function getSportIDByName($name)
 	{
 		return $this->getMapper()->getForeignID('Application_Model_DbTable_Sports', 'sportID', array('sport = "' . $name . '"'));
@@ -81,17 +86,8 @@ class Application_Model_Sport extends Application_Model_ModelAbstract
 			return $this->_attribs['overall'];
 		}
 		
-		$weight = array('sportsmanship' => .1,
-						'attendance'	=> .1,
-						'skillCurrent'	=> .8);
-		
-		$sportsmanship = $weight['sportsmanship'] * $this->sportsmanship;
-		$attendance    = $weight['attendance'] * $this->attendance;
-		$skill		   = $weight['skillCurrent'] * $this->skillCurrent;
-		
-		$overall = $sportsmanship + $attendance + $skill;
-		
-		return ceil($overall);
+		return $this->ratings->getOverall($this->sportsmanship, $this->attendance, $this->skillCurrent);
+
 	}
 	
 	

@@ -420,6 +420,10 @@ div.selected-green,img.selected-green,p.selected-green {
 	border: 1px solid #ccc;
 }
 
+.narrow-column-header:hover {
+	text-decoration:none;
+}
+
 .narrow-column-header-selected {
 	background:#C6C6C6;
 }
@@ -950,6 +954,11 @@ input[type=text],input[type=password],textarea {
 	float:left;
 	width: 13em;
 	height: 1.4em;
+}
+
+input.input-fail, div.input-fail, textarea.input-fail {
+	background: #EDA9A9;
+	border: 1px solid #C60000;
 }
 
 .input-separator {

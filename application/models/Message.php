@@ -5,9 +5,11 @@ class Application_Model_Message extends Application_Model_ModelAbstract
 	protected $_mapperClass = 'Application_Model_MessagesMapper';
 	
 	protected $_attribs     = array('teamMessageID' => '',
+									'gameMessageID' => '',
 									'messageID'		=> '',
 									'teamID'		=> '',
 									'groupID'		=> '',
+									'gameID'		=> '',
 									'userID'		=> '',
 									'message'		=> '',
 									'dateHappened'  => '',
@@ -34,6 +36,8 @@ class Application_Model_Message extends Application_Model_ModelAbstract
 		} elseif ($this->isUserMessage()) {
 			$this->_dbTable = 'Application_Model_DbTable_Messages';
 			$this->_primaryKey = 'messageGroupID';
+		} elseif ($this->isGameMessage()) {
+			$this->setGameMessage();
 		}
 		
 		return parent::save();
@@ -51,6 +55,14 @@ class Application_Model_Message extends Application_Model_ModelAbstract
 	public function isUserMessage()
 	{
 		if ($this->hasValue('messageGroupID')) {
+			return true;
+		}
+		return false;
+	}
+	
+	public function isGameMessage()
+	{
+		if ($this->hasValue('gameMessageID')) {
 			return true;
 		}
 		return false;
@@ -123,6 +135,12 @@ class Application_Model_Message extends Application_Model_ModelAbstract
 	{
 		$date = $this->dateHappened;
 		return parent::getTimeFromNow($date, $maxDays);
+	}
+	
+	public function setGameMessage()
+	{
+		$this->_dbTable = 'Application_Model_DbTable_GameMessages';
+		$this->_primaryKey = 'gameMessageID';
 	}
 
 	
