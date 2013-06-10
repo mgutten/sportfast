@@ -168,11 +168,13 @@ class Application_Model_Games extends Application_Model_TypesAbstract
 			$date = strtotime($game->date);
 			if ($date < time()) {
 				// Previous game
-				$previousGames[] = $game;
+				$previousGames[$date] = $game;
 			}
 		}
 		
-		return $previousGames;
+		
+		
+		return array_reverse($previousGames);
 	}
 	
 									

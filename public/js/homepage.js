@@ -3,7 +3,7 @@ var fadeInterval;
 
 $(function()
 {		
-	setFadeInterval(4000);
+	setFadeInterval(5000);
 								
 	$('.homepage-large-img-dot').click(function()
 	{

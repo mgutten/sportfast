@@ -36,25 +36,27 @@ class Application_View_Helper_Homepage
 		$output   .= $this->homepageDescriptionContainer($textArray);
 		
 		$textArray = array('image'	=> 'ratings',
-						   'header' => "See how you stack up against your area's best.",
+						   'header' => "Get rated and track your improvement.",
 						   'text'   => "Create, find, and challenge other teams and players in your league.  Maybe you are looking for a 
 						   				teammate to fill a gap, or just to get out and play a game you haven't played in years.  We are here for you.");
 										
 		$output   .= $this->homepageDescriptionContainer($textArray);
 		
-		$textArray = array('image'	=> '',
+		$textArray = array('image'	=> 'location',
+						   'header' => "Discover local parks and venues.",
+						   'text'   => "Create, find, and challenge other teams and players in your league.  Maybe you are looking for a 
+						   				teammate to fill a gap, or just to get out and play a game you haven't played in years.  We are here for you.");
+										
+		$output   .= $this->homepageDescriptionContainer($textArray);
+		
+		$textArray = array('image'	=> 'clipboard',
 						   'header' => "Organize your pre-existing games and teams.",
 						   'text'   => "Create, find, and challenge other teams and players in your league.  Maybe you are looking for a 
 						   				teammate to fill a gap, or just to get out and play a game you haven't played in years.  We are here for you.");
 										
 		$output   .= $this->homepageDescriptionContainer($textArray);
 		
-		$textArray = array('image'	=> '',
-						   'header' => "Discover and rate local parks and venues.",
-						   'text'   => "Create, find, and challenge other teams and players in your league.  Maybe you are looking for a 
-						   				teammate to fill a gap, or just to get out and play a game you haven't played in years.  We are here for you.");
-										
-		$output   .= $this->homepageDescriptionContainer($textArray);
+		
 				
 		return $output;
 	}

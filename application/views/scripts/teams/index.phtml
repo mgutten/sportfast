@@ -177,7 +177,7 @@ if ($this->fail) {
 			
 	}
 
-	if ($this->team->sportupCreated && !$this->userOnTeam && $this->topAlert) {
+	if ($this->team->systemCreated && !$this->userOnTeam && $this->topAlert) {
 		// Show alert box
 		$content = "<p class='white heavy left width-100 center'>This is a Sportup-created " . $this->team->sport . " team.</p>";
 		echo $this->topAlert('sportup-team', $content);
@@ -310,7 +310,7 @@ echo "<span id='team-details'
 			$class = '';
 			$text = 'Join';
 			$id    = 'join-button';
-			if (!$this->team->sportupCreated && $this->hasCaptain) {
+			if (!$this->team->systemCreated && $this->hasCaptain) {
 				// Not sportup created team, allow any user to join without request
 				$text = 'Request to Join';
 				$id   = 'request-join-button';

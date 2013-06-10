@@ -57,6 +57,22 @@ class UsersController extends Zend_Controller_Action
 		
     }
 	
+	public function playersAction()
+	{
+		$this->view->narrowColumn = 'right';
+		
+		$userID = $this->getRequest()->getParam('id');
+		
+		$user = new Application_Model_User();
+		$user->getUserBy('u.userID', $userID);
+		
+		$user->getUserFriends();
+		
+		$this->view->currentUser = $user;
+		
+		$this->view->friends = $user->players;		
+	}
+	
 	public function uploadAction()
 	{
 		$this->permission();

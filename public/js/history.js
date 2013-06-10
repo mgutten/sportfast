@@ -214,7 +214,7 @@ function createPieChart()
 				  baselineColor: '#3f3f3f',
 				  minValue: 0
 				  },
-		  legend: {textStyle:{color: '#222'},
+		  legend: {textStyle:{color: '#8d8d8d'},
 		  		   alignment: 'center'}
 		  
         };

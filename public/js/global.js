@@ -1281,10 +1281,11 @@ function populateSearchResults(results)
 											   'width': width});
 	
 	var output = '';
-	
-	if (results.length < 1) {
+
+	if (!results) {
 		// No results
-		output += "<div class='header-search-result dark-back medium'>No results found</div>";
+		
+		output += "<div class='header-search-result dark-back medium default'>No results found</div>";
 	} else {
 		// Results found
 	
@@ -1680,7 +1681,7 @@ function alignAbsolute(ele)
 		// No holder element existing
 		return;
 	}
-	var top = holder.position().top;
+	var top = holder.offset().top;
 	
 	ele.css('top',top);
 }

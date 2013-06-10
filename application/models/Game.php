@@ -244,7 +244,7 @@ class Application_Model_Game extends Application_Model_ModelAbstract
 		if (!$this->hasValue('backupParkName')) {
 			return 'None';
 		} else {
-			return $this->_attribs['backupParkName'];
+			return ucwords($this->_attribs['backupParkName']);
 		}
 	}
 	

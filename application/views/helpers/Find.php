@@ -233,14 +233,19 @@ class Application_View_Helper_Find
 	 * @params ($match => game model,
 	 *			$number => # of match in list)
 	 */
-	public function createPlayer($match, $number)
+	public function createPlayer($match, $number = true)
 	{
 		$sports = $match->sports;
 		$sport = reset($sports);
+		
+		if ($number) {
+			$number = "<p class='find-result-number white green-back heavy'>" . $number . "</p>";
+		}
+		
 		$output  = $this->createOuterStart($match->userID, 'users');
 		$output .=		"<div class='left find-result-img-container'>";
 		$output .=			"<img src='" . $match->getProfilePic('medium') . "' class='left'/>";
-		$output .=			"<p class='find-result-number white green-back heavy'>" . $number . "</p>";
+		$output .=			$number;
 		$output .= 		"</div>";
 		$output .=		"<div class='left find-result-left-container'>";
 		$output .=			"<p class='left heavy largest-text darkest'>" . $match->shortName . "</p>";
@@ -249,17 +254,21 @@ class Application_View_Helper_Find
 		$output .=			"<div class='hidden clear hover'><p class='clear medium'>" . $match->age . " years old</p>";	
 		$output .=			"<p class='clear medium'>" . $match->getHeightInFeet() . ' ' . $match->weight . "lb</p></div>";	
 		$output .= 		"</div>";
-		$output .=		"<div class='right find-player-right-container'>";
-		$output .=			"<div class='sport-holder'><p class='left width-100 center medium smaller-text hidden hover'>" . ucwords($sport->sport) . "</p></div>";
-		$output .=			"<p class='width-100 find-player-overall white largest-text heavy left center medium-background'>" . $sport->overall . "</p>";
-		$output .=			"<p class='find-player-lower white larger-text  clear center medium-background' tooltip='Skill'>" . $sport->skillCurrent . "</p>";
-		$output .=			"<p class='find-player-lower white larger-text  left center medium-background' tooltip='Sportsmanship'>" . $sport->sportsmanship . "</p>";
-		$output .=			"<p class='find-player-lower white larger-text  left center medium-background' tooltip='Attendance'>" . $sport->attendance . "</p>";
-		$output .=		"</div>";
-		
-		if ($sport->getFormat('league')->hasValue('format')) {
-			$output .=	"<img src='/images/find/magnifying.png' class='right find-looking-for' tooltip='Looking for a league team.' />"; 
+		if ($sport) {
+			$output .=		"<div class='right find-player-right-container'>";
+			$output .=			"<div class='sport-holder'><p class='left width-100 center medium smaller-text hidden hover'>" . ucwords($sport->sport) . "</p></div>";
+			$output .=			"<p class='width-100 find-player-overall white largest-text heavy left center medium-background'>" . $sport->overall . "</p>";
+			$output .=			"<p class='find-player-lower white larger-text  clear center medium-background' tooltip='Skill'>" . $sport->skillCurrent . "</p>";
+			$output .=			"<p class='find-player-lower white larger-text  left center medium-background' tooltip='Sportsmanship'>" . $sport->sportsmanship . "</p>";
+			$output .=			"<p class='find-player-lower white larger-text  left center medium-background' tooltip='Attendance'>" . $sport->attendance . "</p>";
+			$output .=		"</div>";
+			
+			if ($sport->getFormat('league')->hasValue('format')) {
+				$output .=	"<img src='/images/find/magnifying.png' class='right find-looking-for' tooltip='Looking for a league team.' />"; 
+			}
 		}
+		
+		
 		$output .= "</a>";
 		
 		return $output;

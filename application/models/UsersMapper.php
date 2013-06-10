@@ -409,12 +409,18 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 		
 		$select->setIntegrityCheck(false);
 		$select->from(array('f' => 'friends'))
-			   ->where('f.userID1 = "' . $savingClass->userID . '" OR  f.userID2 = "' . $savingClass->userID . '"');
+			   ->join(array('u' => 'users'),
+			   		  '(u.userID = f.userID1 OR u.userID = f.userID2) AND u.userID != "' . $savingClass->userID . '"')
+			   ->join(array('c' => 'cities'),
+			   		  'u.cityID = c.cityID')
+			   ->where('f.userID1 = "' . $savingClass->userID . '" OR  f.userID2 = "' . $savingClass->userID . '"')
+			   ->where('u.active = 1');
+
 		
 		$results = $table->fetchAll($select);
 		
 		foreach ($results as $result) {
-			if ($result->userID1 == $savingClass->userID) {
+			/*if ($result->userID1 == $savingClass->userID) {
 				// 1 is current user, save 2
 				$userID = $result->userID2;
 				$name = $result->userName2;
@@ -426,12 +432,10 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 			$nameParts = explode(' ', $name);
 			$firstName = $nameParts[0];
 			$lastName = $nameParts[1];
+			*/
 			
-			$array = array('userID' => $userID,
-						   'firstName' => $firstName,
-						   'lastName'  => $lastName);
-			
-			$savingClass->players->addUser($array);
+			$user = $savingClass->players->addUser($result);
+			$user->getCity()->setAttribs($result);
 		}
 
 		return $savingClass;
@@ -916,8 +920,11 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 						   IF(f.userID1 = '" . $userID . "', f.userName2, f.userName1) AS `name`, 
 						  'users' AS `prefix`,
 						  '' AS picture 
-						FROM `friends` AS `f` 
-					   WHERE (f.userID1 = '" . $userID . "' OR f.userID2 = '" . $userID . "')";
+						FROM `friends` AS `f`
+						INNER JOIN `users` u1 ON f.userID1 = u1.userID
+						INNER JOIN `users` u2 ON f.userID2 = u2.userID
+					   WHERE (u1.active = 1 AND u2.active = 1) 
+					   		AND (f.userID1 = '" . $userID . "' OR f.userID2 = '" . $userID . "')";
 					   
 		$teams  = "SELECT `ut`.`teamID` AS `id`, 
 						  `t`.`teamName` AS `name`, 

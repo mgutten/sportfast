@@ -18,13 +18,16 @@
 }
 
 #history-stats-container {
-
 	width: 33.333%;
+	padding-top: 1em;
+}
+
+.history-stat-container {
+	margin-left: 5em;
 }
 
 .history-stat-header {
 	margin-bottom: -.3em;
-	width: 8em;
 }
 
 .history-option {

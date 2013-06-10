@@ -257,7 +257,7 @@ class SignupController extends Zend_Controller_Action
 					
 				}
 				
-				$user->save();
+				$user->save(true);
 				
 				$subject  = 'Sportup Account Verification';
 				$message  = '<html>

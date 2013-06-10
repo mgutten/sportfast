@@ -1168,7 +1168,7 @@ class AjaxController extends Zend_Controller_Action
 			if ($type == 'game') {
 				$model->canceled = '1';
 			}
-			$model->remove   = '1';
+			$model->remove   = date("Y-m-d H:i:s", strtotime('+1 week'));
 			
 			$model->save();
 		}

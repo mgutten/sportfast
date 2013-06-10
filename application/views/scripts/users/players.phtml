@@ -1,0 +1,29 @@
+<?php
+/** 
+ * controller => users
+ * action => players
+ */
+$this->headTitle($this->currentUser->shortName . "'s Players");
+$this->headLink()->prependStylesheet($this->baseUrl() . '/css/user.css');
+$this->headScript()->prependFile($this->baseUrl() . '/js/user.js');
+?>
+
+<?php
+$this->placeholder('narrowColumn')->captureStart();
+
+echo "<img src='" . $this->currentUser->getProfilePic('large') . "' class='left narrow-column-picture dropshadow rounded-corners'/>";
+
+$this->placeholder('narrowColumn')->captureEnd();
+?>
+
+<header class='jumbo-text darkest heavy clear'>
+<?php echo count($this->friends->getAll()) . ' ' . (count($this->friends->getAll()) == 1 ? 'player' : 'players');?>
+</header>
+
+
+<?php
+echo "<div class='width-100 larger-margin-top clear'>";
+foreach ($this->friends->getAll() as $player) {
+	echo $this->find()->createPlayer($player, false);
+}
+echo "</div>";

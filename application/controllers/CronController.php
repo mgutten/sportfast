@@ -9,6 +9,11 @@ class CronController extends Zend_Controller_Action
         /* Initialize action controller here */
     }
 	
+	public function getMapper()
+	{
+		return new Application_Model_CronMapper();
+	}
+	
 	public function preDispatch()
 	{
 		$pass = $this->getRequest()->getParam('pass');
@@ -21,12 +26,77 @@ class CronController extends Zend_Controller_Action
         
     }
 	
+	/**
+	 * move old games and old teams to "old_" tables, also reset recurring games
+	 * OFTEN: PER HALF HOUR
+	 */
 	public function moveTypeToOldAction()
 	{
-		$mapper = new Application_Model_CronMapper();
+		$mapper = $this->getMapper();
 		
 		$mapper->moveGamesToOld();
-		$mapper->moveTeamsToOld();
+		//$mapper->moveTeamsToOld();
+	}
+	
+	/**
+	 * delete temp pictures from signup/upload pages 
+	 * OFTEN: PER WEEK
+	 */
+	public function removeTempPicturesAction()
+	{
+		$files = glob(PUBLIC_PATH . '/images/tmp/profile/pic/*'); // get all file names
+		foreach($files as $file){ // iterate files
+		  if(is_file($file))
+			unlink($file); // delete file
+		}
+	}
+	
+	/**
+	 * update users age based on birthday
+	 * OFTEN: PER DAY
+	 */
+	public function updateAgeAction()
+	{
+		$mapper = $this->getMapper();
+		
+		$mapper->updateAge();
+	}
+	
+	/**
+	 * remove fake users from games
+	 * OFTEN: PER DAY
+	 */
+	public function removeFakeUsersAction()
+	{
+		$mapper = $this->getMapper();
+		
+		$mapper->removeFakeUsers();
+	}
+	
+	/**
+	 * remove inactive types
+	 * OFTEN: PER WEEK
+	 */
+	public function removeInactiveTypesAction()
+	{
+		$mapper = $this->getMapper();
+		
+		$mapper->removeInactiveUsers();
+		$mapper->removeInactiveTeams();
+	}
+	
+	/**
+	 * warn inactive types
+	 * OFTEN: PER WEEK
+	 */
+	public function warnInactiveTypesAction()
+	{
+		$mapper = $this->getMapper();
+		
+		$inactive = $mapper->getInactiveUsers();
+		
+		return $this->_forward('warn-inactive', 'mail', null, array('inactive' => $inactive));
+		//$mapper->removeInactiveTeams();
 	}
 	
 	public function testPassword($password)

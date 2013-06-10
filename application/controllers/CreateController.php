@@ -224,6 +224,7 @@ class CreateController extends Zend_Controller_Action
 		$team->cityID = $this->view->user->city->cityID;
 		$team->city   = $this->view->user->city->city;
 		$team->picture = str_replace('.jpg','',$post['avatar']);
+		$team->setCurrent('lastActive');
 				
 		if (!empty($post['ageLimitCheckbox'])) {
 			// Limit age was checked

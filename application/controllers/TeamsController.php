@@ -89,13 +89,16 @@ class TeamsController extends Zend_Controller_Action
 			$postForm->setAction('/teams/' . $team->teamID);
 			$postForm->login->setName('submitPostMessage');
 			$this->view->postForm = $postForm;
+			
+			$team->setCurrent('lastActive');
+			$team->save(false);
 		}
 		
 		$this->view->totalPlayers = $team->totalPlayers;
 		$this->view->rosterLimit  = $team->rosterLimit;
 		$this->view->newsfeed	  = $team->messages->getTeamMessages($team->teamID);
 		
-		if ($team->sportupCreated && !$userOnTeam) {
+		if ($team->systemCreated && !$userOnTeam) {
 			$this->view->topAlert = true;
 		}
 		

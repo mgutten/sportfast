@@ -173,6 +173,7 @@ class Application_Model_Park extends Application_Model_ModelAbstract
 		return ucwords($this->_attribs['parkName']);
 	}
 	
+	
 	public function hasStash()
 	{
 		if (!empty($this->_attribs['stash'])) {

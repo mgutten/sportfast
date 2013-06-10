@@ -122,7 +122,7 @@ abstract class Application_Model_ModelAbstract
 			$post = ($time == 1 ? 'day ago' : 'days ago');
 		}  else {
 			// > 6 days, show date
-			$time = date ('l, M j',$date);
+			$time = date ('F j',$date);
 			$post = '';
 		}
 		
@@ -432,7 +432,7 @@ abstract class Application_Model_ModelAbstract
 	 */
 	public function save()
 	{
-
+		
 		$this->getMapper()->save($this);
 		return $this;
 	}

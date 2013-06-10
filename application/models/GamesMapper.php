@@ -552,6 +552,33 @@ class Application_Model_GamesMapper extends Application_Model_MapperAbstract
 		$date = DateTime::createFromFormat('Y-m-d H:i:s', $result['firstGame']);
 		$returnArray['firstGame'] = $date;
 		
+		// Get subscribers
+		$select = $table->select();
+		$select->setIntegrityCheck(false);
+		
+		$select->from(array('gs' => 'game_subscribers'),
+					  array('COUNT(gs.userID) as totalSubscribers'))
+			   ->where('gs.gameID = ?', $gameID);
+			   
+		$result = $table->fetchRow($select);
+		
+		$returnArray['totalSubscribers'] = $result['totalSubscribers'];
+		
+		// Get subscribers
+		$select = $table->select();
+		$select->setIntegrityCheck(false);
+		
+		$select->from(array('oug' => 'old_user_games'),
+					  array('COUNT(oug.userID) as count'))
+			   ->join(array('u' => 'users'),
+			   		  'u.userID = oug.userID',
+					  array('u.firstName', 'u.lastName'))
+			   ->where('oug.gameID = ?', $gameID)
+			   ->order('COUNT(oug.userID) DESC');
+			   
+		$result = $table->fetchRow($select);
+		
+		$returnArray['mostRegular'] = ucwords($result['firstName']) . ' ' . ucwords($result['lastName'][0]);
 		
 		return $returnArray;
 	}

@@ -31,14 +31,19 @@ class Application_Model_Team extends Application_Model_ModelAbstract
 									'maxSkill'	   => '',
 									'minAge'	   => '',
 									'maxAge'	   => '',
-									'sportupCreated' => '',
+									'systemCreated' => '',
 									'leagues'	   => '',
 									'picture'	   => '',
-									'remove'	   => ''
+									'remove'	   => '',
+									'lastActive'   => ''
 									);
 									
 	protected $_primaryKey = 'teamID';
 
+	public function save($loopSave = false) 
+	{
+		return $this->getMapper()->save($this, $loopSave);
+	}
 	
 	public function getProfilePic($size, $id = false, $type = 'teams') 
 	{

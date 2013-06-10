@@ -226,6 +226,67 @@ class MailController extends Zend_Controller_Action
 		}
 			
 	}
+	
+	/**
+	 * send email to warn of impending removal for inactive types
+	 */
+	public function warnInactiveAction()
+	{
+		$inactive = $this->getRequest()->getParam('inactive');
+		
+		foreach ($inactive as $email) {
+			$subject  = 'Account Inactivity';
+			$message  = (isset($email['firstName']) ? $this->buildWarnInactiveUserMessage($email) : $this->buildWarnInactiveTeamMessage($email));
+			$headers  = "MIME-Version: 1.0" . "\r\n";
+			$headers .= "Content-type: text/html; charset=iso-8859-1" . "\r\n";
+			$headers .= "From: support@sportup.com\r\n";	 
+			$headers .= "Reply-To: support@sportup.com\r\n";			
+					
+			mail($email['username'], $subject, $message, $headers);
+		}
+			
+	}
+	
+	/**
+	 * build message for warnInactive action
+	 * @params ($array => array of user details (username, userID, firstName, lastActive))
+	 */
+	public function buildWarnInactiveUserMessage($array)
+	{
+		$output = '<html>
+						<head>
+						</head>
+						<body>';
+						
+		$output .= "Hey " . ucwords($array['firstName']) . ",";
+		
+		$output .= "<br><br><p>We noticed you haven't visited our site in a while.  While we're sad, we understand.  However, 
+					to keep our database up-to-date, we deactivate inactive users after a period of 60 days.</p>";
+					
+		$output .= "<br><br><p><span style='font-weight: bold;font-size: 16px'>
+					Your account has been inactive for " . $array['lastActive'] . " days.  If you wish to keep your 
+					account active, please <a href='http://www.sportup.com/login'>login</a> within the next couple days.</span>";
+					
+		$output .= "<br><br><p>If you don't mind your account becoming inactive, then you do not need to do anything.</p>";
+		
+		$output .= "<br><br>Thanks!";
+		
+		$output .= $this->supportSignature();
+			
+						
+		$output .=		'</body>
+					 </html>'; 
+					 
+		
+		return $output;
+	}
+	
+	public function supportSignature()
+	{
+		$output  = "<br><br><p>Sportup Support Team</p>";
+		$output .= "<br><p style='font-size: 11px'>support@sportup.com</p>";
+	}
+		
 
 }
 

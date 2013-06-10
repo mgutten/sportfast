@@ -44,6 +44,7 @@ class Application_Model_User extends Application_Model_ModelAbstract
 		$this->getMapper()->save($this, $loopSave);
 		return $this;
 	}
+
 	
 	/** 
 	 * actions to take to log user in and store all necessary info
@@ -426,6 +427,14 @@ class Application_Model_User extends Application_Model_ModelAbstract
 		return $this->_attribs['city'];
 	}
 	
+	public function setCity($city)
+	{
+		$this->_attribs['city'] = new Application_Model_City();
+		$this->_attribs['city']->city = $city;
+		
+		return $this;
+	}
+	
 	public function getLocation()
 	{
 		if (empty($this->_attribs['userLocation'])) {
@@ -488,7 +497,8 @@ class Application_Model_User extends Application_Model_ModelAbstract
 		$sport = strtolower($sport);
 		
 		if (isset($this->_attribs['sports'][$sport])) {
-			if (!empty($this->getSport($sport)->sportID)) {
+			
+			if ($this->getSport($sport)->sportID != '') {
 				// Sport is set AND has a sportID (wasn't accidentally set with getSport
 				return true;
 			} else {
@@ -522,7 +532,7 @@ class Application_Model_User extends Application_Model_ModelAbstract
 	public function getLastActiveFromNow()
 	{
 		$date = $this->_attribs['lastActive'];
-		return parent::getTimeFromNow($date, 14);
+		return parent::getTimeFromNow($date, 30);
 	}
 	
 	/**

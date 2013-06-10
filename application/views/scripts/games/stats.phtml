@@ -17,7 +17,7 @@ echo "<img src='" . $this->game->getProfilePic('large', 'parks') . "' class='rou
 echo "<div class='clear larger-margin-top larger-text'>";
 echo	"<p class='clear heavy'>" . $this->game->getGameTitle() . "</p>";
 echo	"<p class='clear'>" . $this->game->gameDate->format('l') . "s at " . $this->game->gameDate->format('ga') . "</p>";
-echo	"<p class='clear light'>" . $this->game->park->parkName . "</p>";
+echo	"<a href='/parks/" . $this->game->park->parkID . "' class='clear light'>" . $this->game->park->parkName . "</a>";
 echo "</div>";
 
 echo "<div class='clear larger-text width-100 light-back' id='history-current-players-container'>";
@@ -47,17 +47,25 @@ $this->placeholder('narrowColumn')->captureEnd();
         <div class='left chart success' id='pie-chart'>
         </div>
         
-        <div class='left chart width-100 stats' id='history-stats-container'>
+        <div class='left chart width-100 stats larger-text' id='history-stats-container'>
             <div class='clear margin-top'>
-                <p class='clear medium history-stat-header'>Total Games</p>
-                <p class='clear jumbo-text darkest heavy'><?php echo $this->history['totalGames'];?></p>
+                <p class='clear darkest history-stat-header' tooltip='Number of games played, successful or not'>Total Games</p>
+                <p class='clear jumbo-text darkest heavy width-100 center'><?php echo $this->history['totalGames'];?></p>
             </div>
-            <div class='left margin-top'>
-                <p class='clear medium history-stat-header'>Most Players</p>
-                <p class='clear jumbo-text darkest heavy'><?php echo $this->history['maxPlayers'];?></p>
+            <div class='left margin-top history-stat-container'>
+                <p class='clear darkest history-stat-header' tooltip='Most players in any game'>Most Players</p>
+                <p class='clear jumbo-text darkest heavy width-100 center'><?php echo $this->history['maxPlayers'];?></p>
             </div>
-            <div class='left margin-top'>
-                <p class='clear medium history-stat-header'>First Game</p>
+            <div class='left margin-top history-stat-container'>
+                <p class='clear darkest history-stat-header' tooltip='Number of current subscribers'>Subscribers</p>
+                <p class='clear jumbo-text darkest heavy width-100 center'><?php echo $this->history['totalSubscribers'];?></p>
+            </div>
+            <div class='clear margin-top'>
+                <p class='clear darkest history-stat-header' tooltip='This player has played in the most games'>Most Regular Player</p>
+                <p class='clear largest-text darkest heavy'><?php echo $this->history['mostRegular'];?></p>
+            </div>
+            <div class='left margin-top history-stat-container'>
+                <p class='clear darkest history-stat-header' tooltip='Date of first game'>First Game</p>
                 <p class='clear largest-text darkest heavy'><?php echo $this->history['firstGame']->format('F d, Y');?></p>
             </div>
             
