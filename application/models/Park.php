@@ -11,7 +11,7 @@ class Application_Model_Park extends Application_Model_ModelAbstract
 									'volleyball'		=> '',
 									'tennis'			=> '',
 									'hours'				=> '',
-									'type'				=> '',
+									'parkType'			=> '',
 									'cost'				=> '',
 									'city'				=> '',
 									'cityID'			=> '',
@@ -20,7 +20,8 @@ class Application_Model_Park extends Application_Model_ModelAbstract
 									'closeTime'			=> '',
 									'ratings'			=> '',
 									'stash'				=> '',
-									'temporary'			=> ''
+									'temporary'			=> '',
+									'specialNotes'		=> ''
 									);
 	
 	
@@ -111,7 +112,7 @@ class Application_Model_Park extends Application_Model_ModelAbstract
 	
 	public function getType()
 	{
-		return ucwords($this->_attribs['type']);
+		return ucwords($this->_attribs['parkType']);
 	}
 	
 	public function getCost($free = false)

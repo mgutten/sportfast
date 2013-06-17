@@ -1050,14 +1050,15 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 		$select = $table->select();
 		$select->setIntegrityCheck(false);
 		
-		$select->from(array('g' => 'games'))
-			   ->join(array('ug' => 'user_games'),
-			   		  'g.gameID = ug.gameID')
-			   ->where('g.date > (now() - INTERVAL 1 WEEK) AND g.date < now()')
-			   ->where('g.canceled = ?', 0)
-			   ->where('ug.userID = ?', $userID)
-			   ->order('g.date desc')
+		$select->from(array('og' => 'old_games'))
+			   ->join(array('oug' => 'old_user_games'),
+			   		  'og.gameID = oug.gameID')
+			   ->where('og.date > (now() - INTERVAL 1 WEEK) AND og.date < now()')
+			   ->where('og.canceled = ?', 0)
+			   ->where('oug.userID = ?', $userID)
+			   ->order('og.date desc')
 			   ->limit(1);
+		
 				 
 		$result = $table->fetchRow($select);
 		
@@ -1077,7 +1078,7 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 			   ->where('ur.gameID = ?', $gameID);
 			   
 		$result = $table->fetchRow($select);
-		
+
 		if ($result) {
 			// Rating was found
 			return false;
@@ -1096,11 +1097,11 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 			   ->where('u.fake != ?', 1);
 		*/
 		// Only get players that user has not rated recently
-		$sql = "SELECT `ug`.*, `u`.* 
-					FROM `user_games` AS `ug` 
-					INNER JOIN `users` AS `u` ON ug.userID = u.userID 
-					INNER JOIN `user_sports` AS `us` ON us.sportID = '" . $game->sportID . "' AND us.userID = ug.userID
-					WHERE (ug.gameID = '53') 
+		$sql = "SELECT `oug`.*, `u`.* 
+					FROM `old_user_games` AS `oug` 
+					INNER JOIN `users` AS `u` ON oug.userID = u.userID 
+					INNER JOIN `user_sports` AS `us` ON (us.sportID = '" . $game->sportID . "' AND us.userID = oug.userID)
+					WHERE (oug.gameID = '" . $game->gameID . "') 
 						AND (u.fake != 1) 
 						AND u.userID != '" . $userID . "'
 						AND u.userID NOT IN (SELECT receivingUserID 
@@ -1109,6 +1110,7 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 													AND dateHappened > NOW() - INTERVAL 1 MONTH
 													AND sportID = '" . $game->sportID . "'
 											)";
+		
 		
 		$db = Zend_Db_Table::getDefaultAdapter();
 		$results = $db->query($sql);

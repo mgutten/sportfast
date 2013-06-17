@@ -77,6 +77,15 @@ class Application_Model_Game extends Application_Model_ModelAbstract
 	}
 	
 	/**
+	 * get all players for the game
+	 * @params ($onlyReal => return only real players? (boolean))
+	 */
+	public function getGamePlayers($onlyReal = false)
+	{
+		return $this->getMapper()->getGamePlayers($this, $onlyReal);
+	}
+	
+	/**
 	 * get history data for chart of subscribe game
 	 * @returns array of game models in order of most recent to least recent
 	 */

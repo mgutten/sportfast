@@ -373,7 +373,7 @@ class UsersController extends Zend_Controller_Action
 				
 			}
 			
-			$sportModel->save();
+			$sportModel->save(true);
 			
 			$user->setUserRating('skill',$sport);
 			$user->setUserRating('attendance',$sport);

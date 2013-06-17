@@ -352,8 +352,17 @@ class Application_Model_Team extends Application_Model_ModelAbstract
 			return false;
 		}
 	}
+	
+	/**
+	 * delete (and move) all of team's games
+	 */
+	public function deleteGames()
+	{
+		$this->getMapper()->moveTeamGames($this->teamID);
 		
-
+		$this->getMapper()->deleteTeamGames($this->teamID);
+	}
+		
 		
 		
 	

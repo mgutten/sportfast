@@ -27,7 +27,7 @@ class Application_Model_Message extends Application_Model_ModelAbstract
 	protected $_dbTable = 'Application_Model_DbTable_TeamMessages';
 	
 	
-	public function save()
+	public function save($loopSave = false)
 	{
 		if ($this->isGroupMessage()) {
 			// Group message, change db table and primary key
@@ -40,7 +40,7 @@ class Application_Model_Message extends Application_Model_ModelAbstract
 			$this->setGameMessage();
 		}
 		
-		return parent::save();
+		return parent::save($loopSave);
 	}
 	
 	

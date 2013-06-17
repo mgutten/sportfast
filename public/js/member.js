@@ -6,6 +6,7 @@ var zoomChanged;
 var paginationClicked;
 
 $(function() {
+	
 	$(document).on('click','.dropdown-menu-option-container', function(e)
 	{
 		// Option has been clicked
@@ -53,8 +54,13 @@ $(function() {
 			// Times section only has one selected
 			if ($(this).index() > 0) {
 				// Only bold first one
-				return
+				return;
 			}
+		}
+		
+		if ($(this).is('.not-selected')) {
+			// php found that user does not want this search parameter for any sport, do not show as selected
+			return;
 		}
 			
 
@@ -239,6 +245,11 @@ function createMarkers()
           	this.setIcon('/images/global/gmap/markers/green.png');
 			index = $.inArray(this,markers);
 			$('.member-game:eq(' + index +')').removeClass('light-green-back');
+        });
+		
+		google.maps.event.addListener(marker, "click", function() {
+			index = $.inArray(this,markers);
+			window.location = $('.member-game:eq(' + index +')').attr('href');
         });
 		
 		if (i > ($('.member-find-lower-inner-container').first().children('.member-game').length) - 1) {

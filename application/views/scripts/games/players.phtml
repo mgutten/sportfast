@@ -8,14 +8,14 @@ $this->headLink()->prependStylesheet($this->baseUrl() . '/css/profile.css');
 $this->headScript()->prependFile($this->baseUrl() . '/js/profile.js');
 ?>
 
-<a href='/games/<?php echo $this->game->gameID;?>' class='left smaller-text medium'>Back to game</a>
+<a href='/games/<?php echo $this->game->gameID;?>' class='left smaller-text medium'>&lt;&lt;Back to game</a>
 
 <div class='width-100 clear' id='player-description-container'>
-    <p class='darkest jumbo-text clear heavy'><?php echo count($this->players);?> <span class='inherit smaller-text'>players</span></p>
+    <p class='darkest jumbo-text clear heavy' tooltip='Total players going'><?php echo $this->game->totalPlayers;?> <span class='inherit smaller-text'>players</span></p>
     
-    <p class='darkest jumbo-text left heavy center'><?php echo $this->game->minPlayers;?> <span class='inherit smaller-text'>needed</span></p>
+    <p class='darkest jumbo-text left heavy center' tooltip='Number of players needed'><?php echo $this->game->minPlayers;?> <span class='inherit smaller-text'>needed</span></p>
     
-    <p class='darkest jumbo-text right heavy'><?php echo $this->timeUntil;?></p>
+    <p class='darkest jumbo-text right heavy' tooltip='Time left until the game starts.'><?php echo $this->timeUntil;?></p>
 </div>
 <div class='clear width-100'>
 <?php

@@ -430,10 +430,10 @@ abstract class Application_Model_ModelAbstract
 	 * save object
 	 * @params (loopSave => loop through child objects and save as well? (boolean))
 	 */
-	public function save()
+	public function save($loopSave = false)
 	{
 		
-		$this->getMapper()->save($this);
+		$this->getMapper()->save($this, $loopSave);
 		return $this;
 	}
 	

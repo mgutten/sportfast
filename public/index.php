@@ -9,7 +9,7 @@ defined('APPLICATION_ENV')
     || define('APPLICATION_ENV', (getenv('APPLICATION_ENV') ? getenv('APPLICATION_ENV') : 'production'));
 
 // ADDED: define path to temporary file directory
-define('PUBLIC_PATH', "X:/Program Files (x86)/wamp/www/Local_site/sportup.com/public");
+define('PUBLIC_PATH', "X:/Program Files (x86)/wamp/www/Local_site/sportfast.com/public");
 
 // Ensure library/ is on include_path
 set_include_path(implode(PATH_SEPARATOR, array(

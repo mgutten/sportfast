@@ -69,10 +69,14 @@ $(function()
 		flagRemoval($(this).attr('userRatingID'));
 	})
    
+	if ($('#chart').length > 0) {
+		// Only load charts on rating page
+		
+		google.load("visualization", "1", {"callback" : createInitialChart,
+										   "packages" :["corechart"]});
+	}
 	
-
-   	google.load("visualization", "1", {"callback" : createInitialChart,
- 						   			   "packages" :["corechart"]});
+	
 	
 })
 

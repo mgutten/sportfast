@@ -86,7 +86,7 @@ class CronController extends Zend_Controller_Action
 	}
 	
 	/**
-	 * warn inactive types
+	 * warn inactive types of impending removal
 	 * OFTEN: PER WEEK
 	 */
 	public function warnInactiveTypesAction()
@@ -99,12 +99,27 @@ class CronController extends Zend_Controller_Action
 		//$mapper->removeInactiveTeams();
 	}
 	
+	/**
+	 * check game status
+	 * OFTEN: PER HALF HOUR
+	 */
+	public function updateGameStatusAction()
+	{
+		$mapper = $this->getMapper();
+		
+		$games = $mapper->updateGameStatus();
+		
+		return $this->_forward('game-status', 'mail', null, array('games' => $games));
+	}
+	
 	public function testPassword($password)
 	{
 		if ($password !== $this->_password) {
 			return $this->_forward('permission', 'error', null);
 		}
 	}
+	
+	
 
 }
 

@@ -989,7 +989,10 @@ function confirmUserToGame(inOrOut, type, id, insertOrUpdate, teamID)
 			   type: type, 
 			   id: id, 
 			   insertOrUpdate: insertOrUpdate,
-			   teamID: teamID}
+			   teamID: teamID},
+		success: function() {
+			reloadPage();
+		}
 	})
 }
 	

@@ -2,6 +2,7 @@
 
 $(function()
 {
+	
 	if ($('#rateGame-alert-container').length > 0) {
 		// Rate user/park from last game is available, show it
 		
@@ -136,9 +137,15 @@ $(function()
 
 			$(this).text('Submitted')
 				   .unbind('click.submit');
+				   
+			if (testSubmitted()) {
+				// All alerts have been rated
+				$('.alert-black-back').trigger('click');
+			}
 		});
 			
 	}
+	
 })
 
 /**
@@ -215,4 +222,26 @@ function populateSportsmanshipInput(sliderEle, value)
 	hiddenEle.val(sliderSportsmanshipValues[value]['level']);
 		
 	populateSliderText (sliderEle, value);
+}
+
+/**
+ * test whether all the ratings on alert have been submitted or not
+ */
+function testSubmitted()
+{
+	var total = $('#rateGame-alert-container').find('.rating-submit').length;
+	var count = 0;
+	
+	$('#rateGame-alert-container').find('.rating-submit').each(function()
+	{
+		if ($(this).text().toLowerCase() == 'submitted') {
+			count++;
+		}
+	})
+	
+	if (count == total) {
+		return true;
+	} else {
+		return false;
+	}
 }

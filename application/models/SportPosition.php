@@ -17,7 +17,7 @@ class Application_Model_SportPosition extends Application_Model_ModelAbstract
 	protected $_overwriteKeys = array('userID');
 	
 	
-	public function save()
+	public function save($loopSave = false)
 	{
 		if (empty($this->positionID)) {
 			// Fill foreign key before save
@@ -26,7 +26,7 @@ class Application_Model_SportPosition extends Application_Model_ModelAbstract
 																												   'positionAbbreviation' => $this->positionAbbreviation));
 		}
 		
-		parent::save($this);
+		parent::save($loopSave);
 	}
 	
 	public function getPositionName()

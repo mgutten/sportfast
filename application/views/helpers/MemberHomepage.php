@@ -22,7 +22,7 @@ class Application_View_Helper_MemberHomepage
 			
 			echo "<img src='/images/global/logo/logo/green/medium.png' class='left'/>";
 			echo "<div class='left member-first-time-overview'>";
-			echo "<p class='clear darkest heavy'>Your dashboard is your home while at Sportup.  From it, you can: </p>
+			echo "<p class='clear darkest heavy'>Your dashboard is your home while at Sportfast.  From it, you can: </p>
 					<ul class='clear margin-top heavy green'>
 						<li>Find games or teams</li> 
 						<li>View your upcoming schedule</li> 
@@ -420,7 +420,7 @@ class Application_View_Helper_MemberHomepage
 				$hour	  = $match->getHour();
 				$dateDesc = $dateTime->format('M j');
 				$id		  = $match->gameID;
-				$location = $match->getLimitedParkName(25);
+				$location = $match->getLimitedParkName(22);
 				$gameIndex= $totalGames;
 				$dateHTML = "<div class='member-find-game-date-day'>" . $day . "</div>&nbsp; 
 								<div class='member-find-game-date-hour'>" . $hour . "</div>";

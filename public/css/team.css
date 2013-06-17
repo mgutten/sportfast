@@ -15,6 +15,10 @@
 	margin-bottom: .5em;
 }
 
+.profile-name {
+	max-width: 9.5em;
+}
+
 /* top section */
 
 /* next game section */
@@ -62,6 +66,10 @@
 
 .team-manage-calendar > .calendar-container > div.calendar-day {
 	cursor: pointer;
+}
+
+#team-manage-calendar-clear {
+	margin-left: 11.5em;
 }
 
 

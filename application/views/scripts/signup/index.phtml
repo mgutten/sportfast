@@ -73,11 +73,6 @@ if (!empty($this->errors)) {
 	}
 	echo "</ul>";
 	echo "</div>";
-} else {
-	// No errors, display normally
-	echo "<div class='green-alert-box white'>
-				Organize and find your own pickup games based on your ability and availability.
-			</div>";
 }
 
 
@@ -121,7 +116,7 @@ echo $this->form->signupPassword;
 // use same setup as signup password, but change ID bits
 echo $this->form->signupPassword->setLabel('Re-enter Password')->setAttribs(array('id'=>'signupReenterPassword','name'=>'signupReenterPassword'));
 ?>
-<div id='signup-password-reqs' class='medium'>Password must be: <ul><li>8-12 characters long</li></ul></div>
+<div id='signup-password-reqs' class='medium hidden'>Password must be: <ul><li>8-12 characters long</li></ul></div>
 </div>
 
 <?php

@@ -197,7 +197,7 @@ class Application_Form_Signup extends Zend_Form
 				'required'		=> true,
 				'decorators'	=> array('Checkbox'),
 				'checked'		=> false,
-				'text'			=> 'I have read and agree to both Sportup\'s Pledge and the <a href="/terms" class="underline medium">Terms and Conditions</a>.',
+				'text'			=> 'I have read and agree to both Sportfast\'s Pledge and the <a href="/terms" class="underline medium">Terms and Conditions</a>.',
 				'class'			=> 'darkest'
 				));
 

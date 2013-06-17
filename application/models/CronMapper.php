@@ -244,6 +244,71 @@ class Application_Model_CronMapper extends Application_Model_MapperAbstract
 		}
 		
 	}
+	
+	/**
+	 * update status of games 2 hours before game time (canceled or happening)
+	 * @returns array of canceled => and on => arrays for each game happening in 2 hours
+	 */
+	public function updateGameStatus()
+	{
+		$db = Zend_Db_Table::getDefaultAdapter();
+		$statement = "SELECT g.gameID, g.sportID, g.minPlayers, (COUNT(ug.userID) + SUM(ug.plus)) as totalPlayers, 
+							 g.sport, g.parkName, g.date 
+						FROM games g
+						LEFT JOIN (SELECT u2.userID, ug2.gameID, ug2.plus FROM users u2
+									INNER JOIN user_games ug2 ON u2.userID = ug2.userID 
+									WHERE fake = 0) ug ON g.gameID = ug.gameID
+						WHERE HOUR(TIMEDIFF(date, now())) > 2
+							AND g.canceled = 0
+						GROUP BY g.gameID";
+		
+						
+		$results = $db->fetchAll($statement);
+		
+		$returnArray = array('canceled' => array(),
+							 'on'		=> array());
+							 
+		foreach ($results as $result) {
+			if ($result['minPlayers'] > $result['totalPlayers']) {
+				// Not enough players for game, cancel
+				$returnArray['canceled'][$result['gameID']] = new Application_Model_Game($result);
+			} else {
+				// Game is on
+				$returnArray['on'][$result['gameID']] = new Application_Model_Game($result);
+			}
+		}
+		
+		if ($returnArray['canceled']) {
+			// Values set to be canceled
+			$statement = "UPDATE games SET canceled = 1,
+										   cancelReason = 'Not enough players'
+							WHERE gameID IN (";
+							
+			$gameIDs = implode(',',array_keys($returnArray['canceled']));
+			
+			$statement .= $gameIDs;
+			
+			$statement .= ')';
+			
+			//$db->query($statement);
+			echo $statement;
+		}
+		
+		// Loop through games and get players
+		foreach ($returnArray as $section) {
+			foreach ($section as $game) {
+				if ($game->hasValue('totalPlayers')) {
+					$game->getGamePlayers(true);
+				}
+			}
+		}
+		
+		return $returnArray;
+		
+	}
+				
+						
+						
 		
 		
 	

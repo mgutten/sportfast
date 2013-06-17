@@ -140,7 +140,7 @@ class Application_Model_Games extends Application_Model_TypesAbstract
 		$nextGames = array();
 		$time = time();
 		foreach ($this->games as $game) {
-			$date = strtotime($game->date);
+			$date = $game->gameDate->format('U');
 			$diff = $date - $time;
 			
 			if ($diff < 0) {

@@ -347,6 +347,10 @@ class Application_Model_GamesMapper extends Application_Model_MapperAbstract
 		$select->from(array('g'  => 'games'))
 			   ->join(array('st' => 'sport_types'),
 			   		  'g.typeID = st.typeID')
+			   ->join(array('p' => 'parks'),
+			   		  'p.parkID = g.parkID',
+					  array('specialNotes',
+					  		'parkType'))
 			   ->join(array('pl' => 'park_locations'),
 			   		  'g.parkID = pl.parkID',
 					  array('AsText(location) as location'))
@@ -375,16 +379,37 @@ class Application_Model_GamesMapper extends Application_Model_MapperAbstract
 		$savingClass->park->location->setAttribs($result);
 		$savingClass->type->setAttribs($result);
 		
+		$this->getGamePlayers($savingClass);
+				
+		return $savingClass;
+				
+	}
+	
+	/**
+	 * get game's players
+	 * @params ($onlyReal => return only real players? (boolean))
+	 */
+	public function getGamePlayers($savingClass, $onlyReal = false)
+	{
+		if (!$savingClass->hasValue('gameID') || !$savingClass->hasValue('sportID')) {
+			return false;
+		}
+		
 		// Get game's players
-		$sportID = $savingClass->sportID;
+		$table = $this->getDbTable();
 		$select = $table->select();
-		$select->setIntegrityCheck(false);	
+		$select->setIntegrityCheck(false);
 			
+		$gameID = $savingClass->gameID;
+		
 		$select->from(array('ug' => 'user_games'))
+			   ->join(array('g' => 'games'),
+			   		  'g.gameID = ug.gameID',
+					  array(''))
 			   ->join(array('u' => 'users'),
 			   		  'ug.userID = u.userID')
 			   ->joinLeft(array('us' => 'user_sports'),
-			   		  'ug.userID = us.userID AND us.sportID = "' . $sportID . '"',
+			   		  'ug.userID = us.userID AND us.sportID = g.sportID',
 					  array('us.sportID',
 					  		'us.skillInitial',
 							'us.often',
@@ -392,7 +417,7 @@ class Application_Model_GamesMapper extends Application_Model_MapperAbstract
 							'us.attendance',
 							'us.sportsmanship'))
 			   ->join(array('s' => 'sports'),
-			   		  's.sportID = ' . $sportID)
+			   		  's.sportID = g.sportID')
 			   ->joinLeft(array('gs' => 'game_subscribers'),
 			   		  'ug.userID = gs.userID AND ug.gameID = gs.gameID',
 					  array('userID as subscribed'))
@@ -400,12 +425,14 @@ class Application_Model_GamesMapper extends Application_Model_MapperAbstract
 			   		  'ug.gameID = gc.gameID AND ug.userID = gc.userID',
 					  array('userID as captain'))
 			   ->where('ug.gameID = ?', $gameID);
-			  
+		
 		$players = $table->fetchAll($select);
 
 		foreach ($players as $player) {
 			
-			if ($player->fake == '1') {
+			if ($onlyReal && $player->fake == '1') {
+				continue;
+			} elseif ($player->fake == '1') {
 				// Fake player
 				$middleSkill = round(($savingClass->maxSkill + $savingClass->minSkill)/2);
 				$skill = mt_rand($middleSkill - 2, $middleSkill + 2);
@@ -429,9 +456,10 @@ class Application_Model_GamesMapper extends Application_Model_MapperAbstract
 			}
 				
 		}
+		
 		return $savingClass;
-				
 	}
+
 	
 	/**
 	 * save user confirmation (confirmed or not) to db for pickup game

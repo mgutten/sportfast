@@ -15,7 +15,7 @@ class Application_Model_SportFormat extends Application_Model_ModelAbstract
 	protected $_overwriteKeys = array('userID','sportID');
 	
 	
-	public function save()
+	public function save($loopSave = false)
 	{
 		if (empty($this->formatID)) {
 			// Fill foreign key before save
@@ -23,6 +23,6 @@ class Application_Model_SportFormat extends Application_Model_ModelAbstract
 									 ->getForeignID('Application_Model_DbTable_SportFormats', 'formatID',array('format' => $this->format));
 		}
 		
-		parent::save($this);
+		parent::save($this, $loopSave);
 	}
 }

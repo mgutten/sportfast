@@ -252,7 +252,7 @@ class Application_Model_Notification extends Application_Model_ModelAbstract
 		return $this;
 	}
 	
-	public function save()
+	public function save($loopSave = false)
 	{
 		$this->setCurrent('dateHappened');
 		

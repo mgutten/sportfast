@@ -9,7 +9,7 @@ var failedCity;
 
 $(function()
 {
-	
+
 	/* update narrow column name value onkeyup */
 	$('#firstName,#lastName').keyup(function()
 	{
@@ -195,6 +195,15 @@ $(function()
 		changeInputBackground($('#signupReenterPassword'), isValid);	
 		
 	})
+	.focus(function()
+	{
+		$('#signup-password-reqs').show();
+	})
+	.blur (function()
+	{
+		$('#signup-password-reqs').hide();
+	})
+		
 	
 	
 	/* validate street address */

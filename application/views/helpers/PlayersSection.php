@@ -43,7 +43,7 @@ class Application_View_Helper_PlayersSection
 				if ($counter >= 14 && $limited) {
 					// Only show 14 players
 									
-					$output .= "<a href='/" . $type . "/" . $typeID . "/players' class='medium clear-right smaler-text'>" . ($totalPlayers - $counter) . " more players</a>";
+					$output .= "<a href='/" . $type . "/" . $typeID . "/players' class='medium margin-top clear-right smaler-text'>" . ($totalPlayers - $counter) . " more players</a>";
 					break;
 				}
 				$output .= "<a href='/users/" . $player->userID . "' class='left team-player-container'>";
@@ -84,7 +84,14 @@ class Application_View_Helper_PlayersSection
 		if ($typeModel instanceof Application_Model_Game) {
 			if ($counter < $typeModel->totalPlayers) {
 				// There are "plus-ones"
-				for($counter = $counter; $counter < $typeModel->totalPlayers; $counter++) {
+				
+				$guests = $typeModel->totalPlayers - $counter;
+				
+				for($i = 0; $i < $guests; $i++) {
+					if ($counter >= 14 && $limited) {
+						$output .= "<a href='/" . $type . "/" . $typeID . "/players' class='medium margin-top clear-right smaler-text'>" . ($typeModel->totalPlayers - $counter) . " more players</a>";
+						break;
+					}
 					$player  = new Application_Model_User();					
 					$output .= "<div class='left team-player-container'>";
 					$output .= 	$player->getBoxProfilePic('medium');
@@ -95,6 +102,7 @@ class Application_View_Helper_PlayersSection
 					$output .=		"</div>";
 					$output .=	"</div>";
 					$output .= "</div>";
+					$counter++;
 				}
 			}
 		}

@@ -16,8 +16,8 @@ class Application_View_Helper_Homepage
 							<div id='homepage-large-img-container' class='absolute dropshadow' holder='homepage-large-img-holder'>
 							<img src='/images/homepage/large/soccer.jpg' class='homepage-large-img fade-current' id='homepage-large-img1' />
 							<img src='/images/homepage/large/basketball.jpg' class='homepage-large-img fade-next' id='homepage-large-img2' />
-							<img src='' class='homepage-large-img' id='homepage-large-img3' />
-							<img src='' class='homepage-large-img' id='homepage-large-img4' />
+							<img src='/images/homepage/large/court.jpg' class='homepage-large-img' id='homepage-large-img3' />
+							<img src='/images/homepage/large/league.jpg' class='homepage-large-img' id='homepage-large-img4' />
 							<div class='centered-body homepage-large-img-center-container'>
 								<div id='homepage-large-img-dot-container'>
 									<div class='homepage-large-img-dot homepage-large-img-dot-selected'></div>
@@ -25,7 +25,9 @@ class Application_View_Helper_Homepage
 									<div class='homepage-large-img-dot'></div>
 									<div class='homepage-large-img-dot'></div>
 								</div>
+								<a href='/how' id='homepage-learn'></a>
 							</div>
+							
 						</div>";
 						
 		$textArray = array('image'	=> 'green_magnifying',

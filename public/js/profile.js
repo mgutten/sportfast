@@ -15,6 +15,7 @@ rosterLimits.ultimate 	= {upper: 22};
 
 $(function()
 {
+
 	/* fade in user description on mouseover */
 	$(document).on('mouseenter.overlay','.profile-player-overlay-container',function() 
 	{
@@ -359,6 +360,12 @@ $(function()
 		populateConfirmActionAlert('leave ' + name);
 		
 	});
+	
+	if ($('#profile-buttons-container-holder').length > 0) {
+	/* align top options animate bar */
+		var top = $('#profile-buttons-container-holder').position().top;
+		$('#profile-buttons-container').css('top', top);
+	}
 	
 	$('#unsubscribe-button, #top-alert-subscribe').click(function()
 	{

@@ -10,7 +10,10 @@ class HowController extends Zend_Controller_Action
 
     public function indexAction()
     {
-		$this->view->whiteBack = true;
+		
+		$sports = new Application_Model_Sports();
+		
+		$this->view->sports = $sports->getAllSportsInfo(true);
     }
 
 

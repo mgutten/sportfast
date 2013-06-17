@@ -105,10 +105,15 @@ class Application_Model_User extends Application_Model_ModelAbstract
 		$returnArray = array();
 		if ($this->games->hasValue('games')) {
 			// User has games scheduled
+			$curDate = new DateTime();
 			foreach ($this->games->getAll() as $game) {
-				$curDate = new DateTime();
-				$days = ceil(($game->gameDate->format('U') - time())/60/60/24); // # of days difference
-				if ($days <= 7) {
+				if ($game->gameDate->format('U') > (time() + (60*60*24*7))) {
+					// Fail safe to prevent games from NEXT month from showing up this month
+					continue;
+				}
+				
+				$days = ($game->gameDate->format('j') - $curDate->format('j')); // # of days difference
+				if ($days < 7) {
 					// Game is happening in next week
 					$returnArray[$game->gameDate->format('w')][] = $game;
 				}
@@ -533,6 +538,20 @@ class Application_Model_User extends Application_Model_ModelAbstract
 	{
 		$date = $this->_attribs['lastActive'];
 		return parent::getTimeFromNow($date, 30);
+	}
+	
+	/**
+	 * check whether user wants teams (to play in league) or not
+	 */
+	public function wantsTeams()
+	{
+		foreach ($this->sports as $key => $sport) {
+			if (isset($sport->_attribs['formats']['league'])) {
+				return true;
+			}
+		}
+		
+		return false;
 	}
 	
 	/**

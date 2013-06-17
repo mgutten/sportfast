@@ -1014,7 +1014,21 @@ class AjaxController extends Zend_Controller_Action
 		
 		$model->updateCaptains();
 	}
-
+	
+	/**
+	 * remove all of team's games
+	 */
+	public function removeTeamGamesAction()
+	{
+		$teamID = $this->getRequest()->getPost('teamID');
+		
+		$team = new Application_Model_Team();
+		
+		$team->teamID = $teamID;
+		
+		$team->deleteGames();
+	}
+	
 	/**
 	 * remove team game
 	 */
@@ -1028,12 +1042,11 @@ class AjaxController extends Zend_Controller_Action
 		
 		
 		$games = $this->view->user->games;
-		$game = $games->setPrimaryKey('teamGameID')
-					  ->exists($teamGameID);
+		$game  = $games->setPrimaryKey('teamGameID')
+					   ->exists($teamGameID);
 		
 		if ($game) {
-			$game->delete();
-			
+			$game->delete();			
 		}
 		
 		$games->setPrimaryKey('teamGameID')
@@ -1122,6 +1135,7 @@ class AjaxController extends Zend_Controller_Action
 	 */
 	public function cancelTypeAction()
 	{
+		
 		$options = $this->getRequest()->getPost('options');
 		$idType  = $options['idType'];
 		
@@ -1134,7 +1148,7 @@ class AjaxController extends Zend_Controller_Action
 		if ($idType == 'gameID') {
 			$model  = new Application_Model_Game();
 			$model->getGameByID($options['typeID']);
-			$array['date'] = $model->gameDate->format('F j');
+			$array['date'] = $model->date;
 			$type = 'game';
 		} elseif ($idType == 'teamID') {
 			$model  = new Application_Model_Team();
@@ -1155,12 +1169,13 @@ class AjaxController extends Zend_Controller_Action
 			// remove recurring game just this once
 			
 			$model->canceled = '1';
-
+			
 			if (!empty($options['cancelReason'])) {
 				$model->cancelReason = rtrim($options['cancelReason']);
 			}
 			
 			$model->save();
+
 			
 		} else {
 			// Mark game/team for removal
@@ -1183,12 +1198,13 @@ class AjaxController extends Zend_Controller_Action
 		$notification->cityID = $this->view->user->cityID;
 		$notification->save();
 		
-		
+				
 		// Force bootstrap reload
 		$reset = new Zend_Session_Namespace('reset');
 		$reset->reset = true;
 		
-		$this->_forward('cancel-type','mail');
+		
+		$this->_forward('cancel-type','mail', null);
 		
 	}
 		

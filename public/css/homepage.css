@@ -19,7 +19,7 @@
 	left:0;
 	width:100%;
 	min-width:61.25em;
-	height:25em;
+	height:400px;
 	overflow:hidden;
 	background:#222;
 	z-index:1;
@@ -31,8 +31,8 @@ img.homepage-large-img {
 	left:50%;
 	margin-left:-800px;
 	width:1600px;
-	min-width:62.5em;
-	height:25em;
+	min-width:1600px;
+	height:400px;
 }
 
 img#homepage-large-img1 {
@@ -51,13 +51,40 @@ img#homepage-large-img4 {
 	background:#33F;
 }
 
+#homepage-learn {
+	position: absolute;
+	width: 160px;
+	height: 58px;
+	top: 336px;
+	left: 637px;
+	/*
+	home {
+		top: 336px;
+		left: 637px;
+	}
+	pickup {
+		top: 224px
+		left: 558px
+	}
+	parks {
+		top: 208px
+		left: 16px
+	}
+	league {
+		top: 248px
+		left: 872px
+	}
+	*/
+	z-index: 20;
+}
+
 .homepage-large-img-center-container {
 	position:absolute;
 	overflow:visible;
 	z-index:5;
 	left:50%;
 	top:0;
-	height:25em; /* same as img.homepage-large-img */
+	height:400px; /* same as img.homepage-large-img */
 	margin-left: -30.62em;
 }
 
@@ -76,7 +103,7 @@ img#homepage-large-img4 {
 	background:url(/images/homepage/img_dot_combined.png) no-repeat;
 	cursor:pointer;
 	float:left;
-	padding:0 .125em;
+	padding:0 2px;
 }
 
 .homepage-large-img-dot-selected {
@@ -84,7 +111,7 @@ img#homepage-large-img4 {
 }
 
 #homepage-large-img-holder {
-	height:25em;
+	height:400px;
 	float:left;
 	clear:both;
 }
@@ -97,7 +124,7 @@ img#homepage-large-img4 {
 	float:left;
 	width:45%;
 	padding: 1em;
-	margin: 2.5em 0em 0em 0em;
+	margin: 3em 0em 0em 0em;
 	cursor:default;
 }
 
@@ -109,6 +136,7 @@ img#homepage-large-img4 {
 	float:right;
 	margin-right:.2em;
 }
+
 
 .homepage-description-header {
 	font-size:2em;

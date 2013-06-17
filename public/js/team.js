@@ -22,6 +22,20 @@ $(function()
 		}
 	)
 	
+	/* clear entire team schedule */
+	$('#team-manage-calendar-clear').click(function()
+	{
+		confirmAction = function() {
+			
+			var detailsEle = getDetailsEle();
+			var teamID = detailsEle.attr('teamID');
+			
+			removeTeamGames(teamID);
+		}
+		
+		populateConfirmActionAlert('delete your entire schedule', "<span class='clear medium width-100 center margin-top'>This action cannot be undone.</span>");
+	})
+	
 	$('#manage-schedule-alert-container').find('.calendar-day').click(function(e)
 	{
 		e.preventDefault();
@@ -294,7 +308,7 @@ $(function()
 			showAlert($('#manage-schedule-alert-container'));
 		} else if (val == 'remove player') {
 			showAlert($('#manage-remove-player-alert-container'));
-		} else if (val == 'team info') {
+		} else if (val == 'edit team') {
 			showAlert($('#manage-team-info-alert-container'));
 		} else if (val == 'delete team') {
 			
@@ -357,6 +371,22 @@ $(function()
 	
 	
 })
+
+/**
+ * remove team games from db
+ */
+function removeTeamGames(teamID)
+{
+
+	$.ajax({
+		url: '/ajax/remove-team-games',
+		type: 'POST',
+		data: {teamID: teamID},
+		success: function(data) {
+			reloadPage();
+		}
+	})
+}
 
 /**
  * remove team game from db

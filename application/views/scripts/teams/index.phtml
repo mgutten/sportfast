@@ -44,6 +44,8 @@ if ($this->fail) {
 			echo $this->calendar()->createCalendar($this->events, true, false, false, false, true, true);
 			echo "</div>";
 			
+			echo "<p class='pointer medium action' id='team-manage-calendar-clear' tooltip='Clear entire schedule (future and past)'>clear schedule</p>";
+			
 			$winOrLossContent  = "<p class='left darkest larger-text'>vs. <span id='tooltip-team-manage-winOrLoss-opponent' class='darkest'>Unknown</span></p>";
 			$winOrLossContent .= "<p class='right header medium x'>X</p>";
 			$winOrLossContent .= "<div class='clear width-100 larger-margin-top larger-text'>";
@@ -84,7 +86,7 @@ if ($this->fail) {
 			$futureEventContent .= "<div id='team-manage-schedule-location-results' class='clear'></div>";
 			$futureEventContent .= "<p class='green-button clear-right right save-button'>Save</p>";
 			$futureEventContent .= "<p class='button left delete-button remove-game'>Delete</p>";
-			$futureEventContent .= "<p class='clear' id='test'></p>";
+
 			echo $this->tooltip('-team-manage-addGame', $futureEventContent);
 			
 			echo $this->alert()->end();
@@ -179,8 +181,8 @@ if ($this->fail) {
 
 	if ($this->team->systemCreated && !$this->userOnTeam && $this->topAlert) {
 		// Show alert box
-		$content = "<p class='white heavy left width-100 center'>This is a Sportup-created " . $this->team->sport . " team.</p>";
-		echo $this->topAlert('sportup-team', $content);
+		$content = "<p class='white heavy left width-100 center'>This is a Sportfast-created " . $this->team->sport . " team.</p>";
+		echo $this->topAlert('sportfast-team', $content);
 	}
 	
 	echo $this->alert()->confirmAlert();
@@ -295,23 +297,41 @@ echo "<span id='team-details'
 </header>
 
 
-<div id='profile-buttons-container'>
-    <?php
+ <?php
 		
-		if ($this->userOnTeam) {
-			// You are on team
-			?>
-            <p class='dark smaller-text right current-position'>You are currently <?php echo ($this->captain ? 'Team Captain' : 'a member');?>.</p>
-			<p class='red-button clear-right leave-button margin-top right' id='leave-button' style='margin-right:0'>
-				Leave
-			</p>
+	if ($this->userOnTeam) {
+		// You are on team
+		?>
+		<div id='profile-buttons-container-holder' class='right'></div>
+			<div id='profile-buttons-container' holder='profile-buttons-container-holder' class='absolute'>
+				<div class='profile-buttons-inner-container left'>
+					<div class='profile-animate-buttons light-back pointer' tooltip='Show options'>
+						<img src='/images/global/arrows/left/medium.png' class='left' />
+					</div>
+					<div class='profile-buttons-innermost-container right'>
+		
+		<p class='dark smaller-text right current-position'>You are currently <?php echo ($this->captain ? 'Team Captain' : 'a member');?>.</p>
+		<p class='red-button clear-right leave-button margin-top right' id='leave-button' style='margin-right:0'>
+			Leave
+		</p>
+    <?php
+		if ($this->captain) {
+			// User is captain
+			echo "<div class='larger-margin-top clear-right profile-buttons-second-row' style='margin-right:0'>" . $this->inviteButton . "</div>";
+			echo "<div class='larger-margin-top right profile-buttons-second-row'>" . $this->manageButton . "</div>";
+		}
+	?>
+        	</div>
+        </div>
+    </div>
+   
     <?php } else {
 			$lower = '';
 			$class = '';
 			$text = 'Join';
 			$id    = 'join-button';
 			if (!$this->team->systemCreated && $this->hasCaptain) {
-				// Not sportup created team, allow any user to join without request
+				// Not sportfast created team, allow any user to join without request
 				$text = 'Request to Join';
 				$id   = 'request-join-button';
 			}
@@ -322,19 +342,16 @@ echo "<span id='team-details'
 				$lower = '<p class="light clear-right smaller-text margin-top">You must have a minimum skill of ' . $this->team->minSkill . ' to join.';
 			}
 			?>
+            <div id='profile-buttons-container'>
     		<p class='green-button right larger-text join-button heavy <?php echo $class;?>' id='<?php echo $id;?>'>
             	<?php echo $text;?>
             </p>
             <?php echo $lower; ?>
-    <?php } 
+            </div>
+    <?php } ?>
 		
-		if ($this->captain) {
-			// User is captain
-			echo "<div class='larger-margin-top clear-right profile-buttons-second-row' style='margin-right:0'>" . $this->inviteButton . "</div>";
-			echo "<div class='larger-margin-top right profile-buttons-second-row'>" . $this->manageButton . "</div>";
-		}
-	?>
-</div>
+		
+        
     
 <?php 
 // Create header for next game section

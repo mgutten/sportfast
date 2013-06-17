@@ -78,10 +78,19 @@ class GamesController extends Zend_Controller_Action
 			$this->view->inviteButton = $dropdown->dropdownButton('invite', '', 'Invite');
 			if ($captain) {
 				// Allow captain to manage
-				$this->view->manageButton = $dropdown->dropdownButton('manage', array('Remove Player',
-																					  array('text' => 'Game Details',
-																					  		'href' => '/games/' . $gameID . '/edit'), 
-																					  'Cancel Game'), 'Manage');
+				$this->view->manageButton = $dropdown->dropdownButton('manage', array(array('text' => 'Edit Game',
+																					  		'href' => '/games/' . $gameID . '/edit',
+																							'image' => '/images/team/icons/edit.png',
+																							'background' => '',
+																							'imageLocation' => 'left'),
+																					  array('text' => 'Remove Player',
+																						'image' => '/images/team/icons/x.png',
+																						'background' => '',
+																						'imageLocation' => 'left'), 
+																					  array('text' => 'Cancel Game',
+																						'image' => '/images/team/icons/trash.png',
+																						'background' => '',
+																						'imageLocation' => 'left')), 'Manage');
 					
 			}
 		}

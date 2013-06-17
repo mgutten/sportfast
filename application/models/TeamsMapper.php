@@ -335,7 +335,6 @@ class Application_Model_TeamsMapper extends Application_Model_MapperAbstract
 						   ))
 				->where('t.teamID = ?', $teamID)
 				->limit(1);
-		
 					   
 		$team = $table->fetchRow($select);
 		
@@ -381,7 +380,9 @@ class Application_Model_TeamsMapper extends Application_Model_MapperAbstract
 			   		  'ut.userID = us.userID AND us.sportID = "' . $sportID . '"')
 			   ->join(array('s' => 'sports'),
 			   		  's.sportID = ' . $sportID)
-			   ->where('ut.teamID = ?', $teamID);
+			   ->where('ut.teamID = ?', $teamID)
+			   ->group('us.userID');
+		
 			   
 		$players = $table->fetchAll($select);
 
@@ -461,6 +462,41 @@ class Application_Model_TeamsMapper extends Application_Model_MapperAbstract
 		
 		return $savingClass;
 
+	}
+	
+	/**
+	 * move team_games => old_team_games
+	 */
+	public function moveTeamGames($teamID)
+	{
+		$db = Zend_Db_Table::getDefaultAdapter();
+		
+		if (!$teamID) {
+			return false;
+		}
+		
+		$insertGames = "INSERT INTO old_team_games (oldTeamGameID, teamID, opponent, date, winOrLoss, leagueLocationID, movedDate) 
+								(SELECT tg.teamGameID, tg.teamID, tg.opponent, tg.date, tg.winOrLoss, tg.leagueLocationID, now()
+									FROM team_games tg 
+									WHERE tg.teamID = '" . $teamID . "'
+										AND tg.date < now())";
+		
+		$db->query($insertGames);
+							
+	}
+	
+	public function deleteTeamGames($teamID)
+	{
+		$db = Zend_Db_Table::getDefaultAdapter();
+		
+		if (!$teamID) {
+			return false;
+		}
+		
+		$deleteGames = "DELETE FROM team_games 
+							WHERE team_games.teamID = '" . $teamID . "'";
+							
+		$db->query($deleteGames);
 	}
 			
 }

@@ -17,7 +17,7 @@ class Application_Model_SportType extends Application_Model_ModelAbstract
 	protected $_primaryKey = 'userSportTypeID';	
 	protected $_overwriteKeys = array('userID');
 	
-	public function save()
+	public function save($loopSave = false)
 	{
 		
 		if (empty($this->typeID)) {
@@ -26,7 +26,7 @@ class Application_Model_SportType extends Application_Model_ModelAbstract
 																													'typeSuffix' => $this->typeSuffix));
 		}
 
-		parent::save($this);
+		parent::save($loopSave);
 	}
 	
 	public function getTypeName()

@@ -72,10 +72,22 @@ class TeamsController extends Zend_Controller_Action
 			// Need to display "Manage" and "Invite" button
 			$dropdown = Zend_Controller_Action_HelperBroker::getStaticHelper('Dropdown');
 			$this->view->inviteButton = $dropdown->dropdownButton('invite', '', 'Invite');
-			$this->view->manageButton = $dropdown->dropdownButton('manage', array('Schedule',
-																				  'Remove Player',
-																				  'Team Info',
-																				  'Delete Team'), 'Manage');
+			$this->view->manageButton = $dropdown->dropdownButton('manage', array(array('text' => 'Schedule',
+																						'image' => '/images/team/icons/schedule.png',
+																						'background' => '',
+																						'imageLocation' => 'left'),
+																				  array('text' => 'Edit Team',
+																						'image' => '/images/team/icons/edit.png',
+																						'background' => '',
+																						'imageLocation' => 'left'),
+																				  array('text' => 'Remove Player',
+																						'image' => '/images/team/icons/x.png',
+																						'background' => '',
+																						'imageLocation' => 'left'),
+																				  array('text' => 'Delete Team',
+																						'image' => '/images/team/icons/trash.png',
+																						'background' => '',
+																						'imageLocation' => 'left')), 'Manage');
 			$this->view->manageScheduleTimeHour = $dropdown->dropdown('manage-schedule-time-hour', array(1,2,3,4,5,6,7,8,9,10,11,12), 7);
 			$this->view->manageScheduleTimeMinute = $dropdown->dropdown('manage-schedule-time-minute', array('00', '15', '30', '45'), '00');
 			$this->view->manageScheduleTimeAmPm = $dropdown->dropdown('manage-schedule-time-ampm', array('am', 'pm'), 'pm', false);

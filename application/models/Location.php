@@ -16,7 +16,7 @@ class Application_Model_Location extends Application_Model_ModelAbstract
 	protected $_primaryKey  = 'userLocationID';	
 	protected $_dbTable		= 'Application_Model_DbTable_UserLocations';	
 	
-	public function save($mapper = 'Application_Model_LocationsMapper')
+	public function save($loopSave = false, $mapper = 'Application_Model_LocationsMapper')
 	{
 		if (!empty($this->_attribs['changedLocation'])) {
 			// Location was changed temporarily

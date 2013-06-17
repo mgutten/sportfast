@@ -259,13 +259,13 @@ class SignupController extends Zend_Controller_Action
 				
 				$user->save(true);
 				
-				$subject  = 'Sportup Account Verification';
+				$subject  = 'Sportfast Account Verification';
 				$message  = '<html>
 								<head>
 								</head>
 								<body>
-									Thank you for joining the Sportup team!  You are almost done.  To verify your account, please click on the link below.<br>
-						     		<a href="sportup.com/signup/verify/' . $user->verifyHash . '"> CLICK HERE TO VERIFY </a>
+									Thank you for joining the Sportfast team!  You are almost done.  To verify your account, please click on the link below.<br>
+						     		<a href="sportfast.com/signup/verify/' . $user->verifyHash . '"> CLICK HERE TO VERIFY </a>
 							    </body>
 						     </html>';
 				$headers  = 'MIME-Version: 1.0' . "\r\n";

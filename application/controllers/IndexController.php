@@ -76,12 +76,21 @@ class IndexController extends Zend_Controller_Action
 			
 			$sportsParen .= ')';
 			
+			
+			$lookingTeams = '';
+			if (!$this->view->user->wantsTeams()) {
+				// User does not want any teams, remove from dropdown
+				$lookingTeams = 'not-selected';
+			}
+			
 			$lookingDropdownTypeArray = array(array('text'  => 'Games',
 												 	'color' => 'light'),
 											  array('text'  => 'Teams',
-												 	'color' => 'light'),
+												 	'color' => 'light',
+													'outerClass' => $lookingTeams),
 											  array('text'  => 'Tournaments',
-												 	'color' => 'light'));
+												 	'color' => 'light',
+													'outerClass' => 'not-selected'));
 													
 			$lookingDropdownTimeArray = array(array('text'  => 'My Availability',
 												 	'color' => 'light'),
@@ -110,13 +119,17 @@ class IndexController extends Zend_Controller_Action
 			
 			$games->findUserGames($this->view->user, $options);
 			
-			$teams  = new Application_Model_Teams();
-			$options = array('`t`.`sport` IN ' . $sportsParen);
-			$teams->findUserTeams($this->view->user);
+			$matches->addMatches($games->games);
 			
-			
-			$matches->addMatches($games->games)
-					->addMatches($teams->teams);
+			if (!$lookingTeams) {
+				// User wants teams
+				$teams  = new Application_Model_Teams();
+				$options = array('`t`.`sport` IN ' . $sportsParen);
+				$teams->findUserTeams($this->view->user);
+				
+				$matches->addMatches($teams->teams);
+			}
+					
 			
 			$this->view->matches = $matches->sortByMatch();
 						

@@ -4,6 +4,7 @@ var changes;
 
 $(function()
 {
+	
 	$('.settings-tab').click(function()
 	{
 		$('.settings-tab-selected').removeClass('settings-tab-selected');

@@ -86,7 +86,7 @@ echo $this->placeholder('absolute')->captureStart();
 		echo $this->alert()->start('upload');
 			echo "<p class='darkest width-100 center heavy'>You must upload a profile picture before joining a game.</p>";
 
-			echo "<a href='/users/" . $this->user->userID . "/upload' class='clear larger-text larger-margin-top heavy green-button white' id='game-canceled-back'>Upload Now</a>";
+			echo "<a href='/users/" . $this->user->userID . "/upload' class='clear right larger-text larger-margin-top heavy green-button white' id='game-canceled-back'>Upload Now</a>";
 		echo $this->alert()->end();
 		
 		$content = "<a href='/users/" . $this->user->userID . "/upload' class='width-100 center white left heavy'>You need a profile picture to play.  <span class='white'>Click here to add one.</span></p>";
@@ -105,7 +105,7 @@ $this->placeholder('narrowColumn')->captureStart();
 	if ($this->gameOn) {	
 		echo "<div class='green-back white heavy narrow-overlay-container dropshadow'>" . $this->totalPlayers . " " . ($this->totalPlayers == 1 ? 'player' : 'players') . "</div>";
 	} else {
-		echo "<div class='dark-red-back white heavy narrow-overlay-container dropshadow' tooltip='" . ($this->game->minPlayers - $this->totalPlayers) . " more players are needed in order for the game to happen.'>"
+		echo "<div class='dark-red-back white heavy narrow-overlay-container dropshadow' tooltip='" . ($this->game->minPlayers - $this->totalPlayers) . " more players are needed in order for this game to happen.'>"
 			 . $this->playersNeeded  . " needed
 			 </div>";
 	}
@@ -185,9 +185,6 @@ if ($this->topAlert && $this->userInGame) {
 } elseif ($this->pastGame) {
 	// This game already happened
 	echo "<div class='red-alert-box white heavy'>This game already happened!</div>";
-} elseif ($this->todayGame) {
-	// This game is happening today
-	echo "<div class='green-alert-box white heavy'>This game is happening today at " . $this->game->gameDate->format('g:ia') . "!</div>";
 }
 ?>
 
@@ -212,7 +209,15 @@ if ($this->topAlert && $this->userInGame) {
 			<a href='/parks/<?php echo $this->game->backupParkID;?>' class='clear light game-location' tooltip='If <?php echo $this->game->park->parkName;?> is unavailable, go to this nearby park instead.'>
 				Backup park: <?php echo $this->game->backupParkName;?>
 			</a> 
-        <?php }?>
+        <?php }
+		
+		if ($this->game->park->specialNotes) {
+			echo "<div class='clear indent'>";
+			echo	"<p class='clear red'>" . $this->game->park->specialNotes . "</p>";
+			echo "</div>";
+		}
+		?>
+        
     </div>
 </header>
 
@@ -277,7 +282,7 @@ if ($this->userInGame) {
                 $id    = 'join-button';
                 $tooltip = '';
                 if (!$this->isPublic) {
-                    // Not sportup created team, allow any user to join without request
+                    // Not sportfast created team, allow any user to join without request
                     $text = 'Request to Join';
                     $id   = 'request-join-button';
                     $tooltip = "tooltip='This is a private game.'";

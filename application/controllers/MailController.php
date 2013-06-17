@@ -78,7 +78,7 @@ class MailController extends Zend_Controller_Action
 			$headers  = "MIME-Version: 1.0" . "\r\n";
 			$headers .= "Content-type: text/html; charset=iso-8859-1" . "\r\n";
 			$headers .= "From: " . $this->view->user->username . "\r\n";	 
-			$headers .= "Reply-To: donotreply@sportup.com" . "\r\n";
+			$headers .= "Reply-To: donotreply@sportfast.com" . "\r\n";
 					
 					
 			mail($email, $subject, $message, $headers);
@@ -109,39 +109,107 @@ class MailController extends Zend_Controller_Action
 	
 	public function cancelTypeAction()
 	{
+									   
 		$post    = $this->getRequest()->getPost();
 		$options = $post['options'];
 		
 		if ($options['idType'] == 'gameID') {
-			$type = 'game';
-			$date  = $post['date'];
-			$action = 'canceled';
-			
+			// Is game
+			$model = new Application_Model_Game();
+			$model->gameID = $options['typeID'];
+			$model->date = $post['date'];
+			$action = 'mailCancelGame';
+			//$date  = $post['date'];		
 		} elseif ($options['idType'] == 'teamID') {
-			$type = 'team';
-			$date = '';
-			$action = 'deleted';
+			// Is team
+			$model = new Application_Model_Team();
+			$model->teamID = $options['typeID'];
+			$action = 'mailCancelTeam';
 		}
 		
-		$sport = $post['sport'];
+		$model->sport = $post['sport'];
 		$userIDs = $post['userIDs'];
 		
 		$users = new Application_Model_Users();
 		$emails = $users->getUserEmails($userIDs);
 		
+		
 		foreach ($emails as $email) {
-			$subject  = 'Your ' . $sport . ' ' . ucwords($type) . ' has been ' . $action;
-			$message  = "Your " . $sport . " " . ucwords($type) . " has been " . $action . ". Please visit the " . $type . " page for more details.";
-			$headers  = "MIME-Version: 1.0" . "\r\n";
-			$headers .= "Content-type: text/html; charset=iso-8859-1" . "\r\n";
-			$headers .= "From: info@sportup.com\r\n";	 
-			$headers .= "Reply-To: donotreply@sportup.com" . "\r\n";
-					
-					
-			mail($email, $subject, $message, $headers);
+			$this->$action($email, $model);		
 		}
 		
 	}
+	
+	/**
+	 * mail email to user that team/game has been canceled or deleted
+	 * @params ($email => where to send,
+	 *			$model => Game or Team model)
+	 */
+	public function mailCancelGame($email, $model)
+	{
+		$sport = ucwords($model->sport);
+		$id = $model->gameID;
+		
+		$subject  = $sport . ' ' . $type . ' ' . $action;
+		$message  = $this->mailStart();
+		
+		$message .= "<p class='bold largest-text'>Your " . $sport . " game has been canceled.</p>";
+		$message .= "<br><br><p class='bold larger-text'>Today at " . $model->gameDate->format('ga') . "</p>";
+		$message .= "<br><br><p>Please visit the <a href='http://www.sportfast.com/games/" . $id . "'>game page</a> for more details.</p>";
+					
+		$message .= $this->mailEnd();
+		
+		
+		$message .= "<br><br><p class='medium'>Reason: </p><p>" . $cancelReason . "</p>";
+		
+		
+		$headers  = "MIME-Version: 1.0" . "\r\n";
+		$headers .= "Content-type: text/html; charset=iso-8859-1" . "\r\n";
+		$headers .= "From: info@sportfast.com\r\n";	 
+		$headers .= "Reply-To: donotreply@sportfast.com" . "\r\n";
+				
+				
+		mail($email, $subject, $message, $headers);
+	}
+	
+	/**
+	 * mail email to user that game is on and happening
+	 * @params ($email => where to send,
+	 *			$game => Game model)
+	 */
+	public function mailGameOn($email, $game)
+	{
+		$sport = $game->sport;
+		
+		$id = $game->gameID;
+		
+		
+		$subject  = $sport . ' Game On!';
+		$message  = $this->mailStart();
+		
+		$message .= "<p>Game on!  See you out there!</p>
+					 <br><p class='largest-text bold'>Today at " . $game->gameDate->format('ga') . "</p>
+					 <p class='larger-text bold'>" . $game->park->parkName . "</p>
+					 <p class='largest-text bold'>" . $game->totalPlayers . " players</p>
+					 <br><a href='http://www.sportfast.com/games/" . $id . "' class='green-button largest-text bold' style='text-decoration:none'>View Page</a>
+					 <br><br><p>Things to remember:</p>
+					 <li>Games typically last between 1 and 2 hours</li>
+					 <li>Bring your equipment <span class='medium'>(shoes, ball, disc, etc)</span></li>
+					 <li>Have fun!</li>
+					<br><br>Please visit the <a href='http://www.sportfast.com/games/" . $id . "'>game page</a> for more details.";
+					
+		$message .= $this->mailEnd();
+		
+		
+		$headers  = "MIME-Version: 1.0" . "\r\n";
+		$headers .= "Content-type: text/html; charset=iso-8859-1" . "\r\n";
+		$headers .= "From: info@sportfast.com\r\n";	 
+		$headers .= "Reply-To: donotreply@sportfast.com" . "\r\n";
+				
+				
+		mail($email, $subject, $message, $headers);
+	}
+	 
 	
 	/**
 	 * mail new password
@@ -177,8 +245,8 @@ class MailController extends Zend_Controller_Action
 						<br><br>You can set your password to something more meaningful under \"Settings\".";
 		$headers  = "MIME-Version: 1.0" . "\r\n";
 		$headers .= "Content-type: text/html; charset=iso-8859-1" . "\r\n";
-		$headers .= "From: info@sportup.com\r\n";	 
-		$headers .= "Reply-To: donotreply@sportup.com" . "\r\n";			
+		$headers .= "From: info@sportfast.com\r\n";	 
+		$headers .= "Reply-To: donotreply@sportfast.com" . "\r\n";			
 				
 		mail($email, $subject, $message, $headers);
 		
@@ -208,10 +276,10 @@ class MailController extends Zend_Controller_Action
 			$message  = $post['question'];
 			$headers  = "MIME-Version: 1.0" . "\r\n";
 			$headers .= "Content-type: text/html; charset=iso-8859-1" . "\r\n";
-			$headers .= "From: contact@sportup.com\r\n";	 
+			$headers .= "From: contact@sportfast.com\r\n";	 
 			$headers .= "Reply-To: " . $post['email'] . "\r\n";			
 					
-			mail("support@sportup.com", $subject, $message, $headers);
+			mail("support@sportfast.com", $subject, $message, $headers);
 		} else {
 			// Fail
 			$errors = array();
@@ -239,8 +307,8 @@ class MailController extends Zend_Controller_Action
 			$message  = (isset($email['firstName']) ? $this->buildWarnInactiveUserMessage($email) : $this->buildWarnInactiveTeamMessage($email));
 			$headers  = "MIME-Version: 1.0" . "\r\n";
 			$headers .= "Content-type: text/html; charset=iso-8859-1" . "\r\n";
-			$headers .= "From: support@sportup.com\r\n";	 
-			$headers .= "Reply-To: support@sportup.com\r\n";			
+			$headers .= "From: support@sportfast.com\r\n";	 
+			$headers .= "Reply-To: support@sportfast.com\r\n";			
 					
 			mail($email['username'], $subject, $message, $headers);
 		}
@@ -253,39 +321,181 @@ class MailController extends Zend_Controller_Action
 	 */
 	public function buildWarnInactiveUserMessage($array)
 	{
-		$output = '<html>
-						<head>
-						</head>
-						<body>';
-						
-		$output .= "Hey " . ucwords($array['firstName']) . ",";
-		
-		$output .= "<br><br><p>We noticed you haven't visited our site in a while.  While we're sad, we understand.  However, 
-					to keep our database up-to-date, we deactivate inactive users after a period of 60 days.</p>";
+		$output  = $this->mailStart();
+								
+		$output .= "<p>We noticed you haven't visited our site in a while.  While we're sad, we understand.  However, 
+					to keep our database up-to-date, we must deactivate inactive users after a period of 60 days.</p>";
 					
-		$output .= "<br><br><p><span style='font-weight: bold;font-size: 16px'>
+		$output .= "<br><p><span class='bold larger-text'>
 					Your account has been inactive for " . $array['lastActive'] . " days.  If you wish to keep your 
-					account active, please <a href='http://www.sportup.com/login'>login</a> within the next couple days.</span>";
+					account active, please <a href='http://www.sportfast.com/login'>login</a> within the next couple days.</span></p>";
 					
-		$output .= "<br><br><p>If you don't mind your account becoming inactive, then you do not need to do anything.</p>";
+		$output .= "<br><p>If you don't mind your account becoming inactive, then you do not need to do anything.</p>";
 		
-		$output .= "<br><br>Thanks!";
+		$output .= "<br><p>Thanks!</p>";
 		
 		$output .= $this->supportSignature();
 			
 						
-		$output .=		'</body>
-					 </html>'; 
+		$output .= $this->mailEnd();
 					 
 		
 		return $output;
 	}
 	
+	/**
+	 * html header and body function (as well as standard styles) for email
+	 */
+	public function mailStart()
+	{
+		$output = '<html>
+					<body>';
+					
+		$output .= $this->buildStyle();
+		
+		$output .= "<table width='98%'>
+						<tr><td>
+						<table width='650' border='0' cellpadding='0' cellspacing='0' align='center'>
+						<tr>
+							<td width='650' align='center'>
+								<tr><td>";
+							
+						
+									 		
+		return $output;
+	}
+	
+	/**
+	 * html header and body function (as well as standard styles) for email
+	 */
+	public function mailEnd()
+	{
+		$output = "				</td></tr>
+								</td>
+							</tr>
+						</table>
+						</td>
+						</tr>
+					</table>
+					
+					</body>
+					</html>";
+		
+		return $output;
+	}
+	
+	/**
+	 * create standard styles css for emails
+	 */
+	public function buildStyle()
+	{	
+		$output = "<style>";
+		
+		$output .= "
+					p {
+						margin: 0;
+					}
+					
+					p,div,span,li,ul,a {
+						font-family: Arial, Helvetica, Sans-Serif;
+					}
+					
+					p,div,span,li,ul {
+						color: #333;
+						
+					}
+					
+					.medium {
+						color: #8d8d8d;
+					}
+					
+					.light {
+						color: #bbb;
+					}
+					
+					.bold {
+						font-weight: bold;
+					}
+					
+					.larger-text {
+						font-size: 1.25em;
+					}
+					
+					.largest-text {
+						font-size: 2em;
+					}
+					
+					.smaller-text {
+						font-size: .9em;
+					}
+					
+					.center {
+						width: 100%;
+						text-align: center;
+					}
+					
+					.green-button {
+						padding: .2em .8em;
+						background: #58bf12;
+						color: #fff;
+					}
+					
+					";
+					
+		$output .= "</style>";
+		
+		return $output;
+	}
+
+		
+	
 	public function supportSignature()
 	{
-		$output  = "<br><br><p>Sportup Support Team</p>";
-		$output .= "<br><p style='font-size: 11px'>support@sportup.com</p>";
+		$output  = "<br><p style='font-family: Arial, Helvetica, Sans-Serif; color: #333; margin: 0;'>Marshall</p>
+					<p class='medium' style='font-family: Arial, Helvetica, Sans-Serif; color: #8d8d8d; margin: 0;'>Sportfast Support Team</p>
+					<p class='smaller-text medium' style='font-family: Arial, Helvetica, Sans-Serif; color: #8d8d8d; font-size: .9em; margin: 0;'>support@sportfast.com</p>";
+		
+		return $output;
 	}
+	
+	/**
+	 * email users whether their game has been canceled or not (game happening in next 2 hours from CronController => updateGameStatusAction)
+	 */
+	public function gameStatusAction()
+	{
+		$games = $this->getRequest()->getParam('games');
+		
+		// Email canceled users
+		foreach ($games['canceled'] as $game) {
+			foreach ($game->players->getAll() as $user) {
+				$this->mailCancelGame($user->username, $game);
+			}
+		}
+		
+		// Email game on users
+		foreach ($games['on'] as $game) {
+			foreach ($game->players->getAll() as $user) {
+				$this->mailGameOn($user->username, $game);
+			}
+		}
+	}
+	
+	public function testAction()
+	{
+		
+		$subject  = $this->view->user->fullName . ' invited you to join ' . $this->view->user->getHisOrHer() . ' ' . ucwords($typeModel->sport) . ' ' . ucwords($type);
+		$message  = $this->mailStart();
+		$message .= "<td width='100%'><tr align='center'><p class='medium largest-text'>Testing the classes and mail server</p></tr></td>";
+		$message .= $this->mailEnd();
+		$headers  = "MIME-Version: 1.0" . "\r\n";
+		$headers .= "Content-type: text/html; charset=iso-8859-1" . "\r\n";
+		$headers .= "From: " . $this->view->user->username . "\r\n";	 
+		$headers .= "Reply-To: donotreply@sportfast.com" . "\r\n";
+				
+				
+		mail($email, $subject, $message, $headers);
+	}
+		
 		
 
 }

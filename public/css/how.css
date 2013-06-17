@@ -1,11 +1,10 @@
 /* how.css */
 .how-title {
-	font-size:1.6em;
-	color:#fff;
-	padding: 0 .3em;
-	text-align:center;
+	font-size:2.7em;
+	padding: 0 0em;
+	text-align:left;
 	float:left;
-	margin: .3em 0 0 .4em;
+	margin: .4em 0 .4em .3em;
 }
 
 /* absolute positioned icons */
@@ -14,11 +13,18 @@
 	float:left;
 	clear:both;
 	margin-top:1em;
+	width:1px;
 }
 
 #how-icon-inner-container {
 	margin:0 auto;
-	width:70em;
+	width:72em;
+	background: #222;
+	background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#444), to(#222));
+	background-image: -webkit-linear-gradient(top, #444, #222); 
+	background-image: -moz-linear-gradient(top, #444, #222);
+	background-image: -ms-linear-gradient(top, #444, #222);
+	background-image: -o-linear-gradient(top, #444, #222);
 }
 
 #how-icon-container {
@@ -35,7 +41,8 @@
 	float:left;
 	position:relative;
 	z-index:20;
-	width:25%;
+	width:23.7%;
+	margin-left: 1%;
 	height:100%;
 }
 
@@ -44,7 +51,6 @@
 	height:8em;
 	display:block;
 	margin: 1em auto 0 auto;
-	background:#8d8d8d;
 }
 
 .how-icon-num {
@@ -105,4 +111,35 @@
 
 .how-section:nth-child(even) {
 	float:right;
+}
+
+/* what sports */
+.how-sport-icon {
+	margin-left: .75em;
+}
+
+.how-sport-icon:first-child {
+	margin-left:0;
+}
+
+#how-sport-icons-container {
+    float: right;
+    right: 50%;
+    position: relative;
+	margin-top: .5em;
+}
+#how-sport-icons-inner-container {
+    float: right;
+    right: -50%;
+    position: relative;
+}
+
+#how-sport {
+	height: 1em;
+}
+
+#how-signup-button {
+	width: auto;
+	margin-left: 5.25em;
+	margin-top: 1.2em;
 }

@@ -94,7 +94,13 @@ class Application_Controller_Helper_Dropdown extends Zend_Controller_Action_Help
 				$post = "</a>";
 			}
 			
-			$output   .= $pre . " class='dropdown-menu-option-container medium animate-darker'>";
+			$outerClass = '';
+			if (isset($option['outerClass'])) {
+				// Give outer div a class
+				$outerClass = ' ' . $option['outerClass'];
+			}
+			
+			$output   .= $pre . " class='dropdown-menu-option-container medium animate-darker " . $outerClass . "'>";
 			$img       = '';
 			$textClass = 'medium';
 		
@@ -111,7 +117,20 @@ class Application_Controller_Helper_Dropdown extends Zend_Controller_Action_Help
 					if (strpos($option['image'], '/solid/') > 0) {
 						// solid png, do not give colored background
 						$background = '';
+					} elseif (isset($option['background'])) {
+						if ($option['background'] == 'none' || !$option['background']) {
+							$background = '';
+						} else {
+							$background = $option['background'];
+						}
 					}
+					
+					if (isset($option['imageLocation'])) {
+						// Set to 'left' or 'right' of text
+						$background .= ' ' . $option['imageLocation'];
+					}
+					
+					
 					$img = "<img src='" . $option['image'] . "' class='dropdown-menu-option-img " . $background . "' />";
 				}
 				
@@ -130,7 +149,18 @@ class Application_Controller_Helper_Dropdown extends Zend_Controller_Action_Help
 				}
 				$text      = '<p class="dropdown-menu-option-text ' . $textClass . '">' . $option . '</p>';
 			}
-			$output .= $text . $img;
+			
+			if (isset($option['imageLocation'])) {
+				// determine which side of the text the image is ('left' or 'right')
+				if (strtolower($option['imageLocation']) == 'right') {
+					$output .= $text . $img;
+				} else {
+					$output .= $img . $text;
+				}
+			} else {
+				// Default to image on right
+				$output .= $text . $img;
+			}
 			$output .= $post;
 		}
 		

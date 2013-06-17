@@ -12,7 +12,7 @@
 #user-buttons-container,#profile-buttons-container {
 	position:absolute;
 	right: 1.5em;
-	width: 15.5em;
+	width: 16em;
 	float:right;
 	overflow-x:hidden;
 	height: 30em;
@@ -36,7 +36,7 @@
 
 .profile-buttons-innermost-container {
 	background:#fff;
-	width: 14.5em;
+	width: 15em;
 }
 
 #profile-top-alert {

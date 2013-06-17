@@ -62,6 +62,7 @@ class Application_Model_Ratings extends Application_Model_ModelAbstract
 					// No ratings found at all, return overall with skill
 					$skill = $this->skillInitial;
 					$return = $this->getOverall($this->sportsmanship, $this->attendance, $skill);
+					
 				}
 			} else {
 				// Skill, sportsmanship
@@ -196,6 +197,7 @@ class Application_Model_Ratings extends Application_Model_ModelAbstract
 	 */
 	public function getAverage($attrib, $additional = false, $month = false)
 	{
+	
 		$total   = 0;
 		$ratings = $this->getAll();
 		$count   = count($ratings);
@@ -205,7 +207,7 @@ class Application_Model_Ratings extends Application_Model_ModelAbstract
 			// No ratings
 			return false;
 		}
-		
+
 		$user = false;
 		$count = 0;
 		foreach ($ratings as $rating) {
@@ -218,6 +220,7 @@ class Application_Model_Ratings extends Application_Model_ModelAbstract
 			
 			if ($month) {
 				// Selected ratings from certain month
+							
 				$date = new DateTime();
 				$sub = new DateInterval('P' . $month . 'M');
 				$date->sub($sub);
@@ -227,6 +230,7 @@ class Application_Model_Ratings extends Application_Model_ModelAbstract
 				$interval = $date->diff($ratingDate);
 				if ($interval->format('%R') == '+' && $interval->format('%m') != 0) {
 					// Rating happened after (in time) the cutoff month
+		
 					continue;
 				}
 			}

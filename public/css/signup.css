@@ -344,6 +344,7 @@ div.signup-narrow-column-img-container {
 	width: 44em;
 	height: 26em;
 	margin: -13em 0 0 -22em;
+	position: fixed;
 }
 
 .signup-import-alert-img {

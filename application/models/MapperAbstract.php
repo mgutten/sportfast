@@ -6,7 +6,7 @@ abstract class Application_Model_MapperAbstract
 	protected $_dbTable;
 	protected $_dbTableClass;	
 	
-	public function save($savingClass, $loopSave = true)
+	public function save($savingClass, $loopSave = false)
 	{			
 	
 		// reset db table in case it has been changed before
@@ -115,7 +115,7 @@ abstract class Application_Model_MapperAbstract
 				}
 				
 	
-				$model->save();
+				$model->save(true);
 			}
 		}
 

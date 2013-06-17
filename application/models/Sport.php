@@ -28,7 +28,7 @@ class Application_Model_Sport extends Application_Model_ModelAbstract
 	protected $_overwriteKeys = array('userID');
 	
 
-	public function save()
+	public function save($loopSave = false)
 	{
 		if (empty($this->sportID)) {
 			// Fill foreign key before save
@@ -36,7 +36,7 @@ class Application_Model_Sport extends Application_Model_ModelAbstract
 								  ->getForeignID('Application_Model_DbTable_Sports', 'sportID',array('sport' => $this->sport));
 		}
 		
-		parent::save();
+		$this->getMapper()->save($this, $loopSave);
 	}
 	
 	/**

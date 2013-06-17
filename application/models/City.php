@@ -12,13 +12,13 @@ class Application_Model_City extends Application_Model_ModelAbstract
 	protected $_primaryKey = 'cityID';
 		
 		
-	public function save()
+	public function save($loopSave = false)
 	{
 		if (!empty($this->_attribs['changedLocation'])) {
 			// Location changed temporarily, do not save
 			return;
 		}
-		return $this->getMapper()->save($this);
+		return $this->getMapper()->save($this, $loopSave);
 	}
 	
 	public function setCity($city) {

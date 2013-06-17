@@ -148,6 +148,7 @@ $this->placeholder('narrowColumn')->captureEnd();
 			$lowerOutput .= 		"<div class='clear user-sport-want-outer-container'>";
 			$lowerOutput .= 			"<p class='clear dark user-sport-want-looking'> Looking for:</p>";
 			$lowerOutput .= 			"<div class='user-sport-want-inner-container left'>";
+		
 			foreach ($sport->formats as $format) {
 				$lowerOutput .=				"<p class='darkest clear'>" . ucwords($format->format) . "</p>";
 			}
@@ -156,6 +157,7 @@ $this->placeholder('narrowColumn')->captureEnd();
 			$typeSuffixes = '';
 			$typeSuffixArray = array();
 			foreach ($sport->types as $type) {
+				
 				if (in_array($type->typeName, $sport->formats) || strtolower($type->typeName) == 'pickup') {
 					// Type was already displayed above
 					continue;
