@@ -1,0 +1,5 @@
+Welcome to Sportfast!
+
+We're here to help you get out and play sports with other athletes.  If you have any questions, please ask us at our <a href='/about/contact'>contact</a> page.
+
+Good luck out there!

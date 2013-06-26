@@ -1,0 +1,97 @@
+<?php
+/* 
+* controller => sports
+* action => ultimate
+*/
+$this->headTitle('Ultimate Rules');
+$this->headLink()->prependStylesheet($this->baseUrl() . '/css/sports.css');
+$this->headScript()->prependFile($this->baseUrl() . '/js/sports.js');
+?>
+
+<?php
+$this->placeholder('narrowColumn')->captureStart();
+
+echo "<p class='clear larger-margin-top heavy darkest'>Also see:</p>";
+
+foreach ($this->sports as $sport) {
+	if (strtolower($sport->sport) == strtolower($this->sport)) {
+		continue;
+	}
+	echo "<a href='/sports/" . strtolower($sport->sport) . "' class='clear sports-narrow-column-sport dark larger-text animate-darker white-background width-100'>" . $sport->sport . "</a>";
+}
+
+$this->placeholder('narrowColumn')->captureEnd();
+?>
+
+<header class='darkest jumbo-text heavy clear'>
+Pickup Ultimate Frisbee
+</header>
+
+
+<img src='/images/sports/<?php echo $this->sport;?>.jpg' class='clear dropshadow sports-img' />
+
+<p class='left larger-text darkest larger-margin-top'>
+    Here are the basic rules of pickup <?php echo $this->sport;?>.
+</p>
+
+<div class='clear sports-section-container width-100'>
+    <div class='clear sports-section-half'>
+        <p class='clear darkest heavy largest-text'>
+            Where it's played
+        </p>
+        <ul class='clear darkest larger-text'>
+            <li>grass field</li>
+        </ul>
+    </div>
+    <div class='left sports-section-half'>
+        <p class='clear darkest heavy largest-text'>
+            What you need
+        </p>
+        <ul class='clear darkest larger-text'>
+        	<li>disc</li>
+            <li>cones or markers</li>
+            <li>cleats or athletic shoes</li>
+        </ul>
+    </div>
+
+</div>
+
+<div class='clear sports-section-container width-100'>
+    <p class='clear darkest heavy largest-text'>
+        Setup
+    </p>
+    <p class='clear darkest'>
+    	The size of the field should be adjusted to the number of players you have.  Fewer players = smaller field.  Use your cones/markers to create the sidelines and endzones.  
+        For a typical 7-a-side game, the sizing is similar to a football field, though the endzones are longer.  The endzones should be 18-25 yards deep and 40 yards wide.  The 
+        distance between the two endzones should be about 65 yards.
+    </p>
+    <div class='width-100 clear'>
+        <img src='/images/sports/ultimate_field.jpg' class='sports-field-img' />
+    </div>
+</div>	
+
+<div class='clear sports-section-container width-100'>
+    <p class='clear darkest heavy largest-text'>
+        Basic rules
+    </p>
+    
+    <ul class='clear darkest '>
+        <li>There can be anywhere from 3 to 7 players per team</li>
+        <li>You can only sub in after a team scores by calling "last back" <span class='medium'>(you are subbing for the team that was scored on)</span>, where the last person to cross the goal line is then out.</li>
+        <li>Substitutions should be made constantly, or you can willingly step off.</li>
+		<li>First team to reach the agreed point limit <span class='medium'>(e.g. 7 points)</span> wins.</li>
+        <li>Catching the disc in the endzone is worth 1 point.</li>
+        <li>No contact is allowed at anytime.</li>
+    	<li>Any time the disc is dropped, hit down, or simply hits the ground, there is a change of possession from that point.</li>
+        <li>You must stop as soon as you catch the disc.  You have a pivot foot, but you cannot take any additional steps.</li>
+        <li>On defense, you will typically "mark" a man.  You must guard him/her and try to prevent them from catching the disc.</li>
+        <li>You may guard the person with the disc, but you must allow a foot or two of distance between the two of you.</li>
+        <li>The defense can call out a "stall count" <span class='medium'>(count to 10)</span> as soon as the offense catches the disc.  If the disc is not thrown before 10, then there is a change of possession.</li>
+        <li>You cannot hit the disc out of the offense's hands.</li>
+        <li>A player who gets fouled should call it by saying "Foul".</li>
+        <li>If a foul occurs, all play stops and everyone must stop moving.  The team retains possession from where the disc was when the foul occured, and once they touch the disc to the ground, play resumes.</li>
+        <li>The disc is "live" when the offense touches the disc to the ground.  This is used on fouls, or when the disc flies out of bounds and must be brought back onto the field.</li>
+        <li>After a team scores, the scoring team stays at that endzone and the opposing team runs back to the other endzone.  The scoring team will then throw the disc to the other team to start a new point.</li>
+    </ul>
+
+</div>

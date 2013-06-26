@@ -33,7 +33,8 @@ class Application_Model_User extends Application_Model_ModelAbstract
 									'messages'		=> '',
 									'plus'			=> '',
 									'fake'			=> '',
-									'joined'		=> ''
+									'joined'		=> '',
+									'noEmail'		=> ''  // Do not email when game is created for them
 									);
 
 	protected $_primaryKey = 'userID';	
@@ -318,6 +319,7 @@ class Application_Model_User extends Application_Model_ModelAbstract
 		
 		return $sex;
 	}
+
 	
 	public function setAgeFromDob()
 	{

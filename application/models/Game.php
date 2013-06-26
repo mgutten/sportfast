@@ -49,7 +49,9 @@ class Application_Model_Game extends Application_Model_ModelAbstract
 									'cityID'		=> '',
 									'canceled'		=> '',
 									'cancelReason'  => '',
-									'remove'		=> ''
+									'remove'		=> '',
+									'sportfastCreated' => '',
+									'doNotEmail'    => ''
 									);
 									
 	protected $_primaryKey = 'gameID';
@@ -74,6 +76,14 @@ class Application_Model_Game extends Application_Model_ModelAbstract
 		return $this->getMapper()->getForeignID('Application_Model_DbTable_SportTypes', 'typeID', array('sportID' => $sportID,
 																									   'typeName' => $typeName,
 																									   'typeSuffix' => $typeSuffix));
+	}
+	
+	/**
+	 * add user to game in db
+	 */
+	public function addUserToGame($gameID, $userID)
+	{
+		return $this->getMapper()->addUserToGame($gameID, $userID);
 	}
 	
 	/**

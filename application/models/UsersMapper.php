@@ -1052,7 +1052,7 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 		
 		$select->from(array('og' => 'old_games'))
 			   ->join(array('oug' => 'old_user_games'),
-			   		  'og.gameID = oug.gameID')
+			   		  'og.oldGameID = oug.oldGameID')
 			   ->where('og.date > (now() - INTERVAL 1 WEEK) AND og.date < now()')
 			   ->where('og.canceled = ?', 0)
 			   ->where('oug.userID = ?', $userID)
@@ -1242,8 +1242,126 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 	}
 
 		
+	/**
+	 * get all user locations
+	 * @params ($upper, $lower => array ('latitude' =>,
+	 *									 'longitude' =>))
+	 */
+	public function getAllUserLocations($upper, $lower, $savingClass)
+	{
+		$table = $this->getDbTable();
+		$select = $table->select();
+		$select->setIntegrityCheck(false);
 		
+		$select->from(array('ul' => 'user_locations'),
+					  array('ul.userID',
+					  		'AsText(ul.location) as location'));
+		
+		$users = $table->fetchAll($select);
+		
+		foreach ($users as $user) {
+			$userModel = $savingClass->addUser($user);
+			$userModel->getLocation()->setAttribs($user);
+		}
+		
+		return $savingClass;
+	}
 	
+	/**
+	 * get counts/stats for total users
+	 */
+	public function getAllUsersStats()
+	{
+		$returnArray = array();
+		
+		$table = $this->getDbTable();
+		$select = $table->select();
+		$select->setIntegrityCheck(false);
+		
+		// Total users
+		$select->from(array('u' => 'users'),
+					  array('COUNT(u.userID) as totalUsers'))
+			   ->where('u.fake = 0');
+		
+		$totalUsers = $table->fetchRow($select);
+		$returnArray['totalUsers'] = array('description' => 'Total users',
+											'value'		  => $totalUsers['totalUsers']);
+		
+		// Total active users
+		$select = $table->select();
+		$select->setIntegrityCheck(false);
+		
+		$select->from(array('u' => 'users'),
+					  array('COUNT(u.userID) as totalUsers'))
+			   ->where('u.fake = 0')
+			   ->where('u.active = 1');
+			   
+		$totalActiveUsers = $table->fetchRow($select);
+		$returnArray['totalActiveUsers'] = array('description' => 'Total active users',
+												'value'		  => $totalActiveUsers['totalUsers']);
+		
+		// Num of active users in last month (who visited in the last month)
+		$select = $table->select();
+		$select->setIntegrityCheck(false);
+		
+		$select->from(array('u' => 'users'),
+					  array('COUNT(u.userID) as totalUsers'))
+			   ->where('u.fake = 0')
+			   ->where('u.lastActive > (now() - INTERVAL 1 month)');
+			   
+		$lastActiveMonth = $table->fetchRow($select);
+		$returnArray['lastActiveMonth'] = array('description' => 'Users active in last month',
+												'value'		  => $lastActiveMonth['totalUsers']);
+														
+		// Num of new users in last month
+		$select = $table->select();
+		$select->setIntegrityCheck(false);
+		
+		$select->from(array('u' => 'users'),
+					  array('COUNT(u.userID) as totalUsers'))
+			   ->where('u.fake = 0')
+			   ->where('u.joined > (now() - INTERVAL 1 month)');
+			   
+		$newUsers = $table->fetchRow($select);
+		$returnArray['newUsersMonth'] = array('description' => 'New users in last month',
+												'value'		  => $newUsers['totalUsers']);
+		
+		
+		// % change of user base in last 3 months
+		$select = $table->select();
+		$select->setIntegrityCheck(false);
+		
+		$select->from(array('u' => 'users'),
+					  array('COUNT(u.userID) as totalUsers'))
+			   ->where('u.fake = 0')
+			   ->where('u.joined > (now() - INTERVAL 3 month)');
+			   
+		$percentageThreeMonth = $table->fetchRow($select);
+		
+		$percentage = round($percentageThreeMonth['totalUsers'] / ($returnArray['totalUsers']['value'] - $percentageThreeMonth['totalUsers']) * 10000)/100;
+		
+		$returnArray['percentage3Month'] = array('description' => '% change in total users (3 months)',
+												'value'		  => $percentage . '%');
+		
+		// % change of user base in last 6 months
+		$select = $table->select();
+		$select->setIntegrityCheck(false);
+		
+		$select->from(array('u' => 'users'),
+					  array('COUNT(u.userID) as totalUsers'))
+			   ->where('u.fake = 0')
+			   ->where('u.joined > (now() - INTERVAL 6 month)');
+			   
+		$percentage6Month = $table->fetchRow($select);
+		
+		$percentage = round($percentage6Month['totalUsers'] / ($returnArray['totalUsers']['value'] - $percentage6Month['totalUsers']) * 10000)/100;
+		
+		$returnArray['percentage6Month'] = array('description' => '% change in total users (6 months)',
+												 'value'		  => $percentage . '%');
+		
+		return $returnArray;
+		
+	}
 	/**
      * Create a hash (encrypt) of a plain text password.
      *

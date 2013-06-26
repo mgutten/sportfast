@@ -256,7 +256,17 @@ class Application_Model_SportsMapper extends Application_Model_MapperAbstract
 		$result = $db->fetchRow($select);
 		
 		$returnArray['totalPlayers'] = $result['players'];
-
+		
+		// Number of calories burned (data comes from 75 minutes of play)
+		$select = $table->select();
+		$select->setIntegrityCheck(false);
+		
+		$select->from(array('s' => 'sports'))
+			   ->where('s.sportID = ?', $sportID);
+			   
+		$result = $table->fetchRow($select);
+		
+		$returnArray['calories'] = ($result['caloriesPerGame'] * $returnArray['totalGames']);
 		
 		return $returnArray;
 

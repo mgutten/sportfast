@@ -280,6 +280,35 @@ abstract class Application_Model_MapperAbstract
 		
 	}
 	
+	public function getValue($column, $tableName = false, $where = false)
+	{
+		$table  = $this->getDbTable();
+		
+		if ($tableName) {
+			// TableName is set, select from that
+			$select = $table->select();
+			$select->setIntegrityCheck(false);
+			$select->from($tableName, $column);
+		} else {
+			$select = $table->select($column);
+		}
+		
+		if ($where) {
+			foreach ($where as $key => $value) {
+				$select->where($key . ' = ?', $value);
+			}
+		} else {
+			$select->where($column . ' = ?', $value);
+		}
+		
+		
+		$select->limit(1);
+		
+		$result = $table->fetchRow($select);
+		
+		return $result->$column;
+	}
+	
 	public function find($id, $column, Application_Model_ModelAbstract $modelClass)
 	{
 		$table  = $this->getDbTable();

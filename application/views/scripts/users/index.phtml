@@ -23,7 +23,7 @@ $this->placeholder('absolute')->captureEnd();
 
 // Narrow right column
 $this->placeholder('narrowColumn')->captureStart();
-echo "<img src='" . $this->currentUser->getProfilePic('large') . "' class='narrow-column-picture dropshadow rounded-corners'/>";
+echo "<img src='" . $this->currentUser->getProfilePic('large') . "' class='narrow-column-picture dropshadow'/>";
 
 echo "<div class='user-narrow-info-container clear'>";
 echo 	"<p class='clear darkest'>" . $this->currentUser->age . " years old</p>";

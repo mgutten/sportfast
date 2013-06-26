@@ -43,6 +43,25 @@ class Application_Model_Message extends Application_Model_ModelAbstract
 		return parent::save($loopSave);
 	}
 	
+	public function getFirstName()
+	{
+		if ($this->sendingUserID == 0) {
+			// Sportfast sent
+			return "Sportfast";
+		} else {
+			return $this->_attribs['firstName'];
+		}
+	}
+	
+	public function getLastName()
+	{
+		if ($this->sendingUserID == 0) {
+			// Sportfast sent
+			return " ";
+		} else {
+			return $this->_attribs['lastName'];
+		}
+	}		
 	
 	public function isGroupMessage()
 	{

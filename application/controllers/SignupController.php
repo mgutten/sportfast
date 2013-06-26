@@ -325,8 +325,28 @@ class SignupController extends Zend_Controller_Action
 			$session = new Zend_Session_Namespace('first_visit');
 			$session->firstVisit = true;
 			
+			$notification = new Application_Model_Notification();
+			$notification->receivingUserID = $user->userID;
+			$notification->action = 'message';
+			$notification->details = 'sportfast';
+			$notification->cityID = $user->city->cityID;
+			$notification->save();
+			
+			$messages = new Application_Model_Messages();
+			$messageGroupID = $messages->messageGroupExists($user->userID, 0);
+			
+			$message = new Application_Model_Message();
+			$message->messageGroupID = $messageGroupID;
+			$message->sendingUserID = 0;
+			$message->receivingUserID = $user->userID;
+			$message->message = file_get_contents(PUBLIC_PATH . '/txt/welcome.txt');
+			
+			$message->save();
+			
+			
 			$this->_redirect('/');
 		} else {
+			// Failure
 			$this->view->narrowColumn = false;
 		}
 	}

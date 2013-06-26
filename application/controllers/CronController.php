@@ -107,10 +107,51 @@ class CronController extends Zend_Controller_Action
 	{
 		$mapper = $this->getMapper();
 		
-		$games = $mapper->updateGameStatus();
+		$date = new DateTime('now');
 		
-		return $this->_forward('game-status', 'mail', null, array('games' => $games));
+		if ($date->format('G') > 7 && $date->format('G') <= 20) {
+			// Only update games between 7AM and 8PM
+			$games = $mapper->updateGameStatus();
+			
+			return $this->_forward('game-status', 'mail', null, array('games' => $games));
+		}
 	}
+	
+	
+	/**
+	 * inform users that they have a game tomorrow
+	 * OFTEN: PER DAY
+	 */
+	public function informUsersGameAction()
+	{
+		$mapper = $this->getMapper();
+		
+		$teamGames = $mapper->getUserTeamGames();
+		$subscribedGames = $mapper->getUserSubscribedGames();
+		
+		$games = array('games' => $subscribedGames,
+					   'teamGames' => $teamGames);
+		
+		return $this->_forward('upcoming-game', 'mail', null, array('games' => $games));
+	}
+	
+	/**
+	 * automatically create games 
+	 * OFTEN: PER DAY
+	 */
+	public function createGamesAction()
+	{
+		$createGames = Zend_Controller_Action_HelperBroker::getStaticHelper('CreateGames');
+		
+		$games = $createGames->createGames();
+		
+		if ($games) {
+			// Games were created
+			return $this->_forward('game-created', 'mail', null, array('games' => $games));
+		}
+	}
+	
+	
 	
 	public function testPassword($password)
 	{

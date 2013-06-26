@@ -42,6 +42,7 @@ class Application_Model_Ratings extends Application_Model_ModelAbstract
 	public function getRatingsForChart($rating, $interval = 4)
 	{
 		$returnArray = array();
+		/*
 		$nullCount = 0;
 		for ($i = ($interval - 1); $i >= 0; $i--) {
 			
@@ -86,9 +87,28 @@ class Application_Model_Ratings extends Application_Model_ModelAbstract
 					$return = $average;
 				}
 			}
+			*/
+		$combo = $rating . 'Value';
 			
-			$returnArray[] = array('month' => date('M', strtotime('-' . $i . ' months')), 
-								   'value' => $return);
+		foreach ($this->getAll() as $ratingModel) {
+				
+				if ($rating == 'overall') {
+					$skill = $ratingModel->skillValue;
+					$sportsmanship = $ratingModel->sportsmanshipValue;
+					$return = $this->getOverall($sportsmanship, 100, $skill);
+					
+				} else {
+					$return = $ratingModel->$combo;
+					
+				}
+				
+				
+				
+				$returnArray[] = array('year' =>  $ratingModel->date->format('Y'),
+									   'day' => $ratingModel->date->format('j'),
+									   'month' => ($ratingModel->date->format('m') - 1), 
+									   'value' => $return);
+
 		}
 		
 		return $returnArray;

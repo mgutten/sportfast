@@ -1,0 +1,23 @@
+/* CSS Document */
+
+.input-container#username-container,.input-container#password-container {
+	float:left;
+	clear:left;
+	margin-top: .2em;
+	padding-left: 0;
+	padding-right: 0;
+}
+
+.input-container#password-container {
+	margin-bottom: 0;
+}
+
+/* user map */
+#gmap {
+	height: 50em;
+	border: solid 1px #333;
+}
+
+.width-33 {
+	width: 33.33%;
+}

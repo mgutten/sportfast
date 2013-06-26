@@ -53,9 +53,17 @@
 				$buttons .= "</div>";
 			}
 			
+			
+			if ($notification->isSports()) {
+				// Special case for smaller sports pictures
+				$pictureClass = 'notification-picture-sports';
+			} else {
+				$pictureClass = 'notification-picture';
+			}
+			
 			echo "<a href='" . $notification->getFormattedUrl() . "' class='notification-container " . $class . " pointer'>" 
 				 . "<div class='notification-text-picture-container'>"
-					 . "<img src='" . $notification->getPicture() . "' class='notification-picture' />"
+					 . "<img src='" . $notification->getPicture() . "' class='" . $pictureClass . "' />"
 					 . "<span class='notification-text'>" . $notification->getFormattedText() . "</span>"
 					 . $buttons
 				 . "</div>"

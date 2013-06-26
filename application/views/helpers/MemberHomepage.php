@@ -557,8 +557,8 @@ class Application_View_Helper_MemberHomepage
 			}
 			$iconsOutput   .= "<img src='" . $sport->getIcon('small', 'outline') . "' class='medium-background member-narrow-rating-icon pointer " . $class . "' />";
 			$ratingsOutput .= "<div class='member-narrow-rating-container'>";
-			$ratingsOutput .= "<p class='width-100 clear center'>" . ucwords($sport->sport) . "</p>";
-			$ratingsOutput .= "<a href='/users/" . $this->_view->user->userID . "/ratings/" . strtolower($sport->sport) . "' class='width-100 clear center green bold largest-text'>" . $sport->getOverall() . "</a>";
+			$ratingsOutput .= "<p class='width-100 clear center darkest'>" . $sport->sport . "</p>";
+			$ratingsOutput .= "<a href='/users/" . $this->_view->user->userID . "/ratings/" . strtolower($sport->sport) . "' class='width-100 clear center green bold jumbo-text'>" . $sport->getOverall() . "</a>";
 			$ratingsOutput .= "<div class='width-100 clear'>";
 			
 			foreach ($ratingOrder as $rating => $label) {

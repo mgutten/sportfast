@@ -10,10 +10,7 @@ $this->headScript()->prependFile($this->baseUrl() . '/js/rating.js');
 $this->headScript()->prependFile($this->baseUrl() . '/js/profile.js');
 $this->headScript()->prependFile('https://www.google.com/jsapi');
 ?>
-<script type='text/javascript'>
 
-
-</script>
 
 <?php
 // Narrow right column
@@ -21,7 +18,7 @@ $this->placeholder('narrowColumn')->captureStart();
 echo "<img src='" . $this->currentUser->getProfilePic('large') . "' class='narrow-column-picture dropshadow rounded-corners'/>";
 
 echo "<p class='width-100 center dark clear larger-margin-top'>" . $this->sport->sport . "</p>";
-echo "<div class='width-100 clear center green bold largest-text'>" . $this->sport->getOverall() . "</div>";
+echo "<div class='width-100 clear center green bold jumbo-text'>" . $this->sport->getOverall() . "</div>";
 echo "<div class='width-100 clear'>";
 
 foreach ($this->ratingOrder as $rating => $label) {
@@ -64,7 +61,7 @@ echo "<p class='clear light margin-top' tooltip='Total number of different playe
 echo "<p class='right dark margin-top'>" . $this->sportStats['totalPlayers'] . "</p>";
 
 
-echo "<p class='clear light margin-top' tooltip='You have played the most " . strtolower($this->sport->sport) . " games with this player.'>Most games with:</p>";
+echo "<p class='clear light margin-top' tooltip='You have played the most " . strtolower($this->sport->sport) . " games with these players.'>Most games with:</p>";
 foreach ($this->sportStats['mostPlayer'] as $player) {
 	
 	if (empty($player['name'])) {
@@ -76,6 +73,17 @@ foreach ($this->sportStats['mostPlayer'] as $player) {
 	
 	echo "<p class='clear width-100 dark'>" . $player . "</p>";
 }
+
+echo "<p class='clear light margin-top' tooltip='Estimated total calories burned (factoring in weight)'>
+		Calories burned:
+	  </p>";
+echo "<p class='right dark margin-top'>" . $this->sportStats['calories'] . "</p>";	 
+
+echo "<p class='clear light margin-top' tooltip='Avg calories burned per week'>
+		Calories/week:
+	  </p>";
+echo "<p class='right dark margin-top'>" . $this->sportStats['caloriesPerWeek'] . "</p>"; 
+
 echo $this->narrowcolumnsection()->end();
 
 $this->placeholder('narrowColumn')->captureEnd();
@@ -129,7 +137,8 @@ userID = '<?php echo $this->currentUser->userID;?>';
 			if ($month['value'] == 0) {
 				$month['value'] = 'null';
 			}
-			echo "['" . $month['month'] . "', " . $month['value'] . "],";
+
+			echo "[new Date(" . $month['year'] . "," . $month['month'] . "," . $month['day'] . "), " . $month['value'] . "], ";
 		}
 		
 		echo '];';

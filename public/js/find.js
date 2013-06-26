@@ -191,7 +191,9 @@ $(function()
 		} else {
 			var index = $(this).attr('parkIndex');
 		}
-		markers[index].setIcon('/images/global/gmap/markers/green_reverse.png');	
+
+		markers[index].setIcon('/images/global/gmap/markers/green_reverse.png');
+		markers[index].setZIndex(1200);
 		
 	})
 	$(document).on('mouseleave','.find-result-games,.find-result-parks',function() {
@@ -201,8 +203,8 @@ $(function()
 			var index = $(this).attr('parkIndex');
 		}
 		markers[index].setIcon('/images/global/gmap/markers/green.png');
-	})
-	
+		markers[index].setZIndex(1);
+	})	
 	
 	
 	$(document).on('mouseenter','.find-result-teams,.find-result-users',function()

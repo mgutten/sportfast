@@ -179,6 +179,15 @@ $(function()
 		})
 	})
 	
+	
+	$('#settings-info-email-alert-container').find('.selectable-text-one').click(function()
+	{
+		var val = $(this).text().toLowerCase();
+		
+		$('#settings-info-email-alert').val(val);
+		changed = 'info';
+	})
+	
 	$(document).bind('click.changed',function() {
 		
 		var button;
@@ -188,7 +197,31 @@ $(function()
 			button = $('#info-save-changes-container')
 		}
 		
-		button.show();
+		if (button.css('display') != 'block') {
+			button.css({'opacity': 0,
+						'display': 'block'})
+				  .stop().animate({opacity: 1}, 800);
+		}
+		
+	})
+	
+	
+	$('.settings-email-alert-on,.settings-email-alert-off').click(function(e)
+	{
+		e.preventDefault();
+		
+		var gameID = $(this).parents('.find-result-container').attr('gameID');
+		var onOrOff = ($(this).text().toLowerCase() == 'on' ? 0 : 1); // DoNotReply in db is 1 = no emails, 0 = emails
+		
+		updateEmailAlert(gameID, onOrOff);
+	})
+	
+	$('.find-result-container').hover(function()
+	{
+		$(this).find('.settings-x').css('opacity', 1);
+	}, function()
+	{
+		$(this).find('.settings-x').css('opacity', 0);
 	})
 		
 })
@@ -209,6 +242,25 @@ function removeSportFromUser(userID, sport)
 		data: {options: options},
 		success: function(data) {
 			reloadPage();
+		}
+	})
+}
+
+/**
+ * update game_subscribers doNotEmail for game
+ * @params (onOrOff => 1 = no emails, 0 = emails)
+ */
+function updateEmailAlert(gameID, onOrOff)
+{
+	var options = {gameID: gameID,
+				   onOrOff: onOrOff};
+				   
+	$.ajax({
+		url: '/ajax/update-email-alert-subscribed-game',
+		type: 'POST',
+		data: {options: options},
+		success: function(data) {
+			showConfirmationAlert('Updated');
 		}
 	})
 }

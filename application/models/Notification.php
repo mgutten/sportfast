@@ -214,12 +214,11 @@ class Application_Model_Notification extends Application_Model_ModelAbstract
 					$post = "</span>";
 				} 
 				
-			} else {
-				if ($replaceVal !== '') {
-					$pre  = "<span class='" . $class . "'>";
-					$replaceVal = $match;
-					$post = "</span>";
-				}
+			} elseif ($replaceVal == '') {
+				$pre  = "<span class='" . $class . "'>";
+				$replaceVal = $match;
+				$post = "</span>";
+				
 			}
 			
 			if ($ucwords) {
@@ -242,6 +241,18 @@ class Application_Model_Notification extends Application_Model_ModelAbstract
 	public function getTeamName()
 	{
 		return ucwords($this->_attribs['teamName']);
+	}
+	
+	/**
+	 * Is the picture of sports?
+	 */
+	public function isSports()
+	{
+		if ($this->_attribs['pictureType'] == 'sports') {
+			return true;
+		} else {
+			return false;
+		}
 	}
 	
 	/**

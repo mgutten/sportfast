@@ -1,0 +1,94 @@
+<?php
+/* 
+* controller => sports
+* action => football
+*/
+$this->headTitle('Football Rules');
+$this->headLink()->prependStylesheet($this->baseUrl() . '/css/sports.css');
+$this->headScript()->prependFile($this->baseUrl() . '/js/sports.js');
+?>
+
+<?php
+$this->placeholder('narrowColumn')->captureStart();
+
+echo "<p class='clear larger-margin-top heavy darkest'>Also see:</p>";
+
+foreach ($this->sports as $sport) {
+	if (strtolower($sport->sport) == strtolower($this->sport)) {
+		continue;
+	}
+	echo "<a href='/sports/" . strtolower($sport->sport) . "' class='clear sports-narrow-column-sport dark larger-text animate-darker white-background width-100'>" . $sport->sport . "</a>";
+}
+
+$this->placeholder('narrowColumn')->captureEnd();
+?>
+
+<header class='darkest jumbo-text heavy clear'>
+Pickup Football
+</header>
+
+
+<img src='/images/sports/<?php echo $this->sport;?>.jpg' class='clear dropshadow sports-img' />
+
+<p class='left larger-text darkest larger-margin-top'>
+    Here are the basic rules of pickup <?php echo $this->sport;?>.
+</p>
+
+<div class='clear sports-section-container width-100'>
+    <div class='clear sports-section-half'>
+        <p class='clear darkest heavy largest-text'>
+            Where it's played
+        </p>
+        <ul class='clear darkest larger-text'>
+            <li>grass field</li>
+        </ul>
+    </div>
+    <div class='left sports-section-half'>
+        <p class='clear darkest heavy largest-text'>
+            What you need
+        </p>
+        <ul class='clear darkest larger-text'>
+        	<li>football</li>
+            <li>cones or markers</li>
+            <li>cleats or athletic shoes</li>
+            <li>flags <span class='medium'>optional</span></li>
+        </ul>
+    </div>
+
+</div>
+
+<div class='clear sports-section-container width-100'>
+    <p class='clear darkest heavy largest-text'>
+        Setup
+    </p>
+    <p class='clear darkest'>
+    	The size of the field should be adjusted to the number of players you have.  Fewer players = smaller field.  Use your cones/markers to create the endzones.  For a 7-on-7 game, the sizing is as follows.  
+        Each endzone should be 7-10 yards deep <span class='medium'>(1 yard = 1 step)</span>.  The field is 40-50 yards wide and the distance from endzone to endzone is 100 yards.  A marker should be placed 
+        at the 50-yard line as the "first down" and "out-of-bounds" marker.
+    </p>
+    <div class='width-100 clear'>
+        <img src='/images/sports/football_field.jpg' class='sports-field-img' />
+    </div>
+</div>	
+
+<div class='clear sports-section-container width-100'>
+    <p class='clear darkest heavy largest-text'>
+        Basic rules
+    </p>
+    
+    <ul class='clear darkest '>
+        <li>There can be anywhere from 4 to 8 players per team</li>
+        <li>First team to reach the agreed point limit <span class='medium'>(e.g. 4 points)</span> wins</li>
+        <li>Each touchdown is worth 1 point</li>
+        <li>Your team has 4 downs to get past the "first down marker" and then 4 downs to score a touchdown after a first down <span class='medium'>(if not, then it's a turnover)</span></li>
+        <li>If there are flags available, use them.  Otherwise it's 2-hand touch <span class='medium'>(you are tackled when a defender touches you with 2 hands)</span></li>
+        <li>Absolutely NO TACKLING</li>
+    	<li>1 run per possession</li>
+        <li>1 blitz per possession <span class='medium'>(you must call "blitz")</span></li>
+        <li>"4 mississipi" count before you can rush the quarterback</li>
+        <li>Blockers cannot use their hands, they must use their body</li>
+        <li>After a touchdown, the scoring team can either throw or kick to the receiving team</li>
+       
+    </ul>
+
+</div>

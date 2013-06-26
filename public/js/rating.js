@@ -59,7 +59,7 @@ $(function()
 			   
 		var value = $(this).text().toLowerCase();
 		
-		createLineChart(chartData[value]);
+		createScatterChart(chartData[value]);
 			   
 		
 	})
@@ -117,7 +117,7 @@ function getRatingsForChart(userID, sportID, rating)
 // bug fix to allow callback in document.ready "google.load(..." line
 function createInitialChart()
 {
-	chart = new google.visualization.LineChart(document.getElementById('chart')); 
+	chart = new google.visualization.ScatterChart(document.getElementById('chart')); 
 	data = new google.visualization.DataTable();
 	
 	
@@ -140,12 +140,12 @@ function createInitialChart()
 						  function() {
 						   google.visualization.events.removeListener(listener)
 						   setTimeout(function() {
-							   createLineChart(chartData['overall'], false, 1000)
+							   createScatterChart(chartData['overall'], false, 1000)
 						   }, 100);
 						   
 						  });
 	
-	createLineChart(tempArray, true);
+	createScatterChart(tempArray, true);
 
 	
 	
@@ -166,17 +166,18 @@ function clearData() {
  * @params (initial => inital load of chart? (boolean),
  *			animation => (optional) duration for animation transition)
  */
-function createLineChart(dataArray, initial, animation)
+function createScatterChart(dataArray, initial, animation)
 {
 	
 	clearData();
-	
+
 	for (i = 0; i < dataArray.length; i++) {
 		if (i == 0) {
 			// First array, columns
 			if (initial) {
-				data.addColumn('string', dataArray[i][0]);
+				data.addColumn('date', dataArray[i][0]);
 				data.addColumn('number', dataArray[i][1]);
+			
 			} else {
 				data.removeColumn(1);
 				data.addColumn('number', dataArray[i][1]);
@@ -194,25 +195,38 @@ function createLineChart(dataArray, initial, animation)
 	}
 		
     	//data = google.visualization.arrayToDataTable(dataArray);
-
+		var min = new Date();
+		min.setMonth(min.getMonth() - 6);
+		
+		var max = new Date();
+		max.setDate(max.getDate() + 7);
+		
         var options = {
 		  backgroundColor: '#222',
 		  chartArea:{left:50,top:15,width:"100%",height:"80%"},
 		  colors:['#58bf12'],
 		  fontName: 'Futura-Heavy',
-		  hAxis: {minorGridlines: {color:'#000'},
+		  hAxis: {baselineColor: '#3f3f3f',
+		  	      minorGridlines: null,
+				  gridlines: {count: 0,
+				  			  color: '#222'},
 		  		  textStyle: {color: '#666',
 				  			  fontSize: 14},
 				  slantedText: true,
-				  slantedTextAngle: 30},
-		  isHtml: true,
-		  lineWidth: 4,
-		  pointSize: 8,
+				  slantedTextAngle: 30,
+				  viewWindowMode: 'explicit',
+				  viewWindow: {max: max,
+				  			   min: min
+							   },
+				  format: 'MMM'
+				  },
+		  pointSize: 6,
 		  animation:{duration: animation,
 					 easing: 'out'},
 		  tooltip: {textStyle: {color: '#58bf12', 
 		  						fontName: 'Futura-Heavy'}, 
-		  			showColorCode: false},
+		  			showColorCode: false
+					},
 		  legend: {position: 'none'},
 		  vAxis: {gridlines: {color: '#3f3f3f'},
 		  		  minorGridlines: {color:'#3f3f3f',

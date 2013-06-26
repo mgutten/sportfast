@@ -237,6 +237,6 @@ class GamesController extends Zend_Controller_Action
 		$this->view->history = $history;
 	}
 
-
+	
 }
 

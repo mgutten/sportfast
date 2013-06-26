@@ -1,0 +1,95 @@
+<?php
+/* 
+* controller => sports
+* action => football
+*/
+$this->headTitle('Soccer Rules');
+$this->headLink()->prependStylesheet($this->baseUrl() . '/css/sports.css');
+$this->headScript()->prependFile($this->baseUrl() . '/js/sports.js');
+?>
+
+<?php
+$this->placeholder('narrowColumn')->captureStart();
+
+echo "<p class='clear larger-margin-top heavy darkest'>Also see:</p>";
+
+foreach ($this->sports as $sport) {
+	if (strtolower($sport->sport) == strtolower($this->sport)) {
+		continue;
+	}
+	echo "<a href='/sports/" . strtolower($sport->sport) . "' class='clear sports-narrow-column-sport dark larger-text animate-darker white-background width-100'>" . $sport->sport . "</a>";
+}
+
+$this->placeholder('narrowColumn')->captureEnd();
+?>
+
+<header class='darkest jumbo-text heavy clear'>
+Pickup Soccer
+</header>
+
+
+<img src='/images/sports/<?php echo $this->sport;?>.jpg' class='clear dropshadow sports-img' />
+
+<p class='left larger-text darkest larger-margin-top'>
+    Here are the basic rules of pickup <?php echo $this->sport;?>.
+</p>
+
+<div class='clear sports-section-container width-100'>
+    <div class='clear sports-section-half'>
+        <p class='clear darkest heavy largest-text'>
+            Where it's played
+        </p>
+        <ul class='clear darkest larger-text'>
+            <li>grass field</li>
+            <li>indoor gym</li>
+            <li>asphalt</li>
+        </ul>
+    </div>
+    <div class='left sports-section-half'>
+        <p class='clear darkest heavy largest-text'>
+            What you need
+        </p>
+        <ul class='clear darkest larger-text'>
+        	<li>soccer ball</li>
+            <li>2 goals</li>
+            <li>cleats or athletic shoes</li>
+            <li>cones or markers</li>
+        </ul>
+    </div>
+
+</div>
+
+<div class='clear sports-section-container width-100'>
+    <p class='clear darkest heavy largest-text'>
+        Setup
+    </p>
+    <p class='clear darkest'>
+    	The size of the field should be adjusted to the number of players you have.  Fewer players = smaller field.  Use your cones/markers to create the sidelines.  The length and width is up to the players, but for a 6-a-side game, 
+        the field should be slightly larger than a basketball court, so about 60 ft wide and 120 feet long.
+    </p>
+    <div class='width-100 clear'>
+        <img src='/images/sports/soccer_field.jpg' class='sports-field-img' />
+    </div>
+</div>	
+
+<div class='clear sports-section-container width-100'>
+    <p class='clear darkest heavy largest-text'>
+        Basic rules
+    </p>
+    
+    <ul class='clear darkest '>
+        <li>There can be anywhere from 4 to 16 players per team</li>
+        <li>All participants play at the same time <span class='medium'>(no substitutions)</span></li>
+        <li>Teams can be chosen however you see fit</li>
+        <li>If there are too many players for one game, then players will need to wait until the current game ends</li>
+		<li>First team to reach the agreed point limit <span class='medium'>(e.g. 3 points)</span> wins</li>
+        <li>20 minute play clock.  If a team has not won by 20 minutes, then a new game should be started.</li>
+        <li>Small goals = no goalkeepers.  Large goals = optional goalkeepers.</li>
+    	<li>No throw-ins.  An out of bounds ball should be kicked in.</li>
+        <li>Any fouls should be kicked from the point of the foul <span class='medium'>(opponent must give at least 3 yards of space)</span></li>
+        <li>The ball must remain below the player's head at all times</li>
+        <li>No slide tackling</li>
+       
+    </ul>
+
+</div>

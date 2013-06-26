@@ -20,6 +20,16 @@ class Application_Model_Users extends Application_Model_TypesAbstract
 		return $user;
 	}
 	
+	public function getAllUserLocations($upper = false, $lower = false)
+	{
+		return $this->getMapper()->getAllUserLocations($upper, $lower, $this);
+	}
+	
+	public function getAllUsersStats()
+	{
+		return $this->getMapper()->getAllUsersStats();
+	}
+	
 	public function getUsersInArea($userID, $latitude, $longitude, $lastActive = false)
 	{
 		return $this->getMapper()->getUsersInArea($userID, $latitude, $longitude, $lastActive);

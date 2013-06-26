@@ -1,0 +1,118 @@
+<?php
+/* 
+* controller => sports
+* action => tennis
+*/
+$this->headTitle('Tennis Rules');
+$this->headLink()->prependStylesheet($this->baseUrl() . '/css/sports.css');
+$this->headScript()->prependFile($this->baseUrl() . '/js/sports.js');
+?>
+
+<?php
+$this->placeholder('narrowColumn')->captureStart();
+
+echo "<p class='clear larger-margin-top heavy darkest'>Also see:</p>";
+
+foreach ($this->sports as $sport) {
+	if (strtolower($sport->sport) == strtolower($this->sport)) {
+		continue;
+	}
+	echo "<a href='/sports/" . strtolower($sport->sport) . "' class='clear sports-narrow-column-sport dark larger-text animate-darker white-background width-100'>" . $sport->sport . "</a>";
+}
+
+$this->placeholder('narrowColumn')->captureEnd();
+?>
+
+<header class='darkest jumbo-text heavy clear'>
+Pickup Tennis
+</header>
+
+
+<img src='/images/sports/<?php echo $this->sport;?>.jpg' class='clear dropshadow sports-img' />
+
+<p class='left larger-text darkest larger-margin-top'>
+    Here are the basic rules of pickup <?php echo $this->sport;?>.
+</p>
+
+<div class='clear sports-section-container width-100'>
+    <div class='clear sports-section-half'>
+        <p class='clear darkest heavy largest-text'>
+            Where it's played
+        </p>
+        <ul class='clear darkest larger-text'>
+            <li>tennis court</li>
+        </ul>
+    </div>
+    <div class='left sports-section-half'>
+        <p class='clear darkest heavy largest-text'>
+            What you need
+        </p>
+        <ul class='clear darkest larger-text'>
+        	<li>tennis balls</li>
+            <li>tennis racquet</li>
+            <li>non-marking shoes <span class='medium'>most athletic shoes are non-marking</span></li>
+        </ul>
+    </div>
+
+</div>
+
+<div class='clear sports-section-container width-100'>
+    <p class='clear darkest heavy largest-text'>
+        Setup
+    </p>
+    <p class='clear larger-text darkest'>
+    	None required
+    </p>
+</div>	
+
+<div class='clear sports-section-container width-100'>
+    <p class='clear darkest heavy largest-text'>
+        Rally rules
+    </p>
+    
+    <ul class='clear darkest '>
+        <li>Noncompetitive</li>
+        <li>If an odd number of participants, rotate players fairly</li>
+        <li>Focus on practicing your hits</li>
+		<li>There is no winning, but you should play for the workout</li>
+        <li>The ball can <span class='medium'>(technically)</span> only bounce once on your side, or else it is "out"</li>
+    </ul>
+
+</div>
+
+<div class='clear sports-section-container width-100'>
+    <p class='clear darkest heavy largest-text'>
+        Match rules
+    </p>
+    
+    <ul class='clear darkest'>
+        <li>Determine the length of the match:</li>
+        <ul class='darkest'>
+        	<li>1 set</li>
+            <li>2 sets</li>
+        </ul>
+        <li>The first player to win 6 games wins the set.</li>
+        <li>The scoring for each game is as follows:</li>
+        <ul class='darkest'>
+        	<li>0 points: "love"</li>
+            <li>1 point: "15"</li>
+            <li>2 points: "30"</li>
+            <li>3 points: "40"</li>
+            <li>4 points: "game"</li>
+        </ul>
+        <li>A player must win a game by 2 points.  After the scores are past "40", the scoring is referred to by: </li>
+        <ul class='darkest'>
+        	<li>ad-in (advantage in): server is +1</li>
+            <li>ad-out (advantage out): server is -1</li>
+            <li>deuce: players are tied</li>
+        </ul>
+        <li>After a player wins a game, the player who did not serve is now the server.</li>
+        <li>Players should switch sides every 2 games.</li>
+        <li>If the ball hits the line, then it is still in play.</li>
+    </ul>
+
+</div>
+
+<div class='clear larger-text sports-section-container'>
+    <p class='clear darkest'>For more precise rules about <?php echo $this->sport;?>, <a href='http://tennis.about.com/cs/beginners/a/beginnerscore.htm' class='medium'>check here.</a></p>
+</div>

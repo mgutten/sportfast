@@ -171,7 +171,7 @@ echo "<span id='game-details'
 if ($this->topAlert && $this->userInGame) {
 	// Game is recurring 
 	echo $this->placeholder('topAlert')->captureStart();
-		$content = "<p class='white heavy width-100 center'>This game happens every week. <span class='white'> Click here to subscribe.</span></p>";
+		$content = "<p class='white heavy width-100 center'>This game happens every week. <span class='white'> Click here to subscribe for weekly reminders.</span></p>";
 		echo $this->topalert('subscribe', $content);
 	echo $this->placeholder('topAlert')->captureEnd();
 	/*

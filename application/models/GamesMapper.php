@@ -498,16 +498,30 @@ class Application_Model_GamesMapper extends Application_Model_MapperAbstract
 	/**
 	 * save user confirmation (confirmed or not) to db for team game
 	 * @params ($userID => user's id,
-	 *			$typeID => gameID,
+	 *			$typeID => teamGameID,
 	 *			$inOrOut=> 0 for not in, 1 for in
 	 *			$insertOrUpdate => "insert" or "update"
 	 */
-	public function saveTeamGameConfirmation($userID, $typeID, $inOrOut, $insertOrUpdate, $teamID)
+	public function saveTeamGameConfirmation($userID, $typeID, $inOrOut, $insertOrUpdate = false, $teamID = false)
 	{
+		
+		
+		$db = Zend_Db_Table::getDefaultAdapter();
+		
+		$sql = "INSERT INTO user_team_games (teamID, userID, teamGameID, confirmed) VALUES ((SELECT teamID FROM team_games WHERE teamGameID = :teamGameID),:userID,:teamGameID,:confirmed)
+				  ON DUPLICATE KEY UPDATE confirmed = :confirmed;";
+		
+		$values = array('teamGameID' => $typeID,
+						'userID'	 => $userID,
+						'confirmed'  => $inOrOut);
+		
+		$db->query($sql, $values);
+		
+		
+		/*
 		$this->setDbTable('Application_Model_DbTable_UserTeamGames');
 		$table    = $this->getDbTable();
-		$insertOrUpdate = strtolower($insertOrUpdate);
-		
+		$insertOrUpdate = strtolower($insertOrUpdate);		  
 		
 		if ($insertOrUpdate == 'update') {
 			$data  = array('confirmed' => $inOrOut);
@@ -528,9 +542,44 @@ class Application_Model_GamesMapper extends Application_Model_MapperAbstract
 						);
 			$table->insert($data);
 		}
+		*/
 		
 		return $this;
 		
+	}
+	
+	/**
+	 * get teamID from teamGameID
+	 */
+	public function getTeamIDFromTeamGameID($teamGameID)
+	{
+		$db = Zend_Db_Table::getDefaultAdapter();
+		$sql = "SELECT teamID FROM team_games WHERE teamGameID = ? LIMIT 1";
+		
+		$results = $db->query($sql, array($teamGameID));
+		
+		foreach ($results as $result) {
+			$teamID = $result['teamID'];
+		}
+		
+		return $teamID;
+	}
+	
+	/**
+	 * check if user has responded to an upcoming team game
+	 * @params ($userID => user's id,
+	 *			$teamGameID => teamGameID,
+	 */
+	public function checkTeamGameConfirmation($userID, $teamGameID)
+	{
+		$table = $this->getDbTable();
+		$select = $table->select();
+		$select->setIntegrityCheck(false);
+		
+		$select->from(array('utg' => 'user_team_games'))
+			   ->where('utg.userID = ?', $userID)
+			   ->where('utg.teamGameID = ?', $teamGameID);
+			   
 	}
 	
 	/**
@@ -703,6 +752,39 @@ class Application_Model_GamesMapper extends Application_Model_MapperAbstract
 					   'temporary = ?'	=> 1);
 	   		
 		return $table->update($data, $where);
+	}
+	
+	/**
+	 * add user to game
+	 */
+	public function addUserToGame($gameID, $userID)
+	{
+		if (empty($gameID) || empty($userID)) {
+			return false;
+		}
+		
+		$table = $this->getDbTable();
+		$select = $table->select();
+		$select->setIntegrityCheck(false);
+		
+		$select->from(array('ug' => 'user_games'))
+			   ->where('ug.userID = ?', $userID)
+			   ->where('ug.gameID = ?', $gameID);
+			   
+		$result = $table->fetchRow($select);
+		
+		if ($result) {
+			// Already in game
+			return false;
+		}
+		
+		$data = array('userID' => $userID,
+					  'gameID' => $gameID);
+		$db = Zend_Db_Table::getDefaultAdapter();
+		
+		$db->insert('user_games', $data);
+		
+		return true;
 	}
 	
 	/**

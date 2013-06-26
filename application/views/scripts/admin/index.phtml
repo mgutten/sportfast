@@ -1,0 +1,16 @@
+<?php
+$this->headLink()->prependStylesheet($this->baseUrl() . '/css/admin.css');
+
+if ($this->loginForm) {
+	echo "<p class='largest-text darkest heavy clear'>Admin Login</p>";
+	echo "<div class='clear'>";
+	echo "<form id='adminLogin' name='adminLogin' method='post' action='/admin/auth'>";
+	echo $this->loginForm;
+	echo "</form>";
+	echo "</div>";
+} else {
+	// Logged in
+	?>	
+	<a class='darkest heavy larger-text' href='/admin/user-map' >User Map</a>
+    
+<?php }?>

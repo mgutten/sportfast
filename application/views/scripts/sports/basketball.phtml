@@ -1,0 +1,89 @@
+<?php
+/* 
+* controller => sports
+* action => basketball
+*/
+$this->headTitle('Basketball Rules');
+$this->headLink()->prependStylesheet($this->baseUrl() . '/css/sports.css');
+$this->headScript()->prependFile($this->baseUrl() . '/js/sports.js');
+?>
+
+<?php
+$this->placeholder('narrowColumn')->captureStart();
+
+echo "<p class='clear larger-margin-top heavy darkest'>Also see:</p>";
+
+foreach ($this->sports as $sport) {
+	if (strtolower($sport->sport) == strtolower($this->sport)) {
+		continue;
+	}
+	echo "<a href='/sports/" . strtolower($sport->sport) . "' class='clear sports-narrow-column-sport dark larger-text animate-darker white-background width-100'>" . $sport->sport . "</a>";
+}
+
+$this->placeholder('narrowColumn')->captureEnd();
+?>
+
+<header class='darkest jumbo-text heavy clear'>
+Pickup Basketball
+</header>
+
+
+<img src='/images/sports/basketball.jpg' class='clear dropshadow sports-img' />
+
+<p class='left larger-text darkest larger-margin-top'>
+    Here are the basic rules of pickup basketball.
+</p>
+
+<div class='clear sports-section-container width-100'>
+    <div class='clear sports-section-half'>
+        <p class='clear darkest heavy largest-text'>
+            Where it's played
+        </p>
+        <ul class='clear darkest larger-text'>
+            <li>basketball court</li>
+        </ul>
+    </div>
+    <div class='left sports-section-half'>
+        <p class='clear darkest heavy largest-text'>
+            What you need
+        </p>
+        <ul class='clear darkest larger-text'>
+            <li>basketball</li>
+            <li>athletic shoes</li>
+        </ul>
+    </div>
+
+</div>
+
+<div class='clear sports-section-container width-100'>
+    <p class='clear darkest heavy largest-text'>
+        Setup
+    </p>
+    <p class='clear darkest larger-text'>
+    	None required
+    </p>
+</div>
+
+<div class='clear sports-section-container width-100'>
+    <p class='clear darkest heavy largest-text'>
+        Basic rules
+    </p>
+    
+    <ul class='clear darkest '>
+        <li>The first 10 players to show up will play the first game.</li>
+        <li>Teams can be chosen any way you see fit, including shooting for teams or simply splitting them up.</li>
+    	<li>Teams should agree on scoring rules:</li>
+            <ul class='darkest'>
+                <li>By ones -- everything is worth 1 point</li>
+                <li>By twos -- everything inside the 3-point-line is 2 points, outside is 3</li>
+            </ul>
+        <li>First team to reach the agreed point limit <span class='medium'>(e.g. 11 points by ones)</span> wins.</li>
+        <li>If there are more than 5 players waiting and the winning team has won 3 games in a row, then new teams should be chosen.</li>
+        <li>A player who gets fouled should call it by saying "Foul".  The ball will then be checked in at the top of the 3-point line.</li>
+        <li>Pickup is usually played with "man" defense, where you are responsible for guarding one opposing player.</li>
+        <li>Teams should "check" the ball after a foul <span class='medium'>(there are no free throws)</span></li>
+        <li>To "check" the ball, the offensive player gives the ball to the defensive player, who will then give it back to them.  The offensive player must then pass the ball to a teammate.</li>
+        <li>The winning team plays the next 5 players <span class='medium'>(those waiting)</span>, or if there are not 5 waiting, then the losing team will shoot 3-pointers to decide who gets to play again <span class='medium'>(make it and you're on)</span></li>
+    </ul>
+
+</div>

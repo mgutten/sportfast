@@ -93,7 +93,7 @@ $this->placeholder('absolute')->captureEnd();
             </div>
         </div>
         <a href='/users/<?php echo $this->user->userID;?>/upload' class='right' id='settings-profile-pic-container' tooltip='Upload new profile picture'>
-        	<img src='<?php echo $this->user->getProfilePic('medium');?>' class='right' id='settings-profile-pic'/>
+        	<img src='<?php echo $this->user->getProfilePic('medium');?>' class='right rounded-corners' id='settings-profile-pic'/>
        	</a>
     	
     	<p class='heavy larger-text darkest width-100 clear settings-sub-header'>Login Info</p>
@@ -108,6 +108,25 @@ $this->placeholder('absolute')->captureEnd();
             
 			echo $this->signupForm->userLocation;
             ?>
+        </div>
+        
+        <div class='clear settings-sub-header larger-text' id='settings-info-email-alert-container'>
+        	<?php
+			$offClass = $onClass = '';
+			if ($this->user->noEmail) {
+				$offClass = 'green-bold';
+				$hiddenVal = 'off';
+			} else {
+				$onClass = 'green-bold';
+				$hiddenVal = 'on';
+			}
+			?>
+        	<p class='darkest clear heavy'>
+            	Email Alerts <span class='medium smaller-text'>when a game is created for you</span>
+            </p>
+            <p class='clear selectable-text-one light pointer <?php echo $onClass;?>'>on</p>
+            <p class='left larger-indent selectable-text-one light pointer <?php echo $offClass;?>'>off</p>
+            <input type='hidden' id='settings-info-email-alert' name='noEmail' value='<?php echo $hiddenVal;?>' />
         </div>
        
         <div class='clear-right larger-margin-top hidden' id='info-save-changes-container'> 
@@ -176,6 +195,12 @@ $this->placeholder('absolute')->captureEnd();
 				echo "<p class='medium clear none-text width-100 center'>No subscribed games</p>";
 			} else {
 				foreach ($this->subscribedGames->getAll() as $game) {
+						$onClass = $offClass = '';
+					if ($game->doNotEmail) {
+						$offClass = 'green-bold';
+					} else {
+						$onClass = 'green-bold';
+					}
 					echo "<a href='/games/" . $game->gameID . "' class='clear find-result-container animate-darker' gameID='" . $game->gameID . "'>";
 					echo	"<img src='" . $game->getProfilePic('medium') . "' class='left'/>";
 					echo	"<div class='left find-result-left-container'>";
@@ -186,6 +211,11 @@ $this->placeholder('absolute')->captureEnd();
 					echo	"</div>";
 					echo	"<div class='right find-result-right-container'>";
 					echo		"<p class='settings-x red jumbo-text header right' tooltip='Unsubscribe from this game'>x</p>";
+					echo		"<div class='clear-right settings-email-alert-container' tooltip='Do you wish to receive weekly reminders for this game?'>";
+					echo			"<p class='darkest clear-right smaller-text'>Email Alerts</p>";
+					echo			"<p class='clear-right light selectable-text-one settings-email-alert-off " . $offClass . "'>off</p>";
+					echo			"<p class='right pointer selectable-text-one light settings-email-alert-on " . $onClass . "'>on</p>";
+					echo		"</div>";
 					echo	"</div>";
 					echo "</a>";
 				}

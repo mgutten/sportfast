@@ -199,7 +199,7 @@ class Application_Controller_Helper_Dropdown extends Zend_Controller_Action_Help
 						continue;
 					}
 					
-					if ($section == 'games') {
+					if ($section == 'games' && $model->isPickup()) {
 						// Game
 						$pre 	 = "<div class='dropdown-menu-option-container animate-darker invite medium smaller-text' idType='gameID' gameID='" . $model->gameID . "'>
 										<p class='dropdown-menu-option-text medium'>";
@@ -210,7 +210,9 @@ class Application_Controller_Helper_Dropdown extends Zend_Controller_Action_Help
 						$pre 	 = "<div class='dropdown-menu-option-container animate-darker invite medium smaller-text' idType='teamID' teamID='" . $model->teamID . "'>
 										<p class='dropdown-menu-option-text medium'>";
 						$content = $model->getLimitedName('teamName', 23);
-					} /*elseif ($section == 'groups') {
+					} else {
+						continue;
+					}/*elseif ($section == 'groups') {
 						// Group
 						$output .= $pre . $model->getLimitedName('groupName', 23) . $post;
 					}*/

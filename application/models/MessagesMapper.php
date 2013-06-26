@@ -141,7 +141,7 @@ class Application_Model_MessagesMapper extends Application_Model_MapperAbstract
 		
 		$select = "SELECT `m`.* FROM 
 						(SELECT * FROM messages as m2 
-							INNER JOIN users as u ON (u.userID = m2.sendingUserID)
+							LEFT JOIN users as u ON (u.userID = m2.sendingUserID)
 							WHERE (receivingUserID = '" . $userID . "')
 							ORDER BY m2.`dateHappened` desc) AS `m` 
 					GROUP BY m.messageGroupID ORDER BY m.dateHappened DESC";
@@ -189,7 +189,7 @@ class Application_Model_MessagesMapper extends Application_Model_MapperAbstract
 		 $select->setIntegrityCheck(false);
 		 
 		 $select->from(array('m' => 'messages'))
-		 		->join(array('u' => 'users'),
+		 		->joinLeft(array('u' => 'users'),
 					   'u.userID = m.sendingUserID')
 		 		->where('m.messageGroupID = ?', $messageGroupID)
 				->order('m.dateHappened DESC')

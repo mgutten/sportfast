@@ -35,6 +35,7 @@ var gmapMarkers;
 var gmap;
 var userLocation = new Array();
 var curDate = new Date();
+var notificationScrolling;
 
 
 $(function()
@@ -141,13 +142,13 @@ $(function()
 			var darkerColor = getDarkerColor(mouseoverColor);
 			var ele         = this;
 			
-			this.stop().animate({backgroundColor: darkerColor},200);
+			this.stop().animate({backgroundColor: darkerColor},300);
 			
 	  }
 	  
 	  /* animate element background darker */
 	  $.fn.animateLighter = function() {
-		 	this.stop().animate({backgroundColor: this.attr('color')},200);		 
+		 	this.stop().animate({backgroundColor: this.attr('color')},300);		 
 	  }
 	  
 	  /* unset height and width restrictions, let image show naturally */
@@ -497,6 +498,26 @@ $(function()
 		
 	})
 	
+	$('#notifications-container').bind('mousewheel', function(e,delta){
+		e.preventDefault();
+		
+		if (notificationScrolling) {
+			return false;
+		}
+		notificationScrolling = true;
+        if(e.originalEvent.wheelDelta /120 > 0) {
+			$(this).stop().animate({scrollTop: $(this).scrollTop() - 80}, {duration:200, complete: function() {
+																											notificationScrolling = false;
+			}});
+        }
+        else{
+			// Down
+			$(this).stop().animate({scrollTop: $(this).scrollTop() + 80}, {duration:200, complete: function() {
+																											notificationScrolling = false;
+			}});
+        }
+    });
+	
 	/* notification Confirm or Decline button was clicked */
 	$('.notification-action-button').click(function(e)
 	{
@@ -663,7 +684,7 @@ $(function()
 	
 	
 	/* change color of selectable text */
-	$('.selectable-text').click(function() {
+	$('.selectable-text,.selectable-text-one').click(function() {
 		if ($(this).is('.selectable-text-one')) {
 			// Only one can be chosen at a time
 			if ($(this).is('.green-bold')) {
@@ -1646,6 +1667,7 @@ function alignDropdownContainer(ele)
 	 var alignedPos = alignEle.offset().left;
 	 if (moveEle.is('.dropdown-menu-hidden-container') || moveEle.css('position') !== 'absolute') {
 		 alignedPos = alignEle.position().left;
+		
 	 }
 	
 	 var windowWidth  = $(window).width();
@@ -1663,6 +1685,8 @@ function alignDropdownContainer(ele)
 		 var moveWidth = moveEle.width();
 		 left -= moveWidth/2;
 	 }
+	 
+	
 	 
 	 moveEle.css('left',left);
 	 

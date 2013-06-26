@@ -126,7 +126,7 @@ class Application_Model_Park extends Application_Model_ModelAbstract
 	
 	public function getHours()
 	{
-		if ($this->_attribs['type'] == 'school') {
+		if ($this->_attribs['parkType'] == 'school') {
 			return 'Not School Hours';
 		}
 		$openTime = $this->getTime('openTime',true);

@@ -112,7 +112,8 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 					}
 				}
 			}
-			//$session->rating = true;
+			$session->rating = true;
+			
 				
 			
 			$user->resetNewNotifications()
@@ -230,16 +231,18 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 		
 		// Games page
 		$r = new Zend_Controller_Router_Route_Regex(
-				'games(?:/(\d+))?(?:/(.+))?',
+				'games(?:/(\d+))?(?:/([a-z]+[-+[a-z]+]?))?(?:/(.+))?',
 				array(
 						'action' => 'index',
 						'controller' => 'games',
 						'module' => 'default',
-						'id'	 => '1'
+						'id'	 => '1',
+						'param2' => '1'
 				),
 				array(
 						1 => 'id',
-						2 => 'action'
+						2 => 'action',
+						3 => 'param2'
 				),
 				'games/%d');
 				
@@ -296,6 +299,25 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 				
 		$router->addRoute('cron', $r);
 		
+		
+		// Games page
+		$r = new Zend_Controller_Router_Route_Regex(
+				'mail(?:/([a-z]+[-+[a-z]+]?))?(?:/(\d+))?(?:/(.+))?',
+				array(
+						'action' => 'index',
+						'controller' => 'mail',
+						'module' => 'default',
+						'id'	 => '1',
+						'param2' => '1'
+				),
+				array(
+						1 => 'action',
+						2 => 'id',
+						3 => 'param2'
+				),
+				'mail/%s');
+				
+		$router->addRoute('mail', $r);
 		
 		return $view;
 	}

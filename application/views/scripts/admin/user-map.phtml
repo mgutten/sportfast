@@ -1,0 +1,38 @@
+<?php 
+$this->headLink()->prependStylesheet($this->baseUrl() . '/css/admin.css');
+$this->headScript()->prependFile($this->baseUrl() . '/js/admin.js');
+$this->headScript()->prependFile('https://maps.googleapis.com/maps/api/js?key=AIzaSyAhxSMQ-WQux2nzTW4dBoKmpfGHVQOk7r8&sensor=false');
+
+?>
+<p class='largest-text darkest heavy'>
+	User Map
+</p>
+<div id='gmap' class='width-100'>
+</div>
+
+<?php
+	foreach ($this->stats as $stat) {
+		echo "<div class='width-33 left larger-margin-top'>";
+		echo	"<p class='darkest clear'>" . ucwords($stat['description']) . "</p>";
+		echo	"<p class='clear darkest heavy largest-text'>" . $stat['value'] . "</p>";
+		echo "</div>";
+	}
+?>
+
+<script type='text/javascript'>
+	<?php 
+	   if (!empty($this->users)) {
+		   // Matches exist
+		   ?>
+		gmapMarkers = [		<?php
+								 foreach ($this->users as $user) {
+									 if ($user instanceof Application_Model_User) {
+										 // Is game, create marker on map
+										 $location = $user->getLocation();
+										 echo '[' . $location->latitude . ',' . $location->longitude . '],';
+									 }
+								 }?>
+					  ]
+	<?php } ?>
+					
+	</script> 

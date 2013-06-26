@@ -137,6 +137,19 @@ class UsersController extends Zend_Controller_Action
 		
 		// Narrow column data
 		$oldData = $this->view->sport->getUserSportData($user->userID);
+
+		$calories = $oldData['calories'] * $user->weight;
+		$curDate  = new DateTime('now');
+		$numWeeks = $curDate->diff($user->getJoinedDate())->format('%a') / 7;
+		
+		$caloriesPerWeek = round($calories/$numWeeks);
+		if ($calories > 5000) {
+			$calories = round($calories/1000) . 'k';
+		} else {
+			$calories = round($calories);
+		}
+		$oldData['calories'] = $calories;
+		$oldData['caloriesPerWeek'] = round($caloriesPerWeek);
 		$this->view->sportStats = $oldData;
 		
 		
@@ -207,6 +220,7 @@ class UsersController extends Zend_Controller_Action
 		$user->weight = $post['weight'];
 		$user->setHeightFromFeetAndInches($post['heightFeet'], $post['heightInches']);
 		$user->setAgeFromDob();
+		$user->noEmail = ($post['noEmail'] == 'on' ? 0 : 1);
 		
 		
 		
@@ -420,9 +434,13 @@ class UsersController extends Zend_Controller_Action
 		$otherUserID = $messages->getOtherUserID($this->view->user->userID);
 		
 		$otherUser = new Application_Model_User();
-		$otherUser->getUserByID($otherUserID);
-		
-		$this->view->otherUserName = $otherUser->shortName;
+		if ($otherUser->getUserByID($otherUserID)) {
+			// Got user
+			$this->view->otherUserName = $otherUser->shortName;
+		} else {
+			// Else might be sportfast welcome message
+			$this->view->otherUserName = "Sportfast";
+		}
 		
 		$this->view->messages = $messages->read;
 		

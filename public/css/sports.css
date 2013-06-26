@@ -1,0 +1,22 @@
+/* CSS Document */
+
+.sports-narrow-column-sport {
+	padding: .1em 0;
+}
+
+.sports-section-container {
+	margin-top: 1.5em;
+}
+
+.sports-section-half {
+	width: 50%;
+}
+
+.sports-field-img {
+	display:block;
+	margin: 1em auto 0 auto;
+}
+
+.sports-img {
+	border: solid 1px #333;
+}

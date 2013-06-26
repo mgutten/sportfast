@@ -194,9 +194,27 @@ class AjaxController extends Zend_Controller_Action
 		 } else {
 			 // Subscribe
 			 $data = array('userID' => $options['userID'],
-			 			   $options['idType'] => $options['typeID']);
+			 			   $options['idType'] => $options['typeID'],
+						   'joinDate' => 'now()');
 			 $table->insert($data);
 		 }
+	 }
+	 
+	 /**
+	  * change doNotEmail column for current user in db for a given game
+	  */
+	 public function updateEmailAlertSubscribedGameAction()
+	 {
+		$options = $this->getRequest()->getPost('options'); 
+		
+		$table = new Application_Model_DbTable_GameSubscribers();
+		
+		$where = array('userID = ?' => $this->view->user->userID,
+					   'gameID = ?' => $options['gameID']);
+		
+		$data = array('doNotEmail' => $options['onOrOff']);
+		
+		$table->update($data, $where);
 	 }
 	 
 	  /**

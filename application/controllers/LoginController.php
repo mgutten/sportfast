@@ -112,6 +112,7 @@ class LoginController extends Zend_Controller_Action
 				// Login was initiated from redirect in Authorization plugin (ie tried to access login-required page without being logged in)
 				// Redirect to stored URL (original attempted url)
 				$url = $session->url;
+				
 				Zend_Session::namespaceUnset('postLoginURL');
 				return $this->_helper->redirector->goToUrl($url);
 			}

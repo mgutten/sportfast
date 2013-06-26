@@ -1,0 +1,90 @@
+<?php
+/* 
+* controller => sports
+* action => volleyball
+*/
+$this->headTitle('Volleyball Rules');
+$this->headLink()->prependStylesheet($this->baseUrl() . '/css/sports.css');
+$this->headScript()->prependFile($this->baseUrl() . '/js/sports.js');
+?>
+
+<?php
+$this->placeholder('narrowColumn')->captureStart();
+
+echo "<p class='clear larger-margin-top heavy darkest'>Also see:</p>";
+
+foreach ($this->sports as $sport) {
+	if (strtolower($sport->sport) == strtolower($this->sport)) {
+		continue;
+	}
+	echo "<a href='/sports/" . strtolower($sport->sport) . "' class='clear sports-narrow-column-sport dark larger-text animate-darker white-background width-100'>" . $sport->sport . "</a>";
+}
+
+$this->placeholder('narrowColumn')->captureEnd();
+?>
+
+<header class='darkest jumbo-text heavy clear'>
+Pickup Volleyball
+</header>
+
+
+<img src='/images/sports/<?php echo $this->sport;?>.jpg' class='clear dropshadow sports-img' />
+
+<p class='left larger-text darkest larger-margin-top'>
+    Here are the basic rules of pickup <?php echo $this->sport;?>.
+</p>
+
+<div class='clear sports-section-container width-100'>
+    <div class='clear sports-section-half'>
+        <p class='clear darkest heavy largest-text'>
+            Where it's played
+        </p>
+        <ul class='clear darkest larger-text'>
+            <li>grass field</li>
+            <li>sand pit/beach</li>
+            <li>asphalt</li>
+        </ul>
+    </div>
+    <div class='left sports-section-half'>
+        <p class='clear darkest heavy largest-text'>
+            What you need
+        </p>
+        <ul class='clear darkest larger-text'>
+        	<li>volleyball</li>
+            <li>net</li>
+            <li>cones or markers</li>
+        </ul>
+    </div>
+
+</div>
+
+<div class='clear sports-section-container width-100'>
+    <p class='clear darkest heavy largest-text'>
+        Setup
+    </p>
+    <p class='clear larger-text darkest'>
+    	If you are playing in a volleyball pit or court, the setup is simple.  The court should be as wide as the net and about 60 ft long.  If there are no pre-drawn lines available, use markers.
+        The net itself may need to be set up, in which case you should refer to the net's instruction manual.  For women, the net is 7'4" high and for men it is 8'.
+    </p>
+</div>	
+
+<div class='clear sports-section-container width-100'>
+    <p class='clear darkest heavy largest-text'>
+        Basic rules
+    </p>
+    
+    <ul class='clear darkest '>
+        <li>You can have anywhere from 2 to 6 players per team.</li>
+        <li>First team to reach the agreed point limit <span class='medium'>(e.g. 15 points)</span> wins.</li>
+        <li>A team has 3 hits to get the ball over to the other team's side, and no player can hit the ball twice consecutively.</li>
+        <li>You can score by either:</li>
+        <ul class='darkest'>
+        	<li>a kill: you hit the ball into the ground of the opposing team's court</li>
+            <li>a fault: the opposing team fails to get the ball over the net or hits the ball out of bounds</li>
+        </ul>
+        <li>A player will serve from behind the back line and continue serving until the serving team fails to score, in which case the opposing team will then serve.</li>
+        <li>After the serving team fails to score, they must rotate in a clockwise direction while maintaining 3 players near the net and 3 players in the back of the court.</li>
+    </ul>
+
+</div>
+

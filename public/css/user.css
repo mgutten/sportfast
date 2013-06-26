@@ -1,5 +1,10 @@
 /* user profile css */
 
+/* overwrite */
+#dropdown-menu-hidden-container-invite-to {
+	width: 8.5em;
+}
+
 /* top user info section */
 
 #profile-buttons-container {

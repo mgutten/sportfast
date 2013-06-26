@@ -40,5 +40,10 @@ class AboutController extends Zend_Controller_Action
 	{
 		$this->view->narrowColumn = false;
 	}
+	
+	public function privacyAction()
+	{
+	}
+	
 }
 
