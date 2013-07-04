@@ -82,6 +82,13 @@ class UsersController extends Zend_Controller_Action
 		if ($session->url) {
 			$this->view->goToURL = $session->url;
 		}
+
+		
+		$session = new Zend_Session_Namespace('pictureRequired');
+		if ($session->fail) {
+			$this->view->pictureRequired = true;
+		}
+		$session->fail = false;
 	}
 	
 	public function ratingsAction()

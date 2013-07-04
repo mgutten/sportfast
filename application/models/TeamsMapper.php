@@ -498,5 +498,29 @@ class Application_Model_TeamsMapper extends Application_Model_MapperAbstract
 							
 		$db->query($deleteGames);
 	}
+	
+	/**
+	 * get team captains
+	 */
+	public function getTeamCaptains($teamID)
+	{
+		$table = $this->getDbTable();
+		$select = $table->select();
+		$select->setIntegrityCheck(false);
+		
+		$select->from(array('tc' => 'team_captains'))
+			   ->where('tc.teamID = ?', $teamID);
+			   
+		$captains = $table->fetchAll($select);
+		
+		$returnArray = array();
+		
+		foreach ($captains as $captain) {
+			$returnArray[] = $captain->userID;
+		}
+		
+		return $returnArray;
+	}
+
 			
 }

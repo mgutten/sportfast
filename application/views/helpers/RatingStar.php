@@ -14,6 +14,7 @@ class Application_View_Helper_RatingStar
 		if ($outerClass) {
 			$class .= $outerClass;
 		}
+
 		
 		if ($url) {
 			// Do not make linkable
@@ -24,9 +25,11 @@ class Application_View_Helper_RatingStar
 			$post = "</div>";
 		}
 		
+
+		
 		$output = $pre .
-						"<img class='clear' src='/images/global/rating/stars/" . $size . ".png'/>
-						<div class='clear rating-star-back-" . $size . " green-back' style='width:" . $width . "'></div>"
+						"<img class='clear' src='/images/global/rating/stars/" . $size . "_dropshadow.png'/>
+						<div class='clear rating-star-back-" . $size . " green-back' style='width:" . $width . ";'></div>"
 				  . $post;
 					
 		return $output;
@@ -39,7 +42,7 @@ class Application_View_Helper_RatingStar
 			$id = " id='" . $id . "' ";
 		}
 		$output  = "<div class='clear rating-star-container-" . $size . "  rating-star-clickable pointer' " . $id . ">";
-		$output .= "<img class='clear' src='/images/global/rating/stars/" . $size . ".png'/>
+		$output .= "<img class='clear' src='/images/global/rating/stars/" . $size . "_dropshadow.png'/>
 						<div class='clear rating-star-back-" . $size . " green-back rating-star-back'></div>";
 		$output .= "</div>";
 						

@@ -487,6 +487,11 @@ div.signup-narrow-column-img-container {
 	margin-top: -.15em;
 }
 
+/* type */
+.signup-type-prefix-container > .selectable-text:nth-child(even) {
+	margin-left: 4.6em;
+}
+
 /* finish button */
 
 #signup-finish {
@@ -495,4 +500,14 @@ div.signup-narrow-column-img-container {
 	width: 93%;
 	font-size: 2em;
 	margin-top: 1.5em;
+}
+
+/* verification page */
+#signup-validate-container {
+	position:absolute;
+	top: 50%;
+	margin-top: -7em;
+	width: 40em;
+	left: 50%;
+	margin-left: -20em;
 }

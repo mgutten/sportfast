@@ -279,10 +279,17 @@ function getAvailableUsers(month, date, year, hour, sportID)
 		type: 'POST',
 		data: {options: options},
 		success: function(data) {
+			
 			$('#available-players').text(data);
-			$('#available-players-container').css({'opacity': 0,
-												   'display': 'block'})
-										     .animate({'opacity': 1}, 300);
+			
+			var percent = Math.floor(data * .25)
+			$('#available-players-percent').text(percent);
+			
+			if ($('#available-players-container').css('display') != 'block') {
+				$('#available-players-container').css({'opacity': 0,
+													   'display': 'block'})
+												 .animate({'opacity': 1}, 300);
+			}
 		}
 	})		
 }
@@ -292,6 +299,8 @@ function getAvailableUsers(month, date, year, hour, sportID)
  */
 function getSimilarGames(month, date, year, sportID)
 {
+	$('*').css('cursor', 'progress');
+	
 	var options = new Object();
 	options.month = month;
 	options.date = date;
@@ -305,6 +314,8 @@ function getSimilarGames(month, date, year, sportID)
 		success: function(data) {
 			data = JSON.parse(data);
 			populateSimilarGames(data);
+			
+			$('*').css('cursor', '');
 		}
 	})		
 }
@@ -788,13 +799,16 @@ function populateSimilarGames(results)
 			output += "</a>";
 		}
 		
+		$('#create-similar-games-outer-container').show();
+		$('#create-similar-games-container').html(output);
+		//$('#create-similar-games-header').show();
 		
 	} else {
 		output  = "<p class='width-100 center light larger-margin-top'>There are no " + sport + " games scheduled for this day.</p>";	
+		$('#create-similar-games-outer-container').hide();
 	}
 	
-	$('#create-similar-games-container').html(output);
-	$('#create-similar-games-header').show();
+	
 }
 	
 

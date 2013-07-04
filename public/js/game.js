@@ -119,7 +119,15 @@ $(function() {
 		
 		$('.alert-x').hide();
 	}
-			
+		
+	if ($('#stash-available-alert-container').length > 0) {
+		// User just joined game and there is a stash available
+		showAlert($('#stash-available-alert-container'));
+		
+		$('.game-stash-button').click(function() {
+			$('.alert-black-back').trigger('click');
+		})
+	}
 
 })
 

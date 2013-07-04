@@ -23,7 +23,8 @@ $this->placeholder('narrowColumn')->captureEnd();
 <header class='width-100 left'>
 	<p class='jumbo-text heavy darkest left'><?php echo $this->numRatings;?></p>
     <p class='left largest-text darkest profile-header-sub'>for <?php echo $this->park->parkName;?> </p>
-    <?php echo $this->ratingStar('large', $this->ratingWidth, $this->currentURI, 'margin-top');?>
+    <?php echo $this->ratingStar('large', $this->ratingWidth, $this->currentURI, '');?>
+    
 </header>
 
 <div class='width-100 clear ratings-container'>

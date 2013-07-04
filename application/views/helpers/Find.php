@@ -282,7 +282,7 @@ class Application_View_Helper_Find
 	public function createPark($match, $number)
 	{
 		$width   = $match->ratings->getStarWidth('quality') . '%';
-		$rating  = $this->_view->ratingstar('small', $width, false) . "<p class='smaller-text left indent green larger-margin-top'>" . $match->ratings->countRatings() . "</p>";
+		$rating  = $this->_view->ratingstar('small', $width, false) . "<p class='hidden smaller-text clear green'>" . $match->ratings->countRatings() . "</p>";
 		$user    = $this->_view->user;
 		
 		$stash = '';
@@ -296,7 +296,7 @@ class Application_View_Helper_Find
 		$output .=			"<p class='find-result-number white green-back heavy'>" . $number . "</p>";
 		$output .= 		"</div>";
 		$output .=		"<div class='left find-result-left-container'>";
-		$output .=			"<p class='left heavy larger-text darkest'>" . $match->parkName . "</p>";
+		$output .=			"<p class='left heavy larger-text darkest' style='font-size:1.75em'>" . $match->getLimitedName('parkName', 28) . "</p>";
 		$output .=			$rating;
 		$output .=			"<p class='clear light'>" . $match->city . "</p>";			
 		$output .=			"<p class='clear darkest'>" . $match->type . "</p>";	

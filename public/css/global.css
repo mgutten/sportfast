@@ -153,7 +153,7 @@ a.animate-darker {
 }
 
 .darkest {
-	color:#444;
+	color:#555;
 }
 
 .green,.green-bold {
@@ -206,7 +206,7 @@ a.animate-darker {
 }
 
 .dark-back {
-	background:#222;
+	background:#444;
 }
 
 .black-back {
@@ -313,6 +313,14 @@ div.selected-green,img.selected-green,p.selected-green {
 	width: 100%;
 }
 
+.width-50 {
+	width: 50%;
+}
+
+.width-33 {
+	width: 33.33%;
+}
+
 #body-white-back {
 	width: 92.5%;
 	margin-left:.75%;
@@ -351,6 +359,10 @@ div.selected-green,img.selected-green,p.selected-green {
 
 .negative-margin-top {
 	margin-top: -.2em;
+}
+
+.negative-margin-bottom {
+	margin-bottom: -.2em;
 }
 
 .indent {
@@ -1001,7 +1013,14 @@ input.input-fail, div.input-fail, textarea.input-fail {
 
 .rounded-corners {
 	-moz-border-radius: 10px;
+	-webkit-border-radius: 10px;
 	border-radius: 10px;
+}
+
+.super-round {
+	-moz-border-radius: 30px;
+	-webkit-border-radius: 30px;
+	border-radius: 30px;
 }
 
 input[type=checkbox] {
@@ -1718,6 +1737,17 @@ div.dropdown-menu-container-reverse:hover {
 	margin-left: 2em;
 }
 
+#feedback {
+	position:fixed;
+	padding-top: .2em;
+	padding-bottom: .2em;
+	left:-2.3em;
+	top: 45%;
+	transform: rotate(90deg);
+	-ms-transform: rotate(90deg); /* IE 9 */
+	-webkit-transform: rotate(90deg); /* Safari and Chrome */
+}
+
 /* end alert box */
 
 /* button styling */
@@ -1953,20 +1983,32 @@ input.city-change-input {
 	height: 40px;
 }
 
+.rating-star-container-medium {
+	height: 35px;
+}
+
 .rating-star-container-small {
 	height: 20px;
 }
 
-.rating-star-container-large > img,.rating-star-container-small > img  {
+.rating-star-container-large > img,
+.rating-star-container-medium > img,
+.rating-star-container-small > img  {
 	position:relative;
 	z-index: 1;
 }
 
-.rating-star-back-large,.rating-star-back-small {
+.rating-star-back-large,
+.rating-star-back-medium,
+.rating-star-back-small {
 	height: inherit;
 	margin-top: -40px;
 	position:relative;
 	z-index: 0;
+}
+
+.rating-star-back-medium {
+	margin-top: -35px;
 }
 
 .rating-star-back-small {

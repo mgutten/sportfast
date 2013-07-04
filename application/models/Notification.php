@@ -113,7 +113,16 @@ class Application_Model_Notification extends Application_Model_ModelAbstract
 				// On that game's page, all notifications should read "this game"
 				$possession = 'this';
 			} else {
-				$possession = 'a';
+				if (($pos = strpos($this->text, '%sport')) > -1) {
+					// Sport is in notification, check to conjugate "a" to "an"
+					$vowels = array('a','e','i', 'o', 'u');
+					if (in_array(strtolower($this->_attribs['sport'][0]), $vowels)) {
+						// Is vowel, possession should be an
+						$possession = 'an';
+					} else {
+						$possession = 'a';
+					}
+				}
 			}
 		}
 		

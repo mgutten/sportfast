@@ -226,7 +226,7 @@ $(function()
 	if (isGames() ||
 		isParks()) {
 		// Map for games page
-		initializeMap(37.98, -122.5, 11, createMarkers);
+		initializeMap(37.98, -122.5, 10, createMarkers);
 	}
 	
 	testFirstLastPagination(page);
@@ -554,9 +554,9 @@ function hideShowMarkers(page)
 			latLon = markers[i].getPosition();
 			bounds.extend(latLon);
 			if ((i == (end - 1)) || (i == (markers.length - 1))) {
-				// Last marker of page
-				gmap.fitBounds(bounds);
-				gmap.panToBounds(bounds);
+				// Last marker of page, move map to fit markers
+				//gmap.fitBounds(bounds);
+				//gmap.panToBounds(bounds);
 				
 			}
 		} else {

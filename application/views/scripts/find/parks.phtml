@@ -26,12 +26,16 @@ $this->placeholder('narrowColumn')->captureStart();
 	$counter = 0;
 	echo "<div class='hidden larger-margin-top clear width-100' id='court-specific'>";
 	foreach ($this->courts as $court) {
-		$class = 'selectable-text light pointer narrow-sport green-bold';
+		$class = 'selectable-text selectable-text-one light pointer narrow-sport ';
 		if ($counter % 2 == 0) {
 			// even
 			$class .= ' clear';
 		} else {
 			$class .= ' right';
+		}
+		
+		if ($counter == 0) {
+			$class .= ' green-bold';
 		}
 		
 		echo	"<p class='" . $class . "'>" . ucwords($court) . "</p>";

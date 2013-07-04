@@ -172,7 +172,7 @@ class Application_Model_User extends Application_Model_ModelAbstract
 	{
 		if (!is_numeric($sportIDOrSportName)) {
 			// Is not sportID already
-			$sportID = $this->getSport($sportIDOrSportName)->sportID;
+			$sportID = $this->getSport($sportIDOrSportName)->getSportIdByName($sportIDOrSportName);
 		} else {
 			$sportID = $sportIDOrSportName;
 		}
@@ -428,12 +428,13 @@ class Application_Model_User extends Application_Model_ModelAbstract
 	
 	public function getCity()
 	{
-		if (empty($this->_attribs['city'])) {			
+		if (!is_object($this->_attribs['city'])) {			
 			$this->_attribs['city'] = new Application_Model_City();
 		}
 		return $this->_attribs['city'];
 	}
 	
+	/*
 	public function setCity($city)
 	{
 		$this->_attribs['city'] = new Application_Model_City();
@@ -441,6 +442,7 @@ class Application_Model_User extends Application_Model_ModelAbstract
 		
 		return $this;
 	}
+	*/
 	
 	public function getLocation()
 	{

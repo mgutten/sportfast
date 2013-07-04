@@ -63,6 +63,17 @@ class Application_Model_CronMapper extends Application_Model_MapperAbstract
 		
 		$db->query($deleteMessages);
 		
+		// Delete game notifications
+		$deleteNotifications = "DELETE FROM notification_log 
+							WHERE gameID IN (SELECT gameID 
+													FROM old_games 
+													WHERE movedDate = (SELECT movedDate 
+																		FROM old_games 
+																		WHERE oldGameID = '" . $oldGameID . "')
+												   )";
+		
+		$db->query($deleteNotifications);
+		
 		// Delete from games table any games labeled "remove"
 		$deleteGames = "DELETE FROM games 
 							WHERE remove IS NOT NULL 
@@ -474,7 +485,9 @@ class Application_Model_CronMapper extends Application_Model_MapperAbstract
 		$date = DateTime::createFromFormat('U', strtotime('+' . $daysInFuture . ' days'));
 		$dayOfWeek = $date->format('w');
 
-		$sql = "SELECT ul.userID, u.username, u.noEmail FROM user_locations ul
+		// Get players
+		
+		$sql = "SELECT ul.userID, u.username, u.noEmail, u.age FROM user_locations ul
 				INNER JOIN users u ON ul.userID = u.userID
 				INNER JOIN user_sport_availabilities usa ON (usa.userID = ul.userID AND usa.sportID = '" . $sportID . "')
 				INNER JOIN (SELECT us.userID, us.skillCurrent FROM user_sports us
@@ -503,7 +516,7 @@ class Application_Model_CronMapper extends Application_Model_MapperAbstract
 										(SELECT location FROM park_locations WHERE parkID = '" . $parkID . "')
 									  )
 									 )
-									) * (5/8 * 100) < 7)
+									) * (5/8 * 100) < 6)
 						AND usa.day = '" . $dayOfWeek . "'
 						AND usa.hour = '" . $timeslot . "'
 						AND usf.format = 'pickup' ";
@@ -518,8 +531,8 @@ class Application_Model_CronMapper extends Application_Model_MapperAbstract
 		
 		$users = $db->fetchAll($sql);
 		
-		$playersNeeded = $rosterLimit * 4;  // Need 4 times rosterLimit for game to happen
-		$playersNeeded = 1;
+		$playersNeeded = $rosterLimit * 1;  // Need 4 times rosterLimit for game to happen
+		
 		if (count($users) >= $playersNeeded) {
 			// Success!  Enough users for a game
 			// Now must test whether there are any games happening nearby and at the same time
@@ -533,7 +546,7 @@ class Application_Model_CronMapper extends Application_Model_MapperAbstract
 										(SELECT location FROM park_locations WHERE parkID = '" . $parkID . "')
 									  )
 									 )
-									) * (5/8 * 100) < 5)
+									) * (5/8 * 100) < 4)
 						AND g.sportID = '" . $sportID . "'
 						AND g.public = 1
 						AND (DAY(g.date) = DAY(now() + INTERVAL 3 day) 
@@ -554,17 +567,43 @@ class Application_Model_CronMapper extends Application_Model_MapperAbstract
 			// Number of players to remove from count of $users since some will hypothetically go to these other games
 			$removePlayers = $numGames * $playersNeeded;
 			
-			
+					
 			for ($i = 0; $i < count($users); $i++) {
 				if ($i < $removePlayers) {
 					// Move users to used list if there is already a game that they can attend
 					$usedPlayers[] = $users[$i]['userID'];
+					unset($users[$i]);
 				}
 			}
 			
 			
-			if ((count($users) - $removePlayers) >= $playersNeeded) {
-				// Second check success!  Still enough players to create game, so do it
+			if (count($users) >= $playersNeeded) {
+				// Second check success!  Still enough players to create game, test to split into age groups
+				$younger = $older = array();
+				for ($i = $removePlayers; $i < count($users); $i++) {
+					if ($users[$i]['age'] < 40) {
+						$younger[$i] = $users[$i];
+					} else {
+						$older[$i] = $users[$i];
+					}
+				}
+				
+				$ageGroups = array('younger', 'older');
+				$randomKey = mt_rand(0, (count($ageGroups) - 1));
+				$secondKey = ($randomKey == 0 ? 1 : 0);
+				$reference = $ageGroups[$randomKey];
+				$secondReference = $ageGroups[$secondKey];
+				
+				if (count($$reference) >= $playersNeeded) {
+					// Game should be for either younger or older depending on which was chosen
+					$finalUsers = $$reference;
+				} elseif (count($$secondReference) >= $playersNeeded) {
+					$finalUsers = $$secondReference;
+				} else {
+					$finalUsers = $users;
+				}
+				
+				
 				if ($sport == 'basketball') {
 					// Check for basketball courts
 					$court = '(p.basketballOutdoor + p.basketballIndoor)';
@@ -666,17 +705,34 @@ class Application_Model_CronMapper extends Application_Model_MapperAbstract
 				
 				$db->query($sql);
 				
-				for ($i = $removePlayers; $i < ($removePlayers + $playersNeeded); $i++) {
+				// Insert which users were invited to which game to db
+				$sql = "INSERT INTO sportfast_user_game_invites (sportfastUserGameID, gameID, userID) VALUES ";
+				$counter = 0;
+				foreach ($finalUsers as $user) {
+					if ($counter == $playersNeeded) {
+						break;
+					}
 					// Now move all used players into used array, and also into "to be informed" array
+					/*
 					if (!isset($users[$i])) {
 						// Protect against empty values
 						continue;
 					}
+					*/
+					if ($counter != 0) {
+						// Not first
+						$sql .= ',';
+					}
+						
 					
-					$game->players->addUser($users[$i]);
-					$usedPlayers[] = $users[$i]['userID'];
+					$sql .= "('', " . $game->gameID . ", " . $user['userID'] . ")";
+					
+					$game->players->addUser($user);
+					$usedPlayers[] = $user['userID'];
+					$counter++;
 				}
 				
+				$db->query($sql);
 				
 				return array('usedPlayers' => $usedPlayers,
 							 'game'	   => $game);

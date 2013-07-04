@@ -977,7 +977,10 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 	 * get available users in an area at a given time
 	 * @params ($datetime => datetime object of time to look for,
 	 *			$sportID => id of sport,
-	 *			$location => location model to search near)
+	 *			$location => associative array of latitude  =>,
+	 *											longitude => to limit users to an area,
+	 *			$savingClass => users model,
+	 *			 )
 	 */
 	public function getAvailableUsers($datetime, $sportID, $location, $savingClass = false)
 	{
@@ -988,24 +991,35 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 		
 		$games = "(SELECT `us`.userID, `us`.often, `ug`.userID as backupID, `g`.sportID
 					FROM `user_sports` AS `us` 
-					LEFT JOIN `user_games` AS `ug` ON ug.userID = us.userID 
-					INNER JOIN `games` AS `g` ON g.gameID = ug.gameID 
+					LEFT JOIN `old_user_games` AS `ug` ON ug.userID = us.userID 
+					INNER JOIN `old_games` AS `g` ON g.gameID = ug.gameID 
 					WHERE g.sportID = '" . $sportID . "'
 					GROUP BY us.userID
 					HAVING MIN(ABS(DATEDIFF(g.date,'" . $formattedDate . "'))) > us.often
 					)";
 		
+		$bounds = $this->getBounds($location['latitude'], $location['longitude'], 10);
+			
+		$distance = "(SELECT ul.userID
+					FROM `user_locations` AS `ul` 
+					WHERE " . $this->getAreaWhere($bounds['upper'], $bounds['lower'], 'ul.location') . "
+					)";
+		
 		$select->setIntegrityCheck(false);
 		$select->from(array('usa'  => 'user_sport_availabilities'))
+			   ->join(array('ul' => new Zend_Db_Expr($distance)),
+			   		  'ul.userID = usa.userID')
 			   ->join(array('us' => 'user_sports'),
 			   		  'usa.userID = us.userID AND usa.sportID = us.sportID')
-			   ->join(array('g' => new Zend_Db_Expr($games)),
+			   ->joinLeft(array('g' => new Zend_Db_Expr($games)),
 			   		  'g.userID = usa.userID')
 			   ->where('usa.day = ?', $datetime->format('w'))
 			   ->where('usa.hour = ?', $datetime->format('G'))
 			   ->where('usa.sportID = ?', $sportID)
 			   ->group('usa.userID');
-			   
+		
+	
+		   
 		$results = $table->fetchAll($select);
 		
 		foreach ($results as $result) {
@@ -1185,7 +1199,10 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 		
 		$city = new Application_Model_City($result);
 		$location = new Application_Model_Location($result);
-		$savingClass->city = $city;
+		$savingClass->city->city = $result['city'];
+		$savingClass->city->cityID = $result['cityID'];
+		$savingClass->city->state = $result['state'];
+		$savingClass->city->changedLocation = false;
 		$savingClass->location = $location;
 		
 		return $savingClass;
@@ -1212,8 +1229,8 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 		
 		$result = $table->fetchRow($select);
 		
-		if ($result['totalUsers'] > 100) {
-			// More than 90 users in given area, minimum alert limit has been reached
+		if ($result['totalUsers'] > 160) {
+			// More than 160 users in given area, minimum alert limit has been reached
 			return false;
 		}
 		
@@ -1338,7 +1355,7 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 			   
 		$percentageThreeMonth = $table->fetchRow($select);
 		
-		$percentage = round($percentageThreeMonth['totalUsers'] / ($returnArray['totalUsers']['value'] - $percentageThreeMonth['totalUsers']) * 10000)/100;
+		$percentage = round($percentageThreeMonth['totalUsers'] / ($returnArray['totalUsers']['value'] - $percentageThreeMonth['totalUsers']) * 1000)/10;
 		
 		$returnArray['percentage3Month'] = array('description' => '% change in total users (3 months)',
 												'value'		  => $percentage . '%');
@@ -1354,7 +1371,7 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 			   
 		$percentage6Month = $table->fetchRow($select);
 		
-		$percentage = round($percentage6Month['totalUsers'] / ($returnArray['totalUsers']['value'] - $percentage6Month['totalUsers']) * 10000)/100;
+		$percentage = round($percentage6Month['totalUsers'] / ($returnArray['totalUsers']['value'] - $percentage6Month['totalUsers']) * 1000)/10;
 		
 		$returnArray['percentage6Month'] = array('description' => '% change in total users (6 months)',
 												 'value'		  => $percentage . '%');

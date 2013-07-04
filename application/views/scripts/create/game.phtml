@@ -134,8 +134,8 @@ echo "</div>";
 
 ?>
 
-<div class='left larger-text larger-margin-top hidden red hidden width-100 center' id='available-players-container'>
-	<p class='inherit'>There are <span class='inherit heavy larger-text' id='available-players'></span> players available at this time. <span class='inherit smaller-text'>(typically 25% will show up)</p>
+<div class='left larger-text larger-margin-top hidden green hidden width-100 center' id='available-players-container'>
+	<p class='inherit'>There are <span class='inherit heavy larger-text' id='available-players'></span> players available at this time. <span class='inherit smaller-text'>(usually <span class='inherit heavy' id='available-players-percent'></span> will show up)</p>
 </div>
 
 
@@ -143,9 +143,11 @@ echo "</div>";
 echo "</div>";	
 
 
-echo "<p class='clear dark heavy hidden' id='create-similar-games-header'>You might be interested in...</p>";
+echo "<div class='clear hidden width-100' id='create-similar-games-outer-container'>
+		<p class='clear dark heavy' id='create-similar-games-header'>You might be interested in...</p>";
 echo "<div class='clear margin-top width-100' id='create-similar-games-container'>";
 
+echo "</div>";
 echo "</div>";
 									
 echo "</div>";

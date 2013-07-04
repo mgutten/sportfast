@@ -89,6 +89,32 @@ class Application_Model_CitiesMapper extends Application_Model_MapperAbstract
 			
 		return $savingClass;
 	}
+	
+	/**
+	 * used to get all zipcodes within the given bounds
+	 * @returns cityIDs
+	 */
+	public function getZipcodesWithin($latitude, $longitude)
+	{
+		$table = $this->getDbTable();
+		
+		$select = $table->select();
+		$select->setIntegrityCheck(false);
+		
+		$select->from(array('z' => 'zipcodes'))
+			   ->where($this->getAreaWhere('POINT(' . $longitude['upper'] . ',' . $latitude['upper'] . ')', 'POINT(' . $longitude['lower'] . ',' . $latitude['lower'] . ')', 'z.location'))
+			   ->where('z.zipcodeType != "PO BOX"');
+			   
+		$zipcodes = $table->fetchAll($select);
+		
+		$returnArray = array();
+		foreach ($zipcodes as $zipcode) {
+			$returnArray[] = $zipcode->cityID;
+		}
+		
+		return $returnArray;
+	}
+		
 
 
 	

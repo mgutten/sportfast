@@ -530,7 +530,7 @@ $(function()
 		var optionalID = '';
 		
 		notificationConfirmDeny(notificationLogID, confirmOrDeny, type, optionalID);
-		showConfirmationAlert('"' + $(this).text() + '" processed');
+		
 	})
 	
 	/* notification Join button was clicked */
@@ -545,7 +545,7 @@ $(function()
 		var url = $(this).parents('a').attr('href');
 		
 		notificationJoin(notificationLogID, type, url);
-		showConfirmationAlert('You have been added to the roster');
+		
 		
 		
 	})
@@ -1038,6 +1038,7 @@ function notificationConfirmDeny(notificationLogID, confirmOrDeny, type, optiona
 		type: 'POST',
 		data: {options: options},
 		success: function(data) {
+			showConfirmationAlert('"' + confirmOrDeny + '" processed');	
 			reloadPage();
 		}
 	})
@@ -1054,13 +1055,22 @@ function notificationJoin(notificationLogID, type, url)
 	var options = new Object();
 	options.notificationLogID = notificationLogID;
 	options.type = type;
+	
 	$.ajax({
 		url: '/ajax/notification-action',
 		type: 'POST',
 		data: {options: options},
 		success: function(data) {
-
-			window.location = url;
+			if (data) {
+				// Profile pic not found, failure
+				window.location = data;
+				return;
+			} else {
+				showConfirmationAlert('You have been added to the roster');
+			}
+			setTimeout(function() {
+				window.location = url;
+			}, 400);
 		}
 	})
 }
@@ -1153,6 +1163,7 @@ function setUserLocation(cityID)
 		type: 'POST',
 		data: {cityID: cityID},
 		success: function(data) {
+			
 			location.reload();
 		}
 	});
@@ -1785,6 +1796,11 @@ function showTooltip(ele)
 	} else {
 		$('.tooltip-tip').css('float','left');
 	}
+	
+	if (tooltipEle.css('text-align') == 'center') {
+			// Is using width-100 and center classes...align tooltip to middle of element
+			left += tooltipEle.width()/2 - 30
+		}
 		
 	$('#tooltip').show()
 				 .stop()

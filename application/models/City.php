@@ -35,6 +35,14 @@ class Application_Model_City extends Application_Model_ModelAbstract
 	{
 		return $this->getMapper()->getCityFromZipcode($zipcode, $this);
 	}
+	
+	/**
+	 * used to create fake users for testing
+	 */
+	public function getZipcodesWithin($latitude, $longitude)
+	{
+		return $this->getMapper()->getZipcodesWithin($latitude, $longitude);
+	}
 		
 	
 }

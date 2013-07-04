@@ -225,9 +225,14 @@ a.member-find-game-container:hover {
 	margin-left: 0;
 }
 
+.member-find-game-number-container {
+	min-width: 1.8em;
+	margin-left: 0;
+}
+
 .member-find-game-sport {
 	float:left;
-	margin-left: 1em;
+	margin-left: .2em;
 	width: 5em;
 }
 
@@ -259,7 +264,7 @@ div.member-find-game-date-hour {
 }
 
 .member-find-game-arrow {
-	margin: .1em 0 0 0;
+	margin: .2em 0 0 0;
 }
 
 .member-find-view-more {

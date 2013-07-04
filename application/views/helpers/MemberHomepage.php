@@ -438,14 +438,14 @@ class Application_View_Helper_MemberHomepage
 			}
 				
 			$output .= "<a class='member-find-game-container member-" . strtolower($type) . "' href='/" . strtolower($type) . "s/" . $id . "' gameIndex='" . $gameIndex . "'>";
-			$output .= "<p class='member-find-game-number green-back white arial bold'>" . $totalMatches . "</p>";
+			$output .= "<div class='left member-find-game-number-container'><p class='member-find-game-number green-back white arial bold'>" . $totalMatches . "</p></div>";
 			$output .= "<p class='member-find-game-sport darkest bold'>" . $match->sport . "</p>";
 			$output .= "<p class='member-find-game-type darkest " . $typeClass . "'>" . $type . "</p>";
 			$output .= "<div class='member-find-game-date medium' tooltip='" . $dateDesc . "'>" . $dateHTML . "</div>";
 			$output .= "<p class='member-find-game-players darkest bold'>" . $match->totalPlayers . "/" . $match->rosterLimit . "</p>";
 			$output .= "<img src='" . $match->getMatchImage() . "' class='member-find-game-match' tooltip='" . $match->getMatchDescription() . "'/>";
 			$output .= "<p class='member-find-game-park medium'>" . $location . "</p>";
-			$output .= "<img src='/images/global/body/double_arrows.png' class='member-find-game-arrow'/>";
+			$output .= "<img src='/images/global/body/single_arrow.png' class='member-find-game-arrow'/>";
 			
 			$output .= "</a>";
 						
@@ -507,7 +507,7 @@ class Application_View_Helper_MemberHomepage
 	 public function createNotification($notification, $size = 'tiny')
 	 {
 		  $output = '';
-		  $preWrapper  = "<a href='" . $notification->getFormattedURL() . "' class='left box-img-container-" . strtolower($size) . "'>";
+		  $preWrapper  = "<a href='" . $notification->getFormattedURL() . "' class='left  box-img-container-" . strtolower($size) . "'>";
 		  $postWrapper = "</a>";
 		  $class	   = 'box-img-' . strtolower($size);
 		  $currentID = false;

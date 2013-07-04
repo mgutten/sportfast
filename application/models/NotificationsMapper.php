@@ -23,12 +23,10 @@ class Application_Model_NotificationsMapper extends Application_Model_MapperAbst
 						  `u`.userID as userID,
 						  COALESCE(`ga`.sport,`t`.sport,`ur`.sport) as sport,
 						  COALESCE(`ga`.date,`ur`.dateHappened) as date, 
-						  ga.parkName, 
-						  ga.parkID, 
+						  COALESCE(`ga`.parkName,`p`.parkName) as parkName, 
+						  COALESCE(`ga`.parkID,`p`.parkID) as parkID,
 						  ga.date, 
-						  t.teamName, 
-						  p.parkName,
-						  p.parkID
+						  t.teamName
 					 FROM `notification_log` AS `nl`
 					 INNER JOIN `notifications` AS `n` ON n.notificationID = nl.notificationID
 					 LEFT JOIN `users` AS `u` ON u.userID = nl.actingUserID
@@ -47,11 +45,13 @@ class Application_Model_NotificationsMapper extends Application_Model_MapperAbst
 		$select .=	 "ORDER BY nl.dateHappened DESC
 					 LIMIT " . $limit;
 		
+		
 		$results = $db->fetchAll($select);
 		
 		$savingClass->isNewsfeed = true;
 		
 		foreach ($results as $result) {
+			
 			$notification = $savingClass->addNotification($result);
 			$notification->newsfeed = true;
 		}

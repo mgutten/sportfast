@@ -260,7 +260,9 @@ class AjaxController extends Zend_Controller_Action
 		 					  'userID'		     => $options['userID']));
 						
 							  
-		
+		// Set session for stash alert when redirected back to games/index
+		$session = new Zend_Session_Namespace('joinedGame');
+		$session->joinedGame = true;
 	 }
 		 
 	 /**
@@ -391,7 +393,7 @@ class AjaxController extends Zend_Controller_Action
 	{
 		$fileInfo = $this->getRequest()->getPost('fileInfo');
 		
-		if (empty($fileInfo['fileWidth']) || empty($fileInfo['fileX'])) {
+		if ($fileInfo['fileWidth'] == '' || $fileInfo['fileX'] == '') {
 			// Spot check for failure
 			return false;
 		}
@@ -641,7 +643,8 @@ class AjaxController extends Zend_Controller_Action
 		
 		$users = new Application_Model_Users();
 		
-		$users->getAvailableUsers($datetime, $options['sportID'], $this->view->user->userLocation);
+		$users->getAvailableUsers($datetime, $options['sportID'], array('latitude' => $this->view->user->userLocation->latitude,
+																		'longitude' => $this->view->user->userLocation->longitude));
 		
 		echo $users->countUsers();
 	}
@@ -811,13 +814,17 @@ class AjaxController extends Zend_Controller_Action
 		$city = new Application_Model_City();
 		$city->find($cityID, 'cityID');
 		
+		
 		$location = new Application_Model_Location();
 		$location->getLocationByCityID($cityID);
 		
 		$this->view->user->changedLocation = true;
-		$this->view->user->city = $city;
+		$this->view->user->city->city = $city->city;
+		$this->view->user->city->cityID = $city->cityID;
+		$this->view->user->city->state = $city->state;
+		$this->view->user->city->changedLocation = true;
 		$this->view->user->location = $location;
-				
+						
 	}
 
 
@@ -904,6 +911,15 @@ class AjaxController extends Zend_Controller_Action
 		} else {
 			// Join action
 			$mapper = new Application_Model_NotificationsMapper();
+			
+			if (!$this->view->user->hasProfilePic()) {
+				// No profile pic, prevent newly invited user from joining game without profile pic
+				$session = new Zend_Session_Namespace('pictureRequired');
+				$session->fail = true;
+				echo '/users/' . $this->view->user->userID . '/upload';
+				return;
+			}
+			
 			$mapper->notificationConfirm($options['notificationLogID'], $options['type']);	
 		}
 		

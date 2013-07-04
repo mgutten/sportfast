@@ -84,6 +84,7 @@ class ParksController extends Zend_Controller_Action
 		$this->view->park = $park;
 		$this->view->parkID = $parkID;
 		
+		
 		$this->view->ratings = $ratings = $park->getParkRatings();
 		$this->view->numRatings = $ratings->countRatings();
 		$this->view->ratingWidth = $ratings->getStarWidth('quality') . '%';

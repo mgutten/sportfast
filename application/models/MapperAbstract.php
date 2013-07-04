@@ -228,12 +228,11 @@ abstract class Application_Model_MapperAbstract
 	 * convert individual latitude and longitude to POINT() format with adjustment
 	 * @params ($latitude => latitude value,
 	 *			$longitude => longitude value,
-	 *			$distance => distance to add/subtract to longitude and latitude to calculate new point
+	 *			$distance => distance to add/subtract to longitude and latitude to calculate new point (in miles)
 	 * @returns associative array with "upper" and "lower" bounds
 	 */
 	public function getBounds($latitude, $longitude, $distance = 10)
 	{
-		$distance  = 10; // in miles 
 		$rad	   = $distance/69; // (1 degree about = 69 mi) could incorporate haversine formula later for more accurate distance calculation
 		$upperPoint = 'POINT(' . ($latitude + $rad) . ',' . ($longitude + $rad) . ')';
 		$lowerPoint = 'POINT(' . ($latitude - $rad) . ',' . ($longitude - $rad) . ')';

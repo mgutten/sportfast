@@ -79,6 +79,14 @@ class Application_Model_Game extends Application_Model_ModelAbstract
 	}
 	
 	/**
+	 * get captains from db
+	 */
+	public function getGameCaptains()
+	{
+		return $this->getMapper()->getGameCaptains($this->gameID);
+	}
+	
+	/**
 	 * add user to game in db
 	 */
 	public function addUserToGame($gameID, $userID)
@@ -99,7 +107,7 @@ class Application_Model_Game extends Application_Model_ModelAbstract
 	 * get history data for chart of subscribe game
 	 * @returns array of game models in order of most recent to least recent
 	 */
-	public function getHistoryData($interval = 6)
+	public function getHistoryData($interval = 6, $userID = false)
 	{
 		$gameID = $this->gameID;
 		if ($this->recurring != '1') {
@@ -107,7 +115,7 @@ class Application_Model_Game extends Application_Model_ModelAbstract
 			return false;
 		}
 		
-		$data = $this->getMapper()->getHistoryData($gameID, $interval);
+		$data = $this->getMapper()->getHistoryData($gameID, $interval, $userID);
 		
 		return $data;
 	}
@@ -319,9 +327,9 @@ class Application_Model_Game extends Application_Model_ModelAbstract
 			if ($diff < 4) {
 				// Avg skill of game and user is close, great match
 				$this->match = 'great';
-			} elseif ($diff < 7) {
+			} elseif ($diff < 9) {
 				$this->match = 'good';
-			} elseif ($diff < 10) {
+			} elseif ($diff < 14) {
 				$this->match = 'decent';
 			} elseif ($diff < 1000) {
 				$this->match = 'bad';
@@ -440,6 +448,7 @@ class Application_Model_Game extends Application_Model_ModelAbstract
 			return $difference . ' players';
 		}
 	}
+
 	
 	public function getShortDate()
 	{

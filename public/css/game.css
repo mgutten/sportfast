@@ -99,6 +99,16 @@
 	margin-left: 2.3em;
 }
 
+#stash-available-alert-container {
+	width: 30em;
+	margin-left: -15em;
+	margin-top: -10em;
+}
+
+.game-stash-button {
+	margin-left: 4em;
+}
+
 /* edit game page */
 .create-section-inner-gmap {
 	margin-top: 0;

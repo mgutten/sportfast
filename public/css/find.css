@@ -218,7 +218,11 @@ a.find-result-container.light-back {
 }
 
 .find-stash {
-	margin-top: .5em;
+	margin-top: .2em;
+}
+
+.find-result-parks > .find-result-left-container {
+	width: 60%;
 }
 
 /* search terms */

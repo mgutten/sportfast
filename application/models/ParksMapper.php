@@ -57,7 +57,7 @@ class Application_Model_ParksMapper extends Application_Model_MapperAbstract
 			// Default location to search near is user's home location, look for games within $distance of user's home location
 			$latitude = $userClass->location->latitude;
 			$longitude = $userClass->location->longitude;
-			$bounds = $this->getBounds($latitude, $longitude);
+			$bounds = $this->getBounds($latitude, $longitude, 7);
 		}
 		
 		

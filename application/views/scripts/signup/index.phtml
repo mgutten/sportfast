@@ -74,7 +74,9 @@ if (!empty($this->errors)) {
 	echo "</ul>";
 	echo "</div>";
 }
-
+?>
+<p class='larger-text green heavy clear width-100 center'>Sportfast is free and easy.</p>
+<?php
 
 $totalSteps = 4;
 $currentStep = 1;
@@ -130,8 +132,8 @@ echo $this->form->userLocation;
 ?>
 
 <div class='clear'></div>
-<ul class='green'>
-	<li>This address will be used to find games, players, and teams closest to you.  It will never be displayed.</li>
+<ul class='green' id='signup-account-address-warning'>
+	<li>This address will be used to find games, players, and teams closest to you.  It will never be displayed and we will never mail you anything.</li>
 </ul>
 
 <?php
@@ -216,7 +218,7 @@ $currentStep++;
 
 ?>
 <p class='signup-agree-header center'>
-We are not a dating site.  We are not a site for funny videos.  We play sports.  As athletes, we adhere to a general code of conduct.  That conduct is laid out below:
+We are not a dating site.  We are not a site for funny videos.  We play sports.  As athletes, we adhere to a general code of conduct.  That conduct is laid out in our Pledge:
 </p>
 <div class='signup-agree-pledges-container'>
 	<?php

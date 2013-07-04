@@ -60,6 +60,14 @@ class Application_Model_Team extends Application_Model_ModelAbstract
 		return $this->getMapper()->getTeamByID($teamID, $this);
 	}
 	
+	/**
+	 * get captains from db
+	 */
+	public function getTeamCaptains()
+	{
+		return $this->getMapper()->getTeamCaptains($this->teamID);
+	}
+	
 
 	public function getMatchName()
 	{

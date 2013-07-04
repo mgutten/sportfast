@@ -28,6 +28,16 @@ echo $this->placeholder('absolute')->captureStart();
 		echo $this->usersideinfo($this->game->sport);
 	}
 	
+	if ($this->stash) {
+		echo $this->alert()->start('stash-available',"Stash available!");
+		
+		echo "<p class='clear medium width-100 center'><span class='darkest'>A stash is a public, free-to-use collection of sports equipment.</span>  <br>It contains useful items like cones, nets, and goals.</p>";
+		
+		echo "<a href='/parks/" . $this->game->park->parkID . "/stash' class='clear heavy largest-text button larger-margin-top game-stash-button' target='_blank'>view stash</a>";
+		
+		echo $this->alert()->end();
+	}
+	
 	
 	if ($this->captain) {
 		// user is captain
@@ -35,11 +45,6 @@ echo $this->placeholder('absolute')->captureStart();
 		// Remove player alert
 		echo $this->removeplayeralert($this->game->players->getAll());
 		
-		
-		// Edit game info alert
-		echo $this->alert()->start('manage-game-info',"Click on anything to edit.");
-		
-		echo $this->alert()->end();
 		
 		// Cancel game
 		echo $this->alert()->start('manage-cancel',"Cancel game.");
@@ -76,7 +81,7 @@ echo $this->placeholder('absolute')->captureStart();
 			}
 			
 			echo $leaveButton; 
-			echo "<a href='/' class='right larger-text larger-margin-top heavy green-button white " . $class . "' id='game-canceled-back'>Back to home</a>";
+			echo "<a href='/' class='right larger-text larger-margin-top heavy button " . $class . "' id='game-canceled-back'>Back to home</a>";
 			
 			
 		echo $this->alert()->end();
@@ -103,7 +108,11 @@ $this->placeholder('narrowColumn')->captureStart();
 //if ($this->userInGame) {
 	// User is attending, show quick stats
 	if ($this->gameOn) {	
-		echo "<div class='green-back white heavy narrow-overlay-container dropshadow'>" . $this->totalPlayers . " " . ($this->totalPlayers == 1 ? 'player' : 'players') . "</div>";
+		$gameFull = '';
+		if ($this->gameFull) {
+			$gameFull = ' (FULL)';
+		}
+		echo "<div class='green-back white heavy narrow-overlay-container dropshadow'>" . $this->totalPlayers . " " . ($this->totalPlayers == 1 ? 'player' : 'players') . $gameFull .  "</div>";
 	} else {
 		echo "<div class='dark-red-back white heavy narrow-overlay-container dropshadow' tooltip='" . ($this->game->minPlayers - $this->totalPlayers) . " more players are needed in order for this game to happen.'>"
 			 . $this->playersNeeded  . " needed
@@ -194,13 +203,13 @@ if ($this->topAlert && $this->userInGame) {
     	<?php echo $this->gameTitle;?>
 	</p>
     <div class='profile-city-container clear'>
-        <p class='darkest clear largest-text'>
+        <p class='darkest clear largest-text' tooltip='<?php echo $this->game->gameDate->format('M j');?>'>
             <?php echo $this->game->getDay() . ' at ' . $this->game->getHour();?>
         </p>  
         <a href='/parks/<?php echo $this->game->park->parkID;?>' class='clear darkest larger-text game-location'>
 			<?php echo $this->game->park->parkName;?>
         </a>
-        <a href='http://www.google.com/maps?q=<?php echo $this->parkLocation->latitude . ',' . $this->parkLocation->longitude;?>' class='left light game-distance smaller-text'>
+        <a href='http://www.google.com/maps?f=d&q=<?php echo $this->parkLocation->latitude . ',' . $this->parkLocation->longitude;?>' class='left light game-distance smaller-text' target='_blank' tooltip='Get directions'>
 			<?php echo $this->game->park->getDistanceFromUser($this->user->location->latitude, $this->user->location->longitude);?> miles from you
         </a>
         <?php 
@@ -239,7 +248,7 @@ if ($this->userInGame) {
             You are attending with 
               <select id='game-plus'>
                 <?php
-                    for ($i = 0; $i < 4; $i++) {
+                    for ($i = 0; $i < 3; $i++) {
                         $selected = '';
                         if ($this->userPlus == $i) {
                             $selected = 'selected';
@@ -281,35 +290,43 @@ if ($this->userInGame) {
                 $text = 'Join';
                 $id    = 'join-button';
                 $tooltip = '';
-                if (!$this->isPublic) {
-                    // Not sportfast created team, allow any user to join without request
-                    $text = 'Request to Join';
-                    $id   = 'request-join-button';
-                    $tooltip = "tooltip='This is a private game.'";
-                }
-				
-                if ($this->game->minSkill > $this->user->getSport($this->game->sport)->overall) {
-                    // User is not good enough for this game
-                    $class = 'transparent default';
-                    $id = '';
-                    $lower = '<p class="light clear-right smaller-text margin-top">You must have a minimum skill of ' . $this->game->minSkill . ' to join.</p>';
-                } elseif ($this->game->maxSkill < $this->user->getSport($this->game->sport)->overall) {
-					 // User is too good 
-                    $class = 'transparent default';
-                    $id = '';
-                    $lower = '<p class="light clear-right smaller-text margin-top">You must have a maximum skill of ' . $this->game->maxSkill . ' to join.</p>';
-				}
+				if ($this->gameFull) {
+					// Game is full, do not let join
+					echo "<p class='right green heavy'>This game is full</p>";
+				} else {
+					if (!$this->isPublic) {
+						// Not sportfast created team, allow any user to join without request
+						$text = 'Request to Join';
+						$id   = 'request-join-button';
+						$tooltip = "tooltip='This is a private game.'";
+					}
 					
-				if (!$this->user->hasProfilePic()) {
-					// User does not have profile pic, do not allow to join
-					$class = 'transparent default';
-					$tooltip = "tooltip='You must upload a picture before you can join any games.'";
-				}
-                ?>
-                <p class='green-button right larger-text join-button heavy <?php echo $class;?>' <?php echo $tooltip;?> id='<?php echo $id;?>'>
-                    <?php echo $text;?>
-                </p>
-                <?php echo $lower; ?>
+					if ($this->userHasSport) {
+					
+						if ($this->game->minSkill > $this->user->getSport($this->game->sport)->overall) {
+							// User is not good enough for this game
+							$class = 'transparent default';
+							$id = '';
+							$lower = '<p class="light clear-right smaller-text margin-top">You must have a minimum skill of ' . $this->game->minSkill . ' to join.</p>';
+						} elseif ($this->game->maxSkill < $this->user->getSport($this->game->sport)->overall) {
+							 // User is too good 
+							$class = 'transparent default';
+							$id = '';
+							$lower = '<p class="light clear-right smaller-text margin-top">You must have a maximum skill of ' . $this->game->maxSkill . ' to join.</p>';
+						}
+					}
+						
+					if (!$this->user->hasProfilePic()) {
+						// User does not have profile pic, do not allow to join
+						$class = 'transparent default';
+						$tooltip = "tooltip='You must upload a picture before you can join any games.'";
+					}
+					?>
+					<p class='green-button right larger-text join-button heavy <?php echo $class;?>' <?php echo $tooltip;?> id='<?php echo $id;?>'>
+						<?php echo $text;?>
+					</p>
+					<?php echo $lower; ?>
+                <?php } ?>
            </div>
         <?php } ?>
 <!--

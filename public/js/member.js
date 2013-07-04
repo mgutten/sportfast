@@ -177,7 +177,7 @@ $(function() {
 	preloadImageArray.push('/images/global/gmap/markers/green.png');
 	preloadImageArray.push('/images/global/gmap/markers/green_reverse.png');
 	
-	initializeMap(37.98, -122.5, 12, createMarkers);
+	initializeMap(37.98, -122.5, 11, createMarkers);
 	setZoom();
 
 	// Update newsfeed every 2 minutes (if update, must change ajax call in notificationsMapper

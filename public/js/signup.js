@@ -226,6 +226,7 @@ $(function()
 			testGeocode();
 		}
 	})
+		
 	
 	
 	/* validate zipcode */
@@ -354,7 +355,7 @@ $(function()
 												 
 	
 	/* handle onclick for sports-form elements */
-	$('.signup-sports-position,.signup-sports-often,.signup-sports-what,.signup-sports-type').children('.signup-sports-selectable').click(function() 
+	$('.signup-sports-position,.signup-sports-often,.signup-sports-what,.signup-sports-type').find('.signup-sports-selectable').click(function() 
 	{
 		var greenEles  = $(this).parent().children('.signup-sports-selectable.green-bold');
 		var countGreen = greenEles.length;
@@ -378,7 +379,8 @@ $(function()
 			}
 		}
 		
-		var sectionEle = $(this).parent();
+		var sectionEle = $(this).parents('.signup-sports-form-section');
+
 		updateSportHiddenInputSelectable(sectionEle);
 	})
 	
@@ -398,6 +400,8 @@ $(function()
 	{
 		// Make text unselectable while mouse is down
 		makeTextSelectable(false);
+		
+		$('.availability').css('cursor', 'pointer');
 		
 		$('#tooltip').hide();
 
@@ -799,7 +803,7 @@ function testIfValues(section, sport)
 		}		
 		
 	}
-	
+	/*
 	if (sectionTitle == 'Type' && sport == 'tennis') {
 		// Require tennis to have at least one typeName and typeSuffix selected
 		var value = hiddenInput.val();
@@ -816,6 +820,7 @@ function testIfValues(section, sport)
 		titleEle.addClass('red');
 		return false;
 	}
+	*/
 	
 	if (section.css('display') == 'none') {
 		return true;
@@ -1021,24 +1026,38 @@ function changeInputBackground(ele, isValid)
 function updateSportHiddenInputSelectable(sectionEle)
 {
 	var values = new Array();
-	var selectedChildren = sectionEle.children('.signup-sports-selectable.green-bold');
+	var selectedChildren = sectionEle.find('.signup-sports-selectable.green-bold');
 	var value;
 	
-	selectedChildren.each(function()
-	{
-		// Replace any internal tags and their content with blank
-		value = $.trim($(this).html().replace(/[<]+.*[\/>]/, ''))
-		values.push(value);
-	})
+	if (selectedChildren.siblings('.signup-type-header').length > 0) {
+		// Is type section, prefix is the .signup-type-header, suffix is the value clicked
+		
+		selectedChildren.each(function()
+		{
+			// Replace any internal tags and their content with blank
+			var prefix = $(this).siblings('.signup-type-header').text();
+			value = prefix + '_' + $.trim($(this).html().replace(/[<]+.*[\/>]/, ''))
+			
+			values.push(value);
+		})
+	} else {
+
+		selectedChildren.each(function()
+		{
+			// Replace any internal tags and their content with blank
+			value = $.trim($(this).html().replace(/[<]+.*[\/>]/, ''))
+			values.push(value);
+		})
+	}
 	
 	if (sectionEle.is('.signup-sports-often')) {
 		var index = selectedChildren.index() - 1;
 		values = oftenConversion[index];
 	}
 	
-	
-	var idStart            = sectionEle.attr('id').replace(/signup-sports-/,'');
+	var idStart = sectionEle.attr('id').replace(/signup-sports-/,'');
 	var sport   = getSportName(sectionEle);
+	
 	var hiddenInputSection = idStart.replace(/-\w+/,'');
 
 	hiddenInputSection	   = capitalize(hiddenInputSection)

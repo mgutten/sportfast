@@ -81,10 +81,37 @@ class Application_View_Helper_SignupSportForm
 					}
 				}
 				
-				$sportType = array();
+				//$sportType = array();
 				$keysType      = array_keys($sport['type']);
 				$counterType   = 0;
 				foreach($sport['type'] as $type) {
+					$sportType = array();
+					$curType = $keysType[$counterType];
+					if ($counterType == 0) {
+						$class = 'clear';
+					} else {
+						$class = 'left';
+					}
+					$output .= "<div class='darkest width-50 " . $class . " signup-type-prefix-container'>";
+					$output .=		"<p class='width-100 center darkest signup-type-header'>" . ucwords($curType) . "</p>";
+					
+					foreach ($type as $prefix => $val) {
+						// Loop through inner arrays of curType (ie suffixes like match, rally, etc)
+						//if (!isset($sportType[$prefix])) {
+							// Suffix is not set, set it
+							$sportType[$prefix] = $sport['type'][$curType][$prefix];
+							
+							if ($userSport && isset($userTypes[$prefix])) {
+								$sportType[$prefix]['selected'] = true;
+							}
+							// Set tooltip to true so selectableText creates tooltip from description
+							$sportType[$prefix]['tooltip'] = $sport['type'][$curType][$prefix]['description'];
+						//}
+						
+					}
+					$output .= $this->selectableText($sportType);
+					$output .= "</div>";
+					/*
 					$curType = $keysType[$counterType];
 					
 					if (!isset($sportType[$curType])) {
@@ -107,9 +134,10 @@ class Application_View_Helper_SignupSportForm
 							$sportType[$prefix]['tooltip'] = $sport['type'][$curType][$prefix]['description'];
 						}
 					}
+					*/
 					$counterType++;
 				}
-				$output .= $this->selectableText($sportType);
+				//$output .= $this->selectableText($sportType);
 				$output .= '</div>';
 			}
 			

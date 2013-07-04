@@ -1,8 +1,21 @@
 <?php
-if ($this->geocode) {
-	// Geocode is required
-	$this->headScript()->prependFile('https://maps.googleapis.com/maps/api/js?key=AIzaSyAhxSMQ-WQux2nzTW4dBoKmpfGHVQOk7r8&sensor=false');
-	$this->headScript()->prependFile($this->baseUrl() . '/js/signupValidate.js');
-}
-
+/* 
+* controller => signup
+* action => validate
+*/
+$this->headTitle('Verify Email');
+$this->headLink()->prependStylesheet($this->baseUrl() . '/css/signup.css');
 ?>
+
+<div class='clear white-back rounded-corners' id='signup-validate-container'>
+	<?php
+	if ($this->success) {
+		//echo "<p class='clear largest-text green heavy width-100 center'>Almost done!</p>";
+		echo "<p class='darkest clear width-100 center larger-text larger-margin-top'>An email verification has been sent to: <br><span class='inherit heavy largest-text'>" . $this->username . "</span></p>";
+	} else {
+		echo "<p class='clear largest-text red heavy width-100 center'>An Error Occurred</p>";
+		echo "<p class='darkest clear width-100 center larger-text larger-margin-top'>An email could not be sent to " . $this->username . ".
+				<br><br>We are aware of this failure and will contact you shortly.  Sorry for the inconvenience!</p>";
+	}
+	?>
+</div>

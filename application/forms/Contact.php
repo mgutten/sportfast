@@ -34,6 +34,11 @@ class Application_Form_Contact extends Zend_Form
 				'autocomplete'  => 'off'
 				));
 				
+		$this->addElement('hidden', 'browser', array(
+				'filters'		=> array('StringTrim'),
+				'autocomplete'  => 'off'
+				));
+				
 		$this->addElement('submit', 'submit', array(
 				'filters'		=> array('StringTrim'),
 				'required'		=> true,

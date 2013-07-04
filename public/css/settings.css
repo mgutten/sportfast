@@ -4,6 +4,10 @@ input[type=text], input[type=password] {
 	width: 14em;
 }
 
+#headerSearchBar {
+	width: 13em;
+}
+
 header {
 	margin-bottom: .5em;
 }

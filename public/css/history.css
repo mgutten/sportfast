@@ -23,11 +23,22 @@
 }
 
 .history-stat-container {
-	margin-left: 5em;
+	width:33.3%;
 }
 
-.history-stat-header {
+.history-stat-double-container {
+	width: 50%;
+}
+
+.history-stat-header,.history-stat-header-small {
 	margin-bottom: -.3em;
+	width:100%;
+	text-align:center;
+	color: #aaa;
+}
+
+.history-stat-header-small {
+	margin-bottom: -.1em;
 }
 
 .history-option {

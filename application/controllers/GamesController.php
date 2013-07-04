@@ -50,9 +50,10 @@ class GamesController extends Zend_Controller_Action
 		$this->view->totalPlayers  = $game->totalPlayers;
 		$this->view->rosterLimit   = $game->rosterLimit;
 		$this->view->minPlayers    = $game->minPlayers;
+		
 		$this->view->gameOn		   = ($game->totalPlayers >= $game->minPlayers ? true : false);
 		$this->view->playersNeeded = $game->getPlayersNeeded();
-		
+		$this->view->gameFull	   = ($game->rosterLimit <= $game->totalPlayers ? true : false);
 		
 		
 		$this->view->newsfeed   = $game->messages->getGameMessages($game->gameID);
@@ -74,6 +75,19 @@ class GamesController extends Zend_Controller_Action
 			$postForm->login->setName('submitPostMessage');
 			$this->view->postForm = $postForm;
 			
+			$stashSports = array('volleyball', 'football', 'ultimate', 'soccer');
+			$session = new Zend_Session_Namespace('joinedGame');
+		
+			if ($game->park->hasStash() 
+				&& in_array(strtolower($game->sport), $stashSports) 
+				&& $session->joinedGame
+				&& !$game->recurring) {
+				// Has stash and sport requires stash and just joined this game
+				$this->view->stash = true;
+			}
+			
+			Zend_Session::namespaceUnset('joinedGame');
+			
 			$dropdown = Zend_Controller_Action_HelperBroker::getStaticHelper('Dropdown');
 			$this->view->inviteButton = $dropdown->dropdownButton('invite', '', 'Invite');
 			if ($captain) {
@@ -94,7 +108,9 @@ class GamesController extends Zend_Controller_Action
 					
 			}
 		}
-				
+			
+		$this->view->userHasSport = $this->view->user->hasSport($game->sport);
+			
 		$this->view->parkLocation = $game->park->location;
 		
 	
@@ -232,7 +248,7 @@ class GamesController extends Zend_Controller_Action
 		
 		$this->view->game = $game;
 		
-		$history = $game->getHistoryData();
+		$history = $game->getHistoryData(6, $this->view->user->userID);
 		
 		$this->view->history = $history;
 	}

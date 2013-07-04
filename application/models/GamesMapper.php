@@ -346,11 +346,14 @@ class Application_Model_GamesMapper extends Application_Model_MapperAbstract
 		
 		$select->from(array('g'  => 'games'))
 			   ->join(array('st' => 'sport_types'),
-			   		  'g.typeID = st.typeID')
+			   		  'g.typeID = st.typeID',
+					  array('typeName',
+					  		'typeSuffix'))
 			   ->join(array('p' => 'parks'),
 			   		  'p.parkID = g.parkID',
 					  array('specialNotes',
-					  		'parkType'))
+					  		'parkType',
+							'stash'))
 			   ->join(array('pl' => 'park_locations'),
 			   		  'g.parkID = pl.parkID',
 					  array('AsText(location) as location'))
@@ -584,9 +587,10 @@ class Application_Model_GamesMapper extends Application_Model_MapperAbstract
 	
 	/**
 	 * get history data for chart of subscribe game
-	 * @params ($interval => how many months to look back)
+	 * @params ($interval => how many months to look back
+	 *			$userID	=> userID of user to see how many games they've played in)
 	 */
-	public function getHistoryData($gameID, $interval = 6)
+	public function getHistoryData($gameID, $interval = 6, $userID = false)
 	{
 		$table = $this->getDbTable();
 		$select = $table->select();
@@ -594,7 +598,7 @@ class Application_Model_GamesMapper extends Application_Model_MapperAbstract
 		
 		$select->from(array('og' => 'old_games'))
 			   ->where('og.gameID = ?', $gameID)
-			   ->where('og.date > (now() - INTERVAL 6 MONTH)')
+			   ->where('og.date > (now() - INTERVAL ' . $interval . ' MONTH)')
 			   ->order('og.date ASC');
 			   
 		$results = $table->fetchAll($select);
@@ -641,12 +645,13 @@ class Application_Model_GamesMapper extends Application_Model_MapperAbstract
 		
 		$returnArray['totalSubscribers'] = $result['totalSubscribers'];
 		
-		// Get subscribers
+		// Get most regular person
 		$select = $table->select();
 		$select->setIntegrityCheck(false);
 		
 		$select->from(array('oug' => 'old_user_games'),
-					  array('COUNT(oug.userID) as count'))
+					  array('COUNT(oug.userID) as count',
+					  		'userID'))
 			   ->join(array('u' => 'users'),
 			   		  'u.userID = oug.userID',
 					  array('u.firstName', 'u.lastName'))
@@ -655,7 +660,23 @@ class Application_Model_GamesMapper extends Application_Model_MapperAbstract
 			   
 		$result = $table->fetchRow($select);
 		
-		$returnArray['mostRegular'] = ucwords($result['firstName']) . ' ' . ucwords($result['lastName'][0]);
+		$returnArray['mostRegular'] = array('name' => ucwords($result['firstName']) . ' ' . ucwords($result['lastName'][0]),
+											'count' => $result['count'],
+											'userID' => $result['userID']);
+		
+		if ($userID) {
+			// Get user's attended games
+			$select = $table->select();
+			$select->setIntegrityCheck(false);
+			
+			$select->from(array('oug' => 'old_user_games'),
+						  array('COUNT(oug.oldGameID) as count'))
+				   ->where('oug.userID = ?', $userID);
+				   
+			$result = $table->fetchRow($select);
+			
+			$returnArray['userCount'] = $result['count'];
+		}
 		
 		return $returnArray;
 	}
@@ -785,6 +806,29 @@ class Application_Model_GamesMapper extends Application_Model_MapperAbstract
 		$db->insert('user_games', $data);
 		
 		return true;
+	}
+	
+	/**
+	 * get game captains
+	 */
+	public function getGameCaptains($gameID)
+	{
+		$table = $this->getDbTable();
+		$select = $table->select();
+		$select->setIntegrityCheck(false);
+		
+		$select->from(array('gc' => 'game_captains'))
+			   ->where('gc.gameID = ?', $gameID);
+			   
+		$captains = $table->fetchAll($select);
+		
+		$returnArray = array();
+		
+		foreach ($captains as $captain) {
+			$returnArray[] = $captain->userID;
+		}
+		
+		return $returnArray;
 	}
 	
 	/**

@@ -27,6 +27,13 @@ $this->placeholder('narrowColumn')->captureEnd();
 </p>
 
 <?php
+$question = "How is Sportfast different?";
+$answer   = "Most sites rely on the user to setup all of the details for a game, organize their buddies, and then post that game to the site and hope someone shows up (which they won't).  
+				But who wants to have to do that?  There shouldn't be any guesswork involved, so we took the guesswork out.  Our system analyzes users' preferences (as well as local events like weather) 
+				and determines where, when, and with who a game should happen.  Games are matched based on skill, age, availability, and location, so you know exactly who you're playing against and how good 
+				they'll be.  Oh, and everyone is welcome.  These aren't pre-organized groups of buddies.  It's a bunch of people looking to play the sport they love.";
+echo $this->faq()->create($question, $answer);
+
 $question = "I can't find any games.  Should I create one?";
 $answer   = "Our system analyzes users' preferences (as well as local events like weather) and determines whether there are enough people to play a game.
 				If there aren't, then we will hold off on creating one until there are enough players.  Nothing is worse than showing up
@@ -39,9 +46,10 @@ echo $this->faq()->create($question, $answer);
 
 $question = "Why can't I see all of the games in my area from my dashboard?";
 $answer   = "The dashboard is designed for quick browsing based on your sport preferences specified under \"Account Settings\".
-				The most common reasons you can't see a particular game is because <strong>you are already in it</strong>, <strong>
+				The most common reasons you can't see a particular game is because either <strong>you are already in it</strong>, <strong>
 				your search parameters are set incorrectly</strong>, or <strong>the game is not a good match for you</strong>.
-				Change the search parameters next to the \"Find\" section on your dashboard, or try looking under the \"Find\" dropdown in the navigation.";
+				Change the search parameters next to the \"Find\" section on your dashboard, or try looking under the \"Find\" dropdown in the top navigation
+				to see more games.";
 				
 echo $this->faq()->create($question, $answer);
 
@@ -56,6 +64,13 @@ echo $this->faq()->create($question, $answer);
 $question = "Why do I need a profile picture?";
 $answer   = "If you want to receive ratings, a picture is essential.  Most people are terrible with names (we are), so a picture helps to identify people.
 				Pictures also give a personal touch to an otherwise anonymous situation.  Try to choose pictures that are easily recognizable.";
+				
+echo $this->faq()->create($question, $answer);
+
+$question = "What's a stash?";
+$answer   = "A stash is a public, free-to-use collection of sports equipment that we donated (out of our own pocket) to a local park or school.  It contains items that
+				are needed to play a certain pickup game (e.g. flags for football, cones for ultimate, or goals for soccer).  Due to limited space, WE DO NOT INCLUDE A BALL
+				OR DISC.  Details about exactly what is in a stash and where it's located can be found on the park's Sportfast page.";
 				
 echo $this->faq()->create($question, $answer);
 
@@ -99,8 +114,21 @@ echo $this->faq()->create($question, $answer);
 
 <?php
 $question = "Why can't I join a certain game?";
-$answer   = "Some games have a specific skill requirement to help keep ridiculously skilled players from playing with beginners.  That wouldn't be fun for anyone.
+$answer   = "The most common reasons: <strong>you do not meet the skill requirement</strong>, <strong>the game is private</strong>, or <strong>the game is full</strong>.
+				Some games have a specific skill requirement to help keep ridiculously skilled players from playing with beginners.  That wouldn't be fun for anyone.
 				The game may also be private, in which case only those who are invited by the creator can join.";
+				
+echo $this->faq()->create($question, $answer);
+
+$question = "How do I reserve a spot for a friend?";
+$answer   = "If you go to your game's page, there will be a small arrow in the top right of the page that, when clicked, will show some options.  One of those options is
+				small dropdown with some numbers.  Change that number to correspond to the number of friends you're bringing.  However, you can only reserve a spot for 2 friends.";
+				
+echo $this->faq()->create($question, $answer);
+
+$question = "How do I leave a game?";
+$answer   = "If you go to your game's page, there will be a small arrow in the top right of the page that, when clicked, will show some options.  One of those options is
+				a button to leave the game.";
 				
 echo $this->faq()->create($question, $answer);
 

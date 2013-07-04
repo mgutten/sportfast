@@ -144,7 +144,7 @@ class CronController extends Zend_Controller_Action
 		$createGames = Zend_Controller_Action_HelperBroker::getStaticHelper('CreateGames');
 		
 		$games = $createGames->createGames();
-		
+		return;
 		if ($games) {
 			// Games were created
 			return $this->_forward('game-created', 'mail', null, array('games' => $games));

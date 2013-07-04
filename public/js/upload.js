@@ -92,11 +92,14 @@ function uploadProfilePic()
 		type: 'POST',
 		data: {fileInfo: fileInfo},
 		success: function(data) {
+			
 			var location = '/';
 			if (goToURL) {
 				location = goToURL;
 			}
-			window.location = location;
+			setTimeout(function() {
+				window.location = location;
+			}, 200);
 		}
 	})
 }

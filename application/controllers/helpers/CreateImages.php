@@ -8,7 +8,7 @@ class Application_Controller_Helper_CreateImages extends Zend_Controller_Action_
 
     public function createimages($fileInfo, $userID)
     {
-		
+
         $src = PUBLIC_PATH . $fileInfo['src'];
 		
 		$image = Zend_Controller_Action_HelperBroker::getStaticHelper('ImageManipulator');
@@ -18,6 +18,8 @@ class Application_Controller_Helper_CreateImages extends Zend_Controller_Action_
 										  'y' => $fileInfo['fileY'],
 										  'fileHeight' => $fileInfo['fileHeight'],
 										  'fileWidth'  => $fileInfo['fileWidth']));
+										  
+		
 		
 		// Large img															   
 		$image->save(PUBLIC_PATH . '/images/users/profile/pic/large/' . $userID . '.jpg');

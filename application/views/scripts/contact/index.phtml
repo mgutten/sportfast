@@ -5,7 +5,7 @@
  */
 $this->headTitle('Contact Us');
 $this->headLink()->prependStylesheet($this->baseUrl() . '/css/contact.css');
-//$this->headScript()->prependFile($this->baseUrl() . '/js/about.js');
+$this->headScript()->prependFile($this->baseUrl() . '/js/contact.js');
 ?>
 
 <div id='contact-container'>
@@ -21,6 +21,7 @@ $this->headLink()->prependStylesheet($this->baseUrl() . '/css/contact.css');
         	Replies will be sent to this email
         </p>
         <?php echo $this->form->question;?>
+        <?php echo $this->form->browser;?>
         <?php echo $this->form->submit;?>
         </form>
         <p class='clear smaller-text larger-margin-top medium'>

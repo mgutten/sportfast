@@ -12,11 +12,20 @@ $this->headScript()->prependFile($this->baseUrl() . '/js/plugins/jcrop.min.js');
 $this->headScript()->prependFile($this->baseUrl() . '/js/plugins/jform.js');
 ?>
 
+
+
 <header class='left jumbo-text darkest heavy'>
 	Upload Profile Picture
 </header>
+
+<?php
+if ($this->pictureRequired) {
+	// Tried to join game without profile pic, show that pic is required
+	echo "<p class='larger-text white left heavy dark-red-back width-100 center' id='upload-required'>Profile Picture required to join game.  Please upload one.</p>";
+}
+?>
 <div id='upload-container' class='clear'>
-    <img class='signup-import-alert-img' id='signup-import-alert-img' src='/images/global/profile/xl/default.jpg' class='clear'/>
+    <img class='clear signup-import-alert-img' id='signup-import-alert-img' src='/images/global/profile/xl/default.jpg'/>
     <div class='signup-import-alert-text-container'>
         <p class='medium clear' id='signup-import-alert-guidelines-header'>Profile pictures should be:</p>
         <ul class='green heavy' id='signup-import-alert-guidelines'>

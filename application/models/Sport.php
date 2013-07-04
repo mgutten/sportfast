@@ -115,12 +115,12 @@ class Application_Model_Sport extends Application_Model_ModelAbstract
 	public function setType($type) 
 	{
 		// Remove overwriting of type to accommodate several same typeName models (ie Singles Match, Singles Rally)
-		$newType = $this->_attribs['types'][strtolower($type)] = new Application_Model_SportType();
+		$newType = $this->_attribs['types'][] = new Application_Model_SportType();
 		
 		return $newType;
 	}
 	
-	public function getType($typeID = false) 
+	public function getType($typeName) 
 	{
 		//$type = strtolower($typeName);
 		/* CHANGED TO ALLOW FOR SEVERAL SPORT TYPES (singles => rally, singles => match)
@@ -130,15 +130,18 @@ class Application_Model_Sport extends Application_Model_ModelAbstract
 			$newType = $this->_attribs['types'][$type];
 		}
 		*/
-		
-		if (isset($this->_attribs['types'][$typeID])) {
-			$newType = $this->_attribs['types'][$typeID];
+		/*
+		if (isset($this->_attribs['types'][$typeName])) {
+			$newType = $this->_attribs['types'][$typeName];
 		} else {
-			$newType = $this->_attribs['types'][$typeID] = new Application_Model_SportType();
+			$newType = $this->_attribs['types'][$typeName] = new Application_Model_SportType();
 		}
+		*/
+		$newType = $this->setType($typeName);
 		
 		return $newType;
 	}
+	
 	
 	public function getTypeNames()
 	{

@@ -18,7 +18,7 @@ $(function()
 			clearTimeout(faqTimeout);
 			faqTimeout = setTimeout(function() {
 					selectQuestion(ele);
-			}, 200)
+			}, 400)
 				
 		} else {
 			selectQuestion($(this));
