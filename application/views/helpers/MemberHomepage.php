@@ -278,9 +278,11 @@ class Application_View_Helper_MemberHomepage
 					}
 					
 					if ($game->isPickup()) {
+						$confirmClass = '';
 						if ($game->isGameOn()) {
 							// Enough players for game
 							$confirm = 'GAME ON';
+							$confirmClass = ' heavy';
 						} else {
 							$confirm = $game->getPlayersNeeded() . " needed";
 						}
@@ -301,7 +303,7 @@ class Application_View_Helper_MemberHomepage
 						$output .= "<div class='member-schedule-day-body-players-container darkest bold'>";
 						$output .= "<p class='member-schedule-day-body-players largest-text center'>" . $game->totalPlayers . "/" . $game->rosterLimit . "</p>";
 						$output .= "<p class='member-schedule-day-body-players-text center clear larger-text'>players</p>";
-						$output .= "<p class='center clear green smaller-text member-schedule-day-body-players-confirmed'>" . $confirm . "</p>";
+						$output .= "<p class='center clear green smaller-text member-schedule-day-body-players-confirmed " . $confirmClass . "'>" . $confirm . "</p>";
 						$output .= "</div>";
 						$type	 = " type='pickupGame'";
 						$typeID  = " typeID='" . $game->gameID . "'";

@@ -79,8 +79,8 @@ class Application_Model_MessagesMapper extends Application_Model_MapperAbstract
 	 }	
 	 
 	/**
-	 * get messages for team's wall
-	 * @params ($teamID	=> id of team to search for,
+	 * get messages for game's wall
+	 * @params ($teamID	=> id of game to search for,
 	 *			$savingClass => messages model 
 	 */
 	 public function getGameMessages($gameID, $savingClass)

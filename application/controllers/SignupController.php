@@ -330,8 +330,8 @@ class SignupController extends Zend_Controller_Action
 					//echo 'An error occured.  Email could not be sent to ' . $user->username . '.';
 				}
 				
-			//} end again
-		//} END AGAIN
+			} 
+		} 
 		
 		
 		if (!empty($post['fileName'])) {

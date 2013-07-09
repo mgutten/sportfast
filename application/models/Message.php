@@ -147,7 +147,8 @@ class Application_Model_Message extends Application_Model_ModelAbstract
 	
 	public function getUserName()
 	{
-		return ucwords($this->firstName) . ' ' . ucwords($this->lastName[0]);
+		// Bug from interference with getFirstName() and getLastName() (this class) in a game's newsfeed message
+		return ucwords($this->_attribs['firstName']) . ' ' . ucwords($this->_attribs['lastName'][0]);
 	}
 	
 	public function getTimeFromNow($date = false, $maxDays = 7)

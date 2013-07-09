@@ -36,9 +36,10 @@ class Application_View_Helper_ProfileNewsfeed
 				$output .= "<div class='newsfeed-notification-container clear'>
 								<a href='/users/" . $message->userID . "' class='left'>" . $message->getBoxProfilePic('small') . "</a>";
 				$output .= "<div class='profile-message-container left'>";
-				$output .= 		"<p class='light left smaller-text arial'>" . $message->userName . " said...</p>";
-				$output .=		"<p class='light-back darkest rounded-corners profile-message clear'>" . $message->message . "</p>";
+				$output .= 		"<p class='light left'>" . $message->getUserName() . " said...</p>";
 				$output .=		"<p class='newsfeed-notification-time light smaller-text'>" . $message->getTimeFromNow() . "</p>";
+				$output .=		"<p class='light-back darkest rounded-corners profile-message clear'>" . $message->message . "</p>";
+				
 				$output .= "</div>";
 				$output .= "</div>";
 			}

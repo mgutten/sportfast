@@ -269,7 +269,7 @@ class Application_Model_CronMapper extends Application_Model_MapperAbstract
 						LEFT JOIN (SELECT u2.userID, ug2.gameID, ug2.plus FROM users u2
 									INNER JOIN user_games ug2 ON u2.userID = ug2.userID 
 									WHERE fake = 0) ug ON g.gameID = ug.gameID
-						WHERE CASE WHEN HOUR(now()) >= 20 THEN HOUR(TIMEDIFF(date, now())) <= 13 ELSE HOUR(TIMEDIFF(g.date, now())) = 2 END
+						WHERE CASE WHEN HOUR(now()) >= 20 THEN HOUR(TIMEDIFF(date, now())) <= 13 ELSE (HOUR(TIMEDIFF(g.date, now())) = 2 and MINUTE(TIMEDIFF(g.date, now())) < 30) END
 							AND g.canceled = 0
 						GROUP BY g.gameID";
 		
@@ -301,8 +301,7 @@ class Application_Model_CronMapper extends Application_Model_MapperAbstract
 			
 			$statement .= ')';
 			
-			//$db->query($statement);
-			echo $statement;
+			$db->query($statement);
 		}
 		
 		// Loop through games and get players

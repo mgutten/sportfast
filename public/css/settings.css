@@ -265,6 +265,11 @@ header {
 	margin-right: 0;
 }
 
+/* type */
+.signup-type-prefix-container > .selectable-text:nth-child(even) {
+	margin-left: 4.4em;
+}
+
 /* susbscribed games */
 .settings-email-alert-on {
 	margin-right: .75em;

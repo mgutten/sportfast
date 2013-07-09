@@ -112,7 +112,7 @@ class Application_View_Helper_Calendar
 						$winOrLoss = $event->winOrLoss;
 					} elseif (!empty($event->_attribs['gameID'])) {
 						// Is game
-						$tooltip  = '<p class="left darkest heavy">' . $event->sport . ' Game</p>';
+						$tooltip  = '<p class="left darkest heavy">' . $event->getGameTitle() . '</p>';
 						$tooltip .= '<p class="clear dark">' . $event->getDay() . '</p>';
 						$tooltip .= '<p class="clear dark">' . $event->getHour() . '</p>';
 						$tooltip .= '<p class="clear dark">' . $event->park->parkName . '</p>';

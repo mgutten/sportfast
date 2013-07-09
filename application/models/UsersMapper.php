@@ -255,7 +255,10 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 			   ->join(array('g' => 'games'),
 			   		  'ug.gameID = g.gameID')
 			   ->join(array('st' => 'sport_types'),
-			   		  'st.typeID = g.typeID')
+			   		  'st.typeID = g.typeID',
+					  array('typeName',
+					  		'typeSuffix',
+							'typeDescription'))
 			   ->join(array('ug2' => 'user_games'),
 			   		  'ug2.gameID = ug.gameID',
 					  array('(COUNT(ug2.userID) + SUM(ug2.plus)) as totalPlayers',
@@ -286,15 +289,17 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 			   		  'utg.teamGameID = tg.teamGameID',
 					  array('(SELECT COUNT(utg2.userID) FROM user_team_games as utg2 WHERE utg2.teamID = ut.teamID AND utg2.confirmed = 1 AND utg2.teamGameID = tg.teamGameID) as confirmedPlayers',
 					  		'utg.confirmed as confirmed'))
-			   ->where('ut.userID = ?', $savingClass->userID)
+			   ->where('utg.userID = ?', $savingClass->userID)
 			   //->where('utg.userID = ?' ,  $savingClass->userID)
-			   ->where('tg.date > CURDATE()')
+			   ->where('tg.date > now()')
 			   ->group('tg.teamGameID');
 		
+
 		$results = $table->fetchAll($select);
 		
 		
 		foreach ($results as $result) {
+			
 			$savingClass->games->addGame($result);
 		}
 

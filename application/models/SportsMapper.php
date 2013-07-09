@@ -17,6 +17,7 @@ class Application_Model_SportsMapper extends Application_Model_MapperAbstract
 			   ->join(array('st' => 'sport_types'),
 			   				's.sportID = st.sportID');
 		
+		
 		$results = $table->fetchAll($select);
 		
 		if ($asClasses) {

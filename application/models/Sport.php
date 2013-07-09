@@ -112,15 +112,17 @@ class Application_Model_Sport extends Application_Model_ModelAbstract
 		return $this->_attribs['availabilities'][$day][$hour];
 	}	
 	
-	public function setType($type) 
+	public function setType($typeID) 
 	{
 		// Remove overwriting of type to accommodate several same typeName models (ie Singles Match, Singles Rally)
 		$newType = $this->_attribs['types'][] = new Application_Model_SportType();
 		
+		$newType->typeID = $typeID;
+		
 		return $newType;
 	}
 	
-	public function getType($typeName) 
+	public function getType($typeID) 
 	{
 		//$type = strtolower($typeName);
 		/* CHANGED TO ALLOW FOR SEVERAL SPORT TYPES (singles => rally, singles => match)
@@ -137,9 +139,29 @@ class Application_Model_Sport extends Application_Model_ModelAbstract
 			$newType = $this->_attribs['types'][$typeName] = new Application_Model_SportType();
 		}
 		*/
-		$newType = $this->setType($typeName);
+		if ($newType = $this->typeExists($typeID)) {
+			// Used in SportsMapper getAllSportsInfo()
+			return $newType;
+		} else {
+			$newType = $this->setType($typeID);
+		}
 		
 		return $newType;
+	}
+	
+	public function typeExists($typeID)
+	{
+		if (!$this->hasValue('types')) {
+			return false;
+		}
+		
+		foreach ($this->_attribs['types'] as $type) {
+			if ($type->typeID == $typeID) {
+				return $type;
+			}
+		}
+		
+		return false;
 	}
 	
 	

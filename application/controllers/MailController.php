@@ -397,6 +397,7 @@ class MailController extends Zend_Controller_Action
 	{
 		$email = $this->getRequest()->getPost('email');
 		
+		//$email = 'guttenberg.m@gmail.com'; for testing
 		$user = new Application_Model_User();
 		$user->getUserBy('u.username', $email);
 		
@@ -419,9 +420,16 @@ class MailController extends Zend_Controller_Action
 		$user->save(false);	
 		
 		$subject  = 'Password Reset';
-		$message  = "A password reset has been requested.  Your new password is:
-						<br><br><p style='font-weight:bold;font-size:16px'>" . $password . "</p>
-						<br><br>You can set your password to something more meaningful under \"Settings\".";
+		$message  = $this->mailStart();
+		$message .= "<tr>
+						<td>
+							<p style='font-family: Arial, Helvetica, Sans-Serif; color: #333;'>A password reset on your Sportfast account has been requested.  Your new password is:</p>
+							<br><p style='font-family: Arial, Helvetica, Sans-Serif; color: #333;font-size: 2em;font-weight:bold;'>" . $password . "</p>
+							<br><p style='font-family: Arial, Helvetica, Sans-Serif; color: #333;'>You can set your password to something more meaningful under your <a href='/users/" . $user->userID . "/settings' style='font-family: Arial, Helvetica, Sans-Serif; color: #444;'>Account Settings</a>.</p>
+						</td>
+					 </tr>";
+		$message .= $this->supportSignature();
+		$message .= $this->mailEnd();
 		$headers  = "MIME-Version: 1.0" . "\r\n";
 		$headers .= "Content-type: text/html; charset=iso-8859-1" . "\r\n";
 		$headers .= "From: info@sportfast.com\r\n";	 
@@ -444,6 +452,7 @@ class MailController extends Zend_Controller_Action
 	public function contactAction()
 	{
 		$this->view->narrowColumn = false;
+		$this->view->whiteBacking = false;
 		
 		$post = $this->getRequest()->getPost();
 		
@@ -502,16 +511,21 @@ class MailController extends Zend_Controller_Action
 	{
 		$output  = $this->mailStart();
 								
-		$output .= "<p>We noticed you haven't visited our site in a while.  While we're sad, we understand.  However, 
-					to keep our database up-to-date, we must deactivate inactive users after a period of 60 days.</p>";
+		$output .= "<tr>
+						<td>
+							<p style='font-family: Arial, Helvetica, Sans-Serif; color: #333;'>We couldn't help but notice that you haven't visited our site in a while.  
+							We're sure you have plenty of excellent excuses--I mean, \"reasons\", for your inactivity.  Just a heads up, 
+							in order to keep our database up-to-date, we must deactivate inactive users after a period of 60 days.</p>";
 					
-		$output .= "<br><p><span class='bold larger-text'>
+		$output .= "<br><p><span style='font-family: Arial, Helvetica, Sans-Serif; color: #333;font-weight:bold; font-size: 1.25em;'>
 					Your account has been inactive for " . $array['lastActive'] . " days.  If you wish to keep your 
-					account active, please <a href='http://www.sportfast.com/login'>login</a> within the next couple days.</span></p>";
+					account active, please <a href='http://www.sportfast.com/login' style='font-family: Arial, Helvetica, Sans-Serif; color: #333;font-weight:bold;font-size:1em;'>login</a> within the next couple days.</span></p>";
 					
-		$output .= "<br><p>If you don't mind your account becoming inactive, then you do not need to do anything.</p>";
+		$output .= "<br><p style='font-family: Arial, Helvetica, Sans-Serif; color: #333;'>If you don't mind your account becoming inactive, then you do not need to do anything.</p>";
 		
-		$output .= "<br><p>Thanks!</p>";
+		$output .= "<br><p style='font-family: Arial, Helvetica, Sans-Serif; color: #333;'>Thanks, and we hope to see you soon!</p>
+						</td>
+					</tr>";
 		
 		$output .= $this->supportSignature(true);
 			
@@ -1030,7 +1044,7 @@ class MailController extends Zend_Controller_Action
 	public function supportSignature($personalized = false)
 	{
 		$output  = "<tr>
-						<td height='40px'></td>
+						<td height='30px'></td>
 					</tr>
 					<tr>
 						<td colspan = '3'>";

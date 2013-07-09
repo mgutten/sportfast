@@ -247,10 +247,10 @@ class Application_Model_TeamsMapper extends Application_Model_MapperAbstract
 		}
 		
 		$teamID  = $savingClass->teamID;
-		
-		$this->delete($savingClass);
 
 		$db = Zend_Db_Table::getDefaultAdapter();
+		
+		$db->delete('team_captains', array('teamID = ?' => $teamID));
 		
 		$insert = "INSERT INTO team_captains (teamID, userID) VALUES ";
 		
