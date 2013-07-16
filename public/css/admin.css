@@ -21,3 +21,19 @@
 .width-33 {
 	width: 33.33%;
 }
+
+/* cities page */
+.admin-cities-container {
+	width: 96%;
+	padding: .2em 2%;
+	border-bottom: solid 1px #e9e9e9;
+}
+
+.admin-cityName {
+	width: 10em;
+}
+
+.admin-totalUsers,
+.admin-last2Months {
+	width: 6em;
+}

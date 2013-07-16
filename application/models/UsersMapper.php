@@ -105,7 +105,7 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 		
 	
 	/**
-	 * Get all games that match $options variable
+	 * Get all users that match $options variable
 	 * @params ($options   => array of options including:
 	 *					sports => associative array of sport => type,
 	 *					distance => distance to look from user's location,
@@ -818,7 +818,7 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 			$select .= ") AND (n.action != 'create' AND nl.receivingUserID IS NULL AND nl.actingUserID != " . $userID . "))";
 		} 
 		
-		$select .= ") AND n.action = 'join') ";
+		$select .= ") AND n.action = 'join' AND (nl.dateHappened > (now() - INTERVAL 7 DAY))) ";
 		
 		
 		if ($onlyNew) {

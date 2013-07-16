@@ -44,7 +44,7 @@ class Application_Controller_Helper_CreateGames extends Zend_Controller_Action_H
 					foreach ($inner as $typeSuffix) {
 						$type = array('typeName' => $typeName,
 									  'typeSuffix' => $typeSuffix);
-									  
+								  
 						$this->testParkGame($combo, $type);
 					}
 				}

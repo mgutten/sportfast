@@ -123,13 +123,15 @@ img#homepage-large-img4 {
 .homepage-description-container {
 	float:left;
 	width:45%;
-	padding: 1em;
+	padding: 1.2em;
 	margin: 3em 0em 0em 0em;
 	cursor:default;
 }
 
+
 #homepage-description-container1,#homepage-description-container3 {
 	clear:both;
+	margin-left: 2px;
 }
 
 #homepage-description-container2,#homepage-description-container4 {
@@ -151,12 +153,19 @@ img#homepage-large-img4 {
 	margin-left:-45px;
 	width:90px;
 	height:90px;
+	transition: width .5s ease, height .5s ease, margin-left .5s ease;
+	-webkit-transition: width .5s ease, height .5s ease, margin-left .5s ease; /* Safari */
 	
 }
+
 
 .homepage-learn {
 	float:right;
 	clear:both;
+}
+
+.homepage-description-container.pointer {
+	cursor: pointer;
 }
 
 /* end below images */

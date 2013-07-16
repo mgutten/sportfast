@@ -16,11 +16,11 @@ class Application_Model_CronMapper extends Application_Model_MapperAbstract
 		$insertGames = "INSERT INTO old_games (gameID, parkID, parkName, backupParkID, backupParkName, 
 											   public, sport, sportID, typeID, rosterLimit, maxSkill, 
 											   minSkill, maxAge, minAge, recurring, date, city, cityID, 
-											   minPlayers, canceled, cancelReason, remove, totalPlayers, movedDate) 
+											   minPlayers, canceled, cancelReason, remove, sportfastCreated, totalPlayers, movedDate) 
 								(SELECT g.gameID, g.parkID, g.parkName, g.backupParkID, g.backupParkName,
 									    g.public, g.sport, g.sportID, g.typeID, g.rosterLimit, g.maxSkill,
 										g.minSkill, g.maxAge, g.minAge, g.recurring, g.date, g.city, g.cityID,
-										g.minPlayers, g.canceled, g.cancelReason, g.remove, COUNT(ug.userID), now()
+										g.minPlayers, g.canceled, g.cancelReason, g.remove, g.sportfastCreated, COUNT(ug.userID), now()
 									FROM games g 
 									LEFT JOIN user_games ug ON ug.gameID = g.gameID 
 									WHERE g.date < now() 
@@ -421,7 +421,7 @@ class Application_Model_CronMapper extends Application_Model_MapperAbstract
 					   p.tennisLights,
 					   HOUR(p.openTime) as openTime,
 					   HOUR(p.closeTime) as closeTime,
-					   (p.basketballOutdoor + p.basketballIndoor) as basketball,
+					   (p.basketballOutdoor) as basketball,
 					   p.field,
 					   p.tennis,
 					   p.volleyball,
@@ -489,13 +489,19 @@ class Application_Model_CronMapper extends Application_Model_MapperAbstract
 		$sql = "SELECT ul.userID, u.username, u.noEmail, u.age FROM user_locations ul
 				INNER JOIN users u ON ul.userID = u.userID
 				INNER JOIN user_sport_availabilities usa ON (usa.userID = ul.userID AND usa.sportID = '" . $sportID . "')
-				INNER JOIN (SELECT us.userID, us.skillCurrent FROM user_sports us
+				INNER JOIN (SELECT us.userID, us.skillCurrent, DATEDIFF(now(),MAX(og.date)) as lastGame, MAX(og.date) as date, us.often FROM user_sports us
 							LEFT JOIN old_user_games oug ON us.userID = oug.userID
 							LEFT JOIN old_games og ON oug.oldGameID = og.oldGameID
+							LEFT JOIN user_games ug ON us.userID = ug.userID
+							LEFT JOIN games g ON ug.gameID = g.gameID
 							WHERE us.sportID = '" . $sportID . "' 
-								AND (DATEDIFF(now(), og.date) >= us.often
-									OR og.date IS NULL)
+								AND (og.sportID = '" . $sportID . "'
+									OR og.sportID IS NULL)
+								AND ((g.sportID = '" . $sportID . "' and ug.userID IS NULL) 
+										OR g.sportID IS NULL
+										OR g.sportID != '" . $sportID . "')
 							GROUP BY us.userID
+							HAVING lastGame >= us.often OR date IS NULL
 							) us ON (us.userID = ul.userID) 
 				INNER JOIN user_sport_formats usf ON usf.userID = ul.userID AND usf.sportID = '" . $sportID . "' ";
 							
@@ -518,7 +524,8 @@ class Application_Model_CronMapper extends Application_Model_MapperAbstract
 									) * (5/8 * 100) < 6)
 						AND usa.day = '" . $dayOfWeek . "'
 						AND usa.hour = '" . $timeslot . "'
-						AND usf.format = 'pickup' ";
+						AND usf.format = 'pickup' 
+						AND u.fake = 0 ";
 						
 		if ($usedPlayers) {
 			// Players have already been used, do not include in results

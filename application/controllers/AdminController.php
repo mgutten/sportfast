@@ -71,6 +71,7 @@ class AdminController extends Zend_Controller_Action
 	
 	public function userMapAction()
 	{
+		$this->backHome();
 		$users = new Application_Model_Users();
 		
 		$users->getAllUserLocations();
@@ -81,8 +82,21 @@ class AdminController extends Zend_Controller_Action
 		
 		$this->view->stats = $stats;
 	}
-			
-			
+		
+	public function citiesAction()
+	{	
+		$this->backHome();
+		$mapper = new Application_Model_AdminMapper();
+		
+		$cities = $mapper->getCityData();
+		
+		$this->view->cities = $cities;
+	}
+	
+	public function backHome()
+	{
+		echo "<a href='/admin' class='clear-right medium larger-margin-top'>home</a>";
+	}
 		
 
 

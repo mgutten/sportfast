@@ -142,7 +142,8 @@ $(function()
 	
 	$('.selectable-text').click(function()
 	{
-		if (!$(this).is('.selectable-text-one') && $(this).siblings('.green-bold').length < 1 ) {
+		if (!$(this).is('.selectable-text-one') && $(this).siblings('.green-bold').length < 1 
+			&& $(this).parents('#find-type-tennis').length < 0) {
 			// Make sure one is always selected
 			$(this).addClass('green-bold');
 			if ($(this).text().toLowerCase() == 'tennis') {
@@ -258,6 +259,7 @@ function findMatches(options, type, orderBy, offset)
 			   orderBy: orderBy,
 			   offset: offset},
 		success: function(data) {
+			
 			data = JSON.parse(data);
 
 			if (offset.length < 1) {

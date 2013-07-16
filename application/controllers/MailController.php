@@ -99,9 +99,11 @@ class MailController extends Zend_Controller_Action
 		$type = ($typeModel instanceof Application_Model_Game ? 'game' : 'team');
 						
 		if ($type == 'game') {
+			
+			$time = ($typeModel->gameDate->format('i') > 0 ? $typeModel->gameDate->format('g:ia') : $typeModel->gameDate->format('ga'));
 			$main = "<td align='center'>
 							 <p class='largest-text bold' style='font-family: Arial, Helvetica, Sans-Serif; font-size: 2.5em; color: #333; font-weight: bold; margin: 0;'>" . $typeModel->sport . "</p>
-							 <p class='largest-text bold' style='font-family: Arial, Helvetica, Sans-Serif; font-size: 2.5em; color: #333; font-weight: bold; margin: 0;'>" . $typeModel->gameDate->format('l') . " at " . $typeModel->gameDate->format('ga') . "</p>
+							 <p class='largest-text bold' style='font-family: Arial, Helvetica, Sans-Serif; font-size: 2.5em; color: #333; font-weight: bold; margin: 0;'>" . $typeModel->gameDate->format('l') . " at " . $time . "</p>
 							 <p class='larger-text bold' style='font-family: Arial, Helvetica, Sans-Serif; font-size: 1.25em; color: #333; font-weight: bold; margin: 0;'>" . $typeModel->park->parkName . "</p>
 						 </td>";
 			
@@ -279,13 +281,15 @@ class MailController extends Zend_Controller_Action
 		$sport = ucwords($model->sport);
 		$id = $model->gameID;
 		
+		$time = ($model->gameDate->format('i') > 0 ? $model->gameDate->format('g:ia') : $model->gameDate->format('ga'));
+		
 		$subject  = $sport . ' Game Canceled';
 		$message  = $this->mailStart();
 		
 		$message .= "<tr>
 						<td align='center'>
 							 <p class='largest-text bold' style='font-family: Arial, Helvetica, Sans-Serif; font-size: 2.5em; color: #333; font-weight: bold; margin: 0;'>" . $model->sport . " Game Canceled</p>
-							 <p class='largest-text bold' style='font-family: Arial, Helvetica, Sans-Serif; font-size: 2.5em; color: #333; font-weight: bold; margin: 0;'>" . $model->gameDate->format('l') . " at " . $model->gameDate->format('ga') . "</p>
+							 <p class='largest-text bold' style='font-family: Arial, Helvetica, Sans-Serif; font-size: 2.5em; color: #333; font-weight: bold; margin: 0;'>" . $model->gameDate->format('l') . " at " . $time . "</p>
 						 </td>
 					 </tr>";
 
@@ -332,6 +336,8 @@ class MailController extends Zend_Controller_Action
 		
 		$id = $game->gameID;
 		
+		$time = ($game->gameDate->format('i') > 0 ? $game->gameDate->format('g:ia') : $game->gameDate->format('ga'));
+		
 		$subject  = $game->sport . ' Game On';
 		$message  = $this->mailStart();
 		
@@ -341,7 +347,7 @@ class MailController extends Zend_Controller_Action
 					 </tr>
 					 <tr>
 					 	<td align='center'>
-							 <p class='largest-text bold' style='font-family: Arial, Helvetica, Sans-Serif; font-size: 2.5em; color: #333; font-weight: bold; margin: 0;'>Today at " . $game->gameDate->format('ga') . "</p>
+							 <p class='largest-text bold' style='font-family: Arial, Helvetica, Sans-Serif; font-size: 2.5em; color: #333; font-weight: bold; margin: 0;'>Today at " . $time . "</p>
 							 <p class='larger-text bold' style='font-family: Arial, Helvetica, Sans-Serif; font-size: 1.25em; color: #333; font-weight: bold; margin: 0;'>" . $game->park->parkName . "</p>
 							 <p class='largest-text bold' style='font-family: Arial, Helvetica, Sans-Serif; font-size: 2.5em; color: #333; font-weight: bold; margin: 0;'>" . $game->totalPlayers . " players</p>
 						 </td>
@@ -550,7 +556,9 @@ class MailController extends Zend_Controller_Action
 				if ($user->doNotEmail) {
 					continue;
 				}
-				$subject  = $game->sport . ' game at ' . $game->gameDate->format('ga') . ' on ' . $game->gameDate->format('l');
+				$time = ($game->gameDate->format('i') > 0 ? $game->gameDate->format('g:ia') : $game->gameDate->format('ga'));
+				
+				$subject  = $game->sport . ' game at ' . $time . ' on ' . $game->gameDate->format('l');
 				$message  = $this->buildUpcomingSubcribedGameMessage($game, $user->userID);
 				$headers  = "MIME-Version: 1.0" . "\r\n";
 				$headers .= "Content-type: text/html; charset=iso-8859-1" . "\r\n";
@@ -565,7 +573,9 @@ class MailController extends Zend_Controller_Action
 			// Is team game
 			foreach ($team->players->getAll() as $user) {
 				$game = $team->games->_attribs['games'][0];
-				$subject  = $team->teamName . ' has a game at ' . $game->gameDate->format('ga') . ' on ' . $game->gameDate->format('l');
+				$time = ($game->gameDate->format('i') > 0 ? $game->gameDate->format('g:ia') : $game->gameDate->format('ga'));
+				
+				$subject  = $team->teamName . ' has a game at ' . $time . ' on ' . $game->gameDate->format('l');
 				$message  = $this->buildUpcomingTeamGameMessage($team, $game, $user->userID);
 				$headers  = "MIME-Version: 1.0" . "\r\n";
 				$headers .= "Content-type: text/html; charset=iso-8859-1" . "\r\n";
@@ -580,11 +590,12 @@ class MailController extends Zend_Controller_Action
 	
 	public function buildUpcomingSubcribedGameMessage($game, $userID) {
 		
+		$time = ($game->gameDate->format('i') > 0 ? $game->gameDate->format('g:ia') : $game->gameDate->format('ga'));
 		$message  = $this->mailStart();
 		
 		$message .= "<tr>
 						<td>
-							<p>You are currently subscribed to this " . strtolower($game->sport) . " game.  Would you like to play?  " . $game->minPlayers . " players are needed.</p>
+							<p style='font-family: Arial, Helvetica, Sans-Serif; color: #333;'>You are currently subscribed to this " . strtolower($game->sport) . " game.  Would you like to play?  <span style='font-family: Arial, Helvetica, Sans-Serif; color: #8d8d8d;'>" . $game->minPlayers . " players are needed.</span></p>
 						</td>
 					</tr>
 					 
@@ -593,9 +604,9 @@ class MailController extends Zend_Controller_Action
 					 </tr>
 					 <tr>
 						 <td align='center'>
-							 <p class='largest-text bold'>" . $game->sport . "</p>
-							 <p class='largest-text bold'>" . $game->gameDate->format('l') . " at " . $game->gameDate->format('ga') . "</p>
-							 <p class='larger-text bold'>" . $game->park->parkName . "</p>
+							 <p class='largest-text bold' style='font-family: Arial, Helvetica, Sans-Serif; font-size: 2.5em; color: #333; font-weight: bold; margin: 0;'>" . $game->sport . "</p>
+							 <p class='largest-text bold' style='font-family: Arial, Helvetica, Sans-Serif; font-size: 2.5em; color: #333; font-weight: bold; margin: 0;'>" . $game->gameDate->format('l') . " at " . $time . "</p>
+							 <p class='larger-text bold' style='font-family: Arial, Helvetica, Sans-Serif; font-size: 1.25em; color: #333; font-weight: bold; margin: 0;'>" . $game->park->parkName . "</p>
 						 </td>
 					 </tr>
 					 <tr>
@@ -603,7 +614,7 @@ class MailController extends Zend_Controller_Action
 					 </tr>
 					 <tr>
 					 	<td align='center'>
-							<a href='http://www.sportfast.com/mail/add-user-subscribe-game/" . $game->gameID . "/" . $userID . "' class='green-button largest-text bold' style='text-decoration:none'>in</a>
+							<a href='http://www.sportfast.com/mail/add-user-subscribe-game/" . $game->gameID . "/" . $userID . "' class='green-button largest-text bold' style='text-decoration: none; font-family: Arial, Helvetica, Sans-Serif; font-size: 2.2em; font-weight: bold; color: #fff; background-color: #58bf12; padding: .2em 1.25em;'>in</a>
 						</td>
 					 </tr>
 					 <tr>
@@ -611,15 +622,15 @@ class MailController extends Zend_Controller_Action
 					 </tr>
 					 <tr>
 					 	<td align='center'>
-							<a href='http://www.sportfast.com/games/" . $game->gameID . "' class='medium'>view game page</a>
+							<a href='http://www.sportfast.com/games/" . $game->gameID . "' class='medium' style='font-family: Arial, Helvetica, Sans-Serif; color: #8d8d8d;font-size:1.25em;'>view game page</a>
 						</td>
 					 </tr>
 					 <tr>
-					 	<td height='30px'></td>
+					 	<td height='50px'></td>
 					 </tr>
 					<tr>
 						<td>
-							<p class='smaller-text'>To unsubscribe, visit <a href='http://www.sportfast.com'>your account</a> and go to your Account Settings</p>
+							<p class='smaller-text' style='font-size:.8em;font-family: Arial, Helvetica, Sans-Serif; color: #8d8d8d;'>To unsubscribe from this game, visit <a href='http://www.sportfast.com' style='font-size:1em;font-family: Arial, Helvetica, Sans-Serif; color: #8d8d8d;'>your account</a> and go to the Games section under your Account Settings.</p>
 						</td>
 					</tr>";
 		/* Inline version
@@ -670,6 +681,8 @@ class MailController extends Zend_Controller_Action
 
 	public function buildUpcomingTeamGameMessage($team, $game, $userID) {
 		
+		$time = ($game->gameDate->format('i') > 0 ? $game->gameDate->format('g:ia') : $game->gameDate->format('ga'));
+		
 		$message  = $this->mailStart();
 		
 		$message .= "<tr>
@@ -684,7 +697,7 @@ class MailController extends Zend_Controller_Action
 					 <tr>
 						 <td colspan='3' align='center'>
 							 <p class='largest-text bold'>vs. " . $game->opponent . "</p>
-							 <p class='largest-text bold'>" . $game->gameDate->format('l') . " at " . $game->gameDate->format('ga') . "</p>
+							 <p class='largest-text bold'>" . $game->gameDate->format('l') . " at " . $time . "</p>
 							 <p class='larger-text bold'>" . $game->locationName . "</p>
 						 </td>
 					 </tr>
@@ -814,7 +827,8 @@ class MailController extends Zend_Controller_Action
 		$games = $this->getRequest()->getParam('games');
 		
 		foreach ($games as $game) {
-			$subject  = $game->sport . ' game at ' . $game->gameDate->format('ga') . ' on ' . $game->gameDate->format('l');
+			$time = ($game->gameDate->format('i') > 0 ? $game->gameDate->format('g:ia') : $game->gameDate->format('ga'));
+			$subject  = $game->sport . ' game at ' . $time . ' on ' . $game->gameDate->format('l');
 			$headers  = "MIME-Version: 1.0" . "\r\n";
 			$headers .= "Content-type: text/html; charset=iso-8859-1" . "\r\n";
 			$headers .= "From: info@sportfast.com\r\n";	 
@@ -833,6 +847,7 @@ class MailController extends Zend_Controller_Action
 	
 	public function buildGameCreatedMessage($game, $userID) 
 	{
+		$time = ($game->gameDate->format('i') > 0 ? $game->gameDate->format('g:ia') : $game->gameDate->format('ga'));
 		$message  = $this->mailStart();
 		
 		$message .= "<tr>
@@ -847,7 +862,7 @@ class MailController extends Zend_Controller_Action
 					 <tr>
 						 <td colspan='3' align='center'>
 							 <p class='largest-text bold'>" . $game->getGameTitle() . "</p>
-							 <p class='largest-text bold'>" . $game->gameDate->format('l') . " at " . $game->gameDate->format('ga') . "</p>
+							 <p class='largest-text bold'>" . $game->gameDate->format('l') . " at " . $time . "</p>
 							 <p class='larger-text bold'>" . $game->park->parkName . "</p>
 						 </td>
 					 </tr>

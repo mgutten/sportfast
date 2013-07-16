@@ -1,0 +1,35 @@
+<?php
+$this->headTitle('Cities');
+$this->headLink()->prependStylesheet($this->baseUrl() . '/css/admin.css');
+$this->headScript()->prependFile($this->baseUrl() . '/js/admin.js');
+
+?>
+
+<header class='jumbo-text heavy darkest clear'>
+	Cities
+</header>
+
+<div class='clear larger-margin-top width-100'>
+	<div class='clear admin-cities-container larger-text'>
+        <p class='heavy medium left admin-cityName'>CITY</p>
+        <p class='heavy medium left admin-totalUsers'>TOTAL USERS</p>
+        <p class='heavy medium left admin-last2Months' tooltip='# of users that joined in this city in last 2 months'>2 MONTHS</p>
+    </div>
+        
+	<?php
+		$totalArray = array('totalUsers' => 0,
+							'last2Months' => 0);
+		foreach ($this->cities as $city) {
+			$last2Months = (isset($city['last2Months']) ? $city['last2Months'] : 0);
+			
+			$totalArray['totalUsers'] += $city['totalUsers'];
+			$totalArray['last2Months'] += $last2Months;
+			
+			echo "<div class='clear admin-cities-container larger-text'>";
+			echo	"<p class='left darkest admin-cityName heavy'>" . ucwords($city['city']) . "</p>";
+			echo	"<p class='left darkest admin-totalUsers heavy'>" . $city['totalUsers'] . "</p>";
+			echo	"<p class='left darkest admin-last2Months heavy'>" . $last2Months . "</p>";
+			echo "</div>";
+		}
+		?>
+</div>

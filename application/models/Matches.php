@@ -43,12 +43,13 @@ class Application_Model_Matches extends Application_Model_ModelAbstract
 			if ($end) {
 				$end = (!$end ? count($this->_attribs['matches']) : $end);
 				for ($i = $offset; $i < ($end + $offset); $i++) {
-					if (!isset($this->_attribs['matches'][$i])) {
+					if (!isset($matches[$i])) {
 						// End of matches
 						break;
 					}
-					array_push($returnMatches, $this->_attribs['matches'][$i]);
+					array_push($returnMatches, $matches[$i]);
 				}
+				
 			} else {
 				$returnMatches = $matches;
 			}
@@ -62,7 +63,7 @@ class Application_Model_Matches extends Application_Model_ModelAbstract
 	private static function matchSort($a,$b) 
 	{
 		// Weight order based on skillDifference and # of players (weight skillDifference more)
-		if ($a->skillDifference > 12) {
+		if (abs($a->skillDifference) > 14) {
 			// large skillDifference, move to back of pile
 			$a = -10;
 			$b = 0;
@@ -99,7 +100,7 @@ class Application_Model_Matches extends Application_Model_ModelAbstract
 			return 0;
 		}
 		
-		return ($a < $b ? -1 : 1);
+		return ($a < $b ? 1 : -1);
 	}
 	
 }

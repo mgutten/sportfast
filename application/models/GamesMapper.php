@@ -61,6 +61,8 @@ class Application_Model_GamesMapper extends Application_Model_MapperAbstract
 						   'avg(us.skillCurrent) - (SELECT skillCurrent FROM user_sports WHERE userID = "' . $userID . '" AND sportID = t.sportID) as skillDifference',
 						   '(COUNT(us.userID) + SUM(ug.plus)) as totalPlayers'
 						   ))
+			   ->join(array('ust' => 'user_sport_types'),
+			   			  'ust.typeID = g.typeID AND ust.userID = "' . $userID . '"')
 			   //->where('g.cityID = ?', $cityID)
 			   ->where('g.public = "1"')
 			   ->where('g.canceled = ?', '0')
@@ -110,8 +112,10 @@ class Application_Model_GamesMapper extends Application_Model_MapperAbstract
 			}
 		}
 		
-		$select->group('g.gameID')
+		$select->having('g.rosterLimit > totalPlayers')
+			   ->group('g.gameID')
 			   ->order('abs(avg(us.skillCurrent) - (SELECT skillCurrent FROM user_sports WHERE userID = "' . $userID . '" AND sportID = t.sportID)) ASC');
+		
 		
 		$results = $table->fetchAll($select);
 
@@ -300,6 +304,7 @@ class Application_Model_GamesMapper extends Application_Model_MapperAbstract
 			$select->having(new Zend_Db_Expr($statements));
 
 		}
+		$select->having('(g.rosterLimit > totalPlayers OR totalPlayers IS NULL)');
 		
 		$select->group('g.gameID');
 		
@@ -317,7 +322,7 @@ class Application_Model_GamesMapper extends Application_Model_MapperAbstract
 		$offsetLimit = (isset($limitArray[1]) ? $limitArray[1] : 0);
 		
 		$select->limit($totalLimit,$offsetLimit);
-	
+		
 		$results = $table->fetchAll($select);
 		
 		$db = Zend_Db_Table::getDefaultAdapter();
@@ -660,9 +665,16 @@ class Application_Model_GamesMapper extends Application_Model_MapperAbstract
 			   
 		$result = $table->fetchRow($select);
 		
-		$returnArray['mostRegular'] = array('name' => ucwords($result['firstName']) . ' ' . ucwords($result['lastName'][0]),
-											'count' => $result['count'],
-											'userID' => $result['userID']);
+		if ($result['count'] > 0 ) {
+			// Is a player
+			$returnArray['mostRegular'] = array('name' => ucwords($result['firstName']) . ' ' . ucwords($result['lastName'][0]),
+												'count' => $result['count'],
+												'userID' => $result['userID']);
+		} else {
+			$returnArray['mostRegular'] = array('name' => 'None',
+												'count' => 0,
+												'userID' => 0);
+		}
 		
 		if ($userID) {
 			// Get user's attended games
