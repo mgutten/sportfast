@@ -242,6 +242,21 @@ function createScatterChart(dataArray, initial, animation)
 
         //chart = new google.visualization.LineChart(document.getElementById('chart')); 
         chart.draw(data, options);
+		
+		google.visualization.events.addListener(chart, 'select', function() {
+          // grab a few details before redirecting
+          	var selection = chart.getSelection();
+          	var row = selection[0].row;
+          	var col = selection[0].column;
+			
+			var ele = $('.rating-container:eq(' + row + ')');
+			
+			$('body').animate({'scrollTop': ele.offset().top}, 600);
+			
+			$('.rating-container').removeClass('light-back');
+			ele.addClass('light-back');
+          
+        });
 }
 
 

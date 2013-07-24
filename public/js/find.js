@@ -265,11 +265,12 @@ function findMatches(options, type, orderBy, offset)
 			if (offset.length < 1) {
 				// No offset, replace all data
 				$('#find-results-inner-container').html(data[0]);
+				page = 1;
 			} else {
 				$('#find-results-inner-container').append(data[0]);
 			}
 			
-			page = 1;
+			
 			$('#find-results-inner-container').css('margin-top',0);
 			
 			$('#loading').hide();			
@@ -284,9 +285,11 @@ function findMatches(options, type, orderBy, offset)
 				for (i = 0; i < data[1].length; i++) {
 					gmapMarkers.push([data[1][i][0],data[1][i][1]]);
 				}
+				
+				createMarkers();
 			}
 			
-			createMarkers();
+			
 			
 		}
 	})

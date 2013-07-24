@@ -53,8 +53,6 @@ class Application_Controller_Helper_CreateGames extends Zend_Controller_Action_H
 				$this->testParkGame($combo);
 			}
 			
-			//var_dump($combo);
-			//var_dump($this->master);
 		}
 
 		
@@ -203,21 +201,21 @@ class Application_Controller_Helper_CreateGames extends Zend_Controller_Action_H
 			// First determine what sports can be played at this park
 			$parkSports = array();
 			
-			if ($park['basketball'] > 0) {
+			if ($park['basketball'] > 0 && $park['basketballPrivate'] == 0) {
 				// Basketball is available
 				$parkSports['basketball'] = true;
 			}
 			
-			if ($park['field'] > 0 && $park['sport']) {
+			if ($park['field'] > 0 && $park['sport'] && $park['fieldPrivate'] == 0) {
 				// Field present and stash available, could play football, ultimate, soccer, or volleyball
 				$parkSports[$park['sport']] = true;
 			}
 			
-			if ($park['tennis'] > 0) {
+			if ($park['tennis'] > 0 && $park['tennisPrivate'] == 0) {
 				$parkSports['tennis'] = true;
 			}
 			
-			if ($park['volleyball'] > 0) {
+			if ($park['volleyball'] > 0 && $park['volleyballPrivate'] == 0) {
 				$parkSports['volleyball'] = true;
 			}
 			
@@ -266,7 +264,7 @@ class Application_Controller_Helper_CreateGames extends Zend_Controller_Action_H
 				for ($i = $openTime; $i <= $$reference; $i++) {
 					
 					if ($park['parkType'] == 'school' &&
-						($i >= 8 && $i < 15) &&
+						($i >= 8 && $i <= 15) &&
 						(date('n') < 6 || date('n') > 8) &&
 						(date('w') != 6 && date('w') != 0)) {
 							// Park is school and during school hours and in school season and weekday

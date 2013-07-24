@@ -47,12 +47,12 @@ Feedback
 				continue;
 			}
 			if ($notification->hasValue('actionRequired')) {	
-				$buttons = "<div class='notification-button-container clear-right' notificationLogID='" . $notification->notificationLogID . "' type='" . $notification->type . "'>";
+				$buttons = "<div class='notification-button-container clear-right' notificationLogID='" . $notification->notificationLogID . "' type='" . $notification->type . "' action='" . $notification->action . "'>";
 				$buttons .= "<p class='button notification-action-button'>Confirm</p>";
 				$buttons .= "<p class='button notification-action-button notification-action-button-second'>Decline</p>";
 				$buttons .= "</div>";
 			} elseif ($notification->hasValue('joinOption')) {
-				$buttons = "<div class='notification-button-container clear-right' notificationLogID='" . $notification->notificationLogID . "' type='" . $notification->type . "'>";
+				$buttons = "<div class='notification-button-container clear-right' notificationLogID='" . $notification->notificationLogID . "' type='" . $notification->type . "' action='" . $notification->action . "'>";
 				$buttons .= "<p class='button notification-join'>Join</p>";
 				$buttons .= "</div>";
 			}
@@ -98,7 +98,7 @@ Request sent
 
     <div class='centered-body body-wrapper'>
     	<div class='header-nav-container-short'>
-        	<a href='/'><img src='/images/global/logo/small2.png' class='left'/> </a>
+        	<a href='/'><img src='/images/global/logo/small_beta.png' class='left'/> </a>
             
             <a href='/'><img src='/images/global/header/home_icon.png' id='header-home-icon' /></a>
             

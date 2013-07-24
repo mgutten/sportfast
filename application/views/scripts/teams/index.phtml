@@ -425,9 +425,11 @@ $playersHeader .= 		"<p class='right medium'>" . $this->totalPlayers . " out of 
 $playersHeader .= "</div>";
 if ($this->nextGame) {
 	$playersHeader .= "<div class='left profile-section-bold-subheader team-player-going-description-container'>";
-	$playersHeader .= 		"<img class='left' src='/images/team/confirm/small.png' />";
+	//$playersHeader .= 		"<img class='left' src='/images/team/confirm/small.png' />";
+	$playersHeader .=		"<div class='left green-back profile-confirm'></div>";
 	$playersHeader .= 		"<p class='left smaller-text medium team-players-section-header-going'>Going to next game</p>";
-	$playersHeader .= 		"<img class='left' src='/images/team/deny/small.png' />";
+	//$playersHeader .= 		"<img class='left' src='/images/team/deny/small.png' />";
+	$playersHeader .=		"<div class='left dark-red-back profile-confirm'></div>";
 	$playersHeader .= 		"<p class='left smaller-text medium team-players-section-header-going'>Not going to next game</p>";
 	$playersHeader .= "</div>";
 }

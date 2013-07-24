@@ -391,8 +391,8 @@ class Application_View_Helper_MemberHomepage
 		$numberOfPages  = 3;
 		if (empty($matches)) {
 			// No matches 
-			$output  = "<p class='medium larger-text member-find-none center'>No matches could be found.</p>";
-			$output .= "<a href='/find' class='light center member-find-none-search'> Broader search</a>";
+			$output  = "<p class='medium larger-text member-find-none center'>No matches found.</p>";
+			$output .= "<a href='/find' class='light center member-find-none-search'><img src='/images/global/body/magnifying_medium.png' style='margin:0 2px -4px 0;'/>Broader search</a>";
 			return $output;
 		}
 			

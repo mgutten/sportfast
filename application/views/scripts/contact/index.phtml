@@ -10,15 +10,17 @@ $this->headScript()->prependFile($this->baseUrl() . '/js/contact.js');
 
 <div id='contact-container'>
 	<p class='clear darkest jumbo-text heavy'>Contact Us</p>
+    <p class='larger-text right green heavy' id='contact-subheader'>We love hearing from you!</p>
     <div class='clear white-back rounded-corners larger-text' id='contact-inner-container'>
 
 		<form action="<?php echo $this->form->getAction(); ?>"
               enctype="<?php echo $this->form->getEnctype(); ?>"
               method="<?php echo $this->form->getMethod(); ?>"
               >
+        
     	<?php echo $this->form->email;?>
         <p class='clear medium smaller-text' id='contact-email-subtext'>
-        	Replies will be sent to this email
+        	Any replies will be sent to this email
         </p>
         <?php echo $this->form->question;?>
         <?php echo $this->form->browser;?>

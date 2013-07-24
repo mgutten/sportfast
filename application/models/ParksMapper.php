@@ -123,14 +123,35 @@ class Application_Model_ParksMapper extends Application_Model_MapperAbstract
 					  array(new Zend_Db_Expr('SQL_CALC_FOUND_ROWS p.*')))
 			   ->join(array('pl' => 'park_locations'),
 			   		  'pl.parkID = p.parkID',
-					  array('AsText(pl.location) as location'))
-			   ->joinLeft(array('pr' => 'park_ratings'),
-			   		  'pr.parkID = p.parkID',
-					  array('AVG(pr.quality) as quality',
-					  		'COUNT(pr.parkRatingID) as numRatings'))
-			   ->where($this->getAreaWhere($bounds['upper'], $bounds['lower'], 'pl.location'))
+					  array('AsText(pl.location) as location'));
+					  
+		if (!empty($options['courts'])) {
+			// Courts have been selected, only show ratings for the court
+			if ($options['courts'][0] == 'field') {
+				// Looking for field
+				$parkWhere = 'pr2.sport IN ("soccer", "ultimate", "football") ';
+			} else {
+				$parkWhere = 'pr2.sport = "' . strtolower($options['courts'][0]) . '"';
+			}
+			$parkRatings = "(SELECT AVG(pr2.quality) as quality,
+									pr2.parkID,
+									pr2.success 
+							FROM park_ratings pr2
+							WHERE " . $parkWhere . "
+							GROUP BY pr2.parkID)";
+		
+			$select->joinLeft(array('pr' => new Zend_Db_Expr($parkRatings)),
+							  'pr.parkID = p.parkID');
+		} else {					  
+			$select->joinLeft(array('pr' => 'park_ratings'),
+							  'pr.parkID = p.parkID',
+							  array('AVG(pr.quality) as quality',
+									'COUNT(pr.parkRatingID) as numRatings'));
+		}
+		
+		$select->where($this->getAreaWhere($bounds['upper'], $bounds['lower'], 'pl.location'))
 			   ->where('p.temporary = 0')
-			   ->where('pr.success = ?', '1');
+			   ->where('pr.success = 1 OR pr.success IS NULL');
 			   
 			   
 		foreach ($where as $statement) {
@@ -141,6 +162,7 @@ class Application_Model_ParksMapper extends Application_Model_MapperAbstract
 	
 		if (!empty($options['order'])) {
 			if ($options['order'] == 'distance') {
+
 				$select->order('GLength(
 									LineStringFromWKB(
 									  LineString(

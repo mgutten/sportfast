@@ -14,6 +14,8 @@ class Application_Model_NotificationsMapper extends Application_Model_MapperAbst
 		
 		$db = Zend_Db_Table::getDefaultAdapter();   
 		
+		$cityIDRange = $this->getCityIdRange($cityID);
+		
 		$select = "SELECT `nl`.*, 
 						  `n`.*, 
 						  `u`.firstName as actingFirstName, 
@@ -35,7 +37,7 @@ class Application_Model_NotificationsMapper extends Application_Model_MapperAbst
 					 LEFT JOIN `teams` AS `t` ON t.teamID = nl.teamID
 					 LEFT JOIN `parks` AS `p` ON p.parkID = nl.parkID
 					 LEFT JOIN `user_ratings` AS `ur` ON ur.userRatingID = nl.ratingID 
-					 WHERE (nl.cityID = " . $cityID . ") 
+					 WHERE (nl.cityID IN " . $cityIDRange . ") 
 						AND n.public = '1' ";
 						
 		if ($onlyNew) {
@@ -93,6 +95,7 @@ class Application_Model_NotificationsMapper extends Application_Model_MapperAbst
 					 LEFT JOIN `user_ratings` AS `ur` ON ur.userRatingID = nl.ratingID 
 					 WHERE (nl.actingUserID = '" . $userID . "'  OR nl.receivingUserID = '" . $userID . "')
 					 	AND n.public = '1'
+						AND (n.action != 'rate' AND (n.type != 'park' OR n.type IS NULL))
 					 ORDER BY nl.dateHappened DESC LIMIT " . $limit;
 						
 		
@@ -111,10 +114,12 @@ class Application_Model_NotificationsMapper extends Application_Model_MapperAbst
 	/**
 	 * user confirmed friend, team, or group request so add to db
 	 * @params ($notificationLogID => id from notification_log table, 
+	 *			$confirmOrDeny => 'confirm' or 'decline',
 	 *			$type => type from notifications table)
 	 */
-	 public function notificationConfirm($notificationLogID, $type)
+	 public function notificationConfirm($notificationLogID, $confirmOrDeny, $type, $action)
 	 {
+		 $db = Zend_Db_Table::getDefaultAdapter();
 		 
 		 if ($type == 'friend') {
 			 $query = "INSERT INTO friends (userID1, userID2, userName1, userName2)
@@ -135,20 +140,37 @@ class Application_Model_NotificationsMapper extends Application_Model_MapperAbst
 						 	FROM notification_log as `nl`
 							WHERE nl.notificationLogID = '" . $notificationLogID . "')";
 		 } elseif ($type == 'team') {
-			 
+			 // Add user to team
 			 $query = "INSERT INTO user_teams (teamID, userID)
 			 			(SELECT nl.teamID,
-								COALESCE(nl.receivingUserID,nl.actingUserID)
+								COALESCE(nl.actingUserID,nl.receivingUserID)
 							FROM notification_log as `nl`
 							WHERE nl.notificationLogID = '" . $notificationLogID . "')";
 			
 			 $query2 = "INSERT INTO notification_log (actingUserID, teamID, notificationID, dateHappened)
-			 			 (SELECT COALESCE(nl.receivingUserID,nl.actingUserID), 
+			 			 (SELECT COALESCE(nl.actingUserID,nl.receivingUserID), 
 						 		 nl.teamID, 
 								 (SELECT notificationID FROM notifications WHERE type ='team' AND action = 'join' AND details IS NULL), 
 								 NOW()
 						 	FROM notification_log as `nl`
 							WHERE nl.notificationLogID = '" . $notificationLogID . "')";
+			 
+			 // User joined team, ask if they still want to be listed as actively searching	
+			 $select = "SELECT COALESCE(nl.actingUserID,nl.receivingUserID) as userID,
+			 				   t.sport,
+							   t.teamID
+							FROM notification_log as `nl`
+							INNER JOIN teams t ON t.teamID = nl.teamID
+							WHERE nl.notificationLogID = '" . $notificationLogID . "'";
+		 	 $result = $db->fetchRow($select);	
+			 
+			 $notification = new Application_Model_Notification();
+			 $notification->action = 'check';
+			 $notification->type = 'user';
+			 $notification->receivingUserID = $result['userID'];
+			 $notification->teamID = $result['teamID'];
+			 
+			 $notification->save();
 							
 		 } elseif ($type == 'game') {
 			 $query = "INSERT INTO user_games (gameID, userID)
@@ -164,13 +186,41 @@ class Application_Model_NotificationsMapper extends Application_Model_MapperAbst
 								 NOW()
 						 	FROM notification_log as `nl`
 							WHERE nl.notificationLogID = '" . $notificationLogID . "')";
+							
+		 } elseif ($type == 'user' && $action == 'check') {
+			 // User has either confirmed or denied that they want to remain listed as actively searching for team
+			 
+			 $select = "SELECT COALESCE(nl.receivingUserID,nl.actingUserID) as userID,
+			 				   t.sportID
+							FROM notification_log as `nl`
+							INNER JOIN teams t ON t.teamID = nl.teamID
+							WHERE nl.notificationLogID = '" . $notificationLogID . "'";
+							
+		 	 $result = $db->fetchRow($select);	
+			 
+			 if (empty($result['userID'])) {
+				 return false;
+			 }
+			 
+			 $query = "DELETE FROM user_sport_formats 
+				 			WHERE userID = '" . $result['userID'] . "'
+								AND sportID = '" . $result['sportID'] . "'
+								AND format = 'league'";
+							
+			 if ($confirmOrDeny == 'confirm') {
+				 $query2 = "INSERT INTO user_sport_formats (userID, sportID, format, formatID) VALUES
+				 			('" . $result['userID'] . "', '" . $result['sportID'] . "', 'league', (SELECT formatID FROM sport_formats WHERE format='league'))";
+			 } else {
+				 $query2 = '';
+			 }
 		 }
 		 
-		 
-		 $db = Zend_Db_Table::getDefaultAdapter();
+		
 		 $db->query($query);
 		 
-		 $db->query($query2);
+		 if ($query2) {
+			 $db->query($query2);
+		 }
 		 
 	 }
 	 

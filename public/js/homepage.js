@@ -12,7 +12,7 @@ buttonPosition[3] = {top: '248px',
 									 					 
 
 $(function()
-{		
+{	
 	setFadeInterval(5500)
 	
 								
@@ -35,19 +35,22 @@ $(function()
 		
 	})
 	
-	$('.homepage-description-container').hover(function()
-	{
-		$(this).find('.homepage-description-img')
-				.css({'height': '100px',
-					  'width': '100px',
-					  'margin-left': '-50px'});
-	}, function()
-	{
-		$(this).find('.homepage-description-img')
-				.css({'height': '90px',
-					  'width': '90px',
-					  'margin-left': '-45px'});
-	});
+	if (!$.browser.safari) {
+		// Safari is slow to animate images, do not allow to animate
+		$('.homepage-description-container').hover(function()
+		{
+			$(this).find('.homepage-description-img')
+					.css({'height': '100px',
+						  'width': '100px',
+						  'margin-left': '-50px'});
+		}, function()
+		{
+			$(this).find('.homepage-description-img')
+					.css({'height': '90px',
+						  'width': '90px',
+						  'margin-left': '-45px'});
+		});
+	}
 										
 		
 				

@@ -160,7 +160,7 @@ class AjaxController extends Zend_Controller_Action
 									  'details' => $options['details']);
 
 		 if ($options['receivingUserID'] == 'captain') {
-			 $options['receivingUserID'] = $notificationsMapper->getForeignID('Application_Model_DbTable_Teams', 'captain', array($options['idType'] => $options['typeID']));
+			 $options['receivingUserID'] = $notificationsMapper->getForeignID('Application_Model_DbTable_TeamCaptains', 'userID', array($options['idType'] => $options['typeID']));
 		 }
 		 
 
@@ -345,6 +345,7 @@ class AjaxController extends Zend_Controller_Action
 	public function uploadTempPictureAction()
 	{
 		$targetPath   = PUBLIC_PATH . "/images/tmp/profile/pic/";
+		
 		$pathInfo     = pathinfo(basename($_FILES['profilePic']['name']));
 		$targetPath  .= uniqid() . basename($_FILES['profilePic']['name']); 
 		//$targetPath  .= uniqid() . $pathInfo['basename']; 
@@ -901,10 +902,11 @@ class AjaxController extends Zend_Controller_Action
 			// Confirm or deny action
 			$options['confirmOrDeny'] = strtolower($options['confirmOrDeny']);
 
-			if ($options['confirmOrDeny'] == 'confirm') {
-				// Confirm action, add to db		
+			if ($options['confirmOrDeny'] == 'confirm' || ($options['type'] == 'user' && $options['action'] == 'check')) {
+				// Confirm action, add to db	
+					
 				$mapper = new Application_Model_NotificationsMapper();
-				$mapper->notificationConfirm($options['notificationLogID'], $options['type']);
+				$mapper->notificationConfirm($options['notificationLogID'], $options['confirmOrDeny'],$options['type'], $options['action']);
 				
 			}
 						

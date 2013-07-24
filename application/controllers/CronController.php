@@ -109,7 +109,7 @@ class CronController extends Zend_Controller_Action
 		
 		$date = new DateTime('now');
 		
-		if ($date->format('G') > 7 && ($date->format('G') <= 20 && $date->format('i') <= 5)) {
+		if ((($date->format('G') >= 6 && $date->format('i') > 31) || $date->format('G') >= 7) && ($date->format('G') < 20)) {
 			// Only update games between 7AM and 8PM
 			$games = $mapper->updateGameStatus();
 			

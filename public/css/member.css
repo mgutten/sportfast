@@ -190,12 +190,12 @@
 	clear:both;
 	width:100%;
 	overflow:hidden;
-	height:  9em;
+	max-height:  9em;
 }
 
 .member-find-lower-outer-inner-container {
 	float:left;
-	height:500%;
+	max-height:500%;
 }
 
 .member-find-lower-inner-container {

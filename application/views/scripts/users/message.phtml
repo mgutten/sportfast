@@ -9,7 +9,7 @@ $this->headLink()->prependStylesheet($this->baseUrl() . '/css/profile.css');
 $this->headScript()->prependFile($this->baseUrl() . '/js/inbox.js');
 ?>
 
-<a href='/users/<?php echo $this->user->userID;?>/inbox' class='left smaller-text medium'>&lt;&lt; Back to inbox</a>
+<a href='/users/<?php echo $this->user->userID;?>/inbox' class='left smaller-text medium'><img src='/images/global/body/single_left_arrow.png' class='back-arrow'/> Back to inbox</a>
 
 
 <header class='jumbo-text darkest heavy clear' id='message-header'>

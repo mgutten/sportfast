@@ -52,20 +52,24 @@ class Application_View_Helper_PlayersSection
 				$success = false;
 				
 				if ($nextGame) {
+					/* only $success is in use, $src is for green check and red X instead of colored box */
 					if ($nextGame->userConfirmed($player->userID)) {
 						// User is going to next game
-						$src = "/images/team/confirm/small.png";
+						//$src = "/images/team/confirm/small.png";
+						$background = 'green-back';
 						$success = true;
 					} elseif ($nextGame->userNotConfirmed($player->userID)) {
 						// User is confirmed as not going
-						$src = "/images/team/deny/small.png";
+						//$src = "/images/team/deny/small.png";
+						$background = 'dark-red-back';
 						$success = true;
 					}
 				}
 				
 				if ($success) {
 					// User is either confirmed or not
-					$output .= "<img src='" . $src . "' class='clear team-confirm-img' />";
+					//$output .= "<img src='" . $src . "' class='clear team-confirm-img' />";
+					$output .= "<div class='" . $background . " clear team-confirm-img'></div>";
 				}
 				
 				$output .= 	"<div class='hover-dark profile-player-overlay-container'>";

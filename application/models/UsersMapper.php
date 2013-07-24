@@ -805,7 +805,7 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 					$select .= " OR ";
 				}
 				
-				$select .= "nl." . $name . "ID IN (" . $$nameCombo . ")";
+				$select .= "(nl." . $name . "ID IN (" . $$nameCombo . ") AND (n.details != 'request' OR n.details IS NULL))";
 				if (!$success) {
 					$success = true;
 				}
@@ -858,7 +858,7 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 					 LEFT JOIN `user_ratings` AS `ur` ON ur.userRatingID = nl.ratingID 
 					 WHERE ((nl.receivingUserID = " . $userID . ") OR
 					 	(nl.actingUserID =  " . $userID . " AND ((n.action = 'friend' AND n.type IS NULL)
-							OR (n.action = 'join' AND n.type = 'team'))) "; // include case when user requests to join team and is accepted, notify user they were accepted
+							OR (n.action = 'join' AND n.type = 'team' AND n.details IS NULL))) "; // include case when user requests to join team and is accepted, notify user they were accepted
 		
 		$counter = 0;
 		$success = false;
@@ -872,7 +872,7 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 					$select .= " OR ";
 				}
 				
-				$select .= "nl." . $name . "ID IN (" . $$nameCombo . ")";
+				$select .= "(nl." . $name . "ID IN (" . $$nameCombo . ") AND n.details != 'request')";
 				if (!$success) {
 					$success = true;
 				}

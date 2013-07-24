@@ -526,10 +526,11 @@ $(function()
 		
 		var notificationLogID = $(this).parent().attr('notificationLogID');
 		var type = $(this).parent().attr('type');
+		var action = $(this).parent().attr('action');
 		var confirmOrDeny 	  = $(this).text().toLowerCase();
 		var optionalID = '';
 		
-		notificationConfirmDeny(notificationLogID, confirmOrDeny, type, optionalID);
+		notificationConfirmDeny(notificationLogID, confirmOrDeny, type, action, optionalID);
 		
 	})
 	
@@ -1022,14 +1023,16 @@ function confirmUserToGame(inOrOut, type, id, insertOrUpdate, teamID)
  * Ajax call to confirm (eg add as friends) or deny (delete) specific notification
  * @params(notificationLogID => id of parent notificationLogID from db,
  *		   confirmOrDeny	 => "confirm" or "deny",
- *		   type				 => type (friend, game, team, group etc) retrieved from db to determine what table to add to
+ *		   type				 => type (friend, game, team, group etc) retrieved from db to determine what table to add to,
+ *		   action			 => action (check, invite, etc),
  *		   optionalID		 => ID for game or group if issued, but blank if not)
  */
-function notificationConfirmDeny(notificationLogID, confirmOrDeny, type, optionalID)
+function notificationConfirmDeny(notificationLogID, confirmOrDeny, type, action, optionalID)
 {
 	var options = new Object();
 	options.notificationLogID = notificationLogID;
 	options.type = type;
+	options.action = action;
 	options.confirmOrDeny = confirmOrDeny;
 	options.optionalID = optionalID;
 
@@ -1038,7 +1041,7 @@ function notificationConfirmDeny(notificationLogID, confirmOrDeny, type, optiona
 		type: 'POST',
 		data: {options: options},
 		success: function(data) {
-			showConfirmationAlert('"' + confirmOrDeny + '" processed');	
+			showConfirmationAlert(capitalize(confirmOrDeny) + ' processed');	
 			reloadPage();
 		}
 	})
@@ -1372,8 +1375,8 @@ function populateSearchResultsInvite(results)
 		output += "<div class='header-search-result dark-back medium'>No results found</div>";
 	} else {
 		// Results found
-	
-		for (i = 0; i < results.length; i++) {
+		var limit = (results.length > 7 ? 7 : results.length);
+		for (i = 0; i < limit; i++) {
 			
 			var tooltip = '';
 			if (results[i]['name'].length > 22) {

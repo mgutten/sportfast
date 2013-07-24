@@ -27,14 +27,23 @@ echo "</div>";
 $this->placeholder('narrowColumn')->captureEnd();
 ?>
 
-<a href='/games/<?php echo $this->game->gameID;?>' class='left smaller-text medium'>&lt;&lt;Back to game</a>
+<a href='/games/<?php echo $this->game->gameID;?>' class='left smaller-text medium'><img src='/images/global/body/single_left_arrow.png' class='back-arrow'/>Back to game</a>
 
 <header class='clear jumbo-text darkest heavy'>
     Game Stats
 </header>
+<?php
+	if ($this->history['totalGames'] == 0) {
+		// No games yet
+		echo "<p class='clear larger-text width-100 center heavy medium' style='margin-top:5em'>There have not been any games yet.  <br><span class='medium'>Please check back after a game has occurred.</span></p>";
+	} else {
+		// Show stats
+		?>
 <p class='clear medium'>
 This game happens every week.  Here are the historical stats for this game.
 </p>
+
+
 
 <div class='clear' id='history-chart-header'>
     <p class='left pointer green-bold largest-text history-option'>Players</p>
@@ -64,22 +73,41 @@ This game happens every week.  Here are the historical stats for this game.
                 <p class='clear jumbo-text dark heavy width-100 center'><?php echo $this->history['totalSubscribers'];?></p>
             </div>
             <div class='clear larger-margin-top width-100' >
-                <p class='clear dark history-stat-header width-100 center' tooltip='How many games you played in'>You've played in</p>
+                <p class='clear dark history-stat-header width-100 center' tooltip="How many games you've played in">You've played in</p>
                 <p class='clear jumbo-text dark heavy width-100 center'><?php echo $this->history['userCount'];?></p>
             </div>
-            <div class='clear larger-margin-top history-stat-double-container'>
-                <p class='clear dark history-stat-header-small' tooltip='This player has played in <?php echo $this->history['mostRegular']['count'];?> games'>Most Regular Player</p>
-                <a href='/users/<?php echo $this->history['mostRegular']['userID'];?>' class='clear largest-text dark heavy width-100 center'><?php echo $this->history['mostRegular']['name'];?> <span class='light'>&nbsp;<?php echo $this->history['mostRegular']['count'];?></span></a>
-            </div>
-            <div class='left larger-margin-top history-stat-double-container'>
-                <p class='clear dark history-stat-header-small' tooltip='Date of first game'>First Game</p>
-                <p class='clear largest-text dark heavy width-100 center'><?php echo $this->history['firstGame']->format('M d, Y');?></p>
-            </div>
             
+            <div class='clear larger-margin-top width-100'>
+                <p class='clear dark history-stat-header-small' tooltip='These players have played in the most games.'>Most Regular Players</p>
+                <?php
+					$counter = 1;
+					echo "<div class='clear width-33 history-most-regular-outer-container margin-top'>";
+					foreach ($this->history['mostRegular'] as $player) {
+						$class = '';
+						if ($player['user']->userID == $this->user->userID) {
+							// Is current user
+							$class = 'green-bold';
+						}
+						$outerClass = 'clear';
+						if ($counter == 11) {
+							echo "</div>";
+							echo "<div class='left width-33 margin-top'>";
+						}
+						echo "<a href='/users/" . $player['user']->userID . "' class='" . $class . " clear width-100 dark no-underline white-background animate-darker smaller-text history-most-regular-container'>
+								<span class='left light history-most-regular-counter larger-margin-top'>" . $counter . ".</span>
+								<img src='" . $player['user']->getProfilePic('tiny') . "' class='left'>
+								<span class='inherit history-most-regular-name left larger-margin-top '>" . $player['user']->shortName . "</span> 
+								<span class='left inherit larger-margin-top'>&nbsp;" . $player['count'] . "</span></a>";
+						$counter++;
+					}
+					echo "</div>";
+				?>
+            </div>
             
         </div>
     </div>
 </div>
+<?php } ?>
 
 <script type='text/javascript'>
 chartData = [['Week', 'Players','No Game'],<?php 

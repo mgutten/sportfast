@@ -45,21 +45,22 @@ class Application_Model_Message extends Application_Model_ModelAbstract
 	
 	public function getFirstName()
 	{
-		if ($this->sendingUserID == 0) {
+		
+		if ($this->sendingUserID === '0') {
 			// Sportfast sent
 			return "Sportfast";
 		} else {
-			return $this->_attribs['firstName'];
+			return ucwords($this->_attribs['firstName']);
 		}
 	}
 	
 	public function getLastName()
 	{
-		if ($this->sendingUserID == 0) {
+		if ($this->sendingUserID === '0') {
 			// Sportfast sent
 			return " ";
 		} else {
-			return $this->_attribs['lastName'];
+			return ucwords($this->_attribs['lastName']);
 		}
 	}		
 	
@@ -148,7 +149,9 @@ class Application_Model_Message extends Application_Model_ModelAbstract
 	public function getUserName()
 	{
 		// Bug from interference with getFirstName() and getLastName() (this class) in a game's newsfeed message
-		return ucwords($this->_attribs['firstName']) . ' ' . ucwords($this->_attribs['lastName'][0]);
+		//return ucwords($this->_attribs['firstName']) . ' ' . ucwords($this->_attribs['lastName'][0]);
+		$last = $this->getLastName();
+		return $this->getFirstName() . ' ' . $last[0];
 	}
 	
 	public function getTimeFromNow($date = false, $maxDays = 7)

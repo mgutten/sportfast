@@ -104,7 +104,7 @@ class MailController extends Zend_Controller_Action
 			$main = "<td align='center'>
 							 <p class='largest-text bold' style='font-family: Arial, Helvetica, Sans-Serif; font-size: 2.5em; color: #333; font-weight: bold; margin: 0;'>" . $typeModel->sport . "</p>
 							 <p class='largest-text bold' style='font-family: Arial, Helvetica, Sans-Serif; font-size: 2.5em; color: #333; font-weight: bold; margin: 0;'>" . $typeModel->gameDate->format('l') . " at " . $time . "</p>
-							 <p class='larger-text bold' style='font-family: Arial, Helvetica, Sans-Serif; font-size: 1.25em; color: #333; font-weight: bold; margin: 0;'>" . $typeModel->park->parkName . "</p>
+							 <p class='larger-text bold' style='font-family: Arial, Helvetica, Sans-Serif; font-size: 1.75em; color: #333; font-weight: bold; margin: 0;'>" . $typeModel->park->parkName . "</p>
 						 </td>";
 			
 			//$intro = "Sportfast will allow us to see who is going, to find players if we need them, to receive any updates, and to track stats on ourselves as well as our game.";
@@ -118,7 +118,7 @@ class MailController extends Zend_Controller_Action
 			// Team
 			$main = "<td align='center'>
 							<p class='largest-text bold' style='font-family: Arial, Helvetica, Sans-Serif; font-size: 2.5em; color: #333; font-weight: bold; margin: 0;'>" . $typeModel->teamName . "</p>
-							<p class='larger-text bold' style='font-family: Arial, Helvetica, Sans-Serif; font-size: 1.25em; color: #333; font-weight: bold; margin: 0;'>" . $typeModel->sport . " Team</p>
+							<p class='larger-text bold' style='font-family: Arial, Helvetica, Sans-Serif; font-size: 1.75em; color: #333; font-weight: bold; margin: 0;'>" . $typeModel->sport . " Team</p>
 						</td>";
 						
 			//$intro = "Sportfast will allow everyone to quickly say whether they're \"in\" or \"out\" for our next game, to see our upcoming schedule, to receive automatic reminders for upcoming games, and to track our progress over the season.";
@@ -348,7 +348,7 @@ class MailController extends Zend_Controller_Action
 					 <tr>
 					 	<td align='center'>
 							 <p class='largest-text bold' style='font-family: Arial, Helvetica, Sans-Serif; font-size: 2.5em; color: #333; font-weight: bold; margin: 0;'>Today at " . $time . "</p>
-							 <p class='larger-text bold' style='font-family: Arial, Helvetica, Sans-Serif; font-size: 1.25em; color: #333; font-weight: bold; margin: 0;'>" . $game->park->parkName . "</p>
+							 <p class='larger-text bold' style='font-family: Arial, Helvetica, Sans-Serif; font-size: 1.75em; color: #333; font-weight: bold; margin: 0;'>" . $game->park->parkName . "</p>
 							 <p class='largest-text bold' style='font-family: Arial, Helvetica, Sans-Serif; font-size: 2.5em; color: #333; font-weight: bold; margin: 0;'>" . $game->totalPlayers . " players</p>
 						 </td>
 					 </tr>
@@ -438,7 +438,7 @@ class MailController extends Zend_Controller_Action
 		$message .= $this->mailEnd();
 		$headers  = "MIME-Version: 1.0" . "\r\n";
 		$headers .= "Content-type: text/html; charset=iso-8859-1" . "\r\n";
-		$headers .= "From: info@sportfast.com\r\n";	 
+		$headers .= "From: support@sportfast.com\r\n";	 
 		$headers .= "Reply-To: donotreply@sportfast.com" . "\r\n";			
 				
 		mail($email, $subject, $message, $headers);
@@ -606,7 +606,7 @@ class MailController extends Zend_Controller_Action
 						 <td align='center'>
 							 <p class='largest-text bold' style='font-family: Arial, Helvetica, Sans-Serif; font-size: 2.5em; color: #333; font-weight: bold; margin: 0;'>" . $game->sport . "</p>
 							 <p class='largest-text bold' style='font-family: Arial, Helvetica, Sans-Serif; font-size: 2.5em; color: #333; font-weight: bold; margin: 0;'>" . $game->gameDate->format('l') . " at " . $time . "</p>
-							 <p class='larger-text bold' style='font-family: Arial, Helvetica, Sans-Serif; font-size: 1.25em; color: #333; font-weight: bold; margin: 0;'>" . $game->park->parkName . "</p>
+							 <p class='larger-text bold' style='font-family: Arial, Helvetica, Sans-Serif; font-size: 1.75em; color: #333; font-weight: bold; margin: 0;'>" . $game->park->parkName . "</p>
 						 </td>
 					 </tr>
 					 <tr>
@@ -633,47 +633,7 @@ class MailController extends Zend_Controller_Action
 							<p class='smaller-text' style='font-size:.8em;font-family: Arial, Helvetica, Sans-Serif; color: #8d8d8d;'>To unsubscribe from this game, visit <a href='http://www.sportfast.com' style='font-size:1em;font-family: Arial, Helvetica, Sans-Serif; color: #8d8d8d;'>your account</a> and go to the Games section under your Account Settings.</p>
 						</td>
 					</tr>";
-		/* Inline version
-			<tr>
-						<td>
-							<p style="font-family: Arial, Helvetica, Sans-Serif; color: #333; margin: 0;">You are currently subscribed to this basketball game.  Would you like to play?  8 players are needed.</p>
-						</td>
-					</tr>
-					 
-					 <tr>
-						 <td height='30px'></td>
-					 </tr>
-					 <tr>
-						 <td align='center'>
-							 <p class="largest-text bold" style="font-family: Arial, Helvetica, Sans-Serif; color: #333; font-weight: bold; font-size: 2em; margin: 0;">Basketball</p>
-							 <p class="largest-text bold" style="font-family: Arial, Helvetica, Sans-Serif; color: #333; font-weight: bold; font-size: 2em; margin: 0;">Tuesday at 1pm</p>
-							 <p class="larger-text bold" style="font-family: Arial, Helvetica, Sans-Serif; color: #333; font-weight: bold; font-size: 1.25em; margin: 0;">Watson Park</p>
-						 </td>
-					 </tr>
-					 <tr>
-						 <td height='20px'></td>
-					 </tr>
-					 <tr>
-					 	<td align='center'>
-							<a href="http://www.sportfast.com/games/1/add-user/2" class="green-button largest-text bold" style="text-decoration: none; font-family: Arial, Helvetica, Sans-Serif; font-weight: bold; font-size: 2em; color: #fff; background-color: #58bf12; padding: .2em 1.25em;">in</a>
-						</td>
-					 </tr>
-					 <tr>
-					 	<td height='10px'></td>
-					 </tr>
-					 <tr>
-					 	<td align='center'>
-							<a href="http://www.sportfast.com/games/1" class="medium" style="font-family: Arial, Helvetica, Sans-Serif; color: #8d8d8d;">view game page</a>
-						</td>
-					 </tr>
-					 <tr>
-					 	<td height='30px'></td>
-					 </tr>
-					<tr>
-						<td>
-							<p class="smaller-text" style="font-family: Arial, Helvetica, Sans-Serif; color: #333; font-size: .75em; margin: 0;">To unsubscribe, visit <a href="http://www.sportfast.com" style="font-family: Arial, Helvetica, Sans-Serif;">your account</a> and go to your Account Settings</p>
-						</td>
-					</tr>*/		
+	
 		$message .= $this->mailEnd();
 		
 		return $message;
@@ -687,7 +647,7 @@ class MailController extends Zend_Controller_Action
 		
 		$message .= "<tr>
 						<td colspan='3'>
-							<p>" . $team->teamName . " has a game coming up.  Are you in or out?</p>
+							<p style='font-family: Arial, Helvetica, Sans-Serif; color: #333;font-size:1em;'>" . $team->teamName . " has a game coming up.  Are you in or out?</p>
 						</td>
 					</tr>
 					 
@@ -696,9 +656,9 @@ class MailController extends Zend_Controller_Action
 					 </tr>
 					 <tr>
 						 <td colspan='3' align='center'>
-							 <p class='largest-text bold'>vs. " . $game->opponent . "</p>
-							 <p class='largest-text bold'>" . $game->gameDate->format('l') . " at " . $time . "</p>
-							 <p class='larger-text bold'>" . $game->locationName . "</p>
+							 <p class='largest-text bold' style='font-family: Arial, Helvetica, Sans-Serif; font-size: 2.5em; color: #333; font-weight: bold; margin: 0;'>vs. " . $game->opponent . "</p>
+							 <p class='largest-text bold' style='font-family: Arial, Helvetica, Sans-Serif; font-size: 2.5em; color: #333; font-weight: bold; margin: 0;'>" . $game->gameDate->format('l') . " at " . $time . "</p>
+							 <p class='larger-text bold' style='font-family: Arial, Helvetica, Sans-Serif; font-size: 1.75em; color: #333; font-weight: bold; margin: 0;'>" . $game->locationName . "</p>
 						 </td>
 					 </tr>
 					 <tr>
@@ -707,11 +667,11 @@ class MailController extends Zend_Controller_Action
 					 
 					<tr>
 						<td align='right' width='320'>
-							<a href='http://www.sportfast.com/mail/add-user-team-game/" . $game->teamGameID . "/" . $userID . "' class='green-button largest-text bold' style='text-decoration:none'>in</a>
+							<a href='http://www.sportfast.com/mail/add-user-team-game/" . $game->teamGameID . "/" . $userID . "' class='green-button largest-text bold' style='text-decoration: none; font-family: Arial, Helvetica, Sans-Serif; font-size: 2.2em; font-weight: bold; color: #fff; background-color: #58bf12; padding: .2em 1.25em;'>in</a>
 						</td>
 						<td width='10'></td>
 						<td align='left' width='320'>
-							<a href='http://www.sportfast.com/mail/remove-user-team-game/" . $game->teamGameID . "/" . $userID . "' class='green-button largest-text bold' style='text-decoration:none'>out</a>
+							<a href='http://www.sportfast.com/mail/remove-user-team-game/" . $game->teamGameID . "/" . $userID . "' class='green-button largest-text bold' style='text-decoration: none; font-family: Arial, Helvetica, Sans-Serif; font-size: 2.2em; font-weight: bold; color: #fff; background-color: #58bf12; padding: .2em 1.25em;'>out</a>
 						</td>
 					</tr>
 					 
@@ -720,53 +680,13 @@ class MailController extends Zend_Controller_Action
 					 </tr>
 					 <tr>
 					 	<td align='center' colspan='3'>
-							<a href='http://www.sportfast.com/teams/" . $team->teamID . "' class='medium'>view team page</a>
+							<a href='http://www.sportfast.com/teams/" . $team->teamID . "' class='medium' style='font-family: Arial, Helvetica, Sans-Serif; color: #8d8d8d;font-size:1.25em;'>view team page</a>
 						</td>
 					 </tr>
 					 <tr>
 					 	<td height='30px'></td>
 					 </tr>";
-		/* Inline version
-			<tr>
-						<td>
-							<p style="font-family: Arial, Helvetica, Sans-Serif; color: #333; margin: 0;">You are currently subscribed to this basketball game.  Would you like to play?  8 players are needed.</p>
-						</td>
-					</tr>
-					 
-					 <tr>
-						 <td height='30px'></td>
-					 </tr>
-					 <tr>
-						 <td align='center'>
-							 <p class="largest-text bold" style="font-family: Arial, Helvetica, Sans-Serif; color: #333; font-weight: bold; font-size: 2em; margin: 0;">Basketball</p>
-							 <p class="largest-text bold" style="font-family: Arial, Helvetica, Sans-Serif; color: #333; font-weight: bold; font-size: 2em; margin: 0;">Tuesday at 1pm</p>
-							 <p class="larger-text bold" style="font-family: Arial, Helvetica, Sans-Serif; color: #333; font-weight: bold; font-size: 1.25em; margin: 0;">Watson Park</p>
-						 </td>
-					 </tr>
-					 <tr>
-						 <td height='20px'></td>
-					 </tr>
-					 <tr>
-					 	<td align='center'>
-							<a href="http://www.sportfast.com/games/1/add-user/2" class="green-button largest-text bold" style="text-decoration: none; font-family: Arial, Helvetica, Sans-Serif; font-weight: bold; font-size: 2em; color: #fff; background-color: #58bf12; padding: .2em 1.25em;">in</a>
-						</td>
-					 </tr>
-					 <tr>
-					 	<td height='10px'></td>
-					 </tr>
-					 <tr>
-					 	<td align='center'>
-							<a href="http://www.sportfast.com/games/1" class="medium" style="font-family: Arial, Helvetica, Sans-Serif; color: #8d8d8d;">view game page</a>
-						</td>
-					 </tr>
-					 <tr>
-					 	<td height='30px'></td>
-					 </tr>
-					<tr>
-						<td>
-							<p class="smaller-text" style="font-family: Arial, Helvetica, Sans-Serif; color: #333; font-size: .75em; margin: 0;">To unsubscribe, visit <a href="http://www.sportfast.com" style="font-family: Arial, Helvetica, Sans-Serif;">your account</a> and go to your Account Settings</p>
-						</td>
-					</tr>*/		
+	
 		$message .= $this->mailEnd();
 		
 		return $message;
@@ -831,7 +751,7 @@ class MailController extends Zend_Controller_Action
 			$subject  = $game->sport . ' game at ' . $time . ' on ' . $game->gameDate->format('l');
 			$headers  = "MIME-Version: 1.0" . "\r\n";
 			$headers .= "Content-type: text/html; charset=iso-8859-1" . "\r\n";
-			$headers .= "From: info@sportfast.com\r\n";	 
+			$headers .= "From: games@sportfast.com\r\n";	 
 			$headers .= "Reply-To: donotreply@sportfast.com\r\n";
 			
 			foreach ($game->players->getAll() as $user) {
@@ -852,7 +772,7 @@ class MailController extends Zend_Controller_Action
 		
 		$message .= "<tr>
 						<td colspan='3'>
-							<p>We created a " . strtolower($game->sport) . " game that you might be interested in.  Wanna play?</p>
+							<p style='font-family: Arial, Helvetica, Sans-Serif; color: #333;font-size:1em;'>We created a " . strtolower($game->sport) . " game that you might be interested in.  Wanna play?</p>
 						</td>
 					</tr>
 					 
@@ -861,9 +781,9 @@ class MailController extends Zend_Controller_Action
 					 </tr>
 					 <tr>
 						 <td colspan='3' align='center'>
-							 <p class='largest-text bold'>" . $game->getGameTitle() . "</p>
-							 <p class='largest-text bold'>" . $game->gameDate->format('l') . " at " . $time . "</p>
-							 <p class='larger-text bold'>" . $game->park->parkName . "</p>
+							 <p class='largest-text bold' style='font-family: Arial, Helvetica, Sans-Serif; font-size: 2.5em; color: #333; font-weight: bold; margin: 0;'>" . $game->getGameTitle() . "</p>
+							 <p class='largest-text bold' style='font-family: Arial, Helvetica, Sans-Serif; font-size: 2.5em; color: #333; font-weight: bold; margin: 0;'>" . $game->gameDate->format('l') . " at " . $time . "</p>
+							 <p class='larger-text bold' style='font-family: Arial, Helvetica, Sans-Serif; font-size: 1.75em; color: #333; font-weight: bold; margin: 0;'>" . $game->park->parkName . "</p>
 						 </td>
 					 </tr>
 					 <tr>
@@ -872,7 +792,7 @@ class MailController extends Zend_Controller_Action
 					 
 					<tr>
 						<td align='center'>
-							<a href='http://www.sportfast.com/mail/add-user-subscribe-game/" . $game->gameID . "/" . $userID . "' class='green-button largest-text bold' style='text-decoration:none'>in</a>
+							<a href='http://www.sportfast.com/mail/add-user-subscribe-game/" . $game->gameID . "/" . $userID . "' class='green-button largest-text bold' style='text-decoration: none; font-family: Arial, Helvetica, Sans-Serif; font-size: 2.2em; font-weight: bold; color: #fff; background-color: #58bf12; padding: .2em 1.25em;'>in</a>
 						</td>
 					</tr>
 					 
@@ -881,54 +801,23 @@ class MailController extends Zend_Controller_Action
 					 </tr>
 					 <tr>
 					 	<td align='center' colspan='3'>
-							<a href='http://www.sportfast.com/games/" . $game->gameID . "' class='medium'>view game page</a>
-						</td>
-					 </tr>
-					 <tr>
-					 	<td height='30px'></td>
-					 </tr>";
-		/* Inline version
-			<tr>
-						<td>
-							<p style="font-family: Arial, Helvetica, Sans-Serif; color: #333; margin: 0;">You are currently subscribed to this basketball game.  Would you like to play?  8 players are needed.</p>
-						</td>
-					</tr>
-					 
-					 <tr>
-						 <td height='30px'></td>
-					 </tr>
-					 <tr>
-						 <td align='center'>
-							 <p class="largest-text bold" style="font-family: Arial, Helvetica, Sans-Serif; color: #333; font-weight: bold; font-size: 2em; margin: 0;">Basketball</p>
-							 <p class="largest-text bold" style="font-family: Arial, Helvetica, Sans-Serif; color: #333; font-weight: bold; font-size: 2em; margin: 0;">Tuesday at 1pm</p>
-							 <p class="larger-text bold" style="font-family: Arial, Helvetica, Sans-Serif; color: #333; font-weight: bold; font-size: 1.25em; margin: 0;">Watson Park</p>
-						 </td>
-					 </tr>
-					 <tr>
-						 <td height='20px'></td>
-					 </tr>
-					 <tr>
-					 	<td align='center'>
-							<a href="http://www.sportfast.com/games/1/add-user/2" class="green-button largest-text bold" style="text-decoration: none; font-family: Arial, Helvetica, Sans-Serif; font-weight: bold; font-size: 2em; color: #fff; background-color: #58bf12; padding: .2em 1.25em;">in</a>
-						</td>
-					 </tr>
-					 <tr>
-					 	<td height='10px'></td>
-					 </tr>
-					 <tr>
-					 	<td align='center'>
-							<a href="http://www.sportfast.com/games/1" class="medium" style="font-family: Arial, Helvetica, Sans-Serif; color: #8d8d8d;">view game page</a>
+							<a href='http://www.sportfast.com/games/" . $game->gameID . "' class='medium' style='font-family: Arial, Helvetica, Sans-Serif; color: #8d8d8d;font-size:1.25em;'>view game page</a>
 						</td>
 					 </tr>
 					 <tr>
 					 	<td height='30px'></td>
 					 </tr>
-					<tr>
-						<td>
-							<p class="smaller-text" style="font-family: Arial, Helvetica, Sans-Serif; color: #333; font-size: .75em; margin: 0;">To unsubscribe, visit <a href="http://www.sportfast.com" style="font-family: Arial, Helvetica, Sans-Serif;">your account</a> and go to your Account Settings</p>
-						</td>
-					</tr>*/	
+					 ";
+
 		$message .= $this->supportSignature();	
+		$message .= "<tr>
+					 	<td height='20px'></td>
+					 </tr>
+					 <tr>
+						<td>
+							<p class='smaller-text' style='font-size:.8em;font-family: Arial, Helvetica, Sans-Serif; color: #8d8d8d;'>To stop receiving notifications when a game is created, visit <a href='http://www.sportfast.com' style='font-size:1em;font-family: Arial, Helvetica, Sans-Serif; color: #8d8d8d;'>your account</a> and go to your Account Settings.</p>
+						</td>
+					</tr>";
 		$message .= $this->mailEnd();
 		
 		return $message;

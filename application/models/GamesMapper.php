@@ -661,19 +661,20 @@ class Application_Model_GamesMapper extends Application_Model_MapperAbstract
 			   		  'u.userID = oug.userID',
 					  array('u.firstName', 'u.lastName'))
 			   ->where('oug.gameID = ?', $gameID)
-			   ->order('COUNT(oug.userID) DESC');
+			   ->group('oug.userID')
+			   ->order('COUNT(oug.userID) DESC')
+			   ->limit(20);
 			   
-		$result = $table->fetchRow($select);
+		$results = $table->fetchAll($select);
 		
-		if ($result['count'] > 0 ) {
+		$returnArray['mostRegular'] = array();
+		if ($results) {
 			// Is a player
-			$returnArray['mostRegular'] = array('name' => ucwords($result['firstName']) . ' ' . ucwords($result['lastName'][0]),
-												'count' => $result['count'],
-												'userID' => $result['userID']);
-		} else {
-			$returnArray['mostRegular'] = array('name' => 'None',
-												'count' => 0,
-												'userID' => 0);
+			foreach ($results as $result) {
+				$user = new Application_Model_User($result);
+				$returnArray['mostRegular'][] = array('user' => $user,
+													  'count' => $result['count']);
+			}
 		}
 		
 		if ($userID) {
@@ -683,7 +684,8 @@ class Application_Model_GamesMapper extends Application_Model_MapperAbstract
 			
 			$select->from(array('oug' => 'old_user_games'),
 						  array('COUNT(oug.oldGameID) as count'))
-				   ->where('oug.userID = ?', $userID);
+				   ->where('oug.userID = ?', $userID)
+				   ->where('oug.gameID = ?', $gameID);
 				   
 			$result = $table->fetchRow($select);
 			

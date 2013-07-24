@@ -120,8 +120,15 @@ abstract class Application_Model_ModelAbstract
 			// > 24 hours, under 7 days
 			$time = $days;
 			$post = ($time == 1 ? 'day ago' : 'days ago');
-		}  else {
-			// > 6 days, show date
+		} elseif(($weeks = floor($days/7)) < 4) {
+			// > 2 weeks, show weeks
+			$time = $weeks;
+			$post = 'weeks ago';
+		} elseif(($months = floor($weeks/4)) < 2) {
+			// > 4 weeks, show month
+			$time = 'a';
+			$post = 'month ago';
+		} else {
 			$time = date ('F j',$date);
 			$post = '';
 		}

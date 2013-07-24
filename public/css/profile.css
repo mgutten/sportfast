@@ -182,7 +182,16 @@ textarea.post-message {
 }
 
 .team-confirm-img {
-	margin: -24px 0 0 .5em;
+	margin: -15px 0 0 -1px;
+	width:14px;
+	height:14px;
+	border:solid 1px #fff
+}
+
+.profile-confirm {
+	height: 12px;
+	width: 12px;
+	margin-top: 3px;
 }
 
 #team-players-container {

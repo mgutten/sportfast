@@ -28,6 +28,8 @@ class Application_Model_CronMapper extends Application_Model_MapperAbstract
 		$db->query($insertGames);
 		$oldGameID = $db->lastInsertId();
 		
+		$select = 
+		
 		// Copy from user_games -> old_user_games					
 		$insertUserGames = "INSERT INTO old_user_games (oldGameID, gameID, userID, plus)
 								(SELECT og.oldGameID, ug.gameID, ug.userID, ug.plus
@@ -262,6 +264,7 @@ class Application_Model_CronMapper extends Application_Model_MapperAbstract
 	 */
 	public function updateGameStatus()
 	{
+		// Only run next morning game status at 7:59pm for games UP TO 8:59am
 		$db = Zend_Db_Table::getDefaultAdapter();
 		$statement = "SELECT g.gameID, g.sportID, g.minPlayers, (COUNT(ug.userID) + SUM(ug.plus)) as totalPlayers, 
 							 g.sport, g.parkName, g.date 
@@ -269,7 +272,7 @@ class Application_Model_CronMapper extends Application_Model_MapperAbstract
 						LEFT JOIN (SELECT u2.userID, ug2.gameID, ug2.plus FROM users u2
 									INNER JOIN user_games ug2 ON u2.userID = ug2.userID 
 									WHERE fake = 0) ug ON g.gameID = ug.gameID
-						WHERE CASE WHEN HOUR(now()) >= 20 THEN HOUR(TIMEDIFF(date, now())) <= 13 ELSE (HOUR(TIMEDIFF(g.date, now())) = 2 and MINUTE(TIMEDIFF(g.date, now())) < 30) END
+						WHERE CASE WHEN (HOUR(now()) >= 19 AND MINUTE(now()) > 31) THEN HOUR(TIMEDIFF(date, now())) <= 13 ELSE (HOUR(TIMEDIFF(g.date, now())) = 2 and MINUTE(TIMEDIFF(g.date, now())) < 30) END
 							AND g.canceled = 0
 						GROUP BY g.gameID";
 		
@@ -425,6 +428,10 @@ class Application_Model_CronMapper extends Application_Model_MapperAbstract
 					   p.field,
 					   p.tennis,
 					   p.volleyball,
+					   p.basketballPrivate,
+					   p.fieldPrivate,
+					   p.tennisPrivate,
+					   p.volleyballPrivate,
 					   p.parkType,
 					   ps.sport,
 					   AsText(pl.location) as location
@@ -713,6 +720,12 @@ class Application_Model_CronMapper extends Application_Model_MapperAbstract
 				
 				// Insert which users were invited to which game to db
 				$sql = "INSERT INTO sportfast_user_game_invites (sportfastUserGameID, gameID, userID) VALUES ";
+				$notification = new Application_Model_Notification();
+				$notification->action = 'create';
+				$notification->type = 'game';
+				$notification->details = 'sportfast';
+				$notification->gameID = $game->gameID;
+				
 				$counter = 0;
 				foreach ($finalUsers as $user) {
 					if ($counter == $playersNeeded) {
@@ -735,6 +748,9 @@ class Application_Model_CronMapper extends Application_Model_MapperAbstract
 					
 					$game->players->addUser($user);
 					$usedPlayers[] = $user['userID'];
+					
+					$notification->receivingUserID = $user['userID'];
+					$notification->save();
 					$counter++;
 				}
 				

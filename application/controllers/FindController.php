@@ -149,7 +149,7 @@ class FindController extends Zend_Controller_Action
 		$findMatches = Zend_Controller_Action_HelperBroker::getStaticHelper('FindMatches');
 		$matches = $findMatches->findmatches('parks',$options, $this->view->user, '30,0');
 		
-		$this->view->matches = $matches->sortByMatch(0, 30);
+		$this->view->matches = $matches->matches;
 
 		$this->view->numMatches = $matches->totalRows;
 		

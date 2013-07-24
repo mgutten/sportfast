@@ -40,6 +40,8 @@ class Application_Model_Messages extends Application_Model_ModelAbstract
 				$notification->text     = $resultRow['message'];
 				$notification->actingFirstName = $resultRow['firstName'];
 				$notification->actingLastName = $resultRow['lastName'];
+
+	
 				$notification->pictureType = $resultRow['pictureType'];
 			} else {
 				// Row is a message

@@ -466,7 +466,11 @@ $(function()
 	
 	/* ajax submit of import profile pic */
 	if (isSignup()) {
-		$('#upload-profile-pic').ajaxForm({success: function(data) {
+		$('#upload-profile-pic').ajaxForm({beforeSubmit: function() {
+															$('#signup-import-loading').show();
+															$('#signup-import-alert-img').hide();
+														},	
+										   success: function(data) {
 														if (data == 'errorFormat') {
 															alert('The file you submitted is in the wrong format. Please select a jpg, png, or gif.');
 															return false;
@@ -477,9 +481,11 @@ $(function()
 														if (jcropAPI) {
 															jcropAPI.destroy()
 														}
+														$('#signup-import-loading').hide();
 														$('#fileName').val(data);
 														$('#signup-import-main-img,.narrow-column-picture').attr('src',data)
-														$('#signup-import-alert-img').attr('src',data)
+														$('#signup-import-alert-img').show()
+																					 .attr('src',data)
 																					 .maintainRatio()
 																					 .Jcrop({aspectRatio: 1.26,
 																							 setSelect: [0,0,200,200],
