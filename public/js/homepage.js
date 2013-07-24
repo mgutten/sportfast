@@ -35,7 +35,7 @@ $(function()
 		
 	})
 	
-	if (!$.browser.safari) {
+	if (!isSafari()) {
 		// Safari is slow to animate images, do not allow to animate
 		$('.homepage-description-container').hover(function()
 		{
@@ -97,5 +97,18 @@ function changeButtonPosition(index)
 							  left: buttonPosition[index]['left']});
 }
 	
-
+function isSafari()
+{
+	var ua = navigator.userAgent.toLowerCase(); 
+ if (ua.indexOf('safari')!=-1){ 
+  	 if(ua.indexOf('chrome')  > -1){
+    	return false;
+   	 } else {
+		// Safari
+   		return true;
+   	}
+  }
+  
+  return false;
+}
 

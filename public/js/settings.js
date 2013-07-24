@@ -188,7 +188,7 @@ $(function()
 		changed = 'info';
 	})
 	
-	$(document).bind('click.changed',function() {
+	$(document).bind('mouseup.changed',function() {
 		
 		var button;
 		if (changed == 'sports') {

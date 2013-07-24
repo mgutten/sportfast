@@ -332,36 +332,28 @@ class UsersController extends Zend_Controller_Action
 
 			
 			if (!empty($post[$sport . 'Type'])) {
-				// Type is set
-				$types = explode(',', $post[$sport . 'Type']);
-				$typeNames = array();
-				foreach ($types as $type) {	
-					// Loop through types and create models
-					$type = strtolower($type);
-					if (!empty($sportsArray[$sport]['type'][$type])) {
-						// $type is typeName
-						$typeNames[] = $type;
-						//$typeModel   = $sportModel->getType($type);
-						//$typeModel->typeName = $type;
-					} else {
-						// $type is typeSuffix
-						$typeSuffixes[] = $type;
-					}
-				}
-				
-				foreach ($typeNames as $typeName) {
-					foreach ($typeSuffixes as $typeSuffix) {
-						// Create new type model foreach typeName/typeSuffix combo
-						$typeModel = $sportModel->getType($typeName);
-						$typeModel->typeName   = $typeName;
-						$typeModel->typeSuffix = $typeSuffix;
-					}
-				}
-			} else {
-				// No type set, create type for base type of "pickup"
-				$typeModel = $sportModel->getType('pickup');
-				$typeModel->typeName = 'pickup';
-			}
+				  // Type is set
+				  $types = explode(',', $post[$sport . 'Type']);
+
+				  //$typeNames = array();
+				  foreach ($types as $type) {	
+					  // Loop through types and create models
+					  $split = explode('_', strtolower($type));
+					  $typeName = $split[0];
+					  $typeSuffix = $split[1];
+					  
+					  $typeModel = $sportModel->setType($typeName);
+					  $typeModel->typeName   = $typeName;
+					  $typeModel->typeSuffix = $typeSuffix;
+
+					  
+				  }
+				  
+			  } else {
+				  // No type set, create type for base type of "pickup"
+				  $typeModel = $sportModel->getType('pickup');
+				  $typeModel->typeName = 'pickup';
+			  }
 			
 			
 			if (!empty($post[$sport . 'Position'])) {
@@ -379,7 +371,7 @@ class UsersController extends Zend_Controller_Action
 			}
 			
 			
-			for ($i = 0; $i < 6; $i++) {
+			for ($i = 0; $i <= 6; $i++) {
 				if (empty($post[$sport . 'Availability' . $i])) {
 					// Day has no availabilities saved
 					continue;
@@ -393,7 +385,7 @@ class UsersController extends Zend_Controller_Action
 				}
 				
 			}
-			
+
 			$sportModel->save(true);
 			
 			$user->setUserRating('skill',$sport);

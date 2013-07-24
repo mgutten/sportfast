@@ -76,8 +76,7 @@ class Application_View_Helper_SignupSportForm
 				if ($userSport) {
 					// Get user types for this sport
 					foreach ($userSport->types as $type) {
-						$userTypes[strtolower($type->typeName)] = true;
-						$userTypes[strtolower($type->typeSuffix)] = true;
+						$userTypes[strtolower($type->typeName)][strtolower($type->typeSuffix)] = true;
 					}
 				}
 				
@@ -101,7 +100,7 @@ class Application_View_Helper_SignupSportForm
 							// Suffix is not set, set it
 							$sportType[$prefix] = $sport['type'][$curType][$prefix];
 							
-							if ($userSport && isset($userTypes[$prefix])) {
+							if ($userSport && isset($userTypes[$curType][$prefix])) {
 								$sportType[$prefix]['selected'] = true;
 							}
 							// Set tooltip to true so selectableText creates tooltip from description

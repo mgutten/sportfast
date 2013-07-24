@@ -31,7 +31,7 @@ class Application_Model_Team extends Application_Model_ModelAbstract
 									'maxSkill'	   => '',
 									'minAge'	   => '',
 									'maxAge'	   => '',
-									'systemCreated' => '',
+									'sportfastCreated' => '',
 									'leagues'	   => '',
 									'picture'	   => '',
 									'remove'	   => '',
@@ -314,6 +314,19 @@ class Application_Model_Team extends Application_Model_ModelAbstract
 			return 0;
 		}
 	}
+	
+	/**
+	 * test if this team was created by the system
+	 */
+	public function isSystemCreated()
+	{
+		if ($this->_attribs['sportfastCreated'] == 0) {
+			return false;
+		} else {
+			return true;
+		}
+	}
+		
 	
 	/**
 	 * test $userID to see if user is captain of team
