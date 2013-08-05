@@ -93,6 +93,16 @@ class AdminController extends Zend_Controller_Action
 		$this->view->cities = $cities;
 	}
 	
+	public function flaggedAction()
+	{
+		$this->backHome();
+		$mapper = new Application_Model_AdminMapper();
+			
+		$flagged = $mapper->getFlaggedRatings();
+		
+		$this->view->flagged = $flagged;
+	}
+	
 	public function backHome()
 	{
 		echo "<a href='/admin' class='clear-right medium larger-margin-top'>home</a>";

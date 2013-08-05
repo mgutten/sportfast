@@ -191,6 +191,10 @@ a.no-underline {
 	padding:.5em 1em;
 }
 
+textarea.white-back {
+	padding: .3em;
+}
+
 .white-background {
 	background: #fff;
 }
@@ -373,6 +377,10 @@ div.selected-green,img.selected-green,p.selected-green {
 
 .negative-margin-top {
 	margin-top: -.2em;
+}
+
+.margin-bottom {
+	margin-bottom: .2em;
 }
 
 .negative-margin-bottom {

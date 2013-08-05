@@ -1166,7 +1166,6 @@ function setUserLocation(cityID)
 		type: 'POST',
 		data: {cityID: cityID},
 		success: function(data) {
-			
 			location.reload();
 		}
 	});

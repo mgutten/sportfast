@@ -42,6 +42,37 @@ class AjaxController extends Zend_Controller_Action
 	}
 	
 	/**
+	 * admin handle the removal or reinstatement of rating
+	 */
+	public function updateFlaggedRatingAction()
+	{
+		$options = $this->getRequest()->getPost('options');
+		
+		$rating = new Application_Model_Rating();
+		
+		$rating->userRatingID = $options['userRatingID'];
+		
+		if ($options['remove'] == 1) {
+			// Delete this rating
+			$rating->find($options['userRatingID'], 'userRatingID');
+			$sportID = $rating->sportID;
+			$userID = $rating->receivingUserID;
+			$rating->delete();
+			
+			$user = new Application_Model_User();
+			$user->userID = $userID;
+			$user->setUserRating('skill',$sportID);
+			$user->setUserRating('attendance',$sportID);
+			$user->setUserRating('sportsmanship', $sportID);
+			
+		} else {
+			$rating->incorrect = NULL;
+			$rating->save();
+		}
+		
+	}
+	
+	/**
 	 * rate user or park
 	 */
 	public function rateTypeAction()
@@ -678,6 +709,7 @@ class AjaxController extends Zend_Controller_Action
 			$points = ($post['points'] != 'false' ? $post['points'] : false);
 			$games = new Application_Model_Games();
 			$games->findUserGames($this->view->user, $options, $points, $day, $hour);
+		
 			$matches->addMatches($games->games);
 		}
 		if (in_array('teams',$post['types'])) {
@@ -814,17 +846,22 @@ class AjaxController extends Zend_Controller_Action
 		
 		$city = new Application_Model_City();
 		$city->find($cityID, 'cityID');
+		$city->changedLocation = true;
 		
 		
 		$location = new Application_Model_Location();
 		$location->getLocationByCityID($cityID);
 		
+		$this->view->user->city = $city;
+		$this->view->user->location = $location;
+		/*
 		$this->view->user->changedLocation = true;
 		$this->view->user->city->city = $city->city;
 		$this->view->user->city->cityID = $city->cityID;
 		$this->view->user->city->state = $city->state;
 		$this->view->user->city->changedLocation = true;
 		$this->view->user->location = $location;
+		*/
 						
 	}
 
@@ -922,7 +959,7 @@ class AjaxController extends Zend_Controller_Action
 				return;
 			}
 			
-			$mapper->notificationConfirm($options['notificationLogID'], $options['type']);	
+			$mapper->notificationConfirm($options['notificationLogID'], false, $options['type']);	
 		}
 		
 

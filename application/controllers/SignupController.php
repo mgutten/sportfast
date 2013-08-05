@@ -600,6 +600,154 @@ class SignupController extends Zend_Controller_Action
 		}
 	}
 	
+	/**
+	 * create fake users that will be used to fill games
+	 */
+	public function createFakeUserAction()
+	{
+		for ($x = 0; $x < 1; $x++) {
+			$user 	  = new Application_Model_User();
+			$user->fake = true;
+			
+	
+			// userLocation is set, user latitude and longitude is stored in userLocation
+			$location = new Application_Model_Location();
+			$longitude = array('upper' => 38.113759,
+							   'lower' => 37.936479);
+			$latitude = array('upper' => -122.601637,
+							   'lower' => -122.498984);
+			$point = $this->getPoint($latitude, $longitude); 
+			$location->location = 'POINT(' . $point['longitude'] . ' ' . $point['latitude'] . ')';
+			$user->userLocation = $location;
+			
+	
+			
+			// Set city obj for user
+			$cities = $user->getCity()->getZipcodesWithin($latitude, $longitude);
+	
+			$user->cityID = $cities[mt_rand(0, (count($cities) - 1))];
+			
+			
+			// Set lastRead to curdate
+			$user->setLastReadCurrent();
+			
+			// Set joined
+			$user->setCurrent('joined');
+			
+			// Convert dob inputs to db format
+			$user->dob = $this->getDOB(mt_rand(18, 55));
+			$user->username = $this->generateUsername();
+			
+			$sex = mt_rand(1, 10);
+			
+			if ($sex < 10) {
+				$sex = 'm';
+			} else {
+				$sex = 'f';
+			}
+			
+			$user->sex = $sex;
+			$user->weight = mt_rand(110, 200);
+			$user->height = mt_rand(65, 76);
+			
+			$user->firstName = $this->getFirstName($sex);
+			$user->lastName = $this->getLastName();
+			$user->active = 1;
+		
+			
+			$sports = new Application_Model_Sports();
+			$sportsArray = $sports->getAllSportsInfo();
+			
+			//$numSports = mt_rand(1, 4);
+			
+			$sports = array_keys($sportsArray);
+			
+			//shuffle($sports);
+			
+			for ($c = 0; $c < count($sports); $c++) {
+				$sport = $sports[$c];
+				
+				$sportModel = $user->getSport($sport);
+				
+				$often = array('0', '2', '7', '30');
+				$sportModel->often = $this->random($often);
+				$sportModel->sport = $sport;
+				
+				// Convert rating from slider (0-6) to meaningful rating (64-100)
+				$sportModel->skillInitial = $sportModel->convertSliderToRating(mt_rand(0, 5)); 
+				//$sportModel->skillCurrent = $sportModel->skillInitial;
+				
+				$sportModel->sportsmanship = 80;
+				$sportModel->attendance	   = 100;
+				
+				$formatOptions = array('pickup', 'league');
+				
+				//$numFormats = mt_rand(1,2);
+				for ($i = 0; $i < count($formatOptions); $i++) {
+					$formats[] = $formatOptions[$i];
+				}
+				
+				foreach	($formats as $format) {
+					// Loop through and create user format selection (e.g. Pickup, League, Weekend Tournament)
+					 $formatModel = $sportModel->getFormat($format);
+					 $formatModel->format = strtolower($format);
+	
+				}
+	
+				
+				if ($sport == 'tennis') {
+					// Type is set
+					$typeNames = array('singles', 'doubles');
+					
+					$typeSuffixes = array('rally', 'match');
+					
+					
+					foreach ($typeNames as $typeName) {
+						foreach ($typeSuffixes as $typeSuffix) {
+							// Create new type model foreach typeName/typeSuffix combo
+							$typeModel = $sportModel->getType($typeName);
+							$typeModel->typeName   = $typeName;
+							$typeModel->typeSuffix = $typeSuffix;
+						}
+					}
+				} else {
+					// No type set, create type for base type of "pickup"
+					$typeModel = $sportModel->getType('pickup');
+					$typeModel->typeName = 'pickup';
+				}
+				
+				
+				if (in_array('league', $formats) && $sport != 'tennis') {
+					// Position is set
+					
+					$positions = array_keys($sportsArray[$sport]['position']);
+					
+					$position = $this->random($positions);
+					
+	
+					$positionModel = $sportModel->getPosition($position);
+					$positionModel->positionAbbreviation = $position;
+					
+	
+				} else {
+					// No position set, create base position "null" for sportID
+					$positionModel = $sportModel->getPosition('null');
+				}
+				
+				$availability = array();
+	
+				for ($d = 0; $d < 7; $d++) {
+					for ($h = 8; $h < 22; $h++) {
+						$availabilityModel = $sportModel->setAvailability($d, $h);
+					}
+				}					
+				
+			}
+			
+			$user->save(true);
+			}
+	}
+	
 	
 	public function getPoint($latitude, $longitude)
 	{

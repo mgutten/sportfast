@@ -72,6 +72,53 @@ class Application_Model_AdminMapper extends Application_Model_MapperAbstract
 		return $returnArray;
 		
 	}
+	
+	/**
+	 * get user ratings that have been flagged as incorrect
+	 */
+	public function getFlaggedRatings()
+	{
+		
+		$table = $this->getDbTable();
+		$select = $table->select();
+		
+		$select->setIntegrityCheck(false);
+		
+		
+		$sql = "(SELECT ur.receivingUserID, 
+						ROUND(AVG(r.value)) as avgSkill, 
+						ROUND(AVG(r2.value)) as avgSportsmanship,
+						ur.sportID
+					FROM user_ratings ur
+					INNER JOIN ratings r ON r.ratingID = ur.skill
+					INNER JOIN ratings r2 ON r2.ratingID = ur.sportsmanship
+					WHERE ur.incorrect = 0 
+					GROUP BY ur.receivingUserID,ur.sportID)";
+		
+		$select->from(array('ur' => 'user_ratings'))
+			   ->join(array('r' => 'ratings'),
+			   		  'ur.skill = r.ratingID',
+					  array('value as skillRating'))
+			   ->join(array('r2' => 'ratings'),
+			   		  'ur.sportsmanship = r2.ratingID',
+					  array('value as sportsmanshipRating'))
+			   ->joinLeft(array('ur2' => new Zend_Db_Expr($sql)),
+			   		  'ur2.receivingUserID = ur.receivingUserID AND ur2.sportID = ur.sportID')
+			   ->where('ur.incorrect = 1');
+		
+		$results = $table->fetchAll($select);
+		
+		$returnArray = array();
+		foreach ($results as $result) {
+			$returnArray[] = array('skill' => $result->skillRating,
+								   'sportsmanship' => $result->sportsmanshipRating,
+								   'avgSkill' => $result->avgSkill,
+								   'avgSportsmanship' => $result->avgSportsmanship,
+								   'userRatingID' => $result->userRatingID);
+		}
+		
+		return $returnArray;
+	}
 					 
 	
 }

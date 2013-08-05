@@ -122,8 +122,13 @@ abstract class Application_Model_ModelAbstract
 			$post = ($time == 1 ? 'day ago' : 'days ago');
 		} elseif(($weeks = floor($days/7)) < 4) {
 			// > 2 weeks, show weeks
-			$time = $weeks;
-			$post = 'weeks ago';
+			if ($weeks == 1) {
+				$post = 'a week ago';
+				$time = '';
+			} else {
+				$time = $weeks;
+				$post = 'weeks ago';
+			}
 		} elseif(($months = floor($weeks/4)) < 2) {
 			// > 4 weeks, show month
 			$time = 'a';

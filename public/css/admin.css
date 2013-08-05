@@ -37,3 +37,16 @@
 .admin-last2Months {
 	width: 6em;
 }
+
+/* flagged ratings */
+.admin-flagged-value {
+	width: 6.5em;
+}
+
+.admin-flagged-confirm {
+	margin-left: 20px;
+}
+
+.admin-flagged-remove {
+	margin-left:20px;
+}

@@ -1,0 +1,29 @@
+<?php
+/** 
+ * controller => teams
+ * action => invite
+ */
+$this->headTitle(ucwords($this->type) . ' Invite');
+$this->headLink()->prependStylesheet($this->baseUrl() . '/css/profile.css');
+?>
+
+<div id='profile-invite-container'>
+	<p class='largest-text darkest heavy clear'>Invite Players</p>
+    <div class='white-back clear'>
+    <?php
+	//echo $this->partial('partials/global/sectionHeaderBold.phtml',array('title'   => 'Invite players')); 
+	?>
+    
+    <form action='/mail/invite-type' method='post'>
+    
+    <p class='clear larger-margin-top dark heavy'>Copy and paste emails here <span class='dark'>(comma separated)</span></p>
+    <textarea class='white-back dropshadow clear' id='profile-invite-emails' name='emails'></textarea>
+    
+    
+    <input type='submit' class='clear right green-button largest-text heavy larger-margin-top' id='profile-send-invites' value='Send Invites' />
+
+    <input type='hidden' name='<?php echo $this->type . 'ID';?>' value='<?php echo $this->typeID;?>' />
+    
+    </form>
+    </div>
+</div>

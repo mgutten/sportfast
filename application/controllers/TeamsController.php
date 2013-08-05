@@ -130,6 +130,16 @@ class TeamsController extends Zend_Controller_Action
 		$this->view->players = $team->players->getAll();
 		
 	}
+	
+	public function inviteAction()
+	{
+		$this->view->whiteBacking = false;
+		$teamID = $this->getRequest()->getParam('id');
+		
+		$this->view->type = 'team';
+		$this->view->typeID = $teamID;
+		
+	}
 
 
 }

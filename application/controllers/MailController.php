@@ -165,7 +165,7 @@ class MailController extends Zend_Controller_Action
 					 <tr>
 						 <td>
 						 	<p style='font-family: Arial, Helvetica, Sans-Serif; font-size: 14px; color: #58bf12; font-weight: bold;text-align:center'>You will not receive any more reminders regarding this " . $type . " or be able to view its details unless you join. 
-								There really is no catch or obligation, we built this because we love sports!</p>
+								There is no catch or gimmick; we built Sportfast because we love sports!</p>
 						 </td>
 					 </tr>
 					 <tr>

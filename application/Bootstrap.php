@@ -56,7 +56,7 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 			Zend_Session::namespaceUnset('reset');
 		}
 		
-		$auth->clearIdentity();
+		//$auth->clearIdentity();
 		if (!empty($_COOKIE['user']) || $auth->hasIdentity()) {
 			// User is logged in 
 			if (!$auth->hasIdentity()) {

@@ -132,13 +132,13 @@ class Application_Model_CronMapper extends Application_Model_MapperAbstract
 		// Update age for those whose birthday is today
 		$sql = "SELECT ug.gameID, ug.userID, g.minPlayers, g.totalPlayers FROM user_games ug 
 					INNER JOIN users u ON ug.userID = u.userID
-					INNER JOIN (SELECT g.gameID, COUNT(ug.userID ) as totalPlayers, ug.plus, g.minPlayers  
+					INNER JOIN (SELECT g.gameID, (COUNT(ug.userID) + SUM(ug.plus)) as totalPlayers, ug.plus, g.minPlayers  
 									FROM games g  
-									INNER JOIN user_games ug ON ug.gameID = g.gameID  
-									HAVING (COUNT(ug.userID) + ug.plus) > FLOOR(.5 * (g.minPlayers))
+									INNER JOIN user_games ug ON ug.gameID = g.gameID
+									GROUP BY ug.gameID
+									HAVING (totalPlayers) > FLOOR(.5 * (g.minPlayers))
 								) g ON g.gameID = ug.gameID 
-					WHERE u.fake = 1 ORDER BY RAND()
-			";
+					WHERE u.fake = 1 ORDER BY RAND()";
 		
 		$results = $db->fetchAll($sql);
 		
@@ -454,6 +454,43 @@ class Application_Model_CronMapper extends Application_Model_MapperAbstract
 	}
 	
 	/**
+	 * get park unavailabilities and return as array
+	 */
+	public function getParkUnavailabilities()
+	{
+		$table = $this->getDbTable();
+		$select = $table->select();
+		
+		$select->setIntegrityCheck(false);
+		
+		$select->from(array('pu' => 'park_unavailabilities'))
+			   ->where('CASE WHEN MONTH(pu.fromMonth) < MONTH(pu.toMonth)
+			   				THEN MONTH(now() + INTERVAL 3 DAY) BETWEEN MONTH(pu.fromMonth) AND MONTH(pu.toMonth) 
+							ELSE MONTH(now() + INTERVAL 3 DAY) >= MONTH(pu.fromMonth) OR MONTH(now() + INTERVAL 3 DAY) <= MONTH(pu.toMonth)
+						END');
+		
+		$results = $table->fetchAll($select);
+		
+		$returnArray = array();
+		foreach ($results as $result) {
+			if (!isset($returnArray[$result->parkID])) {
+				// Set outer parkID array
+				$returnArray[$result->parkID] = array('fromMonth' => $result['fromMonth'],
+													  'toMonth' => $result['toMonth']);
+			}
+			if (!isset($returnArray[$result->parkID][$result->day])) {
+				// Set outer parkID array
+				$returnArray[$result->parkID][$result->day] = array();
+			}
+			
+			$returnArray[$result->parkID][$result->day][$result->hour] = true;
+		}
+		
+		return $returnArray;
+	}
+			
+	
+	/**
 	 * test park to see if game is needed
 	 * @params ($parkID => park to test,
 	 *			$sport => sport to test,
@@ -544,7 +581,7 @@ class Application_Model_CronMapper extends Application_Model_MapperAbstract
 		
 		$users = $db->fetchAll($sql);
 		
-		$playersNeeded = $rosterLimit * 1;  // Need 4 times rosterLimit for game to happen
+		$playersNeeded = $rosterLimit * 4;  // Need 4 times rosterLimit for game to happen
 		
 		if (count($users) >= $playersNeeded) {
 			// Success!  Enough users for a game

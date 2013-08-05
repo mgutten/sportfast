@@ -255,37 +255,14 @@ class Application_Controller_Helper_Dropdown extends Zend_Controller_Action_Help
 		$output  .= "<div class='dropdown-menu-option-results' id='dropdown-menu-option-results-" . $id . "'></div>";
 		
 		$output  .= "<div class='dropdown-menu-option-default'>";
-		/*
-		foreach ($sections as $section) {
-			
-			$output .= "<p class='smaller-text clear medium dropdown-menu-invite-section heavy'>My " . ucwords($section) . "</p>";
-			
-			if ($user->hasValue($section)) {
-				// This section has values, display as options for invite
 
-				foreach ($user->$section->getAll() as $model) {
-					if (($model->rosterLimit == $model->totalPlayers) && !$model instanceof Application_Model_Group) {
-						// Team/Game is full do not show, exclude Group from this as it does not have a roster limit
-						continue;
-					}
-					if ($section == 'games') {
-						// Game
-						$output .= $pre . $model->sport . ' <span class="light">' . date('M j, ga', strtotime($model->date)) . '</span>' . $post;
-					} elseif ($section == 'teams') {
-						// Team
-						$output .= $pre . $model->getLimitedName('teamName', 23) . $post;
-					} elseif ($section == 'groups') {
-						// Group
-						$output .= $pre . $model->getLimitedName('groupName', 23) . $post;
-					}
-				}
-			} else {
-				$output .= "<p class='smaller-text clear medium'>You have no " . $section . ".</p>";
-			}
-		}
-		*/
+		$output .= "</div>";
 		
-		$output .= "</div></div></div>";
+		$currentURL = Zend_Controller_Front::getInstance()->getRequest()->getRequestUri();
+		
+		$output .= "<a href='" . $currentURL . "/invite' class='width-100 clear medium margin-top smaller-text center margin-bottom'>or by email</a>";
+		
+		$output .= "</div></div>";
 		
 		return $output;
 	}

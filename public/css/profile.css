@@ -391,4 +391,21 @@ input[type=text].profile-manage-team-info-roster-limit {
 .user-side-info-add {
 	width: 8em;
 }
+
+/* invite by email page */
+#profile-invite-container {
+	width: 30em;
+	position:absolute;
+	top: 50%;
+	left:50%;
+	margin-left: -15em;
+	margin-top: -14em;
+}
+
+#profile-invite-emails {
+	width: 96.5%;
+	max-width: 96.5%;
+	height: 5em;
+	max-height: 5em;
+}
 	

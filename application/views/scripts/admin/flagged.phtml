@@ -1,0 +1,40 @@
+<?php
+$this->headTitle('Flagged Ratings');
+$this->headLink()->prependStylesheet($this->baseUrl() . '/css/admin.css');
+$this->headScript()->prependFile($this->baseUrl() . '/js/admin.js');
+
+?>
+<?php
+echo "<p class='largest-text heavy dark clear width-100 center'>" . count($this->flagged) . " ratings to review</p>";
+
+echo "<div class='clear admin-cities-container larger-text larger-margin-top'>";
+	echo 	"<p class='light left smaller-text margin-top' style='width:1.5em;'></p>";
+	echo	"<p class='left medium heavy admin-flagged-value'>Skill</p>";
+	echo	"<p class='left medium heavy admin-flagged-value'>AvgSkill</p>";
+	echo	"<p class='left medium heavy admin-flagged-value'>Diff</p>";
+	echo	"<p class='left medium heavy admin-flagged-value'>Sprtshp</p>";
+	echo	"<p class='left medium heavy admin-flagged-value'>AvgSprtshp</p>";
+	echo	"<p class='left medium heavy admin-flagged-value'>Diff</p>";
+	echo "</div>";
+
+$counter = 1;
+foreach ($this->flagged as $rating) {
+	
+	$skillDiff = $rating['skill'] - $rating['avgSkill'];
+	$skillClass = ($skillDiff > 0 ? 'green' : 'red');
+	$sportsmanshipDiff = $rating['sportsmanship'] - $rating['avgSportsmanship'];
+	$sportsmanshipClass = ($sportsmanshipDiff > 0 ? 'green' : 'red');
+	
+	echo "<div class='clear admin-cities-container larger-text'>";
+	echo 	"<p class='light left smaller-text margin-top' style='width:1.5em;'>" . $counter . ".</p>";
+	echo	"<p class='left darkest heavy admin-flagged-value'>" . $rating['skill'] . "</p>";
+	echo	"<p class='left darkest heavy admin-flagged-value'>" . $rating['avgSkill'] . "</p>";
+	echo	"<p class='left " . $skillClass . " heavy admin-flagged-value'>" . $skillDiff . "</p>";
+	echo	"<p class='left darkest heavy admin-flagged-value'>" . $rating['sportsmanship'] . "</p>";
+	echo	"<p class='left darkest heavy admin-flagged-value'>" . $rating['avgSportsmanship'] . "</p>";
+	echo	"<p class='left " . $sportsmanshipClass . " heavy admin-flagged-value'>" . $sportsmanshipDiff . "</p>";
+	echo	"<img src='/images/team/confirm/small.png' class='left admin-flagged-confirm pointer' tooltip='Keep this rating as is.' userRatingID='" . $rating['userRatingID'] . "'/>";
+	echo	"<img src='/images/team/deny/small.png' class='left admin-flagged-remove pointer' tooltip='Delete this rating from the database.' userRatingID='" . $rating['userRatingID'] . "'/>";
+	echo "</div>";
+	$counter++;
+}

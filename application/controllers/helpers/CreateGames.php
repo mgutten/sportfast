@@ -175,6 +175,8 @@ class Application_Controller_Helper_CreateGames extends Zend_Controller_Action_H
 	 */
 	public function convertParksToArray($parks)
 	{
+		$unavailabilities = $this->getMapper()->getParkUnavailabilities();
+		
 		$sportsModel = new Application_Model_Sports();
 		$sports = $sportsModel->getAllSportsInfo();
 		
@@ -263,6 +265,11 @@ class Application_Controller_Helper_CreateGames extends Zend_Controller_Action_H
 				
 				for ($i = $openTime; $i <= $$reference; $i++) {
 					
+					if (isset($unavailabilities[$park['parkID']][date('w', strtotime('+3 days'))][$i])) {
+						// Unavailability is set
+						continue;
+					}
+					
 					if ($park['parkType'] == 'school' &&
 						($i >= 8 && $i <= 15) &&
 						(date('n') < 6 || date('n') > 8) &&
@@ -276,6 +283,7 @@ class Application_Controller_Helper_CreateGames extends Zend_Controller_Action_H
 			}
 		
 		}
+
 		
 		return $master;
 		

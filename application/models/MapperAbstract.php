@@ -58,7 +58,7 @@ abstract class Application_Model_MapperAbstract
 				// This attrib is a location 
 				$data[$column] = new Zend_Db_Expr("GeomFromText('" . $value . "')");
 				continue;
-			} elseif (empty($value) && $value !== '0') {
+			} elseif (empty($value) && $value !== '0' && $value !== NULL) {
 				// Skip empty columns
 				continue;
 			} elseif ($savingClass instanceof Application_Model_User && $column == 'cityID' && !empty($savingClass->changedLocation)) {
@@ -314,8 +314,9 @@ abstract class Application_Model_MapperAbstract
 		$select = $table->select()
 						->where($column . ' = ?', $id)
 						->limit(1);
-				
+		
 		$result = $table->fetchRow($select);
+		
 		
 		if (count($result) == 0) {
 			return;

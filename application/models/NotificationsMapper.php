@@ -117,7 +117,7 @@ class Application_Model_NotificationsMapper extends Application_Model_MapperAbst
 	 *			$confirmOrDeny => 'confirm' or 'decline',
 	 *			$type => type from notifications table)
 	 */
-	 public function notificationConfirm($notificationLogID, $confirmOrDeny, $type, $action)
+	 public function notificationConfirm($notificationLogID, $confirmOrDeny, $type, $action = false)
 	 {
 		 $db = Zend_Db_Table::getDefaultAdapter();
 		 
@@ -215,7 +215,7 @@ class Application_Model_NotificationsMapper extends Application_Model_MapperAbst
 			 }
 		 }
 		 
-		
+
 		 $db->query($query);
 		 
 		 if ($query2) {
