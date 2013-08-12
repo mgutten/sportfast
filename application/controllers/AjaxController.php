@@ -690,6 +690,7 @@ class AjaxController extends Zend_Controller_Action
 		$post = $this->getRequest()->getPost();
 		$matches = new Application_Model_Matches();
 		
+		
 		if (in_array('games',$post['types'])) {
 			// Games are selected
 			$options = array();
@@ -705,7 +706,7 @@ class AjaxController extends Zend_Controller_Action
 			} else {
 				$day = $hour = '';
 			}
-
+			
 			$points = ($post['points'] != 'false' ? $post['points'] : false);
 			$games = new Application_Model_Games();
 			$games->findUserGames($this->view->user, $options, $points, $day, $hour);
@@ -724,12 +725,12 @@ class AjaxController extends Zend_Controller_Action
 			$teams->findUserTeams($this->view->user, $options);
 			$matches->addMatches($teams->teams);
 		}
-		
+
 		$matches->sortByMatch();
 		$this->view->matches = $matches->matches;
 		
 		$output = array();
-		$memberHomepage = $this->view->getHelper('memberHomepage');
+		$memberHomepage = $this->view->getHelper('memberhomepage');
 		$output[0] = $memberHomepage->buildFindBody();
 		
 		if (isset($matches->matches[0])) {
@@ -769,7 +770,7 @@ class AjaxController extends Zend_Controller_Action
 	public function getNewNewsfeedAction()
 	{
 		$newsfeed = new Application_Model_Notifications();
-		$memberHomepage = $this->view->getHelper('memberHomepage');
+		$memberHomepage = $this->view->getHelper('memberhomepage');
 		
 		$request = $this->getRequest();
 		if ($request->getPost('oldOrNew') == 'new') {
@@ -1077,6 +1078,9 @@ class AjaxController extends Zend_Controller_Action
 		} elseif ($options['idType'] == 'groupID') {
 			// Group captain
 			$model = new Application_Model_Group();		
+		} elseif ($options['idType'] == 'gameID') {
+			// Group captain
+			$model = $user->games->exists($options['typeID']);	
 		}
 		
 		$model->captains = array();

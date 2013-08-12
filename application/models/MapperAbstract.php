@@ -107,7 +107,7 @@ abstract class Application_Model_MapperAbstract
 				
 				foreach ($attribs as $attrib => $val) {
 					
-					if (array_key_exists($attrib, $modelAttribs)) {
+					if (array_key_exists($attrib, $modelAttribs) && !is_object($val)) {
 						// Both parent class ($savingClass) and child class have same columns, set child to parents
 						$model->$attrib = $savingClass->$attrib;
 					}

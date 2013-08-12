@@ -19,7 +19,10 @@ class Application_Model_SportPosition extends Application_Model_ModelAbstract
 	
 	public function save($loopSave = false)
 	{
-		if (empty($this->positionID)) {
+		if (empty($this->positionAbbreviation) && empty($this->positionID)) {
+			// Has not been set, do not save
+			return false;
+		} elseif (empty($this->positionID)) {
 			// Fill foreign key before save
 			$this->positionID = $this->getMapper()
 									 ->getForeignID('Application_Model_DbTable_SportPositions', 'positionID',array('sportID'    		  => $this->sportID,

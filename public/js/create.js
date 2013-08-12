@@ -213,6 +213,7 @@ $(function()
 	
 	if (isGame()) {
 		// Create game, initialize google map
+		
 		initializeMap(37.98, -122.5, 11, mapListeners);
 	}
 	
@@ -331,13 +332,15 @@ function findParks(options)
 		type: 'POST',
 		data: {options: options},
 		success: function(data) {
-			data = JSON.parse(data);
 			
+			data = JSON.parse(data);
 			
 			gmapMarkers  = new Array();
 			markerDetails = new Array();
 			if (typeof data[1] != 'undefined') {
+				
 				for (i = 0; i < data[1].length; i++) {
+					
 					gmapMarkers.push([data[1][i][0],data[1][i][1]]);
 					markerDetails.push([data[2][i][0],data[2][i][1],data[2][i][2],data[2][i][3]]);
 				}
@@ -387,6 +390,7 @@ function mapListeners()
  */
 function createMarkers()
 {	
+	
 	// Clear prior markers
 	clearMarkers();
 	
@@ -446,9 +450,12 @@ function addMarkerListeners(marker, count)
 
 function markerClickListeners(marker, content, parkName, parkID)
 {
+
 	google.maps.event.addListener(marker, "click", function() {
+		
 			this.parkName = parkName;
 			this.parkID   = parkID;
+			
 			
 			selectPark(this.parkName, this.parkID);
 			
@@ -467,16 +474,15 @@ function markerClickListeners(marker, content, parkName, parkID)
 
 function markerHoverListeners(marker)
 {
-		google.maps.event.addListener(marker, "mouseover", function(e) {
+	google.maps.event.addListener(marker, "mouseover", function(e) {
 	
-          	this.setIcon('/images/global/gmap/markers/green_reverse.png');
-        });
+		this.setIcon('/images/global/gmap/markers/green_reverse.png');
+	});
+	
+	google.maps.event.addListener(marker, "mouseout", function(e) {
 		
-		google.maps.event.addListener(marker, "mouseout", function(e) {
-			
-          	this.setIcon('/images/global/gmap/markers/green.png');
-        });
-
+		this.setIcon('/images/global/gmap/markers/green.png');
+	});
 }
 
 
@@ -852,9 +858,4 @@ function animateNextSection(curSection)
 	animateNotShow(nextSection.children(), false, false);
 }
 		
-	
-
-		
-	
-	
 	

@@ -3,11 +3,14 @@
  * controller => games
  * action => edit
  */
-$this->headTitle($this->game->type->typeName . ' ' . $this->game->sport);
+$this->headTitle('Edit ' . $this->game->type->typeName . ' ' . $this->game->sport);
 $this->headLink()->prependStylesheet($this->baseUrl() . '/css/game.css');
 $this->headLink()->prependStylesheet($this->baseUrl() . '/css/create.css');
+$this->headLink()->prependStylesheet($this->baseUrl() . '/css/profile.css');
+
 $this->headScript()->prependFile($this->baseUrl() . '/js/editgame.js');
 $this->headScript()->prependFile($this->baseUrl() . '/js/create.js');
+$this->headScript()->prependFile($this->baseUrl() . '/js/profile.js');
 $this->headScript()->prependFile('https://maps.googleapis.com/maps/api/js?key=AIzaSyAhxSMQ-WQux2nzTW4dBoKmpfGHVQOk7r8&sensor=false');
 ?>
 
@@ -21,8 +24,27 @@ $this->headScript()->prependFile('https://maps.googleapis.com/maps/api/js?key=AI
 ?>
 
 <?php
+	$this->placeholder('absolute')->captureStart();
+	
+	echo $this->partial('partials/global/alertBack.phtml');
+	
+	echo $this->alert()->start('change-captain', 'Click to add captain');
+		echo $this->changecaptain($this->game);
+		
+		echo		"<div class='clear width-100 larger-margin-top hidden' id='team-manage-team-info-confirm-container'>";
+		echo			"<p class='button team-manage-team-info-button larger-margin-top right' id='team-manage-team-info-save-changes'>Save changes</p>";
+		echo			"<p class='team-manage-team-info-button right medium smaller-text alert-cancel-button pointer'>Cancel</p>";
+		echo 		"</div>";
+
+	
+	echo $this->alert()->end();
+	
+	$this->placeholder('absolute')->captureEnd();
+	
+	
+	
 	$this->placeholder('narrowColumn')->captureStart();
-		echo "<img src='" . $this->game->getProfilePic('large') . "' class='left'/>";
+		echo "<img src='" . $this->game->getProfilePic('large') . "' class='left narrow-column-picture rounded-corners'/>";
 		echo "<div class='clear width-100 larger-margin-top'>";
 		echo	"<p class='left heavy larger-text darkest'>" . $this->game->getGameTitle() . "</p>";
 		echo	"<p class='clear darkest'>" . $this->game->getHour() . "</p>";
@@ -30,10 +52,23 @@ $this->headScript()->prependFile('https://maps.googleapis.com/maps/api/js?key=AI
 		echo	"<p class='clear light'>" . $this->game->park->parkName . "</p>";
 		echo "</div>";
 	$this->placeholder('narrowColumn')->captureEnd();
+	
+	// Store universal game details in hidden container
+echo "<span id='game-details' 
+			gameID='" . $this->game->gameID . "' 
+			idType='gameID' 
+			actingUserID='" . $this->user->userID . "' 
+			captains='" . implode(',',$this->game->captains) . "'
+			city='" . $this->game->city . "'
+			sport='" . $this->game->sport . "'
+			picture='" . (!$this->user->hasProfilePic() ? 'true' : '') . "'
+	 </span>";
+	
 ?>
 <form action='/games/<?php echo $this->game->gameID;?>/update-game' method='POST'>
-<header class='left jumbo-text darkest heavy'>
-    Edit Game Details
+<header class='left width-100'>
+    <p class='left jumbo-text darkest heavy'>Edit Game Details</p>
+    <p class='right button pointer' id='edit-game-change-captain'>+ change captain</p>
 </header>
 
 <?php

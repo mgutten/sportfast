@@ -581,7 +581,7 @@ class Application_Model_CronMapper extends Application_Model_MapperAbstract
 		
 		$users = $db->fetchAll($sql);
 		
-		$playersNeeded = $rosterLimit * 4;  // Need 4 times rosterLimit for game to happen
+		$playersNeeded = $rosterLimit * 3;  // Need 3 times rosterLimit for game to happen
 		
 		if (count($users) >= $playersNeeded) {
 			// Success!  Enough users for a game
@@ -644,11 +644,15 @@ class Application_Model_CronMapper extends Application_Model_MapperAbstract
 				$reference = $ageGroups[$randomKey];
 				$secondReference = $ageGroups[$secondKey];
 				
+				$youngerGroup = $olderGroup = false;
+				
 				if (count($$reference) >= $playersNeeded) {
 					// Game should be for either younger or older depending on which was chosen
 					$finalUsers = $$reference;
+					$youngerGroup = true;
 				} elseif (count($$secondReference) >= $playersNeeded) {
 					$finalUsers = $$secondReference;
+					$olderGroup = true;
 				} else {
 					$finalUsers = $users;
 				}
@@ -674,6 +678,13 @@ class Application_Model_CronMapper extends Application_Model_MapperAbstract
 							WHERE spi.sportID = '" . $sportID . "'
 							) ps on ps.parkID = p.parkID
 						INNER JOIN park_locations pl ON p.parkID = pl.parkID
+						LEFT JOIN park_unavailabilities pu ON (p.parkID = pu.parkID 
+																AND (CASE WHEN MONTH(pu.fromMonth) < MONTH(pu.toMonth)
+																	THEN MONTH(now() + INTERVAL 3 DAY) BETWEEN MONTH(pu.fromMonth) AND MONTH(pu.toMonth) 
+																	ELSE MONTH(now() + INTERVAL 3 DAY) >= MONTH(pu.fromMonth) OR MONTH(now() + INTERVAL 3 DAY) <= MONTH(pu.toMonth)
+																END)
+																AND pu.day = '" . $dayOfWeek . "'
+																AND pu.hour = '" . $timeslot . "')
 						WHERE (GLength(
 									LineStringFromWKB(
 									  LineString(
@@ -681,10 +692,17 @@ class Application_Model_CronMapper extends Application_Model_MapperAbstract
 										(SELECT location FROM park_locations WHERE parkID = '" . $parkID . "')
 									  )
 									 )
-									) * (5/8 * 100) < 4)
+									) * (5/8 * 100) < 3)
 						AND p.parkID != '" . $parkID . "'
 						AND " . $court . " > 0
 						AND cost = 0
+						AND pu.parkID IS NULL
+						AND (CASE WHEN p.type = 'school' 
+									  AND (" . $timeslot . " > 7 AND " . $timeslot . " < 14)
+									  AND (" . $dayOfWeek . " > 0 AND " . $dayOfWeek . " < 6)
+									  AND (MONTH(now() + INTERVAL 3 DAY) > 8 OR MONTH(now() + INTERVAL 3 DAY) < 6)
+							THEN p.parkType != 'school'
+							ELSE 1 = 1 END)
 						ORDER BY (GLength(
 									LineStringFromWKB(
 									  LineString(
@@ -750,8 +768,16 @@ class Application_Model_CronMapper extends Application_Model_MapperAbstract
 				$sql = "INSERT INTO user_games (gameID, userID) 
 							(SELECT '" . $game->gameID . "', u.userID 
 								FROM users u 
-								WHERE u.fake = 1
-								ORDER BY RAND() LIMIT " . (floor($minPlayers/2) - 1) . ")";
+								WHERE u.fake = 1 ";
+								
+				if ($youngerGroup) {
+					// Is younger game (18-39)
+					$sql .= " AND u.age < 40 ";
+				} elseif ($olderGroup) {
+					$sql .= " AND u.age >= 40 ";
+				}
+				
+				$sql .=	" ORDER BY RAND() LIMIT " . (floor($minPlayers/2) - 1) . ")";
 				
 				$db->query($sql);
 				

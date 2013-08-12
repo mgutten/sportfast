@@ -117,7 +117,7 @@ class Application_Form_Signup extends Zend_Form
 				'required'		=> true,
 				'validators'	=> array(array('Db_NoRecordExists', true, array('table' => 'users', 
 																				'field' => 'username', 
-																				'messages' => array('recordFound' => 'This email has an account associated with it <a href="/forgot" class="underline red">Forgot password?</a>'))),
+																				'messages' => array('recordFound' => 'This email has an account associated with it <a href="/login/forgot" class="underline white">Forgot password?</a>'))),
 										 array('emailAddress',true)),
 				'decorators'	=> array('Overlay','QuestionMark'),
 				'label'			=> 'Username/Email',

@@ -271,8 +271,8 @@ class Application_Controller_Helper_CreateGames extends Zend_Controller_Action_H
 					}
 					
 					if ($park['parkType'] == 'school' &&
-						($i >= 8 && $i <= 15) &&
-						(date('n') < 6 || date('n') > 8) &&
+						($i >= 8 && $i <= 16) &&
+						(date('n') < 6 || date('n') > 8 || (date('n') == 8 && date('j') > 19)) &&
 						(date('w') != 6 && date('w') != 0)) {
 							// Park is school and during school hours and in school season and weekday
 							continue;

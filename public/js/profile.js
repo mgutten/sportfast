@@ -156,6 +156,18 @@ $(function()
 	
 	$(document).on('click', '.remove-captain',function()
 	{
+		
+		var userID = $(this).prev('.team-manage-team-info-captain-real').attr('userID');
+		var imgEle = $('#change-captain-' + userID).find('img');
+
+
+		imgEle.removeClass('clicked full-opacity')
+			  .addClass('not-clicked')
+			  .css('opacity', '1')
+			  .attr('opacity', '.667');
+		
+		imgEle.trigger('mouseleave.animateOpacity');
+
 		$(this).prev('.team-manage-team-info-captain-real').remove();
 		$(this).remove();
 		
@@ -166,16 +178,19 @@ $(function()
 	
 	$('#team-manage-team-info-add-captain').click(function()
 	{
-		"<p class='clear largest-text darkest heavy team-manage-team-info-name pointer team-manage-team-info-captain-real' >\
-									</p><span class='left header red hidden largest-text remove-captain pointer'>x</span>";
+
 		var newEle = document.createElement('p');
-		newEle.setAttribute('class', $('.team-manage-team-info-captain-real').attr('class'));
+		newEle.setAttribute('class', $('#change-captain-name-holder').attr('class'));
 		
 		var x = document.createElement('span');
-		x.setAttribute('class', $('.remove-captain').attr('class'))
+		x.setAttribute('class', $('#change-captain-name-holder').attr('xclass'))
 		x.innerHTML = 'x';
 		
-		$('.remove-captain').last().after(newEle);
+		if ($('.remove-captain').length > 0) {
+			$('.remove-captain').last().after(newEle);
+		} else {
+			$('#change-captain-name-holder').after(newEle);
+		}
 		$(newEle).after(x);
 		
 		$('#team-manage-team-info-captain-container').show();
@@ -210,16 +225,16 @@ $(function()
 		
 	})
 	
-	/*  edit team info hover over change team captain */
+	/*  edit team info hover over change team captain 
 	$('.team-manage-team-info-captain').hover(function()
 	{
 		clickedCaptain.text($(this).attr('playerName'));
 	}, function()
 	{
 		clickedCaptain.text(clickedCaptain.attr('defaultName'));
-	})
+	})*/
 	
-	/* change team captain */
+	/* change team captain 
 	$('.team-manage-team-info-captain').click(function()
 	{
 		if ($('.team-manage-team-info-captain-selected').length > 0) {
@@ -232,10 +247,49 @@ $(function()
 		$(this).find('.animate-opacity').addClass('clicked team-manage-team-info-captain-selected');
 		clickedCaptain.attr('defaultName', $(this).attr('playerName'))
 					  .attr('userID', $(this).attr('userID'))
+					  .attr('id', 'change-captain-name-' + $(this).attr('userID'))
 					  .text($(this).attr('playerName'));
 		
 		changedCaptain = $(this).attr('userID');
 		alertChanged = $('.team-manage-team-info-container');
+	})*/
+	
+	$('.team-manage-team-info-captain').on('click','img.not-clicked', function() 
+	{
+		var parent = $(this).parents('.team-manage-team-info-captain');
+		var userID = parent.attr('userID');
+		if ($('#change-captain-name-' + userID).length > 0) { 
+			// Do not allow same captain twice
+			return;
+		}
+		
+		$('#team-manage-team-info-add-captain').trigger('click');
+		
+		/*
+		if ($('.team-manage-team-info-captain-selected').length > 0) {
+			// Captain img was clicked before
+			var opacity = $('.team-manage-team-info-captain-selected').attr('opacity');
+			$('.team-manage-team-info-captain-selected').stop().animate({opacity: opacity}, 200);
+			$('.team-manage-team-info-captain-selected').removeClass('clicked team-manage-team-info-captain-selected');
+		}
+		*/
+		
+		$(this).addClass('clicked team-manage-team-info-captain-selected full-opacity');
+		$(this).removeClass('not-clicked full-opacity team-manage-team-info-captain-selected');
+		
+		clickedCaptain.attr('defaultName', $(this).attr('playerName'))
+					  .attr('userID', userID)
+					  .attr('id', 'change-captain-name-' + userID)
+					  .text($(this).attr('playerName'));
+		
+		changedCaptain = true;
+		alertChanged = $('.team-manage-team-info-container');
+		
+		
+		
+		var ele = $('.team-manage-team-info-captain-real').last();
+		var name = $(this).parents('.team-manage-team-info-captain').attr('playername');
+		ele.text(name);
 	})
 	
 	
@@ -272,19 +326,23 @@ $(function()
 	
 	$('#team-manage-team-info-save-changes').click(function()
 	{
-		
 		var detailsEle = getDetailsEle();
 		var idType = detailsEle.attr('idType');
 		var typeID = detailsEle.attr(idType);
 		
 		if (changedCaptain) {
 			// Captain was changed
+			
 			var userIDs = new Array();
+			
 			$('.team-manage-team-info-captain-real').each(function()
 			{
-				userIDs.push($(this).attr('userID'));
+				if ($(this).attr('userID')) {
+					// Prevent non-attribute div/span from being added
+					userIDs.push($(this).attr('userID'));
+				}
 			})
-
+			
 			changeCaptains(userIDs, idType, typeID);
 		}
 		

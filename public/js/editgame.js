@@ -7,9 +7,11 @@ $(function()
 	$('#calendar-' + calendarDay).trigger('click');
 	
 	
-	$('.calendar-selectable').click(function()
+	$('#edit-game-change-captain').click(function()
 	{
+		showAlert($('#change-captain-alert-container'));
 	})
 	
+
 })
 		

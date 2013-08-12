@@ -1,6 +1,6 @@
 <?php
 
-class Application_Model_GamesMapper extends Application_Model_MapperAbstract
+class Application_Model_GamesMapper extends Application_Model_TypesMapperAbstract
 {
 	protected $_dbTableClass = 'Application_Model_DbTable_Games';
 	

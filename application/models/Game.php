@@ -86,6 +86,11 @@ class Application_Model_Game extends Application_Model_ModelAbstract
 		return $this->getMapper()->getGameCaptains($this->gameID);
 	}
 	
+	public function updateCaptains()
+	{
+		return $this->getMapper()->updateCaptains($this);
+	}
+	
 	/**
 	 * add user to game in db
 	 */
@@ -93,6 +98,7 @@ class Application_Model_Game extends Application_Model_ModelAbstract
 	{
 		return $this->getMapper()->addUserToGame($gameID, $userID);
 	}
+	
 	
 	/**
 	 * get all players for the game
@@ -237,12 +243,23 @@ class Application_Model_Game extends Application_Model_ModelAbstract
 		}
 	}
 	
-	public function getGameTitle()
+	/**
+	 * get game title (ie pickup basketball, or singles tennis match)
+	 * @params ($mail => will this be used in email, ie should it have inline css instead of classes?))
+	 */
+	public function getGameTitle($mail = false)
 	{
 		// if want bolded prefix, change class to inherit
-		$gameTitle = '<span class="darkest">' . $this->type->typeName . '</span> ' . $this->sport;
+		if ($mail) {
+			// Inline css
+			$css = 'style="font-size:inherit;font-color:inherit;font-weight:normal"';
+		} else {
+			$css = 'class="darkest"';
+		}
+		
+		$gameTitle = '<span ' . $css . '>' . $this->type->typeName . '</span> ' . $this->sport;
 		if ($this->type->hasValue('typeSuffix')) {
-			$gameTitle .= ' <span class="game-title-suffix darkest">' . $this->type->typeSuffix . '</span>';
+			$gameTitle .= ' <span ' . $css . '>' . $this->type->typeSuffix . '</span>';
 		}
 		return $gameTitle;
 	}

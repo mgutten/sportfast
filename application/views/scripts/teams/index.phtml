@@ -111,7 +111,8 @@ if ($this->fail) {
 				echo 		"<div class='team-manage-team-info-name-container left larger-margin-top'>";
 				
 				echo 			"<p class='left smaller-text darkest'>Team Captain</p>";
-					// User is head honcho
+					
+					/*// User is head honcho
 					foreach ($this->team->captains as $captain => $true) {
 						$player = $this->team->players->getUser($captain);
 						echo "<p class='clear largest-text darkest heavy team-manage-team-info-name pointer team-manage-team-info-captain-real' userID='" . $player->userID . "' id='team-manage-team-info-captain' defaultName='" . $this->team->players->getUser($captain)->getLimitedName('fullName',21) . "'>"
@@ -131,6 +132,8 @@ if ($this->fail) {
 					echo				"<p class='margin-top medium smaller-text clear'>Note: you will not be able to access any management controls if you are no longer the captain.</p>";
 					
 					echo			"</div>";
+					*/
+				echo $this->changecaptain($this->team);
 				
 			echo 		"</div>";
 			echo	"</div>";

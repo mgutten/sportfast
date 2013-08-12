@@ -317,12 +317,13 @@ class SignupController extends Zend_Controller_Action
 						     </html>";
 				$headers  = 'MIME-Version: 1.0' . "\r\n";
 				$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";	 
+				$headers .= "From: support@sportfast.com \r\n";
 				
 				
 				$this->view->whiteBacking = false;
 				$this->view->username = $user->username;
 				if(mail($user->username, $subject, $message, $headers)) {
-					$this->view->success = false;
+					$this->view->success = true;
 					//echo 'An email verification has been sent to ' . $user->username . '.';
 				} else {
 					$this->view->success = false;
@@ -605,7 +606,7 @@ class SignupController extends Zend_Controller_Action
 	 */
 	public function createFakeUserAction()
 	{
-		for ($x = 0; $x < 1; $x++) {
+		for ($x = 0; $x < 10; $x++) {
 			$user 	  = new Application_Model_User();
 			$user->fake = true;
 			
@@ -799,9 +800,9 @@ class SignupController extends Zend_Controller_Action
 	public function getFirstName($sex)
 	{
 		if ($sex == 'm') {
-			$first = array('john', 'james', 'jonathan', 'tyler', 'scott', 'jimmy', 'jason', 'chris', 'brendan', 'brad', 'marcus', 'zach', 'will', 'daniel', 'anthony');
+			$first = array('john', 'james', 'jonathan', 'tyler', 'scott', 'jimmy', 'jason', 'chris', 'brendan', 'brad', 'marcus', 'zach', 'will', 'daniel', 'anthony', 'david', 'tom', 'paul', 'george', 'steven', 'jeff');
 		} else {
-			$first = array('lily', 'abby', 'ada', 'agatha', 'cierra', 'claire', 'emily', 'jennifer', 'iris', 'ivy', 'lorie', 'rosa', 'lucy');
+			$first = array('lily', 'abby', 'mary', 'cierra', 'claire', 'emily', 'jennifer', 'iris', 'robin', 'lorie', 'lucy', 'lauren', 'susan', 'lisa', 'karen', 'helen', 'sharon', 'angela');
 		}
 				
 		$firstName = $first[mt_rand(0, (count($first) - 1))];

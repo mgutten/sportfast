@@ -141,7 +141,8 @@ class Application_Model_ParksMapper extends Application_Model_MapperAbstract
 							GROUP BY pr2.parkID)";
 		
 			$select->joinLeft(array('pr' => new Zend_Db_Expr($parkRatings)),
-							  'pr.parkID = p.parkID');
+							  'pr.parkID = p.parkID',
+							  array('pr.quality'));
 		} else {					  
 			$select->joinLeft(array('pr' => 'park_ratings'),
 							  'pr.parkID = p.parkID',
@@ -183,6 +184,7 @@ class Application_Model_ParksMapper extends Application_Model_MapperAbstract
 		$totalRows = $totalRows[0]['totalRows'];
 		
 		foreach ($results as $result) {
+		
 			$park = $savingClass->addPark($result);
 			$park->ratings->setAttribs($result);
 			$park->ratings->addRating($result);

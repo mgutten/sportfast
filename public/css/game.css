@@ -115,3 +115,14 @@
 	z-index: 2;
 	opacity: 1;
 }
+
+#edit-game-change-captain {
+	margin-top: 1.5em;
+}
+
+#change-captain-alert-container {
+	height: 10em;
+	width:34em;
+	margin-top: -5em;
+	margin-left:-17em;
+}

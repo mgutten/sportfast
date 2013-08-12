@@ -37,6 +37,7 @@ class Application_Model_AdminMapper extends Application_Model_MapperAbstract
 			   		  'c.cityID = u.cityID',
 			   		  array('city',
 					  		'cityID'))
+			   ->where('u.fake = 0')
 			   ->group('u.cityID')
 			   ->order('COUNT(userID) DESC');
 			   

@@ -252,6 +252,16 @@ class GamesController extends Zend_Controller_Action
 		
 		$this->view->history = $history;
 	}
+	
+	public function inviteAction()
+	{
+		$this->view->whiteBacking = false;
+		$gameID = $this->getRequest()->getParam('id');
+		
+		$this->view->type = 'game';
+		$this->view->typeID = $gameID;
+		
+	}
 
 	
 }

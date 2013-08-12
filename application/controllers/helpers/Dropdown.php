@@ -89,9 +89,13 @@ class Application_Controller_Helper_Dropdown extends Zend_Controller_Action_Help
 			
 			$pre = "<div";
 			$post = "</div>";
+			
 			if (isset($option['href'])) {
-				$pre = "<a href='" . $option['href'] . "'";
-				$post = "</a>";
+				if (strlen($option['href']) > 1 || $option['href'] == '/')  {
+					// Bug fix for php 5.4 where isset of sub-key will return first letter of array value (isset returns true then)
+					$pre = "<a href='" . $option['href'] . "'";
+					$post = "</a>";
+				}
 			}
 			
 			$outerClass = '';

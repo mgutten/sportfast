@@ -16,7 +16,8 @@
 }
 
 .profile-name {
-	max-width: 9.5em;
+	/*max-width: 9.5em;*/
+	max-width: 13em;
 }
 
 /* top section */

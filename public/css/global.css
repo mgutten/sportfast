@@ -502,6 +502,10 @@ div.selected-green,img.selected-green,p.selected-green {
 	opacity: 0;
 }
 
+.full-opacity {
+	opacity: 1;
+}
+
 
 /* end body declarations */
 
@@ -1781,8 +1785,8 @@ div.dropdown-menu-container-reverse:hover {
 
 .button,.green-button,.red-button {
 	cursor: pointer;
-	border-radius: 5px;
-	-moz-border-radius: 5px;
+	/*border-radius: 5px;
+	-moz-border-radius: 5px;*/
 	border: 1px solid #ccc;
 	background: #f0f0f0;
 	background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#fff), to(#e9e9e9));
@@ -2274,10 +2278,7 @@ input[type=text].selectable-input {
 	color: #bbb;
 }
 
-/* game title */
-.game-title-suffix {
-	
-}
+
 
 /* display image, text, and details for game as a result */
 .find-result-container {

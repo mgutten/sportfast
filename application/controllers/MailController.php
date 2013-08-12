@@ -99,7 +99,7 @@ class MailController extends Zend_Controller_Action
 		$type = ($typeModel instanceof Application_Model_Game ? 'game' : 'team');
 						
 		if ($type == 'game') {
-			
+
 			$time = ($typeModel->gameDate->format('i') > 0 ? $typeModel->gameDate->format('g:ia') : $typeModel->gameDate->format('ga'));
 			$main = "<td align='center'>
 							 <p class='largest-text bold' style='font-family: Arial, Helvetica, Sans-Serif; font-size: 2.5em; color: #333; font-weight: bold; margin: 0;'>" . $typeModel->sport . "</p>
@@ -131,7 +131,7 @@ class MailController extends Zend_Controller_Action
 			$id = $typeModel->teamID;
 		}				
 		
-		$output .= "<tr><td><p style='font-family: Arial, Helvetica, Sans-Serif; font-size: 14px; color: #333; margin: 0;'>I've moved our " . $typeModel->sport . " " . $type . " to Sportfast so we can organize easier.  With Sportfast, you can:</p>
+		$output .= "<tr><td><p style='font-family: Arial, Helvetica, Sans-Serif; font-size: 14px; color: #333; margin: 0;'>I've moved our " . $typeModel->sport . " " . $type . " to Sportfast so we can coordinate easier.  With Sportfast, you can:</p>
 						<ul class='bold' style='font-family: Arial, Helvetica, Sans-Serif; font-size: 14px; color: #333; font-weight: bold;'>";
 		//<br><br>" . $intro . "  It's designed specifically to help organize, find, and manage recreational sports.				
 		foreach ($intro as $point) {
@@ -164,8 +164,8 @@ class MailController extends Zend_Controller_Action
 					 </tr>
 					 <tr>
 						 <td>
-						 	<p style='font-family: Arial, Helvetica, Sans-Serif; font-size: 14px; color: #58bf12; font-weight: bold;text-align:center'>You will not receive any more reminders regarding this " . $type . " or be able to view its details unless you join. 
-								There is no catch or gimmick; we built Sportfast because we love sports!</p>
+						 	<p style='font-family: Arial, Helvetica, Sans-Serif; font-size: 14px; color: #58bf12; font-weight: bold;text-align:center'>You will not receive any more reminders regarding this " . $type . " or be able to view its details until you join. 
+								There is no catch or gimmick; Sportfast is by athletes, for athletes.</p>
 						 </td>
 					 </tr>
 					 <tr>
@@ -781,7 +781,7 @@ class MailController extends Zend_Controller_Action
 					 </tr>
 					 <tr>
 						 <td colspan='3' align='center'>
-							 <p class='largest-text bold' style='font-family: Arial, Helvetica, Sans-Serif; font-size: 2.5em; color: #333; font-weight: bold; margin: 0;'>" . $game->getGameTitle() . "</p>
+							 <p class='largest-text bold' style='font-family: Arial, Helvetica, Sans-Serif; font-size: 2.5em; color: #333; font-weight: bold; margin: 0;'>" . $game->getGameTitle(true) . "</p>
 							 <p class='largest-text bold' style='font-family: Arial, Helvetica, Sans-Serif; font-size: 2.5em; color: #333; font-weight: bold; margin: 0;'>" . $game->gameDate->format('l') . " at " . $time . "</p>
 							 <p class='larger-text bold' style='font-family: Arial, Helvetica, Sans-Serif; font-size: 1.75em; color: #333; font-weight: bold; margin: 0;'>" . $game->park->parkName . "</p>
 						 </td>

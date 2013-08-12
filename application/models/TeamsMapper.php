@@ -1,6 +1,6 @@
 <?php
 
-class Application_Model_TeamsMapper extends Application_Model_MapperAbstract
+class Application_Model_TeamsMapper extends Application_Model_TypesMapperAbstract
 {
 	protected $_dbTableClass = 'Application_Model_DbTable_Teams';
 	
@@ -234,39 +234,6 @@ class Application_Model_TeamsMapper extends Application_Model_MapperAbstract
 		
 	}
 	
-	/**
-	 * Update team's captains
-	 */
-	public function updateCaptains($savingClass)
-	{
-		$this->setDbTable('Application_Model_DbTable_TeamCaptains');
-		$table   = $this->getDbTable();
-		
-		if (!$savingClass->hasCaptain()) {
-			return false;
-		}
-		
-		$teamID  = $savingClass->teamID;
-
-		$db = Zend_Db_Table::getDefaultAdapter();
-		
-		$db->delete('team_captains', array('teamID = ?' => $teamID));
-		
-		$insert = "INSERT INTO team_captains (teamID, userID) VALUES ";
-		
-		$counter = 0;
-		foreach ($savingClass->captains as $captain => $value) {
-			if ($counter != 0) {
-				$insert .= ',';
-			}
-			$insert .= '("' . $teamID . '","' . $captain . '")';
-			$counter++;
-		}
-		
-		$db->query($insert);
-		
-		return $savingClass;
-	}
 	
 	/**
 	 * delete game

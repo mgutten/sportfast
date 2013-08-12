@@ -602,14 +602,17 @@ $(function()
 	})
 	.bind('mouseleave.animateOpacity',function()
 	{
+		
 		if ($(this).is('.clicked')) {
 			// Has clicked class, do nothing
+			
 			$(this).trigger('mouseleave.tooltip');
 			return false;
 		}
 		
 		var originalOpacity = $(this).attr('opacity');
 		$(this).stop().animate({opacity: originalOpacity}, 200);
+		
 	})
 	
 	
@@ -897,10 +900,11 @@ function changeTypeName(name, idType, typeID, actingUserID)
  */
 function changeCaptains(userIDs, idType, typeID) {
 	var options = new Object();
+
 	options.userIDs = userIDs;
 	options.idType = idType;
 	options.typeID = typeID;
-
+	
 	$.ajax({
 		url: '/ajax/change-captain',
 		type: 'POST',
