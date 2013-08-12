@@ -30,7 +30,7 @@ class Application_View_Helper_MemberHomepage
 			echo "</div>";
 			
 			
-			echo "<p class='clear smaller-text member-first-time-sub larger-margin-top darkest'>We will automatically notify you when a game is created matching your preferences.</p>";
+			echo "<p class='clear smaller-text member-first-time-sub larger-margin-top darkest'>We will notify you via email when a game is created matching your preferences.</p>";
 			echo "<p class='clear larger-margin-top medium'>Then again, maybe you're here to   
 					<a href='/create' class='darkest'> organize your own game or team.</a></p>";
 			

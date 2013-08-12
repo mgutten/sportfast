@@ -382,12 +382,12 @@ div.member-find-game-date-hour {
 }
 
 .member-first-time-button {
-	margin: 2em 0 0 10em;
+	margin: 1.2em 0 0 10em;
 }
 
 .member-first-time-sub {
-	margin-left: 7.7em;
-	margin-top: .6em;
+	margin-left: 0em;
+	margin-top: 1.5em;
 }
 
 #more-users-alert-container {

@@ -385,6 +385,13 @@ class SignupController extends Zend_Controller_Action
 			$notification->cityID = $user->city->cityID;
 			$notification->save();
 			
+			$notification = new Application_Model_Notification();
+			$notification->actingUserID = $user->userID;
+			$notification->action = 'join';
+			$notification->details = 'sportfast';
+			$notification->cityID = $user->city->cityID;
+			$notification->save();
+			
 			$session = new Zend_Session_Namespace('signupInvite');
 			if ($session->id) {
 				// User was invited from email invite from fellow user, create notification for them of invite
