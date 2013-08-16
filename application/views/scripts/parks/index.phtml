@@ -43,7 +43,7 @@ $this->placeholder('narrowColumn')->captureEnd();
         <p class='medium clear larger-text'>
             <?php echo $this->park->city;?>&nbsp; <a href='http://www.google.com/maps?f=d&q=<?php echo $this->parkLocation->latitude . ',' . $this->parkLocation->longitude;?>' class='inherit light'><?php echo $this->park->getDistanceFromUser($this->user->getLocation()->latitude,$this->user->getLocation()->longitude);?> miles from you</a>
         </p> 
-        <?php echo $this->ratingStar('large', $this->parkRatingWidth, $this->currentURI . '/ratings', 'margin-top');?>
+        <?php echo $this->ratingstar('large', $this->parkRatingWidth, $this->currentURI . '/ratings', 'margin-top');?>
         <a href='/parks/<?php echo $this->parkID;?>/ratings' class='left green park-num-ratings'><?php echo $this->numRatings;?></a>
     </div>
     <?php } ?>

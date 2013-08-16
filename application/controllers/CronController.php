@@ -44,11 +44,24 @@ class CronController extends Zend_Controller_Action
 	 */
 	public function removeTempPicturesAction()
 	{
-		$files = glob(PUBLIC_PATH . '/images/tmp/profile/pic/*'); // get all file names
-		foreach($files as $file){ // iterate files
-		  if(is_file($file))
-			unlink($file); // delete file
+		$dir = 'images/tmp/profile/pic/';
+		
+		
+		$dirHandle = opendir($dir); 
+		// LOOP OVER ALL OF THE  FILES
+		while ($file = readdir($dirHandle)) { 
+			// IF IT IS NOT A FOLDER, AND ONLY IF IT IS A .JPG WE ACCESS IT
+			if (is_file($dir . $file)) {
+				unlink($dir . $file);
+			}
+						
+			
+
 		}
+		// CLOSE THE DIRECTORY
+		closedir($dirHandle); 
+		
+		
 	}
 	
 	/**

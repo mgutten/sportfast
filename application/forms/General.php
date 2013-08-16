@@ -23,6 +23,14 @@ class Application_Form_General extends Zend_Form
 				'autocomplete'  => 'off'
 				));
 				
+		$this->addElement('textarea', 'textarea', array(
+				'required'		=> true,
+				'decorators'	=> array('Overlay'),
+				'label'			=> '',
+				'class'			=> 'dropshadow',
+				'autocomplete'  => 'off'
+				));
+				
 		$this->addElement('checkbox', 'checkbox',  array(
 				'required'		=> false,
 				'decorators'	=> array('Checkbox'),

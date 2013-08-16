@@ -18,6 +18,11 @@ class PostController extends Zend_Controller_Action
 		$post = $this->getRequest()->getPost();
 		$type = $post['type'];
 		
+		$notification = new Application_Model_Notification();
+		$notification->cityID = $this->view->user->city->cityID;
+		$notification->actingUserID = $this->view->user->userID;
+		$notification->action = 'rate';
+		
 		$rating = new Application_Model_Rating();
 		$rating->comment = $post['comment'];
 		$rating->setDateHappenedCurrent();
@@ -29,9 +34,14 @@ class PostController extends Zend_Controller_Action
 			$rating->quality = $post['rating'];
 			$rating->parkID  = $post['typeID'];
 			$rating->success = '1';
+			
+			$notification->type = 'park';
+			$notification->parkID = $post['typeID'];
 		}
 		
 		$rating->save();
+		
+		$notification->save();
 		
 		$lastURL = $_SERVER['HTTP_REFERER'];
 		$this->_redirect($lastURL);

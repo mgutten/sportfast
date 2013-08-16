@@ -14,6 +14,7 @@ if (!$this->loggedIn) {
 	echo $this->homepage(); //$this->getHelper('homepage')->testFunction();
 } else {
 	// Logged in, display member homepage
+
 	$this->headLink()->prependStylesheet($this->baseUrl() . '/css/member.css');
 	$this->headScript()->prependFile($this->baseUrl() . '/js/member.js');
 	$this->headScript()->prependFile('https://maps.googleapis.com/maps/api/js?key=AIzaSyAhxSMQ-WQux2nzTW4dBoKmpfGHVQOk7r8&sensor=false');

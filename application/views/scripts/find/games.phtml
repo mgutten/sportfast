@@ -170,7 +170,11 @@ $this->placeholder('narrowColumn')->captureEnd();
 ?>
 <?php
 if (!$this->user->hasProfilePic()) {
-	echo "<a href='/users/" . $this->user->userID . "/upload' class='red-alert-box white heavy'>You must have a profile picture to join a game.  <br/>Add one now.</a>";
+	echo "<div class='red-alert-box white'>
+			You must have a profile picture to join a game.  
+			<br><a href='/users/" . $this->user->userID . "/upload' class='white center heavy'>Upload now</a>
+			<br><p class='clear-right smaller-text width-100 center white why-profile pointer'>Why do I need a profile picture?</p>
+		  </div>";
 }
 ?>
 <p class='left dark indent'><span class='inherit' id='find-num-results'><?php echo $this->numMatches;?></span> games found</p>

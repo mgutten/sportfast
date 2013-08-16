@@ -49,6 +49,7 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 		
 		$auth = Zend_Auth::getInstance();
 		
+		
 		$reset = new Zend_Session_Namespace('reset');
 		if ($reset->reset) {
 			// Reset attrib has been set, clear identity and force reload
@@ -264,6 +265,22 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 				'parks/%d');
 				
 		$router->addRoute('parks', $r);
+		
+		// Find page
+		$r = new Zend_Controller_Router_Route_Regex(
+				'find/search(?:/(.*))?',
+				array(
+						'action' => 'search',
+						'controller' => 'find',
+						'module' => 'default',
+						'id'	 => '1'
+				),
+				array(
+						1 => 'search'
+				),
+				'find/search/%s');
+				
+		$router->addRoute('search', $r);
 		
 		// Signup page
 		$r = new Zend_Controller_Router_Route_Regex(

@@ -92,6 +92,7 @@ class FindController extends Zend_Controller_Action
 		$form = new Application_Form_General();
 		$this->view->inputText = $form->text;
 		$this->view->checkbox  = $form->checkbox;
+		
     }
 	
 	public function playersAction()
@@ -168,6 +169,12 @@ class FindController extends Zend_Controller_Action
 		
 		$searchTerm = $session->searchTerm;
 		
+		if ($searchTerm) {
+			Zend_Session::namespaceUnset('searchTerm');
+			$this->_redirect('/find/search/' . $searchTerm);
+		}
+		
+		$searchTerm = $this->getRequest()->getParam('search');
 		$cityID  = $this->view->user->city->cityID;
 		
 		$search  = new Application_Model_Search();

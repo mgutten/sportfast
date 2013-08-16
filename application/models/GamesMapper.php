@@ -432,7 +432,8 @@ class Application_Model_GamesMapper extends Application_Model_TypesMapperAbstrac
 			   ->joinLeft(array('gc' => 'game_captains'),
 			   		  'ug.gameID = gc.gameID AND ug.userID = gc.userID',
 					  array('userID as captain'))
-			   ->where('ug.gameID = ?', $gameID);
+			   ->where('ug.gameID = ?', $gameID)
+			   ->group('ug.userID');
 		
 		$players = $table->fetchAll($select);
 

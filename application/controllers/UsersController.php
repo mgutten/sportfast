@@ -145,7 +145,7 @@ class UsersController extends Zend_Controller_Action
 		// Narrow column data
 		$oldData = $this->view->sport->getUserSportData($user->userID);
 
-		$calories = $oldData['calories'] * $user->weight;
+		$calories = $oldData['calories'] * 160; // Used to be user weight, but removed weight so use average weight of 160
 		$curDate  = new DateTime('now');
 		$numWeeks = $curDate->diff($user->getJoinedDate())->format('%a') / 7;
 		
@@ -224,7 +224,7 @@ class UsersController extends Zend_Controller_Action
 		$user->firstName = $post['firstName'];
 		$user->lastName = $post['lastName'];
 		$user->dob = $post['dob'];
-		$user->weight = $post['weight'];
+		//$user->weight = $post['weight'];
 		$user->setHeightFromFeetAndInches($post['heightFeet'], $post['heightInches']);
 		$user->setAgeFromDob();
 		$user->noEmail = ($post['noEmail'] == 'on' ? 0 : 1);

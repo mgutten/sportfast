@@ -10,12 +10,24 @@ $this->headScript()->prependFile($this->baseUrl() . '/js/find.js');
 
 
 <?php
+
 $this->placeholder('narrowColumn')->captureStart();
-	echo "<img src='" . $this->matches[0]->getProfilePic('large') . "' class='narrow-column-picture'/>";
+	
+	if (isset($this->matches[0])) {
+		// Is a first match
+		$src = $this->matches[0]->getProfilePic('large');
+	} else {
+		// No matches
+		$src = '/images/global/not_found.png';
+	}
+	echo "<img src='" . $src . "' class='narrow-column-picture'/>";
 	echo "<p class='clear larger-margin-top white arial bold larger-text width-100 center dark-back'>FILTERS</p>";
+	
 	echo $this->narrowcolumnsection()->start(array('title' => 'Sports'));
 	$counter = 0;
+	
 	foreach ($this->sports as $sport => $inner) {
+		
 		$class = 'selectable-text light pointer narrow-sport';
 		if ($counter % 2 == 0) {
 			// even
@@ -39,6 +51,7 @@ $this->placeholder('narrowColumn')->captureEnd();
 
 <p class='left dark indent'><span class='inherit' id='find-num-results'><?php echo $this->numMatches;?></span> teams found</p>
 <?php
+
 $content  = "<div class='right' id='find-looking-container'>";
 $content .=		"<p class='left darkest heavy'>Looking for:</p>";
 $content .= 	"<div class='left indent'>" . $this->lookingFor . "</div>";

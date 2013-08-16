@@ -31,6 +31,20 @@ $(function()
 		buildUserIDs();
 		$(this).parents('form').submit();
 	})
+	
+	$('#create-success-addNote').click(function()
+	{
+		$(this).hide();
+		$('#create-success-removeNote').show();
+		$('#note-container').show();
+	})
+	
+	$('#create-success-removeNote').click(function()
+	{
+		$(this).hide();
+		$('#create-success-addNote').show();
+		$('#note-container').hide();
+	})
 		
 	
 	$(document).on('click','.create-userName-result',function()

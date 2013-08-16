@@ -489,7 +489,7 @@ $(function()
 	{
 		animateProfileButtons();
 	});
-		
+	
 	
 	$(document).click(function(e)
 	{

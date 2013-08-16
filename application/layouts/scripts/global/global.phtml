@@ -13,6 +13,10 @@ if (!$this->noDefaultHeadTitle) {
 <head>
 <meta charset='utf-8' />
 <?php
+		$this->headMeta()->setName('keywords', 'sportfast, local pickup, play sports, 
+										pickup games, pickup basketball, pickup soccer, pickup football, 
+										pickup ultimate frisbee, pickup volleyball, find pickup games');
+		echo $this->headMeta()->setName('description', 'Find and manage recreational sports.  From pickup games to league teams, Sportfast lets you play everywhere.');
 		//echo $this->headMeta() . PHP_EOL;
  		echo $this->headTitle() . PHP_EOL;
  		echo $this->headLink()->prependStylesheet($this->baseUrl() . '/css/global.css') . PHP_EOL;

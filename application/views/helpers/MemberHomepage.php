@@ -12,6 +12,7 @@ class Application_View_Helper_MemberHomepage
 	 */
 	public function memberHomepage() 
 	{
+		
 		$user = $this->_view->user;
 		
 		if ($this->_view->firstVisit) {

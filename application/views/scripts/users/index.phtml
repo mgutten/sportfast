@@ -3,7 +3,7 @@
  * controller => users
  * action => index
  */
-$this->headTitle($this->currentUser->shortName);
+$this->headTitle($this->currentUser->fullName);
 $this->headLink()->prependStylesheet($this->baseUrl() . '/css/user.css');
 $this->headLink()->prependStylesheet($this->baseUrl() . '/css/profile.css');
 $this->headScript()->prependFile($this->baseUrl() . '/js/user.js');
@@ -28,7 +28,7 @@ echo "<img src='" . $this->currentUser->getProfilePic('large') . "' class='narro
 echo "<div class='user-narrow-info-container clear'>";
 echo 	"<p class='clear darkest'>" . $this->currentUser->age . " years old</p>";
 echo 	"<p class='clear darkest'>" . $this->currentUser->getSexFull() . "</p>";
-echo 	"<p class='clear darkest'>" . $this->currentUser->getHeightInFeet() . " " . $this->currentUser->weight . " lb</p>";
+echo 	"<p class='clear darkest'>" . $this->currentUser->getHeightInFeet() . "</p>";
 echo "</div>";
 
 $sections = array('players', 'teams');
@@ -67,7 +67,7 @@ $this->placeholder('narrowColumn')->captureEnd();
 	if ($this->currentUser->userID != $this->user->userID) {
 		// Not current user
 	?>
-    <a href='/users/<?php echo $this->user->userID;?>/group/<?php echo $this->currentUser->userID;?>' class='button right' id='user-message'>
+    <a href='/users/<?php echo $this->user->userID;?>/group/<?php echo $this->currentUser->userID;?>' class='button right' id='user-message' onclick='this.href;'> <!-- strange bug in jQuery plugin section of global.js that prevents clicking the message button.  force redirect with inline onclick -->
     	Message
     </a>
     <?php
@@ -112,7 +112,7 @@ $this->placeholder('narrowColumn')->captureEnd();
 			
 			$lowerOutput .= "<div class='user-sport-container rounded-corners light-back " . $class . " dropshadow-bottom'>";
 			$lowerOutput .= 	"<div class='user-sport-left-container'>";
-			$lowerOutput .= 		"<p class='clear medium'>";
+			$lowerOutput .= 		"<p class='clear darkest'>";
 			
 			// Positions
 			$counter = 0;
@@ -177,11 +177,16 @@ $this->placeholder('narrowColumn')->captureEnd();
 			$lowerOutput .=			"</div>";
 			$lowerOutput .=		"</div>";	
 			// Ratings
-			$ratings      = array('Overall', 'skill', 'sportsmanship', 'attendance');			
+			$ratings      = array('Overall' => '', 
+								  'skill' => 'skill', 
+								  'sportsmanship' => 'sprtmn', 
+								  'attendance' => 'attnd');			
 			$lowerOutput .= 	"<div class='user-sport-right-container'>";
-			$lowerOutput .=			"<div class='user-sport-rating-container'>";
+			$lowerOutput .=			"<a href='/users/" . $this->currentUser->userID . "/ratings/" . strtolower($sport->sport) . "' class='user-sport-rating-container'>";
+			$counter = 1;
 			
-			foreach ($ratings as $rating) {
+			foreach ($ratings as $rating => $abbrev) {
+				/*
 				$class = 'user-sport-rating-other-outer';
 				$hiddenClass = 'user-sport-rating-percent';
 				
@@ -196,6 +201,21 @@ $this->placeholder('narrowColumn')->captureEnd();
 				$lowerOutput .=						"<p class='white right rating-inner-percent " . $hiddenClass . " heavy'>" . $sport->$rating . "%</p>";
 				$lowerOutput .=					"</div>";
 				$lowerOutput .=				"</div>";
+				*/
+				$class = 'left larger-text user-rating-container';
+				$label = "<p class='clear width-100 center white smaller-text'>" . $abbrev . "</p>";
+				$value = "<p class='clear width-100 center inherit'>" . $sport->$rating . "</p>";
+				
+				if ($rating == 'Overall') {
+					$class = 'clear width-100 jumbo-text heavy user-rating-container-first';
+					$label = '';
+				} elseif ($counter == count($ratings)) {
+					// Last one
+					$class .= ' user-rating-container-last';
+				}
+				$lowerOutput .= "<div class='center medium-background white " . $class . "'>" . $label . $value . "</div>";
+				
+				$counter++;
 			}
 			
 			$numRatings   = (!$sport->ratings->hasValue('ratings') ? 0 : count($sport->ratings->ratings));
@@ -203,11 +223,10 @@ $this->placeholder('narrowColumn')->captureEnd();
 			if ($numRatings == 1) {
 				$str = 'rating';
 			}
-			$lowerOutput .=				"<a href='/users/" . $this->currentUser->userID . "/ratings/" . strtolower($sport->sport) . "' class='green clear-right user-sport-num-ratings'>" 
+			$lowerOutput .= 		"</a>";
+			$lowerOutput .=				"<a href='/users/" . $this->currentUser->userID . "/ratings/" . strtolower($sport->sport) . "' class='dark clear-right user-sport-num-ratings'>" 
 										. $numRatings . " " . $str
-										. "</a>";
-			$lowerOutput .= 		"</div>";
-			
+										. "</a>";			
 			$lowerOutput .= 	"</div>";
 			$lowerOutput .= "</div>";
 			

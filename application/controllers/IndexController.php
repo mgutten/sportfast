@@ -117,6 +117,7 @@ class IndexController extends Zend_Controller_Action
 			$games   = new Application_Model_Games();
 			$options = array('`g`.`sport` IN ' . $sportsParen);
 			
+			
 			$games->findUserGames($this->view->user, $options);
 			
 			$matches->addMatches($games->games);

@@ -431,7 +431,7 @@ class MailController extends Zend_Controller_Action
 						<td>
 							<p style='font-family: Arial, Helvetica, Sans-Serif; color: #333;'>A password reset on your Sportfast account has been requested.  Your new password is:</p>
 							<br><p style='font-family: Arial, Helvetica, Sans-Serif; color: #333;font-size: 2em;font-weight:bold;'>" . $password . "</p>
-							<br><p style='font-family: Arial, Helvetica, Sans-Serif; color: #333;'>You can set your password to something more meaningful under your <a href='/users/" . $user->userID . "/settings' style='font-family: Arial, Helvetica, Sans-Serif; color: #444;'>Account Settings</a>.</p>
+							<br><p style='font-family: Arial, Helvetica, Sans-Serif; color: #333;'>You can set your password to something more meaningful under your <a href='http://www.sportfast.com/users/" . $user->userID . "/settings' style='font-family: Arial, Helvetica, Sans-Serif; color: #444;'>Account Settings</a>.</p>
 						</td>
 					 </tr>";
 		$message .= $this->supportSignature();

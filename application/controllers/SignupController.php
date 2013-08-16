@@ -164,6 +164,9 @@ class SignupController extends Zend_Controller_Action
 				$sports = new Application_Model_Sports();
 				$sportsArray = $sports->getAllSportsInfo();
 				
+				$ratings = new Application_Model_Ratings();
+				$ratingArray = $ratings->getAvailableRatings('user', 'skill');
+				
 				foreach ($sportsArray as $sport => $section) {
 					if ($post[$sport] !== 'true') {
 						// Sport was not selected
@@ -176,7 +179,9 @@ class SignupController extends Zend_Controller_Action
 					$sportModel->sport = $sport;
 					
 					// Convert rating from slider (0-6) to meaningful rating (64-100)
-					$sportModel->skillInitial = $sportModel->convertSliderToRating($post[$sport . 'Rating']); 
+					//$sportModel->skillInitial = $sportModel->convertSliderToRating($post[$sport . 'Rating']);
+					$value = $ratingArray[$ratings->skillRatings[$post[$sport . 'Rating']]]['value'];
+					$sportModel->skillInitial =  $value + ($value < 99 ? mt_rand(-2,2) : 0); 
 					$sportModel->skillCurrent = $sportModel->skillInitial;
 					
 					$sportModel->sportsmanship = 80;
@@ -610,7 +615,7 @@ class SignupController extends Zend_Controller_Action
 	
 	/**
 	 * create fake users that will be used to fill games
-	 */
+	
 	public function createFakeUserAction()
 	{
 		for ($x = 0; $x < 10; $x++) {
@@ -755,7 +760,7 @@ class SignupController extends Zend_Controller_Action
 			$user->save(true);
 			}
 	}
-	
+	 */
 	
 	public function getPoint($latitude, $longitude)
 	{

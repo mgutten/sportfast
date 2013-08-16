@@ -40,7 +40,16 @@ class Application_Model_Messages extends Application_Model_ModelAbstract
 				$notification->text     = $resultRow['message'];
 				$notification->actingFirstName = $resultRow['firstName'];
 				$notification->actingLastName = $resultRow['lastName'];
-
+				
+				/*
+				if ($resultRow['receivingUserID']) {
+					// Is notification with 2 users (eg invited to team)
+					$notification->receivingUserID = $resultRow['receivingUserID'];
+					$notification->receivingFirstName = $resultRow['receivingFirstName'];
+					$notification->receivingLastName = $resultRow['receivingLastName'];
+					$notification->parentUserID = 2;
+				}
+				*/
 	
 				$notification->pictureType = $resultRow['pictureType'];
 			} else {

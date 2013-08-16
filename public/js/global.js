@@ -40,11 +40,11 @@ var notificationScrolling;
 
 $(function()
 {
+	
 	/* jquery plugin to limit value of input */
 	(function($) {
 		
 	  $.fn.limitVal = function(lower, upper) {
-		  
 			var val = this.val();
 			var lowerLength = lower + '';
 
@@ -88,6 +88,7 @@ $(function()
 
 	  /* jquery plugin to verify based on parameters passed in */	  
 	  $.fn.isValid = function(options) {
+		  
 		  // Create some defaults, extending them with any options that were provided
 			var settings = $.extend( {
 			  'maxLength'     : 500,
@@ -148,11 +149,13 @@ $(function()
 	  
 	  /* animate element background darker */
 	  $.fn.animateLighter = function() {
+		  
 		 	this.stop().animate({backgroundColor: this.attr('color')},300);		 
 	  }
 	  
 	  /* unset height and width restrictions, let image show naturally */
 	  $.fn.maintainRatio = function() {
+		  
 		  	var containerHeight = this.height();
 			var containerWidth  = this.width();
 			
@@ -167,6 +170,7 @@ $(function()
 	  }
 			  
 	})( jQuery );
+	
 	
 	$(document).on('click','.dropdown-menu-option-text',function()
 	{
@@ -322,9 +326,15 @@ $(function()
 	
 	
 	/* Search bar ajax call */
-	$('#headerSearchBar').keyup(function()
+	$('#headerSearchBar').keyup(function(e)
 	{
-		
+		if (e.keyCode == 40 ||
+			e.keyCode == 39 ||
+			e.keyCode == 38 ||
+			e.keyCode == 37) {
+				// Hit an arrow key, return false
+				return;
+			}
 		if ($(this).val().length < 3) {
 			// Blank box (or too short), do not run check
 			$('#header-search-results-container').hide();
@@ -426,6 +436,7 @@ $(function()
 		if (!$(e.target).is('.header-search-result') && !$(e.target).parents('#headerSearchForm').length > 0) {
 			// Hide results container for search
 			$('#header-search-results-container').hide();
+			$('#header-search-results-container').html('');
 		}
 		
 		e.stopPropagation();
@@ -470,6 +481,7 @@ $(function()
 		if (!$(e.target).is('.header-search-result') && !$(e.target).parents('#headerSearchForm').length > 0) {
 			// Hide results container for search
 			$('#header-search-results-container').hide();
+			$('#header-search-results-container').html('');
 		}
 		
 		e.stopPropagation();
@@ -624,6 +636,7 @@ $(function()
 			$(this).css('text-decoration', 'none');
 		}
 	});
+	
 		
 	
 	/* fade input text on focusin and focusout */
@@ -748,6 +761,11 @@ $(function()
 		
 	})
 	
+	/* set narrow column to height of body*/
+	if ($('.body-column-narrow').length > 0) {
+		$('.body-column-narrow').css('height', $('#body-white-back').innerHeight());
+	}
+	
 	/* animate overlay (with dark back) on mouseover */
 	$('.overlay-container').hover(function()
 	{
@@ -769,6 +787,60 @@ $(function()
 																		$('.alert-black-back').css('opacity',.85);
 																	}
 		})
+	})
+	
+	/* show explanation of profile pics onclick of special class */
+	$('.why-profile').click(function()
+	{
+		window.open('http://sportfast.com/about/picture', 'Why a profile picture?', 'width=600,height=200');
+	})
+	
+	/* allow users to use arrow keys to move between ajax return results */
+	$(document).keydown(function(e){
+		
+		if (($('#headerSearchBar').is(':focus') && $('.header-search-result').length > 0) ) {
+				
+				var ele;
+				if ($('.header-search-result.selected').length > 0) {
+					// Already result selected
+					if (e.keyCode == 40) {
+						// down 
+						if ($('.header-search-result.selected').next('.header-search-result').length > 0) {
+							ele = $('.header-search-result.selected').next('.header-search-result')
+						} else {
+							// There is no next ele, return
+							return;
+						}
+					}
+					if (e.keyCode == 38) {
+						// up
+						ele = $('.header-search-result.selected').prev('.header-search-result');
+					}
+					if (e.keyCode == 13) {
+						// enter key, redirect to this
+						window.location = $('.header-search-result.selected').attr('href');
+						return false;
+					}
+					
+				} else if (e.keyCode == 40 && $('.header-search-result').length > 0) {
+					ele = $('.header-search-result').first();
+				} else {
+					return;
+				}
+				
+				$('.header-search-result').removeClass('selected');
+				ele.addClass('selected');
+				 
+			 }
+		
+	});
+	
+	$(document).on('mouseover', '.header-search-result', function() {
+		$('.header-search-result.selected').removeClass('selected');
+		$(this).addClass('selected');
+	})
+	.on('mouseout', '.header-search-result', function() {
+		$(this).removeClass('selected');
 	})
 	
 	/* test all elements for tooltip onhover */
@@ -859,6 +931,7 @@ $(function()
 		if (!$(e.target).is('.header-search-result') && !$(e.target).parents('#headerSearchForm').length > 0) {
 			// Hide results container for search
 			$('#header-search-results-container').hide();
+			$('#header-search-results-container').html('');
 		}
 	});
 	
@@ -1741,16 +1814,34 @@ function fixElements()
 		$('.fixed').each(function()
 		{
 			if (scrollTop < $(this).parent().offset().top) {
-				$(this).css({position: 'static'})
-			} else if ((scrollTop >= ($(this).offset().top - 10))) {
+				
+				$(this).css({position: 'static',
+							 top: 'auto',
+							 bottom: 'auto'})
+			} else {
 				
 				var width = $(this).width();
 				var height = $(this).height();
-				$(this).css({position: 'fixed',
-							 width	 : width,
-							 height  : height,
-							 top	 : 10});
+				
+				if ($(this).parents('.body-column-narrow').length > 0 &&
+					(scrollTop + $('.body-column-narrow').children().height() + 10) > ($('#body-white-back').height() + $('#body-white-back').offset().top)) {
+						// left column is below the white background, prevent from going further
+					
+						$(this).css({position: 'absolute',
+									 width	 : width,
+									 height  : 'auto',
+									 bottom	 : 10,
+									 top	 : 'auto'});
+				} else {
+				
+					$(this).css({position: 'fixed',
+								 width	 : width,
+								 height  : 'auto',
+								 top	 : 10,
+								 bottom	 : 'auto'});
+				}
 			} 
+			
 		});
 	
 }

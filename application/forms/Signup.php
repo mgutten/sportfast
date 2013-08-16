@@ -101,7 +101,7 @@ class Application_Form_Signup extends Zend_Form
 				'validators'	=> array('digits'),
 				'decorators'    => array('Hidden')
 				));
-				
+		/*	
 		$this->addElement('text', 'weight',  array(
 				'filters'		=> array('StringTrim','StringToLower'),
 				'required'		=> true,
@@ -110,7 +110,8 @@ class Application_Form_Signup extends Zend_Form
 				'label'			=> 'lb',
 				'class'			=> 'short-input dropshadow',
 				'maxlength'		=> 3
-				));		
+				));	
+				*/	
 		
 		$this->addElement('text', 'email', array(
 				'filters'		=> array('StringTrim','StringToLower'),
@@ -164,7 +165,7 @@ class Application_Form_Signup extends Zend_Form
 				'required'		=> false,
 				'decorators'	=> array('Checkbox'),
 				'checked'		=> false,
-				'text'			=> 'I don\'t trust computers!  I do not wish to enter my street address.  <i>They might find me.</i> <br><span class="light">(Note: The system will not be able to find your best matches)</span>',
+				'text'			=> 'I do not wish to enter my street address. <br><span class="light">(Note: The system will not be able to find your best matches)</span>',
 				'class'			=> 'medium'
 				));
 				

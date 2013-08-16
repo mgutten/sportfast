@@ -13,7 +13,14 @@ class Application_Model_Ratings extends Application_Model_ModelAbstract
 									'avgQuality'		=> '',
 									'skillInitial'		=> '',
 									'sportsmanship'		=> '',
-									'attendance'		=> '');
+									'attendance'		=> '',
+									'skillRatings'	=> array('beginner',
+															 'decent',
+															 'good',
+															 'better',
+															 'talented',
+															 'unstoppable')
+									);
 	
 	
 	
@@ -21,9 +28,9 @@ class Application_Model_Ratings extends Application_Model_ModelAbstract
 	 * get ratings and descriptions from db
 	 * @returns array of ratings and corresponding descriptions
 	 */
-	public function getAvailableRatings($type, $rating)
+	public function getAvailableRatings($type, $ratingType)
 	{
-		return $this->getMapper()->getAvailableRatings($type, $rating);
+		return $this->getMapper()->getAvailableRatings($type, $ratingType);
 	}
 	
 	/**

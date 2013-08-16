@@ -277,7 +277,7 @@ $(function()
 	});
 	
 	
-	/* change color of sex icon onclick */
+	/* select sport, change color of sport icon onclick */
 	$('.sport-icon-large').click(function() 
 	{
 		var sport = $(this).attr('tooltip').toLowerCase();
@@ -310,6 +310,8 @@ $(function()
 		
 		var hiddenEle = $('#signup-sports-form-' + sport);
 		var down      = false;
+		
+		$('#signup-sports-container').prepend(hiddenEle)
 		animateNotShow(hiddenEle, down);
 		
 	})
@@ -470,6 +472,12 @@ $(function()
 															$('#signup-import-loading').show();
 															$('#signup-import-alert-img').hide();
 														},	
+											uploadProgress: function(event, position, total, percentComplete) {
+												var bar = $('#loading-bar');
+												var percentVal = percentComplete + '%';
+												bar.width(percentVal)
+												//percent.html(percentVal);
+														},
 										   success: function(data) {
 														if (data == 'errorFormat') {
 															alert('The file you submitted is in the wrong format. Please select a jpg, png, or gif.');

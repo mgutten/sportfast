@@ -214,7 +214,7 @@ $(function()
 	if (isGame()) {
 		// Create game, initialize google map
 		
-		initializeMap(37.98, -122.5, 11, mapListeners);
+		initializeMap(37.98, -122.5, 11, mapLoaded);
 	}
 	
 })
@@ -353,6 +353,18 @@ function findParks(options)
 }
 
 	
+/**
+ * first time map is loaded
+ */
+function mapLoaded()
+{
+	// Hide map until it is time to view it
+	google.maps.event.addListenerOnce(gmap, 'idle', function(){
+		$('.create-section-inner-gmap').css({display:'none'});
+	});
+	
+	mapListeners();
+}
 
 /**
  * create map listeners
@@ -451,7 +463,7 @@ function addMarkerListeners(marker, count)
 function markerClickListeners(marker, content, parkName, parkID)
 {
 
-	google.maps.event.addListener(marker, "click", function() {
+	google.maps.event.addListener(marker, "click", function(e) {
 		
 			this.parkName = parkName;
 			this.parkID   = parkID;
@@ -462,8 +474,10 @@ function markerClickListeners(marker, content, parkName, parkID)
 			if (infowindow) {
 				infowindow.close();
 			}
+			
 			infowindow = new google.maps.InfoWindow({
 									  content: content,
+									  position: e.latLng,
 									  maxWidth: 200
 								  });
 			
@@ -790,7 +804,7 @@ function populateSimilarGames(results)
 			}
 			
 			var result = results[i];
-			output += "<a href='/games/" + result['gameID'] + "' class='clear create-similar-game-container animate-darker'>";
+			output += "<a href='/games/" + result['gameID'] + "' class='clear create-similar-game-container animate-darker' target='_blank'>";
 			output += 	"<img src='/images/parks/profile/pic/medium/" + result['parkID'] + ".jpg' onerror=\"this.src='/images/parks/profile/pic/medium/default.jpg'\" class='left'/>";
 			output +=	"<div class='left larger-indent'>";
 			output +=		"<p class='left largest-text heavy darkest'>" + result['gameTitle'] + "</p>";

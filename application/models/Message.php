@@ -63,7 +63,7 @@ class Application_Model_Message extends Application_Model_ModelAbstract
 			return ucwords($this->_attribs['lastName']);
 		}
 	}		
-	
+
 	public function isGroupMessage()
 	{
 		if ($this->hasValue('groupID')) {

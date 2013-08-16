@@ -23,7 +23,7 @@ $this->headScript()->prependFile('https://maps.googleapis.com/maps/api/js?key=AI
 $this->placeholder('absolute')->captureStart();
 ?>
 <p class='medium' id='noAddress-text'>
-	I forfeit the benefit of the system's game-finding ability.
+	The system will not be as accurate while matching you.
 </p>
 
 <?php
@@ -55,7 +55,11 @@ echo $this->alert()->start('signup-import','Upload and crop your image.');
         Accept
     </div>
     
-    <img src='/images/global/loading.gif' id='signup-import-loading' />
+    <div id='signup-import-loading' class='left'>
+    	<div class='left' id='loading-bar'></div>
+    </div>
+    
+    <!--<img src='/images/global/loading.gif' id='signup-import-loading' />-->
    	
 </div>
     
@@ -109,8 +113,6 @@ echo "<span class='signup-dob-slash signup-dimension-indicator' id='heightFeet-i
 echo $this->form->heightInches;
 echo $this->form->height;
 echo "<span class='signup-dob-slash signup-dimension-indicator' id='heightInches-indicator'>\"</span>";
-echo $this->form->weight;
-echo "<span class='signup-dob-slash signup-dimension-indicator' id='weight-indicator'>lb</span>";
 
 
 echo "<div class='clear signup-clear-large'></div>";
@@ -126,6 +128,10 @@ echo $this->form->signupPassword->setLabel('Re-enter Password')->setAttribs(arra
 <?php
 echo "<div class='clear signup-clear-large'></div>";
 ?>
+<p class='green heavy smaller-text' id='signup-account-address-warning'>
+	This address will be used to find games, players, and teams closest to you.  It will never be displayed and will only be used to help find optimal matches.
+</p>
+
 <p id='signup-account-zipcode-city' class='medium smaller-text'></p>
 <?php
 echo $this->form->streetAddress;
@@ -134,9 +140,7 @@ echo $this->form->userLocation;
 ?>
 
 <div class='clear'></div>
-<ul class='green' id='signup-account-address-warning'>
-	<li>This address will be used to find games, players, and teams closest to you.  It will never be displayed and we will never mail you anything.</li>
-</ul>
+
 
 <?php
 echo $this->form->noAddress;
@@ -197,9 +201,13 @@ $currentStep++;
             Upload
         </div>
     </div>
-    <p class='center light clear'>
+    <p class='pointer width-100 center dark clear why-profile'>
+    	Why do I need a profile picture?
+    </p>
+    <p class='center width-100 smaller-text light clear larger-margin-top'>
     	You can add/edit your profile picture under Account Settings later.
     </p>
+    
 </div>
 <?php
 // Hidden inputs for picture info
@@ -270,7 +278,7 @@ echo $this->narrowcolumnsection()->start(array('title' => 'Account Info'));
 </div>
 <div id='account-info-dimensions' class='narrow-column-value'>
 	<span id='account-info-height' class='narrow-column-fade'></span>
-    <span id='account-info-weight' class='narrow-column-fade no-clear'></span>
+    <!--<span id='account-info-weight' class='narrow-column-fade no-clear'></span>-->
 </div>
 <div id='account-info-location' class='narrow-column-value'>
 </div>

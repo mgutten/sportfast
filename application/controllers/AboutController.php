@@ -51,5 +51,11 @@ class AboutController extends Zend_Controller_Action
 		$this->view->narrowColumn = false;
 	}
 	
+	public function pictureAction()
+	{
+		/* why do we require profile pictures, answered */
+		$this->_helper->layout()->disableLayout(); 
+	}
+	
 }
 

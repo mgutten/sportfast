@@ -444,7 +444,9 @@ class Application_Model_CronMapper extends Application_Model_MapperAbstract
 							) ps on ps.parkID = p.parkID
 				INNER JOIN park_locations pl ON pl.parkID = p.parkID
 				WHERE p.temporary = 0
-					AND p.cost = 0";
+					AND p.cost = 0
+					AND p.membershipRequired = 0
+					AND p.active = 1";
 		
 				
 		$results = $db->fetchAll($sql);
@@ -697,7 +699,7 @@ class Application_Model_CronMapper extends Application_Model_MapperAbstract
 						AND " . $court . " > 0
 						AND cost = 0
 						AND pu.parkID IS NULL
-						AND (CASE WHEN p.type = 'school' 
+						AND (CASE WHEN p.parkType = 'school' 
 									  AND (" . $timeslot . " > 7 AND " . $timeslot . " < 14)
 									  AND (" . $dayOfWeek . " > 0 AND " . $dayOfWeek . " < 6)
 									  AND (MONTH(now() + INTERVAL 3 DAY) > 8 OR MONTH(now() + INTERVAL 3 DAY) < 6)

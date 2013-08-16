@@ -22,7 +22,7 @@ class Application_View_Helper_SignupSportForm
 	 */
 	public function loop($sports, $userSports = false)
 	{
-		$output  = '';
+		$output  = '<div id="signup-sports-container" class="clear width-100">';
 		$keysOuter    = array_keys($sports);
 		$counterOuter = 0;
 		foreach ($sports as $sport) {
@@ -252,7 +252,7 @@ class Application_View_Helper_SignupSportForm
 			$counterOuter++;
 			
 		}
-			
+		$output .= "</div>";
 						
 		return $output;
 	}

@@ -18,6 +18,10 @@ $this->headScript()->prependFile($this->baseUrl() . '/js/plugins/jform.js');
 	Upload Profile Picture
 </header>
 
+<p class='right dark why-profile pointer' id='upload-why-profile'>
+        	Why do I need a profile picture?
+        </p>
+
 <?php
 if ($this->pictureRequired) {
 	// Tried to join game without profile pic, show that pic is required
@@ -46,6 +50,8 @@ if ($this->pictureRequired) {
         <p class='medium' id='signup-import-alert-warning'>
             If players cannot recognize you by your picture, you <span class='heavy medium'>will not receive any ratings.</span>
         </p>
+        
+        
         <div class='button green-button larger-text hidden' id='signup-import-alert-accept'>
             Accept
         </div>

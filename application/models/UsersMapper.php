@@ -165,7 +165,8 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 									  LINESTRING(
 									  ' . $bounds["upper"] . ' , ' . $bounds["lower"] . '
 									  ), ul.location
-								   )');
+								   )')
+			   ->where('u.fake = 0');
 	
 		$sportWhere = '';
 		$counter = 0;
@@ -1277,7 +1278,10 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 		
 		$select->from(array('ul' => 'user_locations'),
 					  array('ul.userID',
-					  		'AsText(ul.location) as location'));
+					  		'AsText(ul.location) as location'))
+			   ->join(array('u' => 'users'),
+			   		  'u.userID = ul.userID')
+			   ->where('u.fake = 0');
 		
 		$users = $table->fetchAll($select);
 		

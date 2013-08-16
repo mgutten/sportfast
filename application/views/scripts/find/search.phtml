@@ -31,31 +31,29 @@ if ($this->results) {
 			$name = explode(' ',trim($result['name']));
 			$model = new Application_Model_User();
 			$model->userID = $result['id'];
-			$model->city = $result['city'];
+			$city = $result['city'];
 			$model->firstName = $name[0];
 			$model->lastName  = $name[1];
 			$name = $result['name'];
 			$type = 'User';
-			$city = $model->city;
+			
 		} elseif ($result['prefix'] == 'teams') {
 			// Is team
 			$model = new Application_Model_Team();
 			$model->teamID = $result['id'];
-			$model->city = $result['city'];
 			$model->teamName = $result['name'];
 			$model->picture = $result['picture'];
 			$name = $result['name'];
 			$type = 'Team';
-			$city = $model->city;
+			$city = $result['city'];
 		} elseif ($result['prefix'] == 'parks') {
 			// Is park
 			$model = new Application_Model_Park();
 			$model->parkID = $result['id'];
-			$model->city = $result['city'];
 			$model->parkName = $result['name'];
 			$name = $result['name'];
 			$type = 'Park';
-			$city = $model->city;
+			$city = $result['city'];
 		}
 		
 		echo "<a href='/" . $result['prefix'] . "/" . $result['id'] . "' class='clear find-search-result find-result-container animate-darker'>";
@@ -65,10 +63,9 @@ if ($this->results) {
 		echo 		"</div>";
 		echo	"<div class='left larger-indent'>";
 		echo		"<p class='left largest-text heavy darkest'>" . $name . "</p>";
-		echo		"<p class='clear light larger-text'>" . $city . "</p>";
-		echo	"</div>";
-		echo 	"<div class='right'>";
-		echo		"<p class='right darkest largest-text heavy'>" . $type . "</p>";
+		echo		"<p class='clear darkest'>" . $type . "</p>";
+		echo		"<p class='clear light'>" . $city . "</p>";
+		
 		echo	"</div>";
 		echo "</a>";
 		

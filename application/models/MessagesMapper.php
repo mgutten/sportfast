@@ -36,9 +36,9 @@ class Application_Model_MessagesMapper extends Application_Model_MapperAbstract
 		$table   = $this->getDbTable();
 		$select  = $table->select();
 		$select->setIntegrityCheck(false);
-		
+		/*
 		$messages = "SELECT tm.teamID as teamID, 
-					   tm.userID as userID, 
+					   tm.userID as userID,
 					   u.firstName as firstName,
 					   u.lastName as lastName,
 					   tm.message as message, 
@@ -64,6 +64,45 @@ class Application_Model_MessagesMapper extends Application_Model_MapperAbstract
 							INNER JOIN notifications as n ON n.notificationID = nl.notificationID
 							INNER JOIN teams as t ON t.teamID = nl.teamID
 							WHERE nl.teamID = '" . $teamID . "' AND n.action != 'post'";
+		*/
+		
+		$messages = "SELECT tm.teamID as teamID, 
+					   tm.userID as userID,
+					   '' as receivingUserID,
+					   `u`.firstName as firstName, 
+					   `u`.lastName as lastName, 
+					   '' as receivingFirstName, 
+					   '' as receivingLastName, 
+					   tm.message as message, 
+					   tm.dateHappened as dateHappened,
+					   '' as sport,
+					   '' as pictureType,
+					   'message' as type
+					   FROM team_messages as tm
+					INNER JOIN users as u ON tm.userID = u.userID
+					WHERE tm.teamID = '" . $teamID . "'";
+				
+		$notifications = "SELECT nl.teamID as teamID, 
+							   nl.actingUserID as userID, 
+							   nl.receivingUserID,
+							   `u`.firstName as firstName, 
+							   `u`.lastName as lastName, 
+							   `u2`.firstName as receivingFirstName, 
+							   `u2`.lastName as receivingLastName, 
+							   n.text as message, 
+							   nl.dateHappened as dateHappened,
+							   t.sport as sport,
+							   n.pictureType as pictureType,
+							   'notification' as type
+							   FROM notification_log as nl
+							INNER JOIN users u ON nl.actingUserID = u.userID
+							LEFT JOIN users u2 ON nl.receivingUserID = u2.userID
+							INNER JOIN notifications as n ON n.notificationID = nl.notificationID
+							INNER JOIN teams as t ON t.teamID = nl.teamID
+							WHERE nl.teamID = '" . $teamID . "' 
+								AND n.action != 'post'
+								AND n.public = 1
+							GROUP BY nl.notificationLogID";
 							
 		$sql = $messages . " UNION " . $notifications;
 		$sql .= " ORDER BY dateHappened DESC LIMIT 10";
