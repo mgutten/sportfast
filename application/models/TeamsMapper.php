@@ -234,6 +234,32 @@ class Application_Model_TeamsMapper extends Application_Model_TypesMapperAbstrac
 		
 	}
 	
+	/**
+	 * test if user has been invited to a particular team
+	 */
+	public function isInvited($userID, $teamID)
+	{
+		$table = $this->getDbTable();
+		$select = $table->select();
+		$select->setIntegrityCheck(false);
+		
+		$select->from(array('nl' => 'notification_log'))
+			   ->join(array('n' => 'notifications'),
+			   		  'n.notificationID = nl.notificationID')
+			   ->where('n.action = ?', 'invite')
+			   ->where('n.type = ?', 'team')
+			   ->where('nl.receivingUserID = ?', $userID)
+			   ->where('nl.teamID = ?', $teamID);
+		
+		$result = $table->fetchRow($select);
+		
+		if ($result) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
 	
 	/**
 	 * delete game
@@ -270,7 +296,7 @@ class Application_Model_TeamsMapper extends Application_Model_TypesMapperAbstrac
 		$db = Zend_Db_Table::getDefaultAdapter();
 		
 		$sql = "INSERT INTO old_teams
-					(SELECT t.*, NOW()
+					(SELECT t.*, (NOW() + INTERVAL " . $this->getTimeOffset() . " HOUR)
 					FROM teams as t
 					WHERE t.teamID = '" . $id . "')";
 					
@@ -443,10 +469,10 @@ class Application_Model_TeamsMapper extends Application_Model_TypesMapperAbstrac
 		}
 		
 		$insertGames = "INSERT INTO old_team_games (oldTeamGameID, teamID, opponent, date, winOrLoss, leagueLocationID, movedDate) 
-								(SELECT tg.teamGameID, tg.teamID, tg.opponent, tg.date, tg.winOrLoss, tg.leagueLocationID, now()
+								(SELECT tg.teamGameID, tg.teamID, tg.opponent, tg.date, tg.winOrLoss, tg.leagueLocationID, (NOW() + INTERVAL " . $this->getTimeOffset() . " HOUR)
 									FROM team_games tg 
 									WHERE tg.teamID = '" . $teamID . "'
-										AND tg.date < now())";
+										AND tg.date < (NOW() + INTERVAL " . $this->getTimeOffset() . " HOUR))";
 		
 		$db->query($insertGames);
 							

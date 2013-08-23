@@ -71,7 +71,7 @@ class Application_Model_GamesMapper extends Application_Model_TypesMapperAbstrac
 								' . $bounds["upper"] . ' , ' . $bounds["lower"] . '
 								), pl.location
 								)')
-			   ->where('g.date > NOW()');
+			   ->where('g.date > (NOW() + INTERVAL ' . $this->getTimeOffset() . ' HOUR)');
 			   
 		if ($gameIDs) {
 			// User is in games, do not show those
@@ -115,7 +115,6 @@ class Application_Model_GamesMapper extends Application_Model_TypesMapperAbstrac
 		$select->having('(g.rosterLimit > totalPlayers OR totalPlayers IS NULL)')
 			   ->group('g.gameID')
 			   ->order('abs(avg(us.skillCurrent) - (SELECT skillCurrent FROM user_sports WHERE userID = "' . $userID . '" AND sportID = t.sportID)) ASC');
-		
 		
 		$results = $table->fetchAll($select);
 
@@ -179,6 +178,8 @@ class Application_Model_GamesMapper extends Application_Model_TypesMapperAbstrac
 	 */
 	public function findGames($options, $userClass, $savingClass, $limit = 200)
 	{
+		$this->getTimeOffset();
+		
 		$table    = $this->getDbTable();
 		$select   = $table->select();
 		$select->setIntegrityCheck(false);
@@ -279,7 +280,7 @@ class Application_Model_GamesMapper extends Application_Model_TypesMapperAbstrac
 		}
 			
 		
-		$select->where('g.date > NOW()')
+		$select->where('g.date > (NOW() + INTERVAL ' . $this->getTimeOffset() . ' HOUR)')
 			   ->where('g.public = "1"')
 			   ->where('MBRContains(
 								LINESTRING(
@@ -892,7 +893,7 @@ class Application_Model_GamesMapper extends Application_Model_TypesMapperAbstrac
 		$db = Zend_Db_Table::getDefaultAdapter();
 		
 		$sql = "INSERT INTO old_games
-					(SELECT g.*, NOW(), (SELECT COUNT(ug.userID) FROM user_games as ug WHERE ug.gameID = '" . $id . "')
+					(SELECT g.*, (NOW() + INTERVAL " . $this->getTimeOffset() . " HOUR), (SELECT COUNT(ug.userID) FROM user_games as ug WHERE ug.gameID = '" . $id . "')
 					FROM games as g
 					WHERE g.gameID = '" . $id . "')";
 					

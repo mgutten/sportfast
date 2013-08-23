@@ -1,5 +1,9 @@
 /* settings.css */
 
+.header-section-title-plain-container {
+	margin-top: 0;
+}
+
 input[type=text], input[type=password] {
 	width: 14em;
 }
@@ -20,7 +24,7 @@ header {
 .settings-tab {
 	padding: .2em 2%;
 	color: #D9D9D9;
-	width: 96%;
+	width: 85%;
 }
 
 .settings-tab:hover {
@@ -46,7 +50,7 @@ header {
 }
 
 .settings-container {
-	border: 1px solid #ccc;
+	/*border: 1px solid #ccc;*/
 	width: 94%;
 	padding: 1em;
 }

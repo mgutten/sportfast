@@ -85,6 +85,29 @@ class Application_Model_Notifications extends Application_Model_ModelAbstract
 		
 	}
 	
+	public function getNotificationByID($notificationLogID)
+	{
+		$sections = array('read', 'unread');
+		foreach ($sections as $section) {
+			
+			if ($this->hasValue($section)) {
+				// Section has values, search for id
+				$array = $this->_attribs[$section];
+				foreach ($array as $key => $notification) {
+					if (!is_object($notification)) {
+						continue;
+					}
+					if ($notification->notificationLogID == $notificationLogID) {
+						// Match, delete
+						return $notification;
+					}
+				}
+			}
+		}
+		
+		return false;
+	}
+	
 	public function getUserActivities($userClass, $limit = 15)
 	{
 		$this->setMapper('Application_Model_NotificationsMapper');
@@ -130,5 +153,12 @@ class Application_Model_Notifications extends Application_Model_ModelAbstract
 		return $this;
 	}
 	
+	/**
+	 * delete all notification with details
+	 */
+	public function deleteAll($details)
+	{
+		return $this->getMapper()->delete($details);
+	}
 	
 }

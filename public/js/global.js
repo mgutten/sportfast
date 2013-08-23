@@ -291,14 +291,14 @@ $(function()
 		}
 		
 		var backgroundColor = '#555';
-		$(this).stop().animate({'background-color': backgroundColor},200);
+		$(this).stop().animate({'background-color': backgroundColor},300);
 	},
 	function()
 	{
 		if ($(this).is('.nav-dropdown') || $(this).is('#nav-back-signup')){
 			return;
 		}
-		$(this).stop().animate({'background-color':'transparent'},200);
+		$(this).stop().animate({'background-color':'transparent'},300);
 	});
 	
 	/* dropdown for change city in header */
@@ -529,6 +529,30 @@ $(function()
 			}});
         }
     });
+	
+	/* show remove notification onhover */
+	$('.notification-container').hover(function()
+	{
+		$(this).find('.notification-remove').show();
+	},
+	function()
+	{
+		$(this).find('.notification-remove').hide();
+	})
+	
+	/* delete notification on click x */
+	$('.notification-remove').click(function(e)
+	{
+		e.stopPropagation();
+		e.preventDefault();
+		
+		var notificationLogID = $(this).parents('.notification-container').attr('notificationLogID');
+		
+		deleteNotification(notificationLogID);
+		
+		$(this).parents('.notification-container').hide();
+		
+	})
 	
 	/* notification Confirm or Decline button was clicked */
 	$('.notification-action-button').click(function(e)
@@ -795,6 +819,14 @@ $(function()
 		window.open('http://sportfast.com/about/picture', 'Why a profile picture?', 'width=600,height=200');
 	})
 	
+	/* show explanation of profile pics onclick of special class */
+	$('.why-ratings').click(function()
+	{
+		window.open('http://sportfast.com/about/ratings', 'Ratings', 'width=600,height=300');
+	})
+	
+	
+	
 	/* allow users to use arrow keys to move between ajax return results */
 	$(document).keydown(function(e){
 		
@@ -940,6 +972,23 @@ $(function()
 		
 })
 
+
+/**
+ * Ajax call to delete specific notification
+ */
+function deleteNotification(notificationLogID)
+{
+
+	$.ajax({
+		url: '/ajax/delete-notification',
+		type: 'POST',
+		data: {notificationLogID: notificationLogID},
+		success: function(data) {
+		}
+	})
+	
+}
+		
 
 /**
  * Ajax call to change team/group's name

@@ -36,10 +36,13 @@ $this->placeholder('absolute')->captureEnd();
 		$counter = 0;
 		foreach ($tabs as $tab) {
 			$class = '';
+			$imgClass = 'hidden';
 			if ($counter == 0) {
 				$class = 'settings-tab-selected';
+				$imgClass = '';
 			}
-			echo "<p class='larger-text pointer clear settings-tab light " . $class . "'>" . $tab . "</p>";
+			echo "<p class='larger-text pointer clear heavy settings-tab light " . $class . "'>" . $tab . "</p>
+				  <img src='/images/settings/bar_finish.png' class='left settings-tab-finish " . $imgClass . "'/>";
 			$counter++;
 		}
 		
@@ -51,7 +54,7 @@ $this->placeholder('absolute')->captureEnd();
 
 <div class='right' id='settings-right-container'>
 	<div class='settings-container left' id='account-info-container'>
-    	
+		<?php echo $this->partial('partials/global/sectionHeaderBold.phtml',array('title' =>'Account Info'));?>
         <form action='/users/update-info' method='POST'>
     	 <p class='heavy larger-text darkest width-100 clear settings-sub-header'>User Info</p>
         
@@ -136,6 +139,7 @@ $this->placeholder('absolute')->captureEnd();
     
     
 	<div class='settings-container left hidden' id='sports-container'>
+    	<?php echo $this->partial('partials/global/sectionHeaderBold.phtml',array('title' =>'Sports'));?>
     	<p class='heavy larger-text darkest clear settings-sub-header'>Click an icon to add/edit each sport</p>
     	<div class='left settings-sports-indicator-container'>
         	<div class='settings-sports-indicator left green-back'></div>
@@ -188,6 +192,7 @@ $this->placeholder('absolute')->captureEnd();
     
     
     <div class='settings-container left hidden' id='games-container'>
+		<?php echo $this->partial('partials/global/sectionHeaderBold.phtml',array('title' =>'Games'));?>
     	<p class='heavy larger-text darkest width-100 clear settings-sub-header'>Subscribed Games</p>
 		<?php
 			if (!$this->subscribedGames->hasValue('games')) {

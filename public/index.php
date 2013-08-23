@@ -18,7 +18,7 @@ set_include_path(implode(PATH_SEPARATOR, array(
     get_include_path(),
 )));
 
-// Set timezone to westcoast
+// Set timezone to westcoast (if expanding, need to set according to user's location)
 date_default_timezone_set('America/Los_Angeles');
 
 /** Zend_Application */

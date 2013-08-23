@@ -51,6 +51,12 @@ class MailController extends Zend_Controller_Action
 			}
 		}
 		
+		$note = '';
+		if (!empty($post['note'])) {
+			// Personalized note was sent
+			$note = $post['note'];
+		}
+		
 		foreach ($userIDs as $userID) {
 			$notification = new Application_Model_Notification();
 			
@@ -77,7 +83,7 @@ class MailController extends Zend_Controller_Action
 		
 		foreach ($emails as $email) {
 			$subject  = $this->view->user->fullName . ' invited you to join ' . $this->view->user->getHisOrHer() . ' ' . ucwords($typeModel->sport) . ' ' . ucwords($type);
-			$message  = $this->buildInviteGameMessage($this->view->user, $typeModel);
+			$message  = $this->buildInviteGameMessage($this->view->user, $typeModel, $note);
 			$headers  = "MIME-Version: 1.0" . "\r\n";
 			$headers .= "Content-type: text/html; charset=iso-8859-1" . "\r\n";
 			$headers .= "From: " . $this->view->user->username . "\r\n";	 
@@ -93,7 +99,13 @@ class MailController extends Zend_Controller_Action
 			
 	}
 	
-	public function buildInviteGameMessage($actingUser, $typeModel)
+	/**
+	 * mail for invite to a game or team
+	 * @params ($actingUser => Application_Model_User of user who invited,
+	 *			$typeModel => Application_Model_Game or Application_Model_Team,
+	 *			$note => optional personalized note (str))
+	 */
+	public function buildInviteGameMessage($actingUser, $typeModel, $note = false)
 	{
 		$output = $this->mailStart();
 		$type = ($typeModel instanceof Application_Model_Game ? 'game' : 'team');
@@ -130,6 +142,11 @@ class MailController extends Zend_Controller_Action
 			
 			$id = $typeModel->teamID;
 		}				
+		
+		if ($note) {
+			// Add personalized note
+			$output .= "<tr height='38'><td><p style='font-family: Arial, Helvetica, Sans-Serif; font-size: 14px; color: #333; margin: 0;'>" . $note . "</p></td></tr>";
+		}
 		
 		$output .= "<tr><td><p style='font-family: Arial, Helvetica, Sans-Serif; font-size: 14px; color: #333; margin: 0;'>I've moved our " . $typeModel->sport . " " . $type . " to Sportfast so we can coordinate easier.  With Sportfast, you can:</p>
 						<ul class='bold' style='font-family: Arial, Helvetica, Sans-Serif; font-size: 14px; color: #333; font-weight: bold;'>";
@@ -762,6 +779,8 @@ class MailController extends Zend_Controller_Action
 				$message  = $this->buildGameCreatedMessage($game, $user->userID);
 				mail($user->username, $subject, $message, $headers);
 			}
+			// Temp email admin to notify when game is created
+			mail('guttenberg.m@gmail.com', 'ADMIN: ' . $subject, $this->buildGameCreatedMessage($game, $user->userID), $headers);
 		}
 	}
 	

@@ -25,7 +25,7 @@ $this->headScript()->prependFile($this->baseUrl() . '/js/plugins/jform.js');
 <?php
 if ($this->pictureRequired) {
 	// Tried to join game without profile pic, show that pic is required
-	echo "<p class='larger-text white left heavy dark-red-back width-100 center' id='upload-required'>Profile Picture required to join game.  Please upload one.</p>";
+	echo "<p class='larger-text white left heavy dark-red-back width-100 center' id='upload-required'>Profile Picture required to " . $this->pictureRequired . " game.  Please upload one.</p>";
 }
 ?>
 <div id='upload-container' class='clear'>

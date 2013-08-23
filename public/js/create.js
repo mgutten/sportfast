@@ -39,6 +39,17 @@ $(function()
 		
 		$('.create-game-sport-type-container').hide();
 		
+		if (typeof $(this).attr('missingSport') != 'undefined') {
+			// User is missing this sport from profile, show link to account settings
+			$('#missingSport').text(sport)
+			$('#missingSport-container').show();
+			$('.create-section-inner').css('visibility', 'hidden');
+			return;
+		} else {
+			$('.create-section-inner').css('visibility','visible');
+			$('#missingSport-container').hide();
+		}
+		
 		selectSport($(this));
 		
 		testDate();
@@ -340,9 +351,8 @@ function findParks(options)
 			if (typeof data[1] != 'undefined') {
 				
 				for (i = 0; i < data[1].length; i++) {
-					
 					gmapMarkers.push([data[1][i][0],data[1][i][1]]);
-					markerDetails.push([data[2][i][0],data[2][i][1],data[2][i][2],data[2][i][3]]);
+					markerDetails.push([data[2][i][0],data[2][i][1],data[2][i][2],data[2][i][3], data[2][i][4]]);
 				}
 			}
 			
@@ -382,9 +392,21 @@ function mapListeners()
 		
 		userMarker.setIcon('/images/global/gmap/markers/green_reverse.png');
 		
-		markerClickListeners(userMarker, userContent, $('#parkName').text());
+		markerClickListeners(userMarker, userContent, $('#parkName').text(), 0);
 		
-		new google.maps.event.trigger(userMarker, 'click');
+		//new google.maps.event.trigger(userMarker, 'click');
+		
+		if (infowindow) {
+			infowindow.close();
+		}
+		
+		infowindow = new google.maps.InfoWindow({
+									  content: userContent,
+									  position: event.latLng,
+									  maxWidth: 200
+								  });
+			
+		infowindow.open(gmap, userMarker)
 		
 		var parkLocation = 'POINT' + event.latLng;
 		
@@ -449,12 +471,16 @@ function createMarkers()
 function addMarkerListeners(marker, count)
 {
 		
-		markerHoverListeners(marker)
+		markerHoverListeners(marker, markerDetails[count][0])
 		
 		var content =  "<p class='darkest futura heavy'>" + markerDetails[count][0] + "</p><div class='clear'>" + markerDetails[count][1] + "</div>";
 		
 		if (parseInt(markerDetails[count][2],10) == 1) {
 			content += "<div class='clear' tooltip='Stash available'><img src='/images/global/logo/logo/green/tiny.png' class='left indent'/> <p class='left light smaller-text larger-margin-top'>Stash Available</p></div>";
+		}
+		if (parseInt(markerDetails[count][4],10) > 0) {
+			// membershipRequired
+			content += "<p class='clear red' tooltip='This location requires a membership'>Membership Required</p>";
 		}
 		
 		markerClickListeners(marker, content, markerDetails[count][0], markerDetails[count][3]);
@@ -486,15 +512,23 @@ function markerClickListeners(marker, content, parkName, parkID)
 }
 
 
-function markerHoverListeners(marker)
+function markerHoverListeners(marker, parkName)
 {
 	google.maps.event.addListener(marker, "mouseover", function(e) {
-	
+		
+		$('#parkName-main').text(parkName);
+		$('#parkName-main-container').show();
+		
 		this.setIcon('/images/global/gmap/markers/green_reverse.png');
 	});
 	
 	google.maps.event.addListener(marker, "mouseout", function(e) {
 		
+		if (selectedPark) {
+			$('#parkName-main').text(selectedPark);
+		} else {
+			$('#parkName-main').text('');
+		}
 		this.setIcon('/images/global/gmap/markers/green.png');
 	});
 }
@@ -645,7 +679,7 @@ function selectPark(parkName, parkID)
 		// Park has not been selected before
 		animateNextSection($('#parkName-main-container').parents('.create-section'));
 	}
-	selectedPark = true;
+	selectedPark = parkName;
 	
 	if (typeof parkID != 'undefined') {
 		// parkID is set

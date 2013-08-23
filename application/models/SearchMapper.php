@@ -18,7 +18,7 @@ class Application_Model_SearchMapper extends Application_Model_MapperAbstract
 		$users  = "SELECT userID as id,CONCAT(firstName, ' ', lastName) as name, 'users' as prefix, cityID, city, '' as picture FROM users 
 						WHERE (firstName LIKE :prefix 
 							OR CONCAT(firstName, ' ',lastName) LIKE :prefix 
-							OR lastName LIKE :prefix) AND active = '1'";
+							OR lastName LIKE :prefix) AND active = '1' AND fake = 0";
 							   
 		$teams  = "SELECT teamID as id,teamName as name, 'teams' as prefix, cityID, city, picture FROM teams 
 						WHERE teamName LIKE :prefix  OR

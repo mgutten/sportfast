@@ -232,7 +232,7 @@ class Application_Model_ParksMapper extends Application_Model_MapperAbstract
 			   ->where('g.parkID = ?', $parkID);
 			   
 		if ($newOnly) {
-			$select->where('g.date > now()');
+			$select->where('g.date > (NOW() + INTERVAL ' . $this->getTimeOffset() . ' HOUR)');
 		}
 		
 		$select->group('g.gameID');

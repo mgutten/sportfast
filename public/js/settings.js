@@ -12,6 +12,9 @@ $(function()
 		
 		var value = $(this).text().replace(/ /g,'-').toLowerCase() + '-container';
 		
+		$('.settings-tab-finish').hide();
+		$(this).next('.settings-tab-finish').show();
+		
 		$('.settings-container').hide();
 		$('#' + value).show();
 	})

@@ -1,0 +1,45 @@
+<?php
+echo $this->headLink()->prependStylesheet($this->baseUrl() . '/css/global.css') . PHP_EOL;
+?>
+<style>
+body {
+	background:#F3F3F3;
+}
+
+#ratings-img {
+	margin-left:8.5em;
+}
+
+p {
+	padding: 0 .75em;
+}
+</style>
+<header class='margin-top indent larger-text heavy clear darkest' >
+	How to read your ratings
+</header>
+
+<p class='clear darkest indent margin-top' >
+	In each sport, users rate you based on 3 categories: <span class='green heavy'>skill, sportsmanship, and attendance</span>.
+    These three categories are averaged out (based on a calculated weighting scale) to give us your <span class='green heavy'>overall</span> rating. 
+    This overall rating is the number you will see most prominently as it is the most accurate value of a player's overall abilities and demeanor.
+    The result will look something like this:
+</p>
+<img src='/images/about/ratings/ratings.png' class='clear' id='ratings-img' />
+
+<p class='clear larger-margin-top larger-text heavy darkest'>
+	But, I just joined and haven't been rated by other users...?
+</p>
+<p class='clear darkest indent margin-top'>
+	Can't sneak anything past you, can we!  In order to get you playing games as quickly as possible, we have a universal conversion from our signup "skill"
+    section (i.e. "Beginner", "Decent", "Good", "Better", etc) to a weighted number value.  The same conversion is used when another user rates you.
+</p>
+
+<p class='clear larger-margin-top larger-text heavy darkest '>
+	Why have ratings at all?
+</p>
+<p class='clear darkest indent margin-top' style='padding-bottom: .5em'>
+	We aren't ones to pick the athletically-challenged kid last for dodgeball, but it is actually very important to separate skilled players from beginners.
+    Without a clear line drawn, games become less enjoyable for everyone.  By having ratings, users cannot only see their progress over time, but our system 
+    can create even better games for them.  
+</p>
+

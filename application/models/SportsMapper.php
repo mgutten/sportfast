@@ -247,7 +247,7 @@ class Application_Model_SportsMapper extends Application_Model_MapperAbstract
 							FROM `old_user_games` AS `oug`
 							INNER JOIN old_games og ON oug.oldGameID = og.oldGameID
 							WHERE (oug.oldGameID IN (SELECT oldGameID FROM old_user_games WHERE userID = '" . $userID . "')) 
-								AND (oug.userID != '1')
+								AND (oug.userID != '" . $userID . "')
 								AND og.sportID = '" . $sportID . "' 
 							GROUP BY `oug`.`userID` 
 							ORDER BY COUNT(oug.oldUserGameID) DESC) t";

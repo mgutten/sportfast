@@ -292,5 +292,17 @@ class Application_Model_Notification extends Application_Model_ModelAbstract
 		return $this->getMapper()->addNotification($notificationDetails, $data);
 	}
 	
+	public function delete()
+	{
+		return $this->getMapper()->delete(array('notifications.action' => $this->action,
+												'notifications.type' => $this->type,
+												'notifications.details' => $this->details,
+												'notification_log.gameID' => $this->gameID,
+												'notification_log.teamID' => $this->teamID,
+												'notification_log.actingUserID' => $this->actingUserID,
+												'notification_log.receivingUserID' => $this->receivingUserID),
+										 $this->notificationLogID);
+	}
+	
 	
 }

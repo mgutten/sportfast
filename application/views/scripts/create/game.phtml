@@ -12,6 +12,7 @@ $this->headScript()->prependFile('https://maps.googleapis.com/maps/api/js?key=AI
 
 
 <?php
+
 if ($this->topAlert) {
 	$this->placeholder('topAlert')->captureStart();
 		
@@ -67,8 +68,13 @@ echo $this->partial('partials/global/sectionHeaderBold.phtml',array('title'	=>'W
 echo "<div class='width-100 clear create-section-container'>";
 $lowerOutput = '';
 foreach ($this->sports->getAll() as $sport) {
+	$missingSport = '';
+	if (isset($this->missingSports[strtolower($sport->sport)])) {
+		// User does not have this sport in profile
+		$missingSport = "missingSport = 'true'";
+	}
 	echo "<img src='" . $sport->getIcon('large','outline', 'medium') . "' class='left create-game-sport pointer medium-background' id='" . strtolower($sport->sport) . "' tooltip='" . $sport->sport . "' 
-			sport='" . $sport->sport . "' sportID='" . $sport->sportID . "'/>";
+			sport='" . $sport->sport . "' sportID='" . $sport->sportID . "' " . $missingSport . "/>";
 	
 	if (count($sport->types) > 1) {
 		// More than 1 type
@@ -110,6 +116,17 @@ foreach ($this->sports->getAll() as $sport) {
 }
 
 echo $lowerOutput;
+
+// Missing sport container for when user does not have selected sport in profile
+echo "<div class='clear width-100 larger-margin-top hidden' id='missingSport-container'>";
+echo	"<p class='clear largest-text darkest larger-margin-top width-100 center'>
+			You have not added <span class='heavy' id='missingSport'></span> to your
+			account.
+		 </p>";
+echo	"<div class='clear width-100'>";
+echo  		"<a href='/users/" . $this->user->userID . "/settings' class='green-button heavy auto-center larger-text larger-margin-top' id='missingSport-button'>add it now</a>";
+echo	"</div>";
+echo "</div>";
 
 echo "</div>";
 echo "</div>";

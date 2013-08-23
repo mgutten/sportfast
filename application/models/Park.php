@@ -21,7 +21,8 @@ class Application_Model_Park extends Application_Model_ModelAbstract
 									'ratings'			=> '',
 									'stash'				=> '',
 									'temporary'			=> '',
-									'specialNotes'		=> ''
+									'specialNotes'		=> '',
+									'membershipRequired' => ''
 									);
 	
 	

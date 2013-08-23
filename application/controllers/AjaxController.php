@@ -301,23 +301,27 @@ class AjaxController extends Zend_Controller_Action
 	  */
 	 public function addUserToTeamAction()
 	 {
-		 echo 'nope';
-		 return;
+
 		 $options = $this->getRequest()->getPost('options');
 		 
 		 if (empty($options['userID']) || empty($options['teamID'])) {
 			 return false;
 		 }
-		 
 
 		 $table = new Application_Model_DbTable_UserTeams();
 		 $team = new Application_Model_Team();
-		 $team->getTeamById($options['typeID']);
+		 $team->getTeamById($options['teamID']);
 		 $this->view->user->teams->addTeam($team);	 
-
+		
 		 
-		 $table->insert(array('teamID' => $options['typeID'],
+		 $table->insert(array('teamID' => $options['teamID'],
 		 					  'userID' => $options['userID']));
+							  
+		 $notifications = new Application_Model_Notifications();
+		 $notifications->deleteAll(array('notification.action' => 'invite',
+										 'notification_log.teamID' => $options['teamID'],
+										 'notification.type' => 'team',
+										 'notification_log.receivingUserID' => $options['userID']));
 						
 							  
 	 }
@@ -491,7 +495,7 @@ class AjaxController extends Zend_Controller_Action
 					$width = $match->ratings->getStarWidth('quality') . '%';
 					$star  = $this->view->ratingstar('small',$width);
 					
-					$output[2][] = array($match->parkName, $star, $match->stash, $match->parkID);
+					$output[2][] = array($match->parkName, $star, $match->stash, $match->parkID, $match->membershipRequired);
 					
 				}
 				
@@ -955,7 +959,7 @@ class AjaxController extends Zend_Controller_Action
 			if (!$this->view->user->hasProfilePic()) {
 				// No profile pic, prevent newly invited user from joining game without profile pic
 				$session = new Zend_Session_Namespace('pictureRequired');
-				$session->fail = true;
+				$session->fail = 'join';
 				echo '/users/' . $this->view->user->userID . '/upload';
 				return;
 			}
@@ -972,10 +976,31 @@ class AjaxController extends Zend_Controller_Action
 		//$auth = Zend_Auth::getInstance();
 		//$auth->clearIdentity();
 		
+		// Only removes from user model
 		$this->view->user->notifications->deleteNotificationByID($options['notificationLogID']);
 
 			
 			
+	}
+	
+	/**
+	 * delete notification from db
+	 */
+	public function deleteNotificationAction()
+	{
+		$notificationLogID = $this->getRequest()->getParam('notificationLogID');
+		
+		if (empty($notificationLogID)) {
+			return false;
+		}
+		
+		$notification = new Application_Model_Notification();
+		$notification->notificationLogID = $notificationLogID;
+		
+		$notification->delete();
+		
+		$this->view->user->notifications->deleteNotificationByID($notificationLogID);
+		
 	}
 	
 

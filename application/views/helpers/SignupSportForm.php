@@ -226,7 +226,7 @@ class Application_View_Helper_SignupSportForm
 						<div class='signup-sports-availability-copy-container'>
 							<p class='medium'>Copy availability from:</p>
 							<div class='signup-sports-availability-copy-option-container'>
-								N/A
+								" . $this->_view->copyAvailabilityDropdown . "
 							</div>
 						</div>";
 			$output .= $this->_view->availabilitycalendar()->create($sport['sport'], $userSport);			

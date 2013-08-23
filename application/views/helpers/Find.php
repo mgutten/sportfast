@@ -257,10 +257,10 @@ class Application_View_Helper_Find
 		if ($sport) {
 			$output .=		"<div class='right find-player-right-container'>";
 			$output .=			"<div class='sport-holder'><p class='left width-100 center medium smaller-text hidden hover'>" . ucwords($sport->sport) . "</p></div>";
-			$output .=			"<p class='width-100 find-player-overall white largest-text heavy left center medium-background'>" . $sport->overall . "</p>";
-			$output .=			"<p class='find-player-lower white larger-text  clear center medium-background' tooltip='Skill'>" . $sport->skillCurrent . "</p>";
-			$output .=			"<p class='find-player-lower white larger-text  left center medium-background' tooltip='Sportsmanship'>" . $sport->sportsmanship . "</p>";
-			$output .=			"<p class='find-player-lower white larger-text  left center medium-background' tooltip='Attendance'>" . $sport->attendance . "</p>";
+			$output .=			"<p class='width-100 find-player-overall white largest-text heavy left center dark-back'>" . $sport->overall . "</p>";
+			//$output .=			"<p class='find-player-lower white larger-text  clear center medium-background' tooltip='Skill'>" . $sport->skillCurrent . "</p>";
+			//$output .=			"<p class='find-player-lower white larger-text  left center medium-background' tooltip='Sportsmanship'>" . $sport->sportsmanship . "</p>";
+			//$output .=			"<p class='find-player-lower white larger-text  left center medium-background' tooltip='Attendance'>" . $sport->attendance . "</p>";
 			$output .=		"</div>";
 			
 			if ($sport->getFormat('league')->hasValue('format')) {
@@ -290,6 +290,11 @@ class Application_View_Helper_Find
 			$stash = "<img src='/images/global/logo/logo/green/tiny.png' class='right find-stash' tooltip='Stash available'/>";
 		}
 		
+		$membership = '';
+		if ($match->membershipRequired) {
+			$membership = "<p class='left larger-indent red smaller-text margin-top'>Membership Required</p>";
+		}
+		
 		$output  = $this->createOuterStart($match->parkID, 'parks');
 		$output .=		"<div class='left find-result-img-container'>";
 		$output .=			"<img src='" . $match->getProfilePic('medium') . "' class='left'/>";
@@ -299,7 +304,7 @@ class Application_View_Helper_Find
 		$output .=			"<p class='left heavy larger-text darkest' style='font-size:1.75em'>" . $match->getLimitedName('parkName', 28) . "</p>";
 		$output .=			$rating;
 		$output .=			"<p class='clear light'>" . $match->city . "</p>";			
-		$output .=			"<p class='clear darkest'>" . $match->type . "</p>";	
+		$output .=			"<p class='clear darkest'>" . $match->type . "</p>" . $membership;	
 		$output .= 		"</div>";
 		$output .=		"<div class='right find-park-right-container'>";
 		$output .=			"<p class='largest-text darkest width-100 center heavy find-park-distance' tooltip='Miles from your home.'>" . $match->getDistanceFromUser($user->location->getLatitude(), $user->location->getLongitude()) . "</p>";

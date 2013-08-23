@@ -30,7 +30,9 @@ class TeamsController extends Zend_Controller_Action
 		
 		$this->view->isPublic  = $isPublic = $team->isPublic();
 		$this->view->isPrivate = ($isPublic ? false : true);
-	
+		
+		$this->view->invited = $team->isInvited($this->view->user->userID);
+		
 		$nextGame = $this->view->nextGame = $team->getNextGame();
 		
 		if ($nextGame) {

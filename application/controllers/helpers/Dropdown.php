@@ -246,7 +246,7 @@ class Application_Controller_Helper_Dropdown extends Zend_Controller_Action_Help
 		$id 	 = 'invite';
 		$output .= "<div class='dropdown-menu-hidden-container' id='dropdown-menu-hidden-container-" . $id . "'>
 				    <img src='/images/global/dropdown/dropdown_tip.png' class='dropdown-menu-tip' />
-				    <div dropdown-menu='" . $id . "' id='dropdown-menu-" . $id . "' class='dropdown-menu-options-container  dropdown-menu-options-container-dark invite dropshadow'>";
+				    <div dropdown-menu='" . $id . "' id='dropdown-menu-" . $id . "' class='dropdown-menu-options-container invite dropshadow'>";
 		
 		
 		$pre 	 = "<div class='dropdown-menu-option-container animate-darker invite medium smaller-text'>

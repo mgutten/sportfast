@@ -24,8 +24,15 @@ class Application_Model_Teams extends Application_Model_TypesAbstract
 	
 	public function addTeam($resultRow)
 	{
-
-		$team = $this->_attribs['teams'][] = new Application_Model_Team($resultRow);
+		if ($resultRow instanceof Application_Model_Team) {
+			// Is team model as used in Ajax addUserToTeam
+			$team = new Application_Model_Team();
+			foreach ($resultRow->getAttribs() as $key => $val) {
+				$team->$key = $val;
+			}
+		} else {
+			$team = $this->_attribs['teams'][] = new Application_Model_Team($resultRow);
+		}
 		return $team;
 	}
 	

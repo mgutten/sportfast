@@ -86,7 +86,7 @@ class UsersController extends Zend_Controller_Action
 		
 		$session = new Zend_Session_Namespace('pictureRequired');
 		if ($session->fail) {
-			$this->view->pictureRequired = true;
+			$this->view->pictureRequired = $session->fail;
 		}
 		$session->fail = false;
 	}

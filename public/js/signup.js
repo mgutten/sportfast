@@ -329,7 +329,7 @@ $(function()
 		var index = $.inArray(sport, copyAvailability);
 		if (index > -1) {
 			copyAvailability.splice(index,1);
-			createSportsCopyableDropdown();
+			checkSportsCopyableDropdown();
 		}
 		
 		// remove selected status from the associated form
@@ -433,7 +433,7 @@ $(function()
 	
 	/* copy one sport's availability to another */
 	//$(document).on('click','#sports-copyable>.dropdown-menu-hidden-container>.dropdown-menu-options-container>.dropdown-menu-option-container',function()
-	$(document).on('click','#dropdown-menu-hidden-container-sports-copyable>.dropdown-menu-options-container>.dropdown-menu-option-container',function()
+	$(document).on('click','#dropdown-menu-hidden-container-copyAvailabilityDropdown>.dropdown-menu-options-container>.dropdown-menu-option-container',function()
 	{
 		var sport  	     = $(this).children('p').text().toLowerCase();
 		var receivingEle = $(this).parents('.signup-sports-availability').children('.availabilty-calendar-container');
@@ -538,6 +538,8 @@ $(function()
 			}
 		})
 	}
+	
+	checkSportsCopyableDropdown()
 	
     
 	/* FINAL JAVASCRIPT VALIDATION BEFORE SUBMIT FORM */
@@ -1128,7 +1130,7 @@ function updateAvailabilityHiddenInput(dayEle)
 		
 		if ($.inArray(capitalizedSport, copyAvailability) == -1) {
 			copyAvailability.push(capitalizedSport);
-			createSportsCopyableDropdown();
+			checkSportsCopyableDropdown();
 		}
 		
 	} else {
@@ -1138,7 +1140,7 @@ function updateAvailabilityHiddenInput(dayEle)
 		if (index > -1) {
 			
 			copyAvailability.splice(index,1);
-			createSportsCopyableDropdown();
+			checkSportsCopyableDropdown();
 			
 		}
 	}
@@ -1166,17 +1168,54 @@ function getSportName(ele)
 	return sport;
 }
 
+/**
+ * determine what sports to show for copyable dropdown for each sport
+ */
+function checkSportsCopyableDropdown()
+{
+	$('.dropdown-menu-options-container#dropdown-menu-copyAvailabilityDropdown').each(function()
+	{
+		
+		$(this).find('.dropdown-menu-option-container').each(function()
+		{
+			var sport = $(this).find('p').text();
+			
+			if (sport == 'None') {
+				// Skip None
+				return;
+			}
+			
+			if ($.inArray(sport, copyAvailability) == -1) {
+				$(this).hide();
+			} else {
+				$(this).show();
+			}
+		})
+		
+		var sportName = getSportName($(this));
+		$(this).find('.copyAvailability-' + sportName).hide();	})
+}
 
 /** create ajax dropdown based on selected sports
  * 
  */
 function createSportsCopyableDropdown() 
 {
+	checkSportsCopyableDropdown();
+	return;
 	if (Object.keys(copyAvailability).length < 1) {
 		// There are no elements for dropdown
 		return;
 	}
-	var options  = copyAvailability;
+	
+	var temp = copyAvailability;
+	
+	if ($.inArray('None', temp) == -1) {
+		// None is not in array yet
+		temp.unshift('None');
+	}
+	
+	var options  = temp;
 	var id       = 'sports-copyable';
 	var selected = capitalize(options[0]);
 	

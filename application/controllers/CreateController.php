@@ -16,8 +16,26 @@ class CreateController extends Zend_Controller_Action
 	
 	public function gameAction()
 	{
+		if (!$this->view->user->hasProfilePic()) {
+			// Do not allow to create game without profile pic
+			$session = new Zend_Session_Namespace('pictureRequired');
+			$session->fail = 'create';
+			$this->_helper->_redirector->goToUrl('/users/' . $this->view->user->userID . '/upload');
+		}
 		$sports = new Application_Model_Sports();
 		$this->view->sports = $sports->getAllSportsInfo(true);
+		
+		$userSports = $this->view->user->getSportNames();
+		$missingSports = array();
+		
+		foreach ($sports->getAll() as $sport) {
+			if (!in_array(strtolower($sport->sport), $userSports)) {
+				// User does not have this sport
+				$missingSports[strtolower($sport->sport)] = true;
+			}
+		}
+		
+		$this->view->missingSports = $missingSports;
 		
 		$parks = new Application_Model_Parks();
 		$parks->findParks(array(), $this->view->user);

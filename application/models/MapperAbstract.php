@@ -171,6 +171,25 @@ abstract class Application_Model_MapperAbstract
 		return $result->$column;
 	}
 
+
+	/** 
+	 * get user's time offset from the Denver timezone (mysql timezone), to be used in queries that use mysql function NOW()
+	 */
+	public function getTimeOffset()
+	{
+		$dateTimeZoneUser = new DateTimeZone(date_default_timezone_get());
+
+		$dateTimeUser = new DateTime("now", $dateTimeZoneUser);
+
+		$timeOffset = $dateTimeZoneUser->getOffset($dateTimeUser); // in seconds
+		
+		$timeOffset = $timeOffset * 1/3600; // Convert to hours
+		
+		// Adjust returned time (which refers to GMT) to DST (Denver, CO)
+		$timeOffset = $timeOffset + 6;
+		
+		return $timeOffset;
+	}
 	
 	/**
 	 * get create parentheses encased range for cityID

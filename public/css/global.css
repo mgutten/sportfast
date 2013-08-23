@@ -183,6 +183,15 @@ a.no-underline {
 	text-align:center;
 }
 
+p.auto-center,
+a.auto-center {
+	margin-left: auto;
+	margin-right: auto;
+	display:block;
+	float:none;
+	clear:none;
+}
+
 .justify {
 	text-align:justify;
 }
@@ -665,16 +674,22 @@ div.nav-back:hover {
 }
 
 .nav-back#nav-back-signup {
-	background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#58bf12), to(#1C931F));
+	background: #50b10e;
+	/*background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#58bf12), to(#1C931F));
 	background-image: -webkit-linear-gradient(top, #58bf12, #1C931F); 
 	background-image: -moz-linear-gradient(top, #58bf12, #1C931F);
 	background-image: -ms-linear-gradient(top, #58bf12, #1C931F);
-	background-image: -o-linear-gradient(top, #58bf12, #1C931F);
+	background-image: -o-linear-gradient(top, #58bf12, #1C931F);*/
 	width:10em;
+	-webkit-transition: background .5s ;
+	-moz-transition: background .5s ;
+	-ms-transition: background .5s ;
+	-o-transition: background .5s ;
+	transition: background .5s ;
 }
 
 .nav-back#nav-back-signup:hover {
-	background:#58bf12;
+	background:#42930c;
 }
 
 #nav-back-find {
@@ -790,6 +805,16 @@ div.nav-back:hover {
 	margin-left: 1.5em;
 	width: 73%;
 
+}
+
+.notification-remove {
+	margin-top: -.2em;
+	display:none;
+	padding: 0 .2em;
+}
+
+.notification-remove:hover {
+	color: #888;
 }
 
 .notification-picture,.notification-picture-sports {
@@ -1661,7 +1686,13 @@ div.dropdown-menu-container-reverse:hover {
 }
 
 #inviteSearchBar-container > input {
-	color: #fff;
+	color: #8d8d8d;
+	background: #e9e9e9;
+	border-color: #ccc;
+}
+
+#inviteSearchBar-container > .input-overlay {
+	color: #8d8d8d;
 }
 
 .invite-search-result {

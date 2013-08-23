@@ -13,7 +13,7 @@ $this->headScript()->prependFile($this->baseUrl() . '/js/profile.js');
 <?php
 // Narrow right column
 $this->placeholder('narrowColumn')->captureStart();
-echo "<img src='" . $this->park->getProfilePic('large') . "' class='narrow-column-picture dropshadow rounded-corners'/>";
+echo "<img src='" . $this->park->getProfilePic('large') . "' class='narrow-column-picture dropshadow '/>";
 
 
 echo "<div class='width-100 narrow-column-calendar-container clear'>";

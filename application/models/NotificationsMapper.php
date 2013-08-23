@@ -42,7 +42,7 @@ class Application_Model_NotificationsMapper extends Application_Model_MapperAbst
 						
 		if ($onlyNew) {
 			// Select only notifications that are newer than a minute
-			$select .= "AND dateHappened > (NOW() - INTERVAL 2 MINUTE)";
+			$select .= "AND dateHappened > (NOW() + INTERVAL " . $this->getTimeOffset() . " HOUR - INTERVAL 2 MINUTE)";
 		}
 		$select .=	 "ORDER BY nl.dateHappened DESC
 					 LIMIT " . $limit;
@@ -136,7 +136,7 @@ class Application_Model_NotificationsMapper extends Application_Model_MapperAbst
 			 			 (SELECT nl.actingUserID, 
 						 		 nl.receivingUserID, 
 								 (SELECT notificationID FROM notifications WHERE type IS NULL and action = 'friend'), 
-								 NOW()
+								 (NOW() + INTERVAL " . $this->getTimeOffset() . " HOUR)
 						 	FROM notification_log as `nl`
 							WHERE nl.notificationLogID = '" . $notificationLogID . "')";
 		 } elseif ($type == 'team') {
@@ -151,7 +151,7 @@ class Application_Model_NotificationsMapper extends Application_Model_MapperAbst
 			 			 (SELECT COALESCE(nl.actingUserID,nl.receivingUserID), 
 						 		 nl.teamID, 
 								 (SELECT notificationID FROM notifications WHERE type ='team' AND action = 'join' AND details IS NULL), 
-								 NOW()
+								 (NOW() + INTERVAL " . $this->getTimeOffset() . " HOUR)
 						 	FROM notification_log as `nl`
 							WHERE nl.notificationLogID = '" . $notificationLogID . "')";
 			 
@@ -183,7 +183,7 @@ class Application_Model_NotificationsMapper extends Application_Model_MapperAbst
 			 			 (SELECT nl.receivingUserID, 
 						 		 nl.gameID, 
 								 (SELECT notificationID FROM notifications WHERE type ='game' AND action = 'join' AND details IS NULL), 
-								 NOW()
+								 (NOW() + INTERVAL " . $this->getTimeOffset() . " HOUR)
 						 	FROM notification_log as `nl`
 							WHERE nl.notificationLogID = '" . $notificationLogID . "')";
 							
@@ -258,7 +258,7 @@ class Application_Model_NotificationsMapper extends Application_Model_MapperAbst
 			 }
 		 }
 		 
-		$select->where('nl.dateHappened >= (NOW() - INTERVAL 3 HOUR)');
+		$select->where('nl.dateHappened >= (NOW() - INTERVAL (3 + ' . $this->getTimeOffset() . ') HOUR)');
 
 
 		$results = $table->fetchAll($select);
@@ -269,13 +269,44 @@ class Application_Model_NotificationsMapper extends Application_Model_MapperAbst
 		}
 		 
 		 
-		 $data['dateHappened']	 = new Zend_Db_Expr('NOW()');
+		 $data['dateHappened']	 = new Zend_Db_Expr('(NOW() + INTERVAL ' . $this->getTimeOffset() . ' HOUR)');
 		 $data['notificationID'] = $this->getForeignID('Application_Model_DbTable_Notifications', 'notificationID', $notificationDetails);
 		 
 		 
 		 $table->insert($data);
 		 
 		 
+	 }
+	 
+	 /**
+	  * delete notification either by notificationLogID or by details
+	  */
+	 public function delete($details = false, $notificationLogID = false) 
+	 {
+		 $query = "DELETE notification_log FROM notification_log 
+		 			INNER JOIN notifications ON notifications.notificationID = notification_log.notificationID
+					WHERE ";
+					
+		 if ($notificationLogID) {
+			 $query .= "notification_log.notificationLogID = '" . $notificationLogID . "'";
+		 } elseif ($details) {
+			 $counter = 0;
+			 foreach ($details as $column => $val) {
+				 if (empty($val)) {
+					 continue;
+				 }
+				 
+				 if ($counter != 0) {
+					 $query .= " AND ";
+				 }
+				 $query .= " " . $column . " = '" . $val . "' ";
+				 $counter++;
+			 }
+		 }
+
+		 $db = Zend_Db_Table::getDefaultAdapter();
+		 
+		 $db->query($query);
 	 }
 
 }

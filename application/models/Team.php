@@ -326,6 +326,14 @@ class Application_Model_Team extends Application_Model_ModelAbstract
 			return true;
 		}
 	}
+	
+	/**
+	 * test if userID is invited
+	 */
+	public function isInvited($userID)
+	{
+		return $this->getMapper()->isInvited($userID, $this->teamID);
+	}
 		
 	
 	/**

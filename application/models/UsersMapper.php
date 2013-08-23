@@ -292,7 +292,7 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 					  		'utg.confirmed as confirmed'))
 			   ->where('utg.userID = ?', $savingClass->userID)
 			   //->where('utg.userID = ?' ,  $savingClass->userID)
-			   ->where('tg.date > now()')
+			   ->where('tg.date > (NOW() + INTERVAL ' . $this->getTimeOffset() . ' HOUR)')
 			   ->group('tg.teamGameID');
 		
 
@@ -1013,6 +1013,8 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 		
 		$select->setIntegrityCheck(false);
 		$select->from(array('usa'  => 'user_sport_availabilities'))
+			   ->join(array('u' => 'users'),
+			   		  'usa.userID = u.userID')
 			   ->join(array('ul' => new Zend_Db_Expr($distance)),
 			   		  'ul.userID = usa.userID')
 			   ->join(array('us' => 'user_sports'),
@@ -1022,6 +1024,7 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 			   ->where('usa.day = ?', $datetime->format('w'))
 			   ->where('usa.hour = ?', $datetime->format('G'))
 			   ->where('usa.sportID = ?', $sportID)
+			   ->where('u.fake = ?', 0)
 			   ->group('usa.userID');
 		
 	
@@ -1073,7 +1076,7 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 		$select->from(array('og' => 'old_games'))
 			   ->join(array('oug' => 'old_user_games'),
 			   		  'og.oldGameID = oug.oldGameID')
-			   ->where('og.date > (now() - INTERVAL 1 WEEK) AND og.date < now()')
+			   ->where('og.date > (now() - INTERVAL 1 WEEK) AND og.date < (NOW() + INTERVAL ' . $this->getTimeOffset() . ' HOUR)')
 			   ->where('og.canceled = ?', 0)
 			   ->where('oug.userID = ?', $userID)
 			   ->order('og.date desc')

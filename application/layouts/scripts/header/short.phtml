@@ -43,6 +43,7 @@ Feedback
 		}
 		foreach ($this->user->notifications->$section as $notification) {
 			$buttons = '';
+			$remove = '';
 			if (!is_object($notification)) {
 				continue;
 			}
@@ -51,10 +52,12 @@ Feedback
 				$buttons .= "<p class='button notification-action-button'>Confirm</p>";
 				$buttons .= "<p class='button notification-action-button notification-action-button-second'>Decline</p>";
 				$buttons .= "</div>";
+				$remove = "<p class='light larger-text right notification-remove' tooltip='Delete'>x</p>";
 			} elseif ($notification->hasValue('joinOption')) {
 				$buttons = "<div class='notification-button-container clear-right' notificationLogID='" . $notification->notificationLogID . "' type='" . $notification->type . "' action='" . $notification->action . "'>";
 				$buttons .= "<p class='button notification-join'>Join</p>";
 				$buttons .= "</div>";
+				$remove = "<p class='light larger-text right notification-remove' tooltip='Delete'>x</p>";
 			}
 			
 			
@@ -65,10 +68,11 @@ Feedback
 				$pictureClass = 'notification-picture';
 			}
 			
-			echo "<a href='" . $notification->getFormattedUrl() . "' class='notification-container " . $class . " pointer'>" 
+			echo "<a href='" . $notification->getFormattedUrl() . "' class='notification-container " . $class . " pointer' notificationLogID = '" . $notification->notificationLogID . "'>" 
 				 . "<div class='notification-text-picture-container'>"
 					 . "<img src='" . $notification->getPicture() . "' class='" . $pictureClass . "' />"
 					 . "<span class='notification-text'>" . $notification->getFormattedText() . "</span>"
+					 . $remove
 					 . $buttons
 				 . "</div>"
 				 . "<span class='notification-time-subscript light'>" . $notification->getTimeFromNow() . "</span>"

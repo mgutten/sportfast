@@ -333,12 +333,15 @@ echo "<span id='team-details'
 			$class = '';
 			$text = 'Join';
 			$id    = 'join-button';
-			if (!$this->team->isSystemCreated() && $this->hasCaptain) {
-				// Not sportfast created team, allow any user to join without request
+			if (!$this->team->isSystemCreated() && 
+				$this->hasCaptain &&
+				!$this->invited) {
+				// Not sportfast created team, do not allow any user to join without request
 				$text = 'Request to Join';
 				$id   = 'request-join-button';
 			}
-			if ($this->team->minSkill > $this->user->getSport($this->team->sport)->skill) {
+			if ($this->team->minSkill > $this->user->getSport($this->team->sport)->skill &&
+				!$this->invited) {
 				// User is not good enough for this team
 				$class = 'transparent default';
 				$id = '';

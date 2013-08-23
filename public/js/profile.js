@@ -61,9 +61,17 @@ $(function()
 		var idType = detailsEle.attr('idType');
 		var typeID = detailsEle.attr(idType);
 		var actingUserID = detailsEle.attr('actingUserID');
+		var type;
 		
-		addUserToGame(idType, typeID, actingUserID);
-		showConfirmationAlert('Added to game');
+		if (idType == 'gameID') {
+			addUserToGame(idType, typeID, actingUserID);
+			type = 'game';
+		} else {
+			// team
+			addUserToTeam(typeID, actingUserID);
+			type = 'team';
+		}
+		showConfirmationAlert('Added to ' + type);
 	})
 	
 	/* post message to wall */
@@ -470,8 +478,16 @@ $(function()
 		$(this).parents('.alert-container').find('.alert-x').trigger('click');
 	})
 	
+	/* invite user from invite button */
 	$(document).on('click','.invite-search-result',function()
 	{
+		
+		$('.invite-search-result').remove();
+		 
+		$('#inviteSearchBar').val('')
+							 .focus();
+							
+		
 		var detailsEle = getDetailsEle();
 		var actingUserID = detailsEle.attr('actingUserID');
 		var idType = detailsEle.attr('idType');
@@ -483,6 +499,8 @@ $(function()
 		
 		createNotification(idType, typeID, actingUserID, receivingUserID, action, type, details);
 		showConfirmationAlert('Invite sent');
+		
+		return false; // prevent bug that closes animated div after selecting a name from the results
 	})
 	
 	$('.profile-animate-buttons').click(function()

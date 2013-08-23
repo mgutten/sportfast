@@ -14,6 +14,8 @@ $this->headLink()->prependStylesheet($this->baseUrl() . '/css/profile.css');
 	//echo $this->partial('partials/global/sectionHeaderBold.phtml',array('title'   => 'Invite players')); 
 	?>
     
+    <a href='/<?php echo $this->type;?>s/<?php echo $this->typeID;?>' class='left smaller-text medium'><img src='/images/global/body/single_left_arrow.png' class='back-arrow'/>Back to game</a>
+    
     <form action='/mail/invite-type' method='post'>
     
     <p class='clear larger-margin-top dark heavy'>Copy and paste emails here <span class='dark'>(comma separated)</span></p>

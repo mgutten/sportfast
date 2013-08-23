@@ -39,7 +39,24 @@ class SignupController extends Zend_Controller_Action
 		
 		// Retrieve all available sports, positions, and types
 		$sports = new Application_Model_Sports();
-		$this->view->sports = $sports->getAllSportsInfo();
+		$allSports = $sports->getAllSportsInfo();
+		$this->view->sports = $allSports;
+		
+		$sportNames = array();
+		
+		foreach (array_keys($allSports) as $sport) {
+			
+			$sportNames[] = array('text' => ucwords($sport),
+							    'outerClass' => 'copyAvailability-' . strtolower($sport));
+		}
+		
+		array_unshift($sportNames, array('text' => 'None',
+										 'outerClass' => 'copyAvailability-none'));
+		
+		$dropdown = Zend_Controller_Action_HelperBroker::getStaticHelper('Dropdown');
+		$this->view->copyAvailabilityDropdown = $dropdown->dropdown('copyAvailabilityDropdown',
+																	$sportNames,
+																				 'None'); 
 		
 		/* testing retrieving all of user's information 
 		$user = new Application_Model_User();

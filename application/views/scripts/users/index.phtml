@@ -67,7 +67,7 @@ $this->placeholder('narrowColumn')->captureEnd();
 	if ($this->currentUser->userID != $this->user->userID) {
 		// Not current user
 	?>
-    <a href='/users/<?php echo $this->user->userID;?>/group/<?php echo $this->currentUser->userID;?>' class='button right' id='user-message' onclick='this.href;'> <!-- strange bug in jQuery plugin section of global.js that prevents clicking the message button.  force redirect with inline onclick -->
+    <a href='/users/<?php echo $this->user->userID;?>/group/<?php echo $this->currentUser->userID;?>' class='button right' id='user-message' onclick='window.location = this.href;'> <!-- strange bug in jQuery plugin section of global.js that prevents clicking the message button.  force redirect with inline onclick -->
     	Message
     </a>
     <?php
@@ -182,6 +182,7 @@ $this->placeholder('narrowColumn')->captureEnd();
 								  'sportsmanship' => 'sprtmn', 
 								  'attendance' => 'attnd');			
 			$lowerOutput .= 	"<div class='user-sport-right-container'>";
+			$lowerOutput .=			"<p class='medium smaller-text action right why-ratings pointer'>What are these ratings?</p>";
 			$lowerOutput .=			"<a href='/users/" . $this->currentUser->userID . "/ratings/" . strtolower($sport->sport) . "' class='user-sport-rating-container'>";
 			$counter = 1;
 			

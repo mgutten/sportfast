@@ -33,7 +33,7 @@ class Application_View_Helper_MemberHomepage
 			
 			echo "<p class='clear smaller-text member-first-time-sub larger-margin-top darkest'>We will notify you via email when a game is created matching your preferences.</p>";
 			echo "<p class='clear larger-margin-top medium'>Then again, maybe you're here to   
-					<a href='/create' class='darkest'> organize your own game or team.</a></p>";
+					<a href='/create' class='darkest underline'> organize your own game or team.</a></p>";
 			
 			echo "<p class='button clear heavy member-first-time-button'>Continue to dashboard</p>";
 			
@@ -392,7 +392,7 @@ class Application_View_Helper_MemberHomepage
 		$numberOfPages  = 3;
 		if (empty($matches)) {
 			// No matches 
-			$output  = "<p class='medium larger-text member-find-none center'>No matches found.</p>";
+			$output  = "<p class='medium larger-text member-find-none center'>No matches found</p>";
 			$output .= "<a href='/find' class='light center member-find-none-search'><img src='/images/global/body/magnifying_medium.png' style='margin:0 2px -4px 0;'/>Broader search</a>";
 			return $output;
 		}
@@ -582,6 +582,8 @@ class Application_View_Helper_MemberHomepage
 		}
 		
 		$ratingsOutput .= "</div>";
+		
+		$ratingsOutput .= "<p class='right smaller-text medium larger-margin-top action why-ratings pointer'>What are these ratings?</p>";
 		
 		$output .= $iconsOutput . $ratingsOutput;
 		
