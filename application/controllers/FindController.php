@@ -105,11 +105,11 @@ class FindController extends Zend_Controller_Action
 		$this->view->skill = $skill = array('lower' => 64,
 								   		    'upper' => 100);
 		$this->view->age   = $age   = array('lower' => 17,
-								   			'upper' => 70);
+								   			'upper' => 80);
 		$this->view->time  = $time  = 'user';
 		
 		$options = array();
-		$options['sports'] = array('basketball' => false);
+		$options['sports'] = array('basketball' => true);
 		$options['skill']  = $skill;
 		$options['age']    = $age;
 		$options['time']   = $time;

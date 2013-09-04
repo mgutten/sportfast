@@ -51,6 +51,11 @@ class Application_Model_Team extends Application_Model_ModelAbstract
 		//return parent::getProfilePic($size, $this->teamID, $type);
 	}
 	
+	public function addUserToTeam($userID)
+	{
+		return $this->getMapper()->addUserToTeam($userID, $this);
+	}
+	
 	/**
 	 * get team info from db
 	 * @params ($teamID => teamID)

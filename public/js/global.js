@@ -36,11 +36,16 @@ var gmap;
 var userLocation = new Array();
 var curDate = new Date();
 var notificationScrolling;
+var loggedIn; // set to curtime of page load if user is logged in
+var notificationPoll; // used as setInterval for notificationPoll
+var pageTitle;
+var notificationTitle;
+var titleInterval;
 
 
 $(function()
 {
-	
+
 	/* jquery plugin to limit value of input */
 	(function($) {
 		
@@ -505,6 +510,9 @@ $(function()
 			dropdown.hide();
 		}
 		
+		clearInterval(titleInterval);
+		setTitle(pageTitle);
+		$('#nav-notification-indicator').html('0');
 		$('#nav-notification-indicator-container').hide();
 		
 		
@@ -583,9 +591,16 @@ $(function()
 		
 		notificationJoin(notificationLogID, type, url);
 		
-		
-		
 	})
+	
+	if (loggedIn) {
+		// User is logged in, check for notifications
+		notificationPoll = setInterval(function() {
+				getNewNotifications()
+		}, 30000);
+		
+		pageTitle = getTitle();
+	}
 	
 	/* cannot nest anchor tags, force redirect of notification-container.click (could now be changed to simple a tag) 
 	$('.notification-container').click(function()
@@ -972,6 +987,32 @@ $(function()
 		
 })
 
+
+/**
+ * Ajax call to get new notifications for user
+ */
+function getNewNotifications()
+{
+	$.ajax({
+		url: '/ajax/get-new-notifications',
+		type: 'POST',
+		data: {timestamp: loggedIn},
+		success: function(data) {
+			var date = new Date();
+			var year = date.getFullYear();
+			var month = date.getMonth() + 1;
+			var day = date.getDate();
+			var hours = date.getHours();
+			var minutes = date.getMinutes();
+			var seconds = date.getSeconds();
+			loggedIn = year + "-" + (month < 10 ? '0' + month : month) + "-" + (day < 10 ? '0' + day : day) + " " + hours + ":" + minutes + ":" + seconds;
+
+			data = JSON.parse(data);
+			
+			populateNewNotifications(data);
+		}
+	})
+}
 
 /**
  * Ajax call to delete specific notification
@@ -1373,7 +1414,47 @@ function dropdownMenu(dropdownEle)
 
 }
 
-
+/**
+ * callback function from getNewNotifications
+ */
+function populateNewNotifications(data)
+{
+	if (data[0] < 1) {
+		// This is the number of returned new notifications, no new notifications
+		return;
+	} else {
+		var currentNum = $('#nav-notification-indicator').text();
+		currentNum = (currentNum == '' ? 0 : parseInt(currentNum, 10));
+		var newNum = currentNum + data[0];
+		
+		$('#nav-notification-indicator').html(newNum);
+		$('#nav-notification-indicator').parent().show();
+		
+		notificationTitle = '(' + newNum + ') New Notification' + (newNum > 1 ? 's' : '');
+		//document.getElementsByTagName('title')[0].innerHTML = '(' + newNum + ') ' + pageTitle;
+		
+		clearInterval(titleInterval);
+		setTitle(notificationTitle);
+		
+		// Interval to alternate page title from "new notification" to regular page title
+		titleInterval = setInterval(function()
+		{
+			if (getTitle() == pageTitle) {
+				// Is regular title, show notification title
+				setTitle(notificationTitle);
+			} else {
+				setTitle(pageTitle);
+			}
+		}, 5000);
+				
+		
+		$('#notifications-container').prepend(data[1]);
+		
+	}
+	
+}
+		
+		
 
 /** 
  * callback function from smart slider plugin to handle slider's values
@@ -2251,4 +2332,21 @@ function reloadPage()
 				location.reload();
 	}, 400);
 }
+
+/**
+ * set page title
+ */
+function setTitle(title)
+{
+	document.getElementsByTagName('title')[0].innerHTML = title;
+}
+
+/**
+ * get page title
+ */
+function getTitle(title)
+{
+	return document.getElementsByTagName('title')[0].innerHTML;
+}
+	
 

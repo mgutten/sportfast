@@ -48,16 +48,17 @@ class Application_View_Helper_MemberHomepage
 			$this->_view->placeholder('absolute')->captureStart();
 			
 			$newUsers = ($this->_view->usersInArea['newUsers'] == 0 ? mt_rand(0,1) : $this->_view->usersInArea['newUsers']);
+			$totalUsers = $this->_view->usersInArea['totalUsers'];
 			
 			$users = ($newUsers == 1 ? 'user has' : 'users have');
 			
 			echo $this->_view->alert()->start('more-users', 'Welcome back!');
 			
 			echo "<p class='clear dark'>We are working hard to get our name out there, but it takes time.</p>";
-			echo "<p class='clear width-100 center larger-text darkest heavy'>Since you last visited, 
-					<span class='largest-text inherit'>" . $newUsers . "</span> " . $users . " joined in your area.</p>";
+			echo "<p class='clear width-100 center larger-text darkest heavy'>There are now 
+					<span class='largest-text inherit'>" . $totalUsers . "</span> users in your area.</p>";
 			echo "<p class='clear dark larger-margin-top'>We won't make any games until there are enough users to show up.</p>";
-			echo "<p class='clear dark larger-margin-top'>Your word is stronger than ours, so tell your friends and let's get some games together!</p>";
+			echo "<p class='clear dark larger-margin-top'>Tell your friends and let's get some games together!</p>";
 			
 			echo $this->_view->alert()->end();
 			echo $this->_view->partial('partials/global/alertBack.phtml');
@@ -93,6 +94,7 @@ class Application_View_Helper_MemberHomepage
 			
 			$sections = array('my teams');
 			echo $this->_view->narrowteamsection($user, $sections);
+			
 			
 			/*$this->_view->narrowcolumnsection()->start(array('title' => 'My Teams'));
 				if ($this->_view->user->hasValue('teams')) {
@@ -137,8 +139,7 @@ class Application_View_Helper_MemberHomepage
 																							  'content' => $newsfeedHeader)); 
 		$newsfeed    = $this->buildNewsfeed();
 		$output     .= $newsfeed;																			 
-																		 
-																							 
+																		 																		 
 		return $output;
 	}
 	
@@ -304,7 +305,7 @@ class Application_View_Helper_MemberHomepage
 						$output .= "<div class='member-schedule-day-body-players-container darkest bold'>";
 						$output .= "<p class='member-schedule-day-body-players largest-text center'>" . $game->totalPlayers . "/" . $game->rosterLimit . "</p>";
 						$output .= "<p class='member-schedule-day-body-players-text center clear larger-text'>players</p>";
-						$output .= "<p class='center clear green smaller-text member-schedule-day-body-players-confirmed " . $confirmClass . "'>" . $confirm . "</p>";
+						$output .= "<p class='center clear green smaller-text member-schedule-day-body-players-confirmed margin-top " . $confirmClass . "'>" . $confirm . "</p>";
 						$output .= "</div>";
 						$type	 = " type='pickupGame'";
 						$typeID  = " typeID='" . $game->gameID . "'";
@@ -313,7 +314,7 @@ class Application_View_Helper_MemberHomepage
 						$teamID  = " teamID='" . $team->teamID . "'";
 						$output .= "<a href='/teams/" . $game->teamID . "' class='member-schedule-day-body-game-container schedule-container'>";
 						$output .= "<div class='member-schedule-day-body-game-left-container'>";
-						$output .= "<p class='bold darkest larger-text'>vs. " . $game->getLimitedName('opponent', 25);
+						$output .= "<p class='darkest larger-text'>vs. <span class='heavy'>" . $game->getLimitedName('opponent', 25) . "</span></p>";
 						$output .= "<p class='clear medium'>" . $team->teamName . "</p>";
 						$output .= "<p class='clear darkest'>" . $game->getDay() . "</p>";
 						$output .= "<p class='clear darkest'>" . $game->getHour() . "</p>";
@@ -321,7 +322,7 @@ class Application_View_Helper_MemberHomepage
 						$output .= "</div>";
 						$output .= "<div class='member-schedule-day-body-team-players-container darkest bold'>";
 
-						$output .= "<p class='center clear darkest member-schedule-day-body-players-confirmed'>
+						$output .= "<p class='center clear darkest member-schedule-day-body-players-confirmed' tooltip='" . $game->countConfirmedPlayers() . " players are going to this game'>
 										<span class='confirmed larger-text heavy member-teamGame-confirmed left width-100 center'>" . $game->countConfirmedPlayers() . "</span> 
 										<span class='clear darkest width-100 heavy center'>confirmed</span>
 									</p>";

@@ -24,6 +24,7 @@ class Application_Model_CronMapper extends Application_Model_MapperAbstract
 									FROM games g 
 									LEFT JOIN user_games ug ON ug.gameID = g.gameID 
 									WHERE g.date < (NOW() + INTERVAL " . $this->getTimeOffset() . " HOUR) 
+									AND g.gameID != (SELECT MAX(gameID) FROM games)
 									GROUP BY g.gameID)";
 		$db->query($insertGames);
 		$oldGameID = $db->lastInsertId();
@@ -230,7 +231,8 @@ class Application_Model_CronMapper extends Application_Model_MapperAbstract
 								 t.minSkill, t.maxSkill, t.minAge, t.maxAge, t.picture, t.remove, t.lastActive, (NOW() + INTERVAL " . $this->getTimeOffset() . " HOUR)
 									FROM teams t 
 									WHERE ";
-		$counter = 0;							
+		$counter = 0;	
+		$where[] = "t.teamID != (SELECT MAX(teamID) FROM teams)"; // Do not remove max value from teams						
 		foreach ($where as $statement) {
 			if ($counter != 0) {
 				$insertTeams .= " AND ";
@@ -272,7 +274,7 @@ class Application_Model_CronMapper extends Application_Model_MapperAbstract
 						LEFT JOIN (SELECT u2.userID, ug2.gameID, ug2.plus FROM users u2
 									INNER JOIN user_games ug2 ON u2.userID = ug2.userID 
 									WHERE fake = 0) ug ON g.gameID = ug.gameID
-						WHERE CASE WHEN (HOUR((NOW() + INTERVAL " . $this->getTimeOffset() . " HOUR)) >= 19 AND MINUTE((NOW() + INTERVAL " . $this->getTimeOffset() . " HOUR)) > 31) THEN HOUR(TIMEDIFF(date, (NOW() + INTERVAL " . $this->getTimeOffset() . " HOUR))) <= 13 ELSE (HOUR(TIMEDIFF(g.date, (NOW() + INTERVAL " . $this->getTimeOffset() . " HOUR))) = 2 and MINUTE(TIMEDIFF(g.date, (NOW() + INTERVAL " . $this->getTimeOffset() . " HOUR))) < 30) END
+						WHERE CASE WHEN (HOUR((NOW() + INTERVAL " . $this->getTimeOffset() . " HOUR)) >= 19 AND MINUTE((NOW() + INTERVAL " . $this->getTimeOffset() . " HOUR)) > 31) THEN HOUR(TIMEDIFF(g.date, (NOW() + INTERVAL " . $this->getTimeOffset() . " HOUR))) <= 13 AND g.date >= (NOW() + INTERVAL " . $this->getTimeOffset() . " HOUR) ELSE (HOUR(TIMEDIFF(g.date, (NOW() + INTERVAL " . $this->getTimeOffset() . " HOUR))) = 1 and MINUTE(TIMEDIFF(g.date, (NOW() + INTERVAL " . $this->getTimeOffset() . " HOUR))) > 29) END
 							AND g.canceled = 0
 						GROUP BY g.gameID";
 		

@@ -129,8 +129,8 @@ class Application_Model_Ratings extends Application_Model_ModelAbstract
 	{
 		
 		$weight = array('sportsmanship' => .1,
-						'attendance'	=> .1,
-						'skillCurrent'	=> .8);
+						'attendance'	=> .05,
+						'skillCurrent'	=> .85);
 		
 		$sportsmanship = $weight['sportsmanship'] * $sportsmanship;
 		$attendance    = $weight['attendance'] * $attendance;

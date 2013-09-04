@@ -446,6 +446,7 @@ div.selected-green,img.selected-green,p.selected-green {
 	padding: .1em 0 .1em;
 	display:block;
 	min-height: 1.7em;
+	position:relative;
 
 }
 
@@ -491,6 +492,14 @@ div.selected-green,img.selected-green,p.selected-green {
 	width: 94.7%;
 	padding: .1em .25em;
 	display:none;
+}
+
+.narrow-column-team-captain {
+	position:absolute;
+	left:5px;
+	top:6px;
+	font-size:.7em;
+	padding: 0 .2em;
 }
 
 .animate-hidden-container {
@@ -2097,6 +2106,53 @@ input.city-change-input {
 
 .rating-star-back-small {
 	margin-top: -20px;
+}
+
+.rating-sprite-small {
+	width: 96px;
+	height: 20px;
+	background:url('/images/global/rating/stars/sprite_small.png');
+	overflow:hidden;
+}
+
+.rating-star-4 {
+	background-position: -20px 0px;
+}
+
+.rating-star-3 {
+	background-position: -40px 0px;
+}
+
+.rating-star-2 {
+	background-position: -60px 0px;
+}
+
+.rating-star-1 {
+	background-position: -80px 0px;
+}
+
+.rating-star-0 {
+	background-position: -100px 0px;
+}
+
+.rating-star-4_5 {
+	background-position: 0px 20px;
+}
+
+.rating-star-3_5 {
+	background-position: -20px 20px;
+}
+
+.rating-star-2_5 {
+	background-position: -60px 20px;
+}
+
+.rating-star-1_5 {
+	background-position: -80px 20px;
+}
+
+.rating-star-0_5 {
+	background-position: -100px 20px;
 }
 
 	

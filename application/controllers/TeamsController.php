@@ -93,7 +93,21 @@ class TeamsController extends Zend_Controller_Action
 			$this->view->manageScheduleTimeHour = $dropdown->dropdown('manage-schedule-time-hour', array(1,2,3,4,5,6,7,8,9,10,11,12), 7);
 			$this->view->manageScheduleTimeMinute = $dropdown->dropdown('manage-schedule-time-minute', array('00', '15', '30', '45'), '00');
 			$this->view->manageScheduleTimeAmPm = $dropdown->dropdown('manage-schedule-time-ampm', array('am', 'pm'), 'pm', false);
-		}
+			
+			$avatarNames = array();
+			if ($handle = opendir(PUBLIC_PATH . '/images/teams/avatars/small')) {
+				/* This is the correct way to loop over the directory. */
+				while (false !== ($entry = readdir($handle))) {
+					if ($entry === '.' || $entry === '..') continue;
+					$avatarNames[] = $entry;
+				}
+				closedir($handle);
+			}
+			
+			
+			$this->view->avatarNames = $avatarNames;
+			$this->view->defaultAvatar = $team->picture . '.jpg';
+			}
 		
 		$this->view->userOnTeam   = $userOnTeam = $team->players->userExists($this->view->user->userID);
 		
@@ -137,9 +151,20 @@ class TeamsController extends Zend_Controller_Action
 	{
 		$this->view->whiteBacking = false;
 		$teamID = $this->getRequest()->getParam('id');
+		$team = new Application_Model_Team();
+		$team->getTeamByID($teamID);
+		
+		$this->view->team = $team;
 		
 		$this->view->type = 'team';
 		$this->view->typeID = $teamID;
+		
+		$form = new Application_Form_General();
+							   
+		$note = 	$form->textarea->setName('note')
+							   	   ->setLabel("Write note...");
+
+		$this->view->note = $note;
 		
 	}
 

@@ -98,7 +98,7 @@ class Application_View_Helper_Calendar
 				if ($tooltips) {
 					if (!empty($event->_attribs['teamGameID'])) {
 						// Is team game
-						$tooltip  = '<p class="left darkest">vs. ' . $event->opponent . '</p>';
+						$tooltip  = '<p class="left darkest">vs. <span class="heavy inherit">' . $event->opponent . '</span></p>';
 						
 						$extraTooltip = '';
 						if ($date->format('U') < $curDate->format('U')) {

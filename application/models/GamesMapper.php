@@ -812,7 +812,24 @@ class Application_Model_GamesMapper extends Application_Model_TypesMapperAbstrac
 		
 		if ($result) {
 			// Already in game
-			return false;
+			return 'already';
+		}
+		
+		$select = $table->select();
+		$select->setIntegrityCheck(false);
+		
+		$select->from(array('g' => 'games'))
+			   ->join(array('ug' => 'user_games'),
+			   		  'ug.gameID = g.gameID',
+					  array('COUNT(ug.userID) as totalPlayers'))
+			   ->where('g.gameID = ?', $gameID)
+			   ->group('g.gameID');
+			   
+		$result = $table->fetchRow($select);
+		
+		if ($result['rosterLimit'] <= $result['totalPlayers']) {
+			// Game is full
+			return 'full';
 		}
 		
 		$data = array('userID' => $userID,
@@ -821,7 +838,7 @@ class Application_Model_GamesMapper extends Application_Model_TypesMapperAbstrac
 		
 		$db->insert('user_games', $data);
 		
-		return true;
+		return false;
 	}
 	
 	/**

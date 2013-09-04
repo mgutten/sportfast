@@ -63,15 +63,15 @@ echo "<p class='right dark margin-top'>" . $this->sportStats['totalPlayers'] . "
 
 echo "<p class='clear light margin-top' tooltip='You have played the most " . strtolower($this->sport->sport) . " games with these players.'>Most games with:</p>";
 foreach ($this->sportStats['mostPlayer'] as $player) {
-	
+
 	if (empty($player['name'])) {
 		// No most played with player
-		$player = 'None';
+		$name = 'None';
 	} else {
-		$player = $player['name'] . " <span class='right dark'>" . $player['times'] . "";
+		$name = $player['name'] . " <span class='right dark'>" . $player['times'] . "</span>";
 	}
 	
-	echo "<p class='clear width-100 dark'>" . $player . "</p>";
+	echo "<a href='/users/" . $player['userID'] . "' class='clear width-100 dark'>" . $name . "</a>";
 }
 
 echo "<p class='clear light margin-top' tooltip='Estimated total calories burned'>

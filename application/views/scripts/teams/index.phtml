@@ -103,7 +103,21 @@ if ($this->fail) {
 				echo		"<p class='team-manage-team-info-tab left pointer'>Advanced</p>";
 				echo	"</div>";
 				echo	"<div class='team-manage-team-info-lower-container width-100 clear'>";
-				echo		"<img src='" . $this->team->getProfilePic('medium') . "' class='left' id='team-manage-team-info-img' />";
+				echo		"<div class='left' id='team-manage-team-info-img-outer-container'>
+								<img src='" . $this->team->getProfilePic('medium') . "' class='left pointer' id='team-manage-team-info-img' />
+								<div class='hidden clear margin-top' id='team-manage-team-info-img-container'>";
+				foreach ($this->avatarNames as $fileName) {
+					$class = 'left create-team-avatar pointer ';
+					if ($fileName == $this->defaultAvatar) {
+						$class .= ' create-team-avatar-selected';
+					}
+					echo "<img src='/images/teams/avatars/small/" . $fileName . "' class='" . $class . "' avatar='" . str_replace('.jpg','', $fileName) . "'/>";
+					
+					// preload large images
+					echo "<img src='/images/teams/avatars/medium/" . $fileName . "' class='hidden'/>";
+				}
+				echo 			"</div>
+							</div>";
 				echo 		"<div class='team-manage-team-info-name-container left'>";
 				echo 			"<p class='left smaller-text darkest'>Team Name</p>";
 				echo 			"<input type='text' class='clear darkest heavy team-manage-team-info-name' id='team-manage-team-info-name' value='" . $this->team->teamName . "'/>";
@@ -133,7 +147,7 @@ if ($this->fail) {
 					
 					echo			"</div>";
 					*/
-				echo $this->changecaptain($this->team);
+			echo $this->changecaptain($this->team);
 				
 			echo 		"</div>";
 			echo	"</div>";
@@ -383,9 +397,9 @@ echo $this->partial('partials/global/sectionHeaderBold.phtml',array('title'   =>
 		// Next game and user on team, show info
 ?>
 	<div class='team-next-game-left-container left'>
-    	<p class='left largest-text darkest heavy'>vs. <?php echo $this->nextTeamName;?></p>
+    	<p class='left largest-text darkest'>vs. <span class='heavy inherit'><?php echo $this->nextTeamName;?></span></p>
         <p class='clear darkest'>
-        	<?php echo $this->nextDay;?> <span class='light'><?php echo $this->nextShortDate;?></span> at <?php echo $this->nextHour;?>
+        	<?php echo $this->nextDay;?> at <?php echo $this->nextHour;?>
         </p>
         <p class='clear darkest'>
         	<?php echo $this->nextLocationName;?> <a href='http://www.maps.google.com/maps?f=d&q=<?php echo $this->nextLocationStreetAddress;?>' class='light'>directions</a>

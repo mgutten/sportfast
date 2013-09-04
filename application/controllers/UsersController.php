@@ -24,7 +24,9 @@ class UsersController extends Zend_Controller_Action
 		}
 		
 		$user->getUserSportsInfo();
-		$user->getUserFriendsGroupsTeams();
+		//$user->getUserFriendsGroupsTeams();
+		$user->getUserTeams();
+		$user->getUserFriends();
 		$user->getUserRatings();
 		$user->getUserGames(false);
 		

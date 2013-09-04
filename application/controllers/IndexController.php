@@ -21,6 +21,7 @@ class IndexController extends Zend_Controller_Action
 			// Member homepage
 			$this->view->narrowColumn = 'right';
 			
+		
 			//$this->view->user->getMapper()->getCityIdRange('984');
 					
 			$session = new Zend_Session_Namespace('first_visit');

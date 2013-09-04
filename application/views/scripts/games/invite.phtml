@@ -1,14 +1,15 @@
 <?php
 /** 
- * controller => teams
+ * controller => games
  * action => invite
  */
 $this->headTitle(ucwords($this->type) . ' Invite');
 $this->headLink()->prependStylesheet($this->baseUrl() . '/css/profile.css');
+$this->headScript()->prependFile($this->baseUrl() . '/js/createsuccess.js');
 ?>
 
 <div id='profile-invite-container'>
-	<p class='largest-text darkest heavy clear'>Invite Players</p>
+	<p class='largest-text darkest heavy clear'>Invite to game</p>
     <div class='white-back clear dropshadow'>
     <?php
 	//echo $this->partial('partials/global/sectionHeaderBold.phtml',array('title'   => 'Invite players')); 
@@ -21,6 +22,9 @@ $this->headLink()->prependStylesheet($this->baseUrl() . '/css/profile.css');
     <p class='clear larger-margin-top dark heavy'>Copy and paste emails here <span class='dark'>(comma separated)</span></p>
     <textarea class='white-back dropshadow clear' id='profile-invite-emails' name='emails'></textarea>
     
+    <?php echo $this->note;?>
+    <p class='clear light pointer margin-top' id='create-success-addNote'>+add personal note</p>
+    <p class='clear light pointer margin-top hidden' id='create-success-removeNote'>remove personal note</p>
     
     <input type='submit' class='clear right green-button largest-text heavy larger-margin-top' id='profile-send-invites' value='Send Invites' />
 

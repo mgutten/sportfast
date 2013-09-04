@@ -35,6 +35,21 @@ class GamesController extends Zend_Controller_Action
 			$session = Zend_Session::namespaceUnset('goToURL');
 		}
 		
+		$session = new Zend_Session_Namespace('addToGame');
+		if (isset($session->fail)) {
+			// From MailController addUserSubscribeGame action, user not added to game from email
+			if ($session->fail == 'already') {
+				// User is already in this game
+				$this->view->addToGame = 'You are already in this game.';
+			} else {
+				// Game is full
+				$this->view->addToGame = 'This game is full.';
+			}
+			
+			Zend_Session::namespaceUnset('addToGame');
+		}
+		
+		
 		$session = new Zend_Session_Namespace('userSport');
 		$session->sport = $game->sport;
 		
@@ -260,6 +275,13 @@ class GamesController extends Zend_Controller_Action
 		
 		$this->view->type = 'game';
 		$this->view->typeID = $gameID;
+		
+		$form = new Application_Form_General();
+							   
+		$note = $form->textarea->setName('note')
+							   ->setLabel("Write note...");
+
+		$this->view->note = $note;
 		
 	}
 

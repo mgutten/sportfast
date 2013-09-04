@@ -22,6 +22,35 @@ $(function()
 		}
 	)
 	
+	/* click on edit team's logo */
+	$('#team-manage-team-info-img').click(function()
+	{
+		$('#team-manage-team-info-img-container').show();
+		
+	})
+	
+	/* edit team img avatar */
+	$('.create-team-avatar').hover(function()
+	{
+		var src = $(this).attr('src').replace('/small/','/medium/');
+		$('#team-manage-team-info-img').attr('src', src);
+	},
+	function()
+	{
+		var src = $('.create-team-avatar-selected').attr('src').replace('/small/','/medium/');
+		$('#team-manage-team-info-img').attr('src', src);
+	})
+	.click(function()
+	{
+		$('.create-team-avatar-selected').removeClass('create-team-avatar-selected');
+		$(this).addClass('create-team-avatar-selected');
+		
+		changedAvatar = $(this).attr('avatar');
+		
+		$('#team-manage-team-info-confirm-container').show();
+	})
+		
+	
 	/* clear entire team schedule */
 	$('#team-manage-calendar-clear').click(function()
 	{
@@ -63,6 +92,7 @@ $(function()
 			
 			$('#tooltip-team-manage-winOrLoss').find('.inner-shadow,.member-schedule-button-selected')
 											   .removeClass('inner-shadow member-schedule-button-selected');
+											   
 			var winOrLoss = $(this).attr('winOrLoss');
 			var selectedButton;
 			
@@ -90,6 +120,8 @@ $(function()
 			var tooltip = $('#tooltip-team-manage-addGame');
 			var date = getDateClicked($(this));
 			$('#team-manage-schedule-date').text(date.monthName + ' ' + date.day);
+			
+			$('#teamManageScheduleLocation').attr('locationID', '');
 			
 			// Hide other tooltip
 			$('#tooltip-team-manage-winOrLoss').find('.x').trigger('click');

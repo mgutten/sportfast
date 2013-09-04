@@ -292,10 +292,9 @@ function getAvailableUsers(month, date, year, hour, sportID)
 		data: {options: options},
 		success: function(data) {
 			
-			$('#available-players').text(data);
-			
 			var percent = Math.floor(data * .25)
-			$('#available-players-percent').text(percent);
+			//$('#available-players-percent').text(percent);
+			$('#available-players').text(data);
 			
 			if ($('#available-players-container').css('display') != 'block') {
 				$('#available-players-container').css({'opacity': 0,

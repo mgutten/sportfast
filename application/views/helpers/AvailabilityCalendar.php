@@ -73,6 +73,9 @@ class Application_View_Helper_AvailabilityCalendar
 							$class .= ' selected-green';
 						}
 					}
+					if ($counter > 21) {
+						continue;
+					}
 					
 					$tooltipHourStart = $this->convertTime($counter);
 					$tooltipHourEnd   = $this->convertTime($counter+1);
@@ -88,7 +91,7 @@ class Application_View_Helper_AvailabilityCalendar
 		}
 		
 		
-		$output .= $this->createLabels('right');
+		//$output .= $this->createLabels('right');
 		
 
 		$output .= "</div>";
@@ -127,13 +130,13 @@ class Application_View_Helper_AvailabilityCalendar
 		
 		$output .= "<p class='availability-calendar-label-hour medium' $style>8</p>";
 		$output .= "<p class='availability-calendar-label-time light' $style>AM</p>";
-		$output .= "<p class='availability-calendar-label-hour medium' $style>12</p>";
+		$output .= "<p class='availability-calendar-label-hour medium' $style>noon</p>";
 		$output .= "<p class='availability-calendar-label-time light' $style>PM</p>";
 		$output .= "<p class='availability-calendar-label-hour medium' $style>4</p>";
 		$output .= "<p class='availability-calendar-label-time light' $style>PM</p>";
 		$output .= "<p class='availability-calendar-label-hour medium' $style>8</p>";
 		$output .= "<p class='availability-calendar-label-time light' $style>PM</p>";
-		$output .= "<p class='availability-calendar-label-hour medium' $style>12</p>";
+		//$output .= "<p class='availability-calendar-label-hour medium' $style>12</p>";
 		
 		$output .= "</div>";
 		

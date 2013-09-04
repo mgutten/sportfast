@@ -146,7 +146,7 @@ class Application_Model_User extends Application_Model_ModelAbstract
 	 */
 	public function getUserTeams()
 	{
-		return $this->getMapper()->getUserTypes('teams',$this);
+		return $this->getMapper()->getUserTeams($this);
 	}
 	
 	/**
@@ -247,10 +247,13 @@ class Application_Model_User extends Application_Model_ModelAbstract
 		return $this->notifications->getUserNotifications();
 	}
 	
-	
-	public function getNewUserNotifications()
+	/**
+	 * only get new notifications
+	 * @params( $sinceTime => if true, only get notifications that happened in last interval (1 minute)
+	 */
+	public function getNewUserNotifications($sinceTime = false)
 	{
-		return $this->notifications->getUserNotifications(true);
+		return $this->notifications->getUserNotifications(true, $sinceTime);
 	}
 	
 	public function resetNewNotifications()

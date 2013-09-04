@@ -38,6 +38,15 @@ echo $this->placeholder('absolute')->captureStart();
 		echo $this->alert()->end();
 	}
 	
+	if ($this->addToGame) {
+		// User not added to game from email
+		echo $this->alert()->start('addToGame',"");
+		
+		echo "<p class='clear darkest width-100 center largest-text heavy'>" . $this->addToGame . "</p>";
+				
+		echo $this->alert()->end();
+	}
+	
 	
 	if ($this->captain) {
 		// user is captain
@@ -249,6 +258,9 @@ if ($this->userInGame) {
               <select id='game-plus'>
                 <?php
                     for ($i = 0; $i < 3; $i++) {
+						if ($i > ($this->game->rosterLimit - count($this->game->players->getAll()))) {
+							continue;
+						}
                         $selected = '';
                         if ($this->userPlus == $i) {
                             $selected = 'selected';

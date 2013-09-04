@@ -493,6 +493,56 @@ class Application_Model_TeamsMapper extends Application_Model_TypesMapperAbstrac
 	}
 	
 	/**
+	 * add user to team
+	 */
+	public function addUserToTeam($userID, $savingClass)
+	{
+
+		$this->setDbTable('Application_Model_DbTable_UserTeams');
+		
+		$table = $this->getDbTable();
+		$select = $table->select();
+		
+		$select->where('userID = ?', $userID)
+			   ->where('teamID = ?', $savingClass->teamID);
+			   
+		$result = $table->fetchRow($select);
+		
+		if (!empty($result['teamID'])) {
+			// Already exists
+			return true;
+		}
+		
+		$table = $this->getDbTable();
+		$select = $table->select();
+		
+		$select->setIntegrityCheck(false);
+		
+		$select->from(array('t' => 'teams'))
+			   ->join(array('ut' => 'user_teams'),
+			   		  't.teamID = ut.teamID',
+					  array('COUNT(ut.userID) as totalPlayers'))
+			   ->where('t.teamID = ?', $savingClass->teamID);
+			  
+			   
+		$result = $table->fetchRow($select);
+		
+		if ($result['rosterLimit'] <= $result['totalPlayers']) {
+			// Full team
+			return 'full';
+		}
+		
+		$data = array('userID' => $userID,
+					  'teamID' => $savingClass->teamID);
+					  
+		$this->getDbTable()->insert($data);
+		
+		return false;
+	}
+		
+		
+	
+	/**
 	 * get team captains
 	 */
 	public function getTeamCaptains($teamID)

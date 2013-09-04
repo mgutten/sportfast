@@ -220,8 +220,9 @@ class Application_Model_SportsMapper extends Application_Model_MapperAbstract
 				if (!$result) {
 					continue;
 				} else {
-					$returnArray['mostPlayer'][] = array('name' => ucwords($result['firstName']) . ' ' . ucwords($result['lastName'][0]),
-														 'times' => $result['times']);
+					$returnArray['mostPlayer'][] = array('name'   => ucwords($result['firstName']) . ' ' . ucwords($result['lastName'][0]),
+														 'times'  => $result['times'],
+														 'userID' => $result['userID']);
 					
 				}
 			}

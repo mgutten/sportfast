@@ -25,12 +25,18 @@ class Application_View_Helper_RatingStar
 			$post = "</div>";
 		}
 		
-
-		
-		$output = $pre .
-						"<img class='clear' src='/images/global/rating/stars/" . $size . "_dropshadow.png'/>
-						<div class='clear rating-star-back-" . $size . " green-back' style='width:" . $width . ";'></div>"
-				  . $post;
+		if ($size == 'small') {
+			// TESTING sprite.png to make no white background
+			$width = round($width / 2) / 10;
+			$width = str_replace('.', '_', $width);
+			$output = "<div class='clear rating-sprite-" . $size . " rating-star-" . $width . "'></div>";
+		} else {
+			
+			$output = $pre .
+							"<img class='clear' src='/images/global/rating/stars/" . $size . "_dropshadow.png'/>
+							<div class='clear rating-star-back-" . $size . " green-back' style='width:" . $width . ";'></div>"
+					  . $post;
+		}
 					
 		return $output;
 	}

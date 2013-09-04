@@ -316,6 +316,7 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
      */
 	public function getUserTeams($savingClass)
 	{
+		
 		$table   = $this->getDbTable();
 		$select  = $table->select();
 		
@@ -326,13 +327,21 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 			   ->join(array('ut2' => 'user_teams'),
 			   		  'ut2.teamID = ut.teamID',
 					  array('COUNT(ut2.userID) as totalPlayers'))
+			   ->join(array('tc' => new Zend_Db_Expr('(SELECT tc2.teamID, GROUP_CONCAT(tc2.userID separator ",") as captains FROM team_captains tc2 GROUP BY tc2.teamID)')),
+			   		  'tc.teamID = t.teamID')
 			   ->where('ut.userID = ?', $savingClass->userID)
 			   ->group('ut.teamID');
 		
 		$results = $table->fetchAll($select);
 		
 		foreach ($results as $result) {
-			$savingClass->teams->addTeam($result);
+			
+			$team = $savingClass->teams->addTeam($result);
+			$captains = explode(',', $result->captains);
+
+			foreach ($captains as $captain) {
+				$team->addCaptain($captain);
+			}
 		}
 
 		return $savingClass;
@@ -699,9 +708,10 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 	 * get notifications for user given in $savingClass
 	 * @params ($userID 	 => userClass model,
 	 			$savingClass => where to save the information (Notifications object),
-				$onlyNew	 => only select new notifications )
+				$onlyNew	 => only select new notifications,
+				$sinceTime   => if true, only select notifications since now - interval of 1 minute)
 	 */
-	public function getUserNotifications($userClass, $savingClass, $onlyNew = false)
+	public function getUserNotifications($userClass, $savingClass, $onlyNew = false, $sinceTime = false)
 	{		
 		/* MUST RETRIEVE GAMEIDS, TEAMIDS, AND GROUPIDS FOR ALL GAMES, TEAMS, GROUPS THAT USER ($userClass) is currently in */
 		$db = Zend_Db_Table::getDefaultAdapter();   
@@ -829,6 +839,10 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 			// Select old notifications
 			$select .= " AND nl.dateHappened <= '" . $lastRead . "' ";
 		}
+		
+		if ($sinceTime) {
+			$select .= " AND nl.dateHappened >= '" . $sinceTime . "' ";
+		}
 	
 		$select .= " GROUP BY nl.notificationID, nl.gameID, nl.teamID) UNION ";
 		$select .= "(SELECT `nl`.gameID,
@@ -896,6 +910,11 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 			// Select old notifications
 			$select .= " AND nl.dateHappened <= '" . $lastRead . "' ";
 		}
+		
+		if ($sinceTime) {
+			$select .= " AND nl.dateHappened >= '" . $sinceTime . "' ";
+		}
+		
 		$select .= " ) ORDER BY dateHappened DESC";
 		
 		if (!$onlyNew) {
@@ -909,6 +928,8 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 			$notification = $savingClass->addNotification($result);
 			$notification->parentUserID = $userClass->userID;
 		}
+		
+		return $savingClass;
 
 	}
 	

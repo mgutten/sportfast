@@ -2,6 +2,7 @@
 var changedAlert = false;
 var changedCaptain = false;
 var changedName = false;
+var changedAvatar = false;
 var changedAdvanced = false;
 var confirmAction;
 var clickedCaptain;
@@ -362,6 +363,12 @@ $(function()
 			changeTypeName(name, idType, typeID, actingUserID);
 		}
 		
+		if (changedAvatar) {
+			// Avatar has been changed
+			updateTeamAvatar(typeID, changedAvatar);
+		}
+		
+		
 		if (changedAdvanced) {
 			testAdvancedChanges();
 		}
@@ -478,6 +485,11 @@ $(function()
 		$(this).parents('.alert-container').find('.alert-x').trigger('click');
 	})
 	
+	if ($('#addToGame-alert-container').length > 0) {
+		// Show alert
+		showAlert($('#addToGame-alert-container'));
+	}
+	
 	/* invite user from invite button */
 	$(document).on('click','.invite-search-result',function()
 	{
@@ -495,9 +507,11 @@ $(function()
 		var receivingUserID = $(this).attr('userID');
 		var action = 'invite';
 		var type   = idType.replace(/ID/, '');
-		var details;		
+		var details;	
 		
-		createNotification(idType, typeID, actingUserID, receivingUserID, action, type, details);
+		inviteUserToType(idType, typeID, receivingUserID);	
+		
+		//createNotification(idType, typeID, actingUserID, receivingUserID, action, type, details);
 		showConfirmationAlert('Invite sent');
 		
 		return false; // prevent bug that closes animated div after selecting a name from the results
@@ -562,6 +576,45 @@ function getType()
 	return type;
 }
 
+
+/**
+ * invite user to type (game or team)
+ * @params (idType => 'gameID' or 'teamID',
+ *			typeID => gameID or typeID,
+ *			receivingUserID => user who is being invited
+ */
+function inviteUserToType(idType, typeID, receivingUserID)
+{
+	if (idType == 'gameID') {
+		var options = {gameID : typeID,
+					   userIDs: receivingUserID};
+	} else {
+		var options = {teamID : typeID,
+					   userIDs: receivingUserID};
+	}
+		   
+	$.ajax({
+		url:'/mail/invite-type',
+		type: 'POST',
+		data: options,
+		success: function(data) {
+
+		}
+	})
+}
+
+function updateTeamAvatar(teamID, changedAvatar)
+{
+	var options = {teamID: teamID,
+				   avatar: changedAvatar};
+	$.ajax({
+		url:'/ajax/update-team-avatar',
+		type: 'POST',
+		data: {options: options},
+		complete: function(data) {
+		}
+	})
+}
 
 /**
  * cancel/delete game or team

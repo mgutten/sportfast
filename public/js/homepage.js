@@ -1,12 +1,13 @@
 // homepage.js
 var fadeInterval;
 var buttonPosition = new Array;
-/* for soccer picture
+
 buttonPosition[0] = {top: '336px',
 					 left: '637px'};
-*/
+/* for tennis picture
 buttonPosition[0] = {top: '295px',
 					 left: '825px'};
+*/
 buttonPosition[1] = {top: '224px',
 					 left: '575px'};
 buttonPosition[2] = {top: '208px',

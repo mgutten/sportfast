@@ -186,6 +186,11 @@ a.find-result-container.light-back {
 .find-player-overall {
 	padding: .05em 0;
 	margin-top: 0em;
+	width: 2.5em;
+	margin-left: auto;
+	margin-right:auto;
+	float:none;
+	display:block;
 }
 
 .find-player-lower {
@@ -200,7 +205,7 @@ a.find-result-container.light-back {
 }
 
 .find-looking-for {
-	margin: 4em .5em 0 0;
+	margin: 1em 0 0 0;
 }
 
 .sport-holder {

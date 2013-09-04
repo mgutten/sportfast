@@ -141,9 +141,9 @@ class Application_Model_Notifications extends Application_Model_ModelAbstract
 	}
 	
 	
-	public function getUserNotifications($onlyNew = false)
+	public function getUserNotifications($onlyNew = false, $sinceTime = false)
 	{
-		return $this->getMapper()->getUserNotifications($this->_parent, $this, $onlyNew);
+		return $this->getMapper()->getUserNotifications($this->_parent, $this, $onlyNew, $sinceTime);
 	}
 	
 	

@@ -100,7 +100,7 @@ $(function()
 		if (((page + 1) % 5 == 0) &&
 			(parseInt($('#find-num-results').text(),10) > $('.find-result-container').length)) {
 			// Next page is factor of five (ie every 30 results if 6 results per page), append more results
-			var offset = (page + 1) * 6;
+			var offset = ((page + 1) * 6) + 1;
 			buildOptions(offset);
 		}
 		
@@ -621,7 +621,7 @@ function incrementPages(difference)
  */
 function buildOptions(offset)
 {
-
+	
 	offset = (typeof offset == 'undefined' ? '' : offset);
 
 	

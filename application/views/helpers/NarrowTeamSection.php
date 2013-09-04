@@ -70,6 +70,20 @@ class Application_View_Helper_NarrowTeamSection
 							$output .=  "<a href='" . $url . "/" . $result->$id . "' class='" . $class . " left' " . $tooltip . ">";
 							$output .=  	"<img src='" . $result->getProfilePic('tiny') . "' class='left " . $imgClass . "'/>";
 							$output .= 	$text;
+							
+							if ($section == 'teams') {
+								
+								if ($result->isCaptain($userClass->userID)) {
+									//$output .= "<img src='/images/global/match/small/great.png' class='narrow-column-team-captain'/>";
+									if ($userClass->userID == $this->_view->user->userID) {
+										// your
+										$pronoun = 'You';
+									} else {
+										$pronoun = 'They';
+									}
+									$output .= "<span class='narrow-column-team-captain green-back white' tooltip='" . $pronoun . " are captain'>C</span>";
+								}
+							}
 							$output .=  "</a>";
 							$counter++;
 						}

@@ -160,6 +160,70 @@ class AjaxController extends Zend_Controller_Action
 		
 	}
 	
+	
+	/**
+	 * get new notifications for user
+	 */
+	public function getNewNotificationsAction()
+	{
+		$timestamp = $this->getRequest()->getParam('timestamp');
+		
+		$this->view->user->resetNewNotifications()
+				 		 ->getNewUserNotifications($timestamp);
+					 
+		$numNew = count($this->view->user->notifications->unread);
+		
+		$output = '';
+		
+		foreach ($this->view->user->notifications->unread as $notification) {
+			$buttons = '';
+			$remove = '';
+			$class = 'light-back';
+			if (!is_object($notification)) {
+				continue;
+			}
+			if ($notification->hasValue('actionRequired')) {	
+				$buttons = "<div class='notification-button-container clear-right' notificationLogID='" . $notification->notificationLogID . "' type='" . $notification->type . "' action='" . $notification->action . "'>";
+				$buttons .= "<p class='button notification-action-button'>Confirm</p>";
+				$buttons .= "<p class='button notification-action-button notification-action-button-second'>Decline</p>";
+				$buttons .= "</div>";
+				$remove = "<p class='light larger-text right notification-remove' tooltip='Delete'>x</p>";
+			} elseif ($notification->hasValue('joinOption')) {
+				$buttons = "<div class='notification-button-container clear-right' notificationLogID='" . $notification->notificationLogID . "' type='" . $notification->type . "' action='" . $notification->action . "'>";
+				$buttons .= "<p class='button notification-join'>Join</p>";
+				$buttons .= "</div>";
+				$remove = "<p class='light larger-text right notification-remove' tooltip='Delete'>x</p>";
+			}
+			
+			
+			if ($notification->isSports()) {
+				// Special case for smaller sports pictures
+				$pictureClass = 'notification-picture-sports';
+			} else {
+				$pictureClass = 'notification-picture';
+			}
+			
+			$output .=  "<a href='" . $notification->getFormattedUrl() . "' class='notification-container " . $class . " pointer' notificationLogID = '" . $notification->notificationLogID . "'>" 
+						 . "<div class='notification-text-picture-container'>"
+							 . "<img src='" . $notification->getPicture() . "' class='" . $pictureClass . "' />"
+							 . "<span class='notification-text'>" . $notification->getFormattedText() . "</span>"
+							 . $remove
+							 . $buttons
+						 . "</div>"
+						 . "<span class='notification-time-subscript light'>" . $notification->getTimeFromNow() . "</span>"
+						 . "</a>";
+		
+		}
+		
+		$return = array();
+		$return[0] = $numNew;
+		$return[1] = $output;
+		
+		echo json_encode($return);
+		
+	}
+	
+	
 	/**
 	 * reset user's lastRead column of db to current time (ie after click on notifications button)
 	 */
@@ -232,6 +296,22 @@ class AjaxController extends Zend_Controller_Action
 	 }
 	 
 	 /**
+	  * update team avatar (from team page)
+	  */
+	 public function updateTeamAvatarAction()
+	 {
+		 $options = $this->getRequest()->getPost('options'); 
+		 $teamID = $options['teamID'];
+		 $avatar = $options['avatar'];
+		 
+		 $team = $this->view->user->teams->exists($teamID);
+		 
+		 $team->picture = $avatar;
+		 
+		 $team->save();
+	 }
+	 
+	 /**
 	  * change doNotEmail column for current user in db for a given game
 	  */
 	 public function updateEmailAlertSubscribedGameAction()
@@ -297,7 +377,7 @@ class AjaxController extends Zend_Controller_Action
 	 }
 		 
 	 /**
-	  * add user to team INACTIVE
+	  * add user to team
 	  */
 	 public function addUserToTeamAction()
 	 {
@@ -325,6 +405,8 @@ class AjaxController extends Zend_Controller_Action
 						
 							  
 	 }
+	 
+
 	 
 	 /**
 	  * add post to team or group page
@@ -510,7 +592,7 @@ class AjaxController extends Zend_Controller_Action
 		
 	
 	/**
-	 * get and return matches based on user's for find page
+	 * get and return matches based on user's find page
 	 */
 	public function findMatchesAction()
 	{
@@ -539,6 +621,13 @@ class AjaxController extends Zend_Controller_Action
 			
 		$findMatches = Zend_Controller_Action_HelperBroker::getStaticHelper('FindMatches');
 		$findMatches = $findMatches->findmatches($type,$options, $this->view->user, $limit);
+		
+		if ($type == 'players') {
+			// Set session var so current sport is shown on user's page
+			$session = new Zend_Session_Namespace('userSport');
+			$sport = array_keys($options['sports']);
+			$session->sport = $sport[0];
+		}
 
 		if ($orderBy == 'match') {
 			// Order by in php (order by match)

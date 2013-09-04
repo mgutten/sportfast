@@ -244,7 +244,7 @@ $(function()
 			
 		if (failedCity) {
 			// City was not found, failure
-			isValid = false;
+			//isValid = false;
 		}
 		
 		changeInputBackground($(this), isValid);
@@ -672,6 +672,7 @@ function testGeocode()
  */
 function populateCity(city)
 {
+	
 	city = JSON.parse(city);
 	if (city.length > 150) {
 		// if city length seems to be error (long message), do not display
@@ -680,13 +681,15 @@ function populateCity(city)
 		// No city found
 		changeInputBackground($('#zipcode'), false);
 		failedCity = true;
-		$('#signup-account-zipcode-city').text('City not found');
+		$('#signup-account-zipcode-city').text('City not available');
+		return;
 	} else {
 		var cityName = city[0]['city'] + ', ' + city[0]['state'];
 		failedCity = false;
 		$('#signup-account-zipcode-city').text(cityName);
 		
 	}
+	
 	testGeocode();
 }
 
