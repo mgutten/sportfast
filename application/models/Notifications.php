@@ -158,6 +158,7 @@ class Application_Model_Notifications extends Application_Model_ModelAbstract
 	 */
 	public function deleteAll($details)
 	{
+		$this->setMapper('Application_Model_NotificationsMapper');
 		return $this->getMapper()->delete($details);
 	}
 	

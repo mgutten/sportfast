@@ -25,13 +25,37 @@ class TeamsController extends Zend_Controller_Action
 			return;
 		}
 		
+		$session = new Zend_Session_Namespace('invites');
+		if ($session->sent) {
+			// From mailController inviteTypeAction, invites successfully sent, alert
+			$this->view->invitesSent = true;
+			Zend_Session::namespaceUnset('invites');
+		}
+		
+		$session = new Zend_Session_Namespace('addToTeam');
+		if (isset($session->fail)) {
+			// From MailController addUserSubscribeGame action, user not added to game from email
+			if ($session->fail == 'already') {
+				// User is already in this game
+				$this->view->addToTeam = 'You are already on this team.';
+			} elseif ($session->fail == 'full') {
+				// Game is full
+				$this->view->addToTeam = 'This team is full.';
+			} else {
+				// Successfully added
+				$this->view->addToTeam = 'You have been added to the roster.';
+			}
+			
+			
+			Zend_Session::namespaceUnset('addToTeam');
+		}
+		
 		$session = new Zend_Session_Namespace('userSport');
 		$session->sport = $team->sport;		
 		
 		$this->view->isPublic  = $isPublic = $team->isPublic();
 		$this->view->isPrivate = ($isPublic ? false : true);
 		
-		$this->view->invited = $team->isInvited($this->view->user->userID);
 		
 		$nextGame = $this->view->nextGame = $team->getNextGame();
 		
@@ -59,6 +83,12 @@ class TeamsController extends Zend_Controller_Action
 			$this->view->nextGameTypeID = ' typeID="' . $nextGame->teamGameID . '"';
 			$this->view->nextGameType   = ' type="teamGame"';
 			$this->view->nextGameTeamID = ' teamID="' . $team->teamID . '"';
+			
+			if ($team->reserves->exists($this->view->user->userID)) {
+				// User is in reserves, see if was invited to next game
+				
+				$this->view->invitedToNextGame= $team->isInvitedToGame($this->view->user->userID, $nextGame->teamGameID);
+			}
 		}
 		
 		$this->view->previousGames = $team->games->getPreviousGames();
@@ -76,6 +106,10 @@ class TeamsController extends Zend_Controller_Action
 			$this->view->inviteButton = $dropdown->dropdownButton('invite', '', 'Invite');
 			$this->view->manageButton = $dropdown->dropdownButton('manage', array(array('text' => 'Schedule',
 																						'image' => '/images/team/icons/schedule.png',
+																						'background' => '',
+																						'imageLocation' => 'left'),
+																				  array('text' => 'Reserves',
+																						'image' => '/images/team/icons/reserve.png',
 																						'background' => '',
 																						'imageLocation' => 'left'),
 																				  array('text' => 'Edit Team',
@@ -107,7 +141,13 @@ class TeamsController extends Zend_Controller_Action
 			
 			$this->view->avatarNames = $avatarNames;
 			$this->view->defaultAvatar = $team->picture . '.jpg';
-			}
+			
+			$form = new Application_Form_General();
+			$userName = $form->text->setName('userName')
+								   ->setLabel("Start typing a player's name...");
+								   
+			$this->view->reserveUserName = $userName;
+		}
 		
 		$this->view->userOnTeam   = $userOnTeam = $team->players->userExists($this->view->user->userID);
 		
@@ -120,6 +160,8 @@ class TeamsController extends Zend_Controller_Action
 			
 			$team->setCurrent('lastActive');
 			$team->save(false);
+		} else {
+			$this->view->invited = $team->isInvited($this->view->user->userID);
 		}
 		
 		$this->view->totalPlayers = $team->totalPlayers;

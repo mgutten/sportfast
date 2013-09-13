@@ -1,4 +1,55 @@
-<br /><br />
-<div id="view-content">
-	<p>View script for controller <b>About</b> and script/action name <b>index</b></p>
-</div>
+<?php
+/** 
+ * controller => about
+ * action => index
+ */
+$this->headTitle('About Sportfast');
+$this->headLink()->prependStylesheet($this->baseUrl() . '/css/about.css');
+
+?>
+
+<?php
+$this->placeholder('narrowColumn')->captureStart();
+
+
+$team = array('marshall g' => array('position' => 'founder',
+									'sport' => 'basketball',
+									'joined' => 'Oct 2012')
+			  );
+
+foreach ($team as $name => $array) {
+	$firstName = explode(' ', $name);
+	$firstName = $firstName[0];
+	
+	echo "<img src='/images/about/us/" . strtolower($firstName) . ".jpg' class='narrow-column-picture clear about-team-member'>";
+	echo "<p class='clear darkest heavy larger-text'>" . ucwords($name) . "</p><p class='right medium about-team-position'> " . ucwords($array['position']) . "</p>";
+	echo "<p class='clear larger-margin-top medium width-100 center'>Favorite sport:</p>";
+	echo "<p class='darkest clear width-100 center'>" . ucwords($array['sport']) . "</p>";
+	echo "<p class='clear larger-margin-top medium width-100 center'>Member since:</p>";
+	echo "<p class='darkest clear width-100 center'>" . $array['joined'] . "</p>";
+
+	
+}
+$this->placeholder('narrowColumn')->captureEnd();
+?>
+
+
+
+<img src='/images/about/us/logo_large.png' class='clear' id='about-img' />
+
+<p class='clear darkest'>
+Like all hopeful startups, Sportfast was born in a basement.  And I don't mean a figurative basement.  No.  This is a literal basement.  
+Not a dusty, poorly-lit room, but a basement nonetheless.  We're a small, and I do mean small, company started in Marin County with nothing more than a plan on a napkin and a few energy drinks.
+We aren't bigshot millionaires or venture capitalists.  We are average joes who love to play sports.  Although we're entirely self-funded (aka broke), we donate what we can to our community's parks and schools. 
+
+<br><br>We have one goal here at Sportfast, and that's to bring recreational sports into
+the 21st century.  Email lists.  Sporatic, inconsistent pickup games.  These are issues every athlete has dealt with at some point.  All it would 
+take is a little elbow grease and a lot of coding, and we could have ourselves an awesome tool.  And that's how Sportfast was born.  
+
+<br><br>We're entirely dedicated to both our users and our cause.  Our users' input is incredibly valuable to us, so if you have ANY suggestions (seriously, anything) we would love 
+to hear from you.   We take all suggestions seriously and enjoy hearing what features our users want.
+
+<br><br>Above all else, we just want to thank you for your support and participation.  
+
+<br><br><span class='larger-text heavy darkest width-100 center left'>Now go out there and play some games!</span>
+</p>

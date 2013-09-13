@@ -16,6 +16,7 @@ class Application_Model_Notification extends Application_Model_ModelAbstract
 									'groupID'			=> '',
 									'ratingID'			=> '',
 									'parkID'			=> '',
+									'teamGameID'	    => '',
 									'textData'			=> array(),
 									'text'				=> '',
 									'firstName'			=> '',
@@ -63,7 +64,7 @@ class Application_Model_Notification extends Application_Model_ModelAbstract
 			$path = $this->getProfilePic($size, $this->parkID, 'parks');
 		} elseif ($picture == 'sports') {
 			// Sports pic
-			if (empty($this->sport)) {
+			if (!$this->hasValue('sport')) {
 				// Game has been deleted or for some reason does not have sport saved, default to basketball
 				$path = $this->getSportIcon('basketball', $size, 'solid', 'medium');
 			} else {
@@ -286,6 +287,7 @@ class Application_Model_Notification extends Application_Model_ModelAbstract
 					   'teamID'  => $this->teamID,
 					   'ratingID'  => $this->ratingID,
 					   'parkID'  => $this->parkID,
+					   'teamGameID' => $this->teamGameID,
 					   'cityID'	 => $this->cityID,
 					   'dateHappened' => $this->dateHappened);
 					   

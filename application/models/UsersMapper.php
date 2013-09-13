@@ -24,6 +24,10 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 		
 		$results = $table->fetchAll($select);
 		
+		if (count($results) < 1) {
+			return false;
+		}
+		
 		$user = $this->createUserClasses($results, $savingClass);
 		
 		return $user;	
@@ -265,7 +269,7 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 					  array('(COUNT(ug2.userID) + SUM(ug2.plus)) as totalPlayers',
 					  		'(SELECT COUNT(userID) FROM user_games WHERE gameID = ug.gameID AND confirmed = "1") AS confirmedPlayers'))
 			   ->where('ug.userID = ?', $savingClass->userID)
-			   ->where('g.date > CURDATE()')
+			   ->where('g.date > (NOW() + INTERVAL ' . $this->getTimeOffset() . ' HOUR)')
 			   ->group('ug.gameID');
 
 		
@@ -281,14 +285,14 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 		$select  = $table->select();
 		
 		$select->setIntegrityCheck(false);
-		$select->from(array('ut' => 'user_teams'))
-			   ->join(array('tg' => 'team_games'),
-			   		  'ut.teamID = tg.teamID')
+		$select->from(array('tg' => 'team_games'))
+			   ->join(array('t' => 'teams'),
+			   		  't.teamID = tg.teamID')
 			   ->join(array('ll' => 'league_locations'),
 			   		  'll.leagueLocationID = tg.leagueLocationID')
 			   ->joinLeft(array('utg' => 'user_team_games'),
 			   		  'utg.teamGameID = tg.teamGameID',
-					  array('(SELECT COUNT(utg2.userID) FROM user_team_games as utg2 WHERE utg2.teamID = ut.teamID AND utg2.confirmed = 1 AND utg2.teamGameID = tg.teamGameID) as confirmedPlayers',
+					  array('(SELECT COUNT(utg2.userID) FROM user_team_games as utg2 WHERE utg2.teamID = tg.teamID AND utg2.confirmed = 1 AND utg2.teamGameID = tg.teamGameID) as confirmedPlayers',
 					  		'utg.confirmed as confirmed'))
 			   ->where('utg.userID = ?', $savingClass->userID)
 			   //->where('utg.userID = ?' ,  $savingClass->userID)
@@ -887,7 +891,7 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 					$select .= " OR ";
 				}
 				
-				$select .= "(nl." . $name . "ID IN (" . $$nameCombo . ") AND n.details != 'request')";
+				$select .= "(nl." . $name . "ID IN (" . $$nameCombo . ") AND (n.details != 'request' OR n.details IS NULL))";
 				if (!$success) {
 					$success = true;
 				}
@@ -920,7 +924,6 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 		if (!$onlyNew) {
 			$select .= " LIMIT 10";
 		}
-		
 		
 		$results = $db->fetchAll($select);
 
@@ -1255,7 +1258,8 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 			   ->join(array('u' => 'users'),
 			   		  'ul.userID = u.userID',
 					  array('COUNT(u.userID) as totalUsers'))
-			   ->where($this->getAreaWhere($bounds['upper'], $bounds['lower'], 'ul.location'));
+			   ->where($this->getAreaWhere($bounds['upper'], $bounds['lower'], 'ul.location'))
+			   ->where('u.fake = 0');
 		
 		$result = $table->fetchRow($select);
 		
@@ -1462,5 +1466,49 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
         }
         return Zend_Registry::get('my_hasher');
     }
+	
+	/**
+	 * delete user (userID) and all data
+	 */
+	public function deleteUser($userID) {
+
+		if (empty($userID)) {
+			return false;
+		}
+		
+		
+		$db = Zend_Db_Table::getDefaultAdapter();
+		
+		$insert = 'INSERT INTO deleted_users (userID, name, team_captain, game_subscribed) VALUES ("' . $userID . '", 
+																								   (SELECT CONCAT(firstName, " ", lastName) FROM users WHERE userID = "' . $userID . '"),
+																								   (SELECT GROUP_CONCAT(teamID SEPARATOR ",") FROM team_captains WHERE userID = "' . $userID . '"),
+																								   (SELECT GROUP_CONCAT(gameID SEPARATOR ",") FROM game_subscribers WHERE userID = "' . $userID . '")
+																							)';
+		$db->query($insert);
+		
+		
+		$db->delete('users', array('userID = ?' => $userID));
+		
+		$db->delete('user_locations', array('userID = ?' => $userID));
+		
+		$db->delete('user_teams', array('userID = ?' => $userID));
+		
+		$db->delete('team_captains', array('userID = ?' => $userID));
+		
+		$db->delete('user_games', array('userID = ?' => $userID));
+		
+		$db->delete('user_team_games', array('userID = ?' => $userID));
+		
+		$db->delete('game_subscribers', array('userID = ?' => $userID));
+		
+		
+		
+		//$db->delete('friends', array('userID1 = ?' => $userID));
+		//$db->delete('friends', array('userID2 = ?' => $userID));
+		
+		return true;
+		
+		
+	}
 
 }

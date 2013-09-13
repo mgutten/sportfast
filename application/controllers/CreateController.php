@@ -95,7 +95,7 @@ class CreateController extends Zend_Controller_Action
 			// Custom park is used
 			$park = new Application_Model_Park();
 			$park->parkName = $post['parkName'];
-			$park->temporary = 1;
+			$park->temporary = '1';
 			$park->cityID = $this->view->user->city->cityID;
 			$park->save(false);
 			
@@ -113,17 +113,18 @@ class CreateController extends Zend_Controller_Action
 		
 		$game = new Application_Model_Game();
 		
+
 		$game->parkID = $parkID;
 		$game->parkName = $post['parkNameHidden'];
 		$game->date   = $post['datetime'];
 		$game->sport  = $post['sport'];
 		$game->sportID = $post['sportID'];
-		$game->recurring = ($post['recurring'] == 'yes' ? 1 : 0);
-		$game->public = ($post['visibility'] == 'public' ? 1 : 0);
+		$game->recurring = ($post['recurring'] == 'yes' ? '1' : '0');
+		$game->public = ($post['visibility'] == 'public' ? '1' : '0');
 		$game->minPlayers = $post['minPlayers'];
 		$game->rosterLimit = $post['rosterLimit'];
 		$game->cityID = $this->view->user->city->cityID;
-		
+
 		$game->typeID = $game->getSportTypeID($post['sportID'], $post['typeName'], $post['typeSuffix']);
 		
 		if (!empty($post['ageLimitCheckbox'])) {
@@ -145,7 +146,6 @@ class CreateController extends Zend_Controller_Action
 		}
 		
 		$game->save(false);
-		
 		
 		// Insert user to game
 		$table = new Application_Model_DbTable_UserGames();
@@ -237,7 +237,7 @@ class CreateController extends Zend_Controller_Action
 		$team->teamName = $post['teamName'];
 		$team->sport  = $post['sport'];
 		$team->sportID = $post['sportID'];
-		$team->public = ($post['visibility'] == 'public' ? 1 : 0);
+		$team->public = ($post['visibility'] == 'public' ? '1' : '0');
 		$team->rosterLimit = $post['rosterLimit'];
 		$team->cityID = $this->view->user->city->cityID;
 		$team->city   = $this->view->user->city->city;

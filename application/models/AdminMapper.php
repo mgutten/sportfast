@@ -61,6 +61,7 @@ class Application_Model_AdminMapper extends Application_Model_MapperAbstract
 			   		  array('city',
 					  		'cityID'))
 			   ->where('u.joined > (now() - INTERVAL 2 MONTH)')
+			   ->where('u.fake = 0')
 			   ->group('u.cityID')
 			   ->order('COUNT(userID) DESC');
 			   

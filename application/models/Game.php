@@ -38,6 +38,7 @@ class Application_Model_Game extends Application_Model_ModelAbstract
 									'winOrLoss'		=> '',
 									'gameDate'		=> '',
 									'teamID'		=> '',
+									'teamName'      => '',
 									'leagueLocationID'	=> '',
 									'players'		=> '',
 									'type'			=> '',
@@ -197,6 +198,10 @@ class Application_Model_Game extends Application_Model_ModelAbstract
 		return $this->_attribs['messages'];
 	}
 
+	public function getTeamName()
+	{
+		return ucwords($this->_attribs['teamName']);
+	}
 	
 	public function getType()
 	{
@@ -266,6 +271,10 @@ class Application_Model_Game extends Application_Model_ModelAbstract
 	
 	public function getTotalPlayers()
 	{
+		if ($this->isTeamGame()) {
+			return $this->confirmedPlayers;
+		}
+		
 		if (!$this->hasValue('totalPlayers')) {
 			return '0';
 		}
@@ -405,6 +414,10 @@ class Application_Model_Game extends Application_Model_ModelAbstract
 		
 		if ($hourDiff > 12 && $hourDiff < 24) {
 			// Correct for ::diff() failure when event is (eg 2 days ahead but under 48 hours, returns 1 day)
+			$dayDiff += 1;
+		} elseif ($dayDiff == 0 && 
+				  ($gameDate->format('m-d') != $curDate->format('m-d'))) {
+			// Correct for case when under 12 hours before gametime but still before 12AM
 			$dayDiff += 1;
 		}
 		

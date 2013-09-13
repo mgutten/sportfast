@@ -250,24 +250,46 @@ class AjaxController extends Zend_Controller_Action
 	{
 		 $options = $this->getRequest()->getPost('options');
 		 $notificationsMapper = new Application_Model_NotificationsMapper();
+		 
+		 $notification = new Application_Model_Notification();
+		 
+		 $notification->action = $options['action'];
+		 $notification->type = $options['type'];
+		 $notification->details = $options['details'];
+		 $notification->actingUserID = $options['actingUserID'];
+		 $notification->cityID = $this->view->user->city->cityID;
+		 /*
+		 
 		 $notificationDetails = array('action'  => $options['action'],
 									  'type'	=> $options['type'],
 									  'details' => $options['details']);
+		*/
 
 		 if ($options['receivingUserID'] == 'captain') {
-			 $options['receivingUserID'] = $notificationsMapper->getForeignID('Application_Model_DbTable_TeamCaptains', 'userID', array($options['idType'] => $options['typeID']));
+			 if ($options['type'] == 'team') {
+				 $table = 'TeamCaptains';
+			 } else {
+				 // Game
+				 $table = 'GameCaptains';
+			 }
+			 $options['receivingUserID'] = $notificationsMapper->getForeignID('Application_Model_DbTable_' . $table, 'userID', array($options['idType'] => $options['typeID']));
 		 }
 		 
-
+		 $notification->receivingUserID = $options['receivingUserID'];
+		 
+		/*
 		 $data = array('actingUserID' 	  => $options['actingUserID'],
 		 			   'receivingUserID'  => $options['receivingUserID'],
-					   'cityID'		 	  => $this->view->user->city->cityID);		
+					   'cityID'		 	  => $this->view->user->city->cityID);	
+		*/	
 					   
 		if (!empty($options['idType'])) {
-			$data[$options['idType']] = $options['typeID'];
+			//$data[$options['idType']] = $options['typeID'];
+			$notification->$options['idType'] = $options['typeID'];
 		}
-			  
-		 $notificationsMapper->addNotification($notificationDetails, $data);
+		
+		$notification->save();  
+		// $notificationsMapper->addNotification($notificationDetails, $data);
 		 
 	 }
 	 
@@ -359,16 +381,25 @@ class AjaxController extends Zend_Controller_Action
 			 return false;
 		 }
 		 
-		 if ($options['idType'] == 'gameID') {
-			 // Add user to game, and add game to user's auth session
-			 $table = new Application_Model_DbTable_UserGames();
-			 $game = new Application_Model_Game();
-			 $game->getGameById($options['typeID']);
-			 $this->view->user->games->addGame($game);	 
-		 }
-		 
+		 $table = new Application_Model_DbTable_UserGames();
 		 $table->insert(array($options['idType'] => $options['typeID'],
 		 					  'userID'		     => $options['userID']));
+		 
+		 if ($options['idType'] == 'gameID') {
+			 // Add user to game, and add game to user's auth session
+			 $game = new Application_Model_Game();
+			 $game->getGameById($options['typeID']);
+			 $this->view->user->games->addGame($game);
+		 }
+		 
+		 
+		 $notifications = new Application_Model_Notifications();				  
+		 $notifications->deleteAll(array('n.action' => array('leave',
+															  'join'),
+										  'n.type'   => 'game',
+										  'nl.actingUserID' => $options['userID'],
+										  'nl.gameID' => $options['typeID']));
+		 
 						
 							  
 		// Set session for stash alert when redirected back to games/index
@@ -398,12 +429,41 @@ class AjaxController extends Zend_Controller_Action
 		 					  'userID' => $options['userID']));
 							  
 		 $notifications = new Application_Model_Notifications();
-		 $notifications->deleteAll(array('notification.action' => 'invite',
-										 'notification_log.teamID' => $options['teamID'],
-										 'notification.type' => 'team',
-										 'notification_log.receivingUserID' => $options['userID']));
+		 $notifications->deleteAll(array('n.action' => 'invite',
+										 'nl.teamID' => $options['teamID'],
+										 'n.type' => 'team',
+										 'nl.receivingUserID' => $options['userID']));
+										 
+		 $notifications = new Application_Model_Notifications();				  
+		 $notifications->deleteAll(array('n.action' => array('leave',
+															  'join'),
+										  'n.type'   => 'team',
+										  'nl.actingUserID' => $options['userID'],
+										  'nl.teamID' => $options['teamID']));
 						
 							  
+	 }
+	 
+	 /**
+	  * add user to reserve list
+	  */
+	 public function addUserToReserveAction()
+	 {
+		 $teamID = $this->getRequest()->getParam('teamID');
+		 $userID = $this->getRequest()->getParam('userID');
+		 $remove = $this->getRequest()->getParam('remove');
+		 
+		 $team = new Application_Model_Team();
+		 
+		 $team->teamID = $teamID;
+		 
+		 if (!empty($remove)) {
+			 // Remove user, not add
+			 $team->removeReserve($userID);
+		 } else {
+			 $teamReserveID = $team->addReserve($userID);
+			 echo $teamReserveID;
+		 }
 	 }
 	 
 
@@ -1052,14 +1112,16 @@ class AjaxController extends Zend_Controller_Action
 				echo '/users/' . $this->view->user->userID . '/upload';
 				return;
 			}
-			
+
 			$mapper->notificationConfirm($options['notificationLogID'], false, $options['type']);	
 		}
+		
 		
 
 		// Delete notification
 		$db = Zend_Db_Table::getDefaultAdapter();
 		$db->delete('notification_log',array('notificationLogID = ?' => $options['notificationLogID']));
+		
 		
 		/* If cannot maintain integrity of $auth user notifications, clearIdentity and force reload of everything */
 		//$auth = Zend_Auth::getInstance();
@@ -1067,9 +1129,32 @@ class AjaxController extends Zend_Controller_Action
 		
 		// Only removes from user model
 		$this->view->user->notifications->deleteNotificationByID($options['notificationLogID']);
-
 			
-			
+	}
+	
+	/**
+	 * invite users to team game
+	 */
+	public function inviteToTeamGameAction()
+	{
+		$options = $this->getRequest()->getParam('options');
+		
+		if (!$options['reserves']) {
+			return false;
+		}
+		
+		$notification = new Application_Model_Notification();
+		$notification->actingUserID = $this->view->user->userID;
+		$notification->action = 'invite';
+		$notification->type = 'teamgame';
+		$notification->teamID = $options['teamID'];
+		$notification->teamGameID = $options['teamGameID'];
+		
+		foreach ($options['reserves'] as $userID) {
+			$notification->receivingUserID = $userID;
+			$notification->save();
+		}
+		
 	}
 	
 	/**
@@ -1091,6 +1176,40 @@ class AjaxController extends Zend_Controller_Action
 		$this->view->user->notifications->deleteNotificationByID($notificationLogID);
 		
 	}
+	
+	/**
+	 * delete team/game message
+	 */
+	public function deleteMessageAction()
+	{
+		$options = $this->getRequest()->getParam('options');
+		
+		if (empty($options['messageID'])) {
+			return false;
+		}
+		
+		if ($options['type'] == 'team') {
+			// Is team message
+			$idType = 'teamMessageID';
+		} elseif ($options['type'] == 'game') {
+			// Is game message
+			$idType = 'gameMessageID';
+		} else {
+			// Is user message
+			$idType = 'messageID';
+		}
+		
+		$message = new Application_Model_Message();
+		
+		$message->$idType = $options['messageID'];
+		
+		$message->delete();
+		
+		
+		
+	}
+		
+		
 	
 
 	/*
@@ -1503,6 +1622,28 @@ class AjaxController extends Zend_Controller_Action
 						  
 			$notificationsMapper->addNotification($notificationDetails, $data);
 		}
+	}
+	
+	/**
+	 * delete user from db
+	 */
+	public function deleteUserAction()
+	{
+		$userID = $this->getRequest()->getParam('userID');
+		
+		
+		if (empty($userID)) {
+			return;
+		}
+		
+		// Delete user
+		$this->view->user->delete();
+		
+		// Clear session
+		$auth = Zend_Auth::getInstance();
+		$auth->clearIdentity();
+		
+		setcookie('user', '', time() - 1, '/');
 	}
 			
 

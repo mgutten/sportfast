@@ -16,11 +16,15 @@ class UsersController extends Zend_Controller_Action
 		$userID = $this->getRequest()->getParam('id');
 		
 		$user = new Application_Model_User();
-		$user->getUserBy('u.userID', $userID);
+		$userFound = $user->getUserBy('u.userID', $userID);
 		
 		if ($user->fake) {
-			
 			$this->_redirect('/error/permission');
+		} elseif (!$userFound) {
+			// User does not exist
+			$this->view->userNotFound = true;
+			$this->view->narrowColumn = false;
+			
 		}
 		
 		$user->getUserSportsInfo();
@@ -48,7 +52,7 @@ class UsersController extends Zend_Controller_Action
 		
 		// Get latest user activity
 		$activities = new Application_Model_Notifications();
-		$activities->getUserActivities($user);
+		$activities->getUserActivities($user, 10);
 		$this->view->activities = $activities->read;
 
 		$this->view->memberHomepage = $this->view->getHelper('memberhomepage');

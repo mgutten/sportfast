@@ -144,9 +144,15 @@ class Application_View_Helper_Find
 		if ($userInGame) {
 			$button = '';
 		}
+		$limit = '';
+		if ($match->hasValue('rosterLimit')) {
+			// Is a limit, show limit
+			$limit = '/' . $match->rosterLimit;
+		}
+		
 		$output  = "<div class='right find-result-right-container'>";
 		$output .=		"<div class='left find-result-players-container'>";
-		$output .=			"<p class='largest-text heavy darkest left width-100 center'>" . $match->totalPlayers . "/" . $match->rosterLimit . "</p>";
+		$output .=			"<p class='largest-text heavy darkest left width-100 center'>" . $match->totalPlayers . $limit . "</p>";
 		$output .=			"<p class='larger-text clear heavy width-100 darkest center find-players'>players</p>";
 		$output .=		"</div>";
 		$output .=		$button;
@@ -160,8 +166,9 @@ class Application_View_Helper_Find
 	 * @params ($match => game model,
 	 *			$number => # of match in list)
 	 */
-	public function createGame($match, $number)
+	public function createGame($match, $number = false)
 	{
+		
 		$userInGame = false;
 		if ($this->_view->user->games->gameExists($match->gameID, 'gameID')) {
 			$userInGame = true;
@@ -170,22 +177,51 @@ class Application_View_Helper_Find
 		if ($match->canceled) {
 			$matchImg = '<img class="left" src="/images/global/canceled.png" tooltip="This game has been canceled. Reason: ' . $match->getCancelReason(true) . '"/>';
 		} else {
-			$matchImg = "<img src='" . $match->getMatchImage() . "' tooltip='" . $match->getMatchDescription() . "' class='left find-result-match-img'/>" 
-					  . ($userInGame ? "<p class='left find-results-joined smaller-text green'> You're playing!</p>" : '');
-
+			$matchImg = "<div class='left'>";
+			if (!$match->isTeamGame()) {
+				// Only show match img for pickup games
+				$matchImg .= "<img src='" . $match->getMatchImage() . "' tooltip='" . $match->getMatchDescription() . "' class='left find-result-match-img'/>" ;
+				$class = 'find-results-joined';
+			} else {
+				$class = '';
+			}
+			$matchImg .= ($userInGame ? "<p class='left " . $class . " smaller-text green'> You're playing!</p>" : '');
+					  
+			if (!$match->isPublic()) {
+				// Private game
+				$matchImg .= "<p class='clear margin-top red smaller-text'>Private Game</p>";
+			}
 			
+			$matchImg .= "</div>";
+
 		}
 		
-		$output  = $this->createOuterStart($match->gameID, 'games');
+		if ($match->isTeamGame()) {
+			// Is team game, show team game
+			$leftBox = "<p class='heavy darkest clear larger-text'><span class='darkest'>vs. </span>" . $match->opponent . "</p>";
+			$leftBox .= "<p class='clear medium'>" . $match->teamName . "</p>";
+			$leftBox .= "<p class='clear darkest'>" . $match->getDay() . "</p>";
+			$leftBox .= "<p class='clear darkest'>" . $match->getHour() . "</p>";
+			$leftBox .= "<p class='clear medium'>" . $match->locationName . "</p>";
+			$id = $match->teamID;
+			$prefix = 'teams';
+		} else {
+			$leftBox  =	"<p class='left heavy largest-text darkest'>" . $match->getGameTitle() . "</p>";
+			$leftBox .=	"<p class='clear darkest'>" . $match->getDay() . "</p>";		
+			$leftBox .=	"<p class='clear darkest'>" . $match->getHour() . "</p>";		
+			$leftBox .=	"<p class='clear darkest'>" . $match->park->parkName . "</p>";
+			$id = $match->gameID;
+			$prefix = 'games';
+		}
+			
+		
+		$output  = $this->createOuterStart($id, $prefix);
 		$output .=		"<div class='left find-result-img-container'>";
 		$output .=			"<img src='" . $match->getProfilePic('medium') . "' class='left'/>";
 		$output .=			($number ? "<p class='find-result-number white green-back heavy'>" . $number . "</p>" : '');
 		$output .= 		"</div>";
 		$output .=		"<div class='left find-result-left-container'>";
-		$output .=			"<p class='left heavy largest-text darkest'>" . $match->getGameTitle() . "</p>";
-		$output .=			"<p class='clear darkest'>" . $match->getDay() . "</p>";		
-		$output .=			"<p class='clear darkest'>" . $match->getHour() . "</p>";		
-		$output .=			"<p class='clear darkest'>" . $match->park->parkName . "</p>";
+		$output .=			$leftBox;
 		$output .= 		"</div>";
 		$output .=		$matchImg;
 		$output .=		$this->createRight($match, $userInGame);

@@ -17,10 +17,12 @@ $(function()
 	$('#userName').keyup(function(e)
 	{
 		
-		if ($('.create-userName-result').length > 0) {
-				
+		if ($('.create-userName-result').length > 0 && 
+			((e.keyCode >= 37 && e.keyCode <= 40) || e.keyCode == 13)) {
+							  
 			  var ele;
 			  if ($('.create-userName-result.selected').length > 0) {
+				  
 				  // Already result selected
 				  if (e.keyCode == 40) {
 					  // down 
@@ -43,9 +45,8 @@ $(function()
 			  } else if (e.keyCode == 40 && $('.create-userName-result').length > 0) {
 				  // No result already selected
 				  ele = $('.create-userName-result').first();
-			  } else {
-				  return;
-			  }
+			  } 
+				
 			  
 			  $('.create-userName-result').removeClass('selected');
 			  ele.addClass('selected');
@@ -56,9 +57,12 @@ $(function()
 			return false;
 		}
 		
+		
 		if ($(this).val().length < 3) {
 			return;
 		}
+		
+		
 		
 		var limit = new Array('users');
 		searchDatabase($(this).val(), populateSearchResultsInvite, limit);

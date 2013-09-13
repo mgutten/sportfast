@@ -77,7 +77,8 @@ class Application_Model_MessagesMapper extends Application_Model_MapperAbstract
 					   tm.dateHappened as dateHappened,
 					   '' as sport,
 					   '' as pictureType,
-					   'message' as type
+					   'message' as type,
+					   tm.teamMessageID
 					   FROM team_messages as tm
 					INNER JOIN users as u ON tm.userID = u.userID
 					WHERE tm.teamID = '" . $teamID . "'";
@@ -93,7 +94,8 @@ class Application_Model_MessagesMapper extends Application_Model_MapperAbstract
 							   nl.dateHappened as dateHappened,
 							   t.sport as sport,
 							   n.pictureType as pictureType,
-							   'notification' as type
+							   'notification' as type,
+							   '' as teamMessageID
 							   FROM notification_log as nl
 							INNER JOIN users u ON nl.actingUserID = u.userID
 							LEFT JOIN users u2 ON nl.receivingUserID = u2.userID
@@ -137,7 +139,8 @@ class Application_Model_MessagesMapper extends Application_Model_MapperAbstract
 					   tm.dateHappened as dateHappened,
 					   '' as sport,
 					   '' as pictureType,
-					   'message' as type
+					   'message' as type,
+					   tm.gameMessageID
 					   FROM game_messages as tm
 					INNER JOIN users as u ON tm.userID = u.userID
 					WHERE tm.gameID = '" . $gameID . "'";
@@ -150,7 +153,8 @@ class Application_Model_MessagesMapper extends Application_Model_MapperAbstract
 							   nl.dateHappened as dateHappened,
 							   g.sport as sport,
 							   n.pictureType as pictureType,
-							   'notification' as type
+							   'notification' as type,
+							   '' as gameMessageID
 							   FROM notification_log as nl
 							INNER JOIN users as u ON nl.actingUserID = u.userID
 							INNER JOIN notifications as n ON n.notificationID = nl.notificationID
@@ -179,7 +183,7 @@ class Application_Model_MessagesMapper extends Application_Model_MapperAbstract
 		$db = Zend_Db_Table::getDefaultAdapter();
 		
 		$select = "SELECT `m`.* FROM 
-						(SELECT * FROM messages as m2 
+						(SELECT m2.*, u.* FROM messages as m2 
 							LEFT JOIN users as u ON (u.userID = m2.sendingUserID)
 							WHERE (receivingUserID = '" . $userID . "')
 							ORDER BY m2.`dateHappened` desc) AS `m` 
@@ -276,6 +280,41 @@ class Application_Model_MessagesMapper extends Application_Model_MapperAbstract
 			return $db->lastInsertID();
 		}
 		
+	 }
+	 
+	 /**
+	  * delete message
+	  */
+	 public function delete($messageModel)
+	 {
+		 if ($messageModel->isTeamMessage()) {
+			 // Team
+			 $table = 'Application_Model_DbTable_TeamMessages';
+			 $idType = 'teamMessageID';
+			 $messageModel->setTeamMessage();
+		 } elseif ($messageModel->isGameMessage()) {
+			 // Game
+			 $table = 'Application_Model_DbTable_GameMessages';
+			 $idType = 'gameMessageID';
+			 $messageModel->setGameMessage();
+		 } elseif ($messageModel->isUserMessage()) {
+			 // User
+			 $table = 'Application_Model_DbTable_Messages';
+			 $idType = 'messageID';
+			 $messageModel->setUserMessage();
+		 } else {
+			 return false;
+		 }
+		 
+		 $this->setDbTable($messageModel->getDbTable());
+		 
+		 $table = $this->getDbTable();
+		 
+		 $primaryKey = $messageModel->_primaryKey;
+
+		 $table->delete(array($primaryKey . ' = ?' => $messageModel->$primaryKey)); 
+		 
+		 return true;
 	 }
 			
 						

@@ -12,6 +12,13 @@ $this->headScript()->prependFile($this->baseUrl() . '/js/profile.js');
 
 
 <?php
+if ($this->userNotFound) {
+	echo "<p class='clear width-100 center heavy jumbo-text darkest'>User Not Found</p>";
+	echo "<p class='clear width-100 center largest-text darkest'>This user does not appear to exist.</p>";
+	echo "<div class='clear width-100'><a href='/' class='center heavy button auto-center' style='width:9em;margin-top:.5em;'>Back to homepage</a></div>";
+	return;
+}
+
 $this->placeholder('absolute')->captureStart();
 
 echo $this->partial('partials/global/alertBack.phtml');
@@ -156,20 +163,22 @@ $this->placeholder('narrowColumn')->captureEnd();
 			// Array of types, display
 			$typeSuffixes = '';
 			$typeSuffixArray = array();
+			$typeNameArray = array();
 			foreach ($sport->types as $type) {
-				
-				if (in_array($type->typeName, $sport->formats) || strtolower($type->typeName) == 'pickup') {
-					// Type was already displayed above
+				if (strtolower($type->typeName) == 'pickup') {
+					// Type has not been displayed yet
 					continue;
+					
 				}
-				$lowerOutput  .=			"<p class='medium clear user-sport-type'>" . ucwords($type->typeName) . "</p>";
 				
-				if (in_array($type->typeSuffix, $typeSuffixArray)) {
+				$lowerOutput  .=			"<p class='medium clear user-sport-type'>" . ucwords($type->typeName) . " " . ucwords($type->typeSuffix) . "</p>";
+				/*if (in_array($type->typeSuffix, $typeSuffixArray)) {
 					// Suffix was already used
 					continue;
-				}
-				$typeSuffixes .= 			"<p class='medium clear user-sport-type'>" . ucwords($type->typeSuffix) . "</p>";
-				$typeSuffixArray[] = $type->typeSuffix;
+				}*/
+				//$typeSuffixes .= 			"<p class='medium clear user-sport-typeSuffix'>" . ucwords($type->typeSuffix) . "</p>";
+				//$typeSuffixArray[] = $type->typeSuffix;
+				//$typeNameArray[] = $type->typeName;
 			}
 			$lowerOutput .= $typeSuffixes;
 			
@@ -229,6 +238,14 @@ $this->placeholder('narrowColumn')->captureEnd();
 										. $numRatings . " " . $str
 										. "</a>";			
 			$lowerOutput .= 	"</div>";
+			
+			if ($this->currentUser->players->exists($this->user->userID) || $this->currentUser->userID == $this->user->userID) {
+				// Are friends, let see availability
+				$lowerOutput .= "<div class='clear user-availability-show'><img src='/images/global/body/down_arrow.png' class='left margin-top'/><p class='medium left pointer indent user-show-availability'>show availability</p></div>";
+				$lowerOutput .= "<div class='clear user-availability-hide hidden'><img src='/images/global/body/up_arrow.png' class='left margin-top'/><p class='medium left pointer indent user-show-availability'>hide availability</p></div>";
+				$lowerOutput .= $this->availabilitycalendar()->create($sport->sport, $sport);
+			}
+				
 			$lowerOutput .= "</div>";
 			
 			$count++;
@@ -242,13 +259,19 @@ $this->placeholder('narrowColumn')->captureEnd();
 	echo $lowerOutput;
 	
 	
-	/*
-	echo $this->partial('partials/global/sectionHeaderPlain.phtml',array('title'   => 'Upcoming Games'));
 	
-	$games = $this->user->games->getAll();
-	for ($i = 0; $i < 3; $i++) {
-		echo "<img src='" . $games[$i]->getProfilePic('large') . "' class='left'/>";
-	}*/
+	if ($this->currentUser->games->hasValue('games')) {
+		
+		echo $this->partial('partials/global/sectionHeaderBold.phtml',array('title'   => 'Upcoming Games'));
+		
+		$games = $this->currentUser->games->getGamesByDate();
+		
+		for ($i = 0; $i < 3; $i++) {
+			if (isset($games[$i])) {
+				echo $this->find()->createGame($games[$i]);
+			}
+		}
+	}
 	
 	// Activity section
 	echo "<div id='user-activities-container'>";

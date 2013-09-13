@@ -26,6 +26,21 @@ $(function()
 		$(this).trigger('click');
 	})
 	
+	/* delete account */
+	$('#settings-delete-account').click(function()
+	{
+		confirmAction = function() {
+			var detailsEle = $('#details-ele');
+			var userID = detailsEle.attr('actingUserID');
+			
+			deleteUser(userID);
+		}
+		
+		populateConfirmActionAlert('delete your account', "<p class='larger-margin-top medium clear width-100 center'>This action cannot be undone.</p>");
+	})
+		
+		
+	
 	
 	$('#info-save-changes').click(function()
 	{
@@ -229,6 +244,21 @@ $(function()
 		
 })
 
+/**
+ * ajax delete user from db
+ */
+function deleteUser(userID)
+{
+	
+	$.ajax({
+		url: '/ajax/delete-user',
+		type: 'POST',
+		data: {userID: userID},
+		success: function(data) {
+			reloadPage();
+		}
+	})
+}
 
 /**
  * ajax remove sport from user

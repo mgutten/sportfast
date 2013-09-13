@@ -335,14 +335,28 @@ input[type=text].create-input {
 }
 
 #create-teamInfo-avatar {
+	/*margin-top: 12px;
+	margin-left: 1px;*/
+}
+
+
+
+#create-teamInfo-avatar-overlay {
+	position:absolute;
+	top: 45%;
+}
+
+#create-teamInfo-avatar-container {
+	position:relative;
 	margin-top: 12px;
 	margin-left: 1px;
 }
 
-#create-teamInfo-avatar:hover {
+#create-teamInfo-avatar-container:hover {
 	border: solid 1px #444;
 	margin-top: 11px;
 	margin-left: 0px;
+
 }
 
 

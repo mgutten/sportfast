@@ -48,7 +48,7 @@ class Application_View_Helper_SignupSportForm
 			}
 			$output .= "<div id='signup-sports-hidden-" . $sport['sport'] . "' class='animate-hidden-container signup-sports-hidden " . $class . "'>
 						<div class='signup-sports-form' id='signup-sports-form-" . $sport['sport'] . "' sport='" . $sport['sport'] . "'>
-						<p class='center header signup-sports-title'>" . ucwords($sport['sport']) . "</p>
+						<p class='center header signup-sports-title darkest'>" . ucwords($sport['sport']) . "</p>
 						" . $remove;
 						
 			

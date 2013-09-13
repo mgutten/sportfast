@@ -288,6 +288,7 @@ class Application_Model_CronMapper extends Application_Model_MapperAbstract
 			if ($result['minPlayers'] > $result['totalPlayers']) {
 				// Not enough players for game, cancel
 				$returnArray['canceled'][$result['gameID']] = new Application_Model_Game($result);
+				$returnArray['canceled'][$result['gameID']]->cancelReason = 'Not enough players';
 			} else {
 				// Game is on
 				$returnArray['on'][$result['gameID']] = new Application_Model_Game($result);

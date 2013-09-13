@@ -106,6 +106,14 @@ echo $this->placeholder('absolute')->captureStart();
 		$content = "<a href='/users/" . $this->user->userID . "/upload' class='width-100 center white left heavy'>You need a profile picture to play.  <span class='white'>Click here to add one.</span></p>";
 		echo $this->topalert('upload', $content);
 	}
+	
+	if ($this->invitesSent) {
+		// Invites sent from previous page, show alert
+		echo $this->alert()->start('invites');
+		echo "<p class='largest-text darkest width-100 center heavy'>Invites sent.</p>";
+
+		echo $this->alert()->end();
+	}
 		
 
 	
@@ -183,15 +191,17 @@ echo "<span id='game-details'
 			public='" . ($this->isPublic ? 'public' : 'private') . "'
 			picture='" . (!$this->user->hasProfilePic() ? 'true' : '') . "'
 	 </span>";
+	 
+
 ?>
 
 <?php
 if ($this->topAlert && $this->userInGame) {
 	// Game is recurring 
-	echo $this->placeholder('topAlert')->captureStart();
+	echo $this->placeholder('topalert')->captureStart();
 		$content = "<p class='white heavy width-100 center'>This game happens every week. <span class='white'> Click here to subscribe for weekly reminders.</span></p>";
 		echo $this->topalert('subscribe', $content);
-	echo $this->placeholder('topAlert')->captureEnd();
+	echo $this->placeholder('topalert')->captureEnd();
 	/*
 	$buttonID = 'subscribe-button';
 	$buttonText = '+Subscribe';
@@ -311,9 +321,7 @@ if ($this->userInGame) {
 						$text = 'Request to Join';
 						$id   = 'request-join-button';
 						$tooltip = "tooltip='This is a private game.'";
-					}
-					
-					if ($this->userHasSport) {
+					} elseif ($this->userHasSport) {
 					
 						if ($this->game->minSkill > $this->user->getSport($this->game->sport)->overall) {
 							// User is not good enough for this game
@@ -326,6 +334,12 @@ if ($this->userInGame) {
 							$id = '';
 							$lower = '<p class="light clear-right smaller-text margin-top">You must have a maximum skill of ' . $this->game->maxSkill . ' to join.</p>';
 						}
+					} elseif (!$this->userHasSport) {
+						// User does not have sport
+						$text = 'Sport Needed';
+						$class = 'transparent default';
+						$id   = 'join-sport-needed';
+						$tooltip = "tooltip='You do not have this sport included in your profile.  Add it under Account Settings.'";
 					}
 						
 					if (!$this->user->hasProfilePic()) {

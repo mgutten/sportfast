@@ -203,6 +203,61 @@
 }
 */
 
+/* reserves */
+.team-reserve-player {
+	position:relative;
+	margin-left: 1px;
+	margin-top: 1px;
+}
 
+.team-reserve-confirmed {
+	width: 10px;
+	height: 10px;
+	background: #58bf12;
+	position:absolute;
+	bottom: -1px;
+	left: -1px;
+	border: 1px solid white;
+}
 
+.team-reserve-player > div > img.animate-opacity {
+	opacity: .6;
+}
+
+#reserves-alert-container {
+	width: 32em;
+	height:auto;
+	margin-left: -16em;
+	margin-top: -6em;
+}
+
+#team-reserve-invite {
+	width: 3em;
+}
+
+#userName-container {
+	margin: 1.5em auto;
+	display:block;
+	float: none;
+	width: 20em;
+}
+
+#userName {
+	width: 19.3em;
+}
+
+.create-userName-result {
+	padding: .5em;
+	width: 100%;
+	background:#fff;
+	border-top: 1px solid #e9e9e9;
+}
+
+.create-userName-result.selected {
+	background: #e9e9e9 !important;
+}
+
+#create-userName-results-container {
+	width: 95%;
+}
 	 

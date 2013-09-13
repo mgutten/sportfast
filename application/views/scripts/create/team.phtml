@@ -102,7 +102,12 @@ echo "<div class='clear create-section width-100'>";
 echo "<div class='clear create-section-inner width-100'>";
 echo $this->partial('partials/global/sectionHeaderBold.phtml',array('title'	=>'Team Info'));
 
-echo "<img src='/images/teams/profile/pic/medium/default.jpg' class='left pointer margin-top' id='create-teamInfo-avatar'/>";
+echo "<div class='left pointer margin-top' id='create-teamInfo-avatar-container'>
+		<img src='/images/teams/profile/pic/medium/default.jpg' class='left pointer' id='create-teamInfo-avatar'/>
+		<div class='width-100 transparent-black' id='create-teamInfo-avatar-overlay'>
+			<p class='white clear width-100 center'>choose logo</p>
+		</div>
+	  </div>";
 
 echo $this->form->teamName;
 

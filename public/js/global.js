@@ -549,7 +549,7 @@ $(function()
 	})
 	
 	/* delete notification on click x */
-	$('.notification-remove').click(function(e)
+	$(document).on('click', '.notification-remove', function(e)
 	{
 		e.stopPropagation();
 		e.preventDefault();
@@ -563,10 +563,16 @@ $(function()
 	})
 	
 	/* notification Confirm or Decline button was clicked */
-	$('.notification-action-button').click(function(e)
+	$(document).on('click','.notification-action-button',function(e)
 	{
 		e.preventDefault();
 		e.stopPropagation(); // To prevent $('.notification-container').click from firing
+		
+		if (typeof $(this).attr('clicked') != 'undefined') {
+			return false;
+		}
+		
+		$(this).attr('clicked') = true;
 		
 		var notificationLogID = $(this).parent().attr('notificationLogID');
 		var type = $(this).parent().attr('type');
@@ -579,10 +585,17 @@ $(function()
 	})
 	
 	/* notification Join button was clicked */
-	$('.notification-join').click(function(e)
+	$(document).on('click', '.notification-join', function(e)
 	{
 		e.preventDefault();
 		e.stopPropagation(); // To prevent $('.notification-container').click from firing
+		
+		if (typeof $(this).attr('clicked') != 'undefined') {
+			// Prevent 2 notifications
+			return false;
+		}
+		
+		$(this).attr('clicked') = true;
 		
 		var notificationLogID = $(this).parent().attr('notificationLogID');
 		var type = $(this).parent().attr('type');
@@ -641,7 +654,7 @@ $(function()
 	{
 		if ($(this).is('.clicked')) {
 			// Has clicked class, do nothing
-			return false;
+			return;
 		}
 		
 		if (!$(this).attr('opacity')) {
@@ -1225,7 +1238,7 @@ function notificationJoin(notificationLogID, type, url)
 	var options = new Object();
 	options.notificationLogID = notificationLogID;
 	options.type = type;
-	
+
 	$.ajax({
 		url: '/ajax/notification-action',
 		type: 'POST',

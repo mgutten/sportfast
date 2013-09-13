@@ -45,6 +45,7 @@ $(function()
 		var type   = idType.replace(/ID/, '');
 		var details = 'request';
 		
+		
 		showConfirmationAlert('Request sent');
 		
 		$(this).text('Request sent')
@@ -140,6 +141,33 @@ $(function()
 		reloadPage();
 		
 	});
+	
+	/* show delete button for message if exists */
+	$('.newsfeed-notification-container').hover(function()
+	{
+		var deleteButton = $(this).find('.profile-delete-message');
+		if (deleteButton.length > 0) {
+			deleteButton.show();
+		}
+	}, function()
+	{
+		var deleteButton = $(this).find('.profile-delete-message');
+		if (deleteButton.length > 0) {
+			deleteButton.hide();
+		}
+	});
+	
+	/* delete newsfeed message on click of delete button */
+	$('.profile-delete-message').click(function()
+	{
+		var detailsEle = getDetailsEle();
+		var type = getType();
+		var messageID = $(this).parents('.profile-message-container').attr('messageID');
+
+		deleteMessage(type, messageID);
+	});
+		
+		
 	
 	$(document).on('click', '.team-manage-team-info-captain-real',function()
 	{
@@ -517,6 +545,11 @@ $(function()
 		return false; // prevent bug that closes animated div after selecting a name from the results
 	})
 	
+	if ($('#invites-alert-container').length > 0) {
+		// Invites were sent on previous page, show alert
+		showAlert($('#invites-alert-container'));
+	}
+	
 	$('.profile-animate-buttons').click(function()
 	{
 		animateProfileButtons();
@@ -543,6 +576,26 @@ $(function()
 	
 	
 })
+
+
+/**
+ * ajax function to delete user message
+ */
+function deleteMessage(type, messageID)
+{
+	var options = {type: type,
+				   messageID: messageID};
+				   
+	$.ajax({
+		url:'/ajax/delete-message',
+		type: 'POST',
+		data: {options:options},
+		success: function(data) {
+			reloadPage();
+		}
+	})
+}
+
 
 /**
  * get details container which should hold all necessary info for team/group info
@@ -687,6 +740,7 @@ function addPost(idType, typeID, actingUserID, message)
 		type: 'POST',
 		data: {options: options},
 		success: function(data) {
+
 			var receivingUserID;
 			var action = 'post';
 			var type   = idType.replace(/ID/, '');

@@ -26,6 +26,22 @@ $(function()
 		
 	})
 	
+	
+	/* show user availabilty on click */
+	$('.user-availability-show').click(function()
+	{
+		$(this).parent().find('.availabilty-calendar-container').show();
+		$(this).hide();
+		$(this).parent().find('.user-availability-hide').show();
+	})
+	
+	$('.user-availability-hide').click(function()
+	{
+		$(this).next('.availabilty-calendar-container').hide();
+		$(this).hide();
+		$(this).parent().find('.user-availability-show').show();
+	})
+	
 	$("#user-player-request").click(function()
 	{
 		var detailsEle = $('#user-details');

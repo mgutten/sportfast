@@ -15,7 +15,7 @@ $this->headScript()->prependFile('https://www.google.com/jsapi');
 <?php
 // Narrow right column
 $this->placeholder('narrowColumn')->captureStart();
-echo "<img src='" . $this->currentUser->getProfilePic('large') . "' class='narrow-column-picture dropshadow rounded-corners'/>";
+echo "<img src='" . $this->currentUser->getProfilePic('large') . "' class='narrow-column-picture dropshadow'/>";
 
 echo "<p class='width-100 center dark clear larger-margin-top'>" . $this->sport->sport . "</p>";
 echo "<div class='width-100 clear center green bold jumbo-text'>" . $this->sport->getOverall() . "</div>";
@@ -91,7 +91,7 @@ $this->placeholder('narrowColumn')->captureEnd();
 ?>
 
 <a href='<?php echo $this->baseURI;?>' class='left smaller-text medium'><img src='/images/global/body/single_left_arrow.png' class='back-arrow'/>Back to profile</a>
-<div class='right larger-text' id='rating-sports'><?php echo $this->sportButton;?></div>
+
 
 <div class='clear width-100' id='chart-container'>
 	<div class='clear width-100'>
@@ -107,7 +107,8 @@ $this->placeholder('narrowColumn')->captureEnd();
 			$counter++;
 		}
 		?>
-        
+    <div class='right larger-text' id='rating-sports'><?php echo $this->sportButton;?></div>
+    
     </div>
     <div id='chart' class='left width-100' style='height: 250px'>
     </div>

@@ -130,8 +130,10 @@ $this->placeholder('absolute')->captureEnd();
             <p class='left larger-indent selectable-text-one light pointer <?php echo $offClass;?>'>off</p>
             <input type='hidden' id='settings-info-email-alert' name='noEmail' value='<?php echo $hiddenVal;?>' />
         </div>
+        
+        <p class='red-button heavy clear' id='settings-delete-account'>Delete Account</p>
        
-        <div class='clear-right larger-margin-top hidden' id='info-save-changes-container'> 
+        <div class='right larger-margin-top hidden' id='info-save-changes-container'> 
             <p class='green-button right largest-text heavy' id='info-save-changes'>Save Changes</p>
         </div>
         </form>
@@ -183,11 +185,16 @@ $this->placeholder('absolute')->captureEnd();
 			
 			//echo $lowerOutput;
 		?>
+        
+        
         </div>
+        
+        
         
         <div class='clear-right larger-margin-top hidden' id='sports-save-changes-container'> 
             <p class='green-button right largest-text heavy' id='sports-save-changes'>Save Changes</p>
         </div>
+        
     </div>
     
     

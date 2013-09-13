@@ -283,6 +283,7 @@ $(function()
 		var sport = $(this).attr('tooltip').toLowerCase();
 		if ($(this).is('.selected-green')) {
 			// Already selected, return
+			$('html,body').animate({scrollTop: $('#signup-sports-form-' + sport).offset().top}, 600);
 			return;
 		}
 		if ($('#signup-sports-what').is('.red')) {
@@ -805,7 +806,7 @@ function testIfValues(section, sport)
 	if (sectionTitle == 'Availability') {
 		// Special case for availability section
 		fail = true;
-		for (i = 0; i < 6; i++) {
+		for (i = 0; i < 7; i++) {
 			hiddenInput = $('#' + id + i) // e.g. basketballAvailabilitySu
 			if (hiddenInput.val().length > 0) {
 				// At least one availability has value

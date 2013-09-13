@@ -29,13 +29,11 @@ class Application_Model_Message extends Application_Model_ModelAbstract
 	
 	public function save($loopSave = false)
 	{
-		if ($this->isGroupMessage()) {
-			// Group message, change db table and primary key
-			$this->_dbTable = 'Application_Model_DbTable_GroupMessages';
-			$this->_primaryKey = 'groupMessageID';
+		if ($this->isTeamMessage()) {
+			// Team message, change db table and primary key
+			$this->setTeamMessage();
 		} elseif ($this->isUserMessage()) {
-			$this->_dbTable = 'Application_Model_DbTable_Messages';
-			$this->_primaryKey = 'messageGroupID';
+			$this->setUserMessage();
 		} elseif ($this->isGameMessage()) {
 			$this->setGameMessage();
 		}
@@ -64,9 +62,9 @@ class Application_Model_Message extends Application_Model_ModelAbstract
 		}
 	}		
 
-	public function isGroupMessage()
+	public function isTeamMessage()
 	{
-		if ($this->hasValue('groupID')) {
+		if ($this->hasValue('teamMessageID')) {
 			return true;
 		}
 		return false;
@@ -140,7 +138,12 @@ class Application_Model_Message extends Application_Model_ModelAbstract
 			}
 		} else {
 			// Text message from user
-			$id = $this->userID;
+			if (!$this->userID) {
+				// Should be sportfast account, give id of 0
+				$id = '0';
+			} else {
+				$id = $this->userID;
+			}
 		}
 		
 		return parent::getProfilePic($size, $id, $type);
@@ -164,6 +167,18 @@ class Application_Model_Message extends Application_Model_ModelAbstract
 	{
 		$this->_dbTable = 'Application_Model_DbTable_GameMessages';
 		$this->_primaryKey = 'gameMessageID';
+	}
+	
+	public function setUserMessage()
+	{
+		$this->_dbTable = 'Application_Model_DbTable_Messages';
+		$this->_primaryKey = 'messageID'; // changed from messageGroupID
+	}
+	
+	public function setTeamMessage()
+	{
+		$this->_dbTable = 'Application_Model_DbTable_TeamMessages';
+		$this->_primaryKey = 'teamMessageID';
 	}
 
 	

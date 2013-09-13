@@ -23,7 +23,7 @@ abstract class Application_Model_MapperAbstract
 		$columns = $table->info(Zend_Db_Table_Abstract::COLS);
 		$attribs = $savingClass->getAttribs();
 		$models  = array();
-		
+
 		foreach ($attribs as $column => $value) {
 			// Loop through savingClass attributes and determine what is an individual object
 			// and what is a valid column for this table
@@ -82,7 +82,7 @@ abstract class Application_Model_MapperAbstract
 			$data[$column] = strtolower(trim($savingClass->$column));
 			
 		}
-		
+
 		
 		$primaryColumn = $table->info('primary');
 		$primaryColumn = $primaryColumn[1];
@@ -113,7 +113,6 @@ abstract class Application_Model_MapperAbstract
 					}
 					
 				}
-				
 	
 				$model->save(true);
 			}

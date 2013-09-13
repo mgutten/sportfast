@@ -172,7 +172,7 @@ $(function()
 	
 	
 	/* show alert for create team avatar */
-	$('#create-teamInfo-avatar').click(function()
+	$('#create-teamInfo-avatar-container').click(function()
 	{
 		showAlert($('#avatars-alert-container'));
 	})

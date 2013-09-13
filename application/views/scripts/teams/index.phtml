@@ -8,6 +8,11 @@ $this->headLink()->prependStylesheet($this->baseUrl() . '/css/team.css');
 $this->headLink()->prependStylesheet($this->baseUrl() . '/css/profile.css');
 $this->headScript()->prependFile($this->baseUrl() . '/js/team.js');
 $this->headScript()->prependFile($this->baseUrl() . '/js/profile.js');
+if ($this->captain) {
+	// Used for reserve search function
+	$this->headScript()->prependFile($this->baseUrl() . '/js/createsuccess.js');
+}
+
 ?>
 
 <?php
@@ -192,8 +197,73 @@ if ($this->fail) {
 			echo 		"</div>";
 				
 			echo $this->alert()->end();
+			
+			
+			// Reserves
+			echo $this->alert()->start('reserves', "Edit " . $this->team->teamName . "'" . (substr($this->team->teamName, -1) == 's' ? '' : 's') . " Reserves");
+			
+			echo "<div class='clear width-100' id='team-reserve-alert-container'>";
+			
+			if (!$this->team->reserves->hasValue('users')) {
+				// no reserves, show description
+				$player = new Application_Model_User();
+				$player->firstName = 'John';
+				$player->lastName = 'Charlie';
+				$player->userID = 300;
+				
+				echo "<div class='left team-reserve-player hidden'>"
+							 . $player->getBoxProfilePic('medium')
+							 . "<div class='hover-dark profile-player-overlay-container'>"
+								. "<div class='profile-player-overlay'>"
+									. "<p class='white width-100 center left larger-margin-top team-reserve-name'>" . $player->shortName . "</p>"
+									. "<div class='clear larger-margin-top width-100'>
+											<div class='red-button auto-center clear team-reserve-remove' userID='" . $player->userID . "'>remove</div>
+										</div>
+								   </div>
+							   </div>
+						  </div>";
+				
+				echo "<p class='margin-top width-100 darkest' id='team-reserve-none'>
+						Players on your reserves list can be invited to play in any upcoming team game.  
+						They do not receive any team notifications or updates, and will only be able to join a game if a team captain invites them.
+					  </p>";
+			} else {
+				foreach ($this->team->reserves->getAll() as $player) {
+					echo "<div class='left team-reserve-player'>"
+							 . $player->getBoxProfilePic('medium')
+							 . "<div class='hover-dark profile-player-overlay-container'>"
+								. "<div class='profile-player-overlay'>"
+									. "<p class='white width-100 center left larger-margin-top team-reserve-name'>" . $player->shortName . "</p>"
+									. "<div class='clear larger-margin-top width-100'>
+											<div class='red-button auto-center clear team-reserve-remove' userID='" . $player->userID . "'>remove</div>
+										</div>
+								   </div>
+							   </div>
+						  </div>";
+							 
+				}
+			}
+			echo "</div>";
+			
+			
+			echo "<div class='clear width-100' id='team-reserve-alert-userName-container'>" 
+					. $this->reserveUserName
+				. "</div>";
+				
+			echo "<div class='clear' id='create-userName-results-container'></div>";
+			
+			echo $this->alert()->end();
 				
 			
+	}
+	
+	if ($this->addToTeam) {
+		// User not added to game from email
+		echo $this->alert()->start('addToGame',"");
+		
+		echo "<p class='clear darkest width-100 center largest-text heavy'>" . $this->addToTeam . "</p>";
+				
+		echo $this->alert()->end();
 	}
 
 	if ($this->team->isSystemCreated() && !$this->userOnTeam && $this->topAlert) {
@@ -203,6 +273,16 @@ if ($this->fail) {
 	}
 	
 	echo $this->alert()->confirmAlert();
+	
+	
+	if ($this->invitesSent) {
+		// Invites sent from previous page, show alert
+		echo $this->alert()->start('invites');
+		echo "<p class='largest-text darkest width-100 center heavy'>Invites sent.</p>";
+
+		echo $this->alert()->end();
+	}
+	
 	
 	echo $this->placeholder('absolute')->captureEnd();
 ?>
@@ -297,7 +377,8 @@ echo "<span id='team-details'
 			rosterLimit='" . $this->team->rosterLimit . "'
 			sport='" . $this->team->sport . "'
 			public='" . ($this->isPublic ? 'public' : 'private') . "'
-			teamName='" . $this->team->teamName . "'>
+			teamName='" . $this->team->teamName . "'
+			nextGameID='" . ($this->nextGame ? $this->nextGame->teamGameID : '') . "'
 	 </span>";
 ?>
 
@@ -347,12 +428,14 @@ echo "<span id='team-details'
 			$class = '';
 			$text = 'Join';
 			$id    = 'join-button';
+			$tooltip = 'Join Team';
 			if (!$this->team->isSystemCreated() && 
 				$this->hasCaptain &&
 				!$this->invited) {
 				// Not sportfast created team, do not allow any user to join without request
 				$text = 'Request to Join';
 				$id   = 'request-join-button';
+				$tooltip = 'Request to join team.';
 			}
 			if ($this->team->minSkill > $this->user->getSport($this->team->sport)->skill &&
 				!$this->invited) {
@@ -363,7 +446,7 @@ echo "<span id='team-details'
 			}
 			?>
             <div id='profile-buttons-container'>
-    		<p class='green-button right larger-text join-button heavy <?php echo $class;?>' id='<?php echo $id;?>'>
+    		<p class='green-button right larger-text join-button heavy <?php echo $class;?>' id='<?php echo $id;?>' tooltip='<?php echo $tooltip;?>'>
             	<?php echo $text;?>
             </p>
             <?php echo $lower; ?>
@@ -398,11 +481,11 @@ echo $this->partial('partials/global/sectionHeaderBold.phtml',array('title'   =>
 ?>
 	<div class='team-next-game-left-container left'>
     	<p class='left largest-text darkest'>vs. <span class='heavy inherit'><?php echo $this->nextTeamName;?></span></p>
-        <p class='clear darkest'>
+        <p class='clear darkest' tooltip='<?php echo $this->nextGame->gameDate->format('M j');?>'>
         	<?php echo $this->nextDay;?> at <?php echo $this->nextHour;?>
         </p>
         <p class='clear darkest'>
-        	<?php echo $this->nextLocationName;?> <a href='http://www.maps.google.com/maps?f=d&q=<?php echo $this->nextLocationStreetAddress;?>' class='light'>directions</a>
+        	<?php echo $this->nextLocationName;?> <a href='http://www.maps.google.com/maps?f=d&q=<?php echo $this->nextLocationStreetAddress;?>' target='_blank' class='light'>directions</a>
         </p>
     </div>
 	
@@ -424,8 +507,8 @@ echo $this->partial('partials/global/sectionHeaderBold.phtml',array('title'   =>
 			$inClass = '';
 			$existingID = '';
 		}
-		if ($this->userOnTeam) {
-			// User is on team
+		if ($this->userOnTeam || $this->invitedToNextGame) {
+			// User is on team or is reserve invited to play
 	?>
     <div class='team-next-game-right-container right' <?php echo $this->nextGameType . $this->nextGameTypeID . $this->nextGameTeamID . $existingID;?>>
         <p class='darkest center'>Are you in, or are you out?</p>
@@ -465,6 +548,56 @@ if ($this->team->players->hasValue('users')) {
 	echo "<p class='none-text larger-text light width-100 center'>There are no players.</p>";
 }
 echo "</div>";
+
+// Reserves section
+if ($this->userOnTeam) {
+	if (!$this->captain && !$this->team->reserves->hasValue('users')) {
+		// Is not captain and there are no reserves, do not display
+	} else {
+		// Is captain with no reserves OR there are reserves
+		echo "<div class='clear width-100'>
+				<div class='clear pointer' id='team-show-reserves'>
+					<img src='/images/global/body/down_arrow.png' class='left margin-top' /><p class=' indent medium left'>show reserves</p>
+				</div>
+				<div class='clear pointer hidden' id='team-hide-reserves'>
+					<img src='/images/global/body/up_arrow.png' class='left margin-top' /><p class=' indent medium left'>hide reserves</p>
+				</div>";
+		if (!$this->team->reserves->hasValue('users')) {
+			// Is captain and no reserves, show explanation
+			echo "<p class='left indent darkest pointer' tooltip='Your reserves list allows you to quickly invite backup players to your next game.'>?</p>";
+		}
+			
+		echo "<div class='clear hidden margin-top' id='team-reserves-container'>";
+		
+		
+		foreach ($this->team->reserves->getAll() as $player) {
+			$confirmed = '';
+			if ($this->nextGame->userConfirmed($player->userID)) {
+				$confirmed = "<div class='team-reserve-confirmed'></div>";
+			}
+			echo "<div class='left team-reserve-player' tooltip='" . $player->shortName . "' userID='" . $player->userID . "'>" 
+					. $player->getBoxProfilePic('small', 'users', 'animate-opacity', 'dark-back')
+					. $confirmed
+					. "</div>";
+		}
+		
+		if ($this->captain) {
+			// Is captain, show "add user to reserve" box
+			echo "<div class='left box-img-container-small pointer white-background animate-darker' style='margin-left: 1px;' tooltip='Add player to your reserves list.' id='team-reserve-add'>
+					<p class='heavy medium width-100 center margin-top'>+ add</p>
+				  </div>";
+		} 
+		
+		echo "<div class='clear width-100'>
+				<p class='green-button auto-center margin-top hidden' id='team-reserve-invite' tooltip='Invite selected reserve players to play in the next game.'>invite</p>
+			  </div>";
+
+			
+		echo "</div>";
+		echo "</div>";
+	}
+}
+		
 
 echo $this->partial('partials/global/sectionHeaderPlain.phtml',array('title' => 'Recent Activity'));
 

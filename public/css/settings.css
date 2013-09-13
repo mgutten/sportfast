@@ -123,6 +123,10 @@ header {
 	width: 8em;
 }
 
+#settings-delete-account {
+	margin-top: 1.5em;
+}
+
 
 /* games */
 .settings-x {

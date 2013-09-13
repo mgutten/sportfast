@@ -35,16 +35,27 @@ class GamesController extends Zend_Controller_Action
 			$session = Zend_Session::namespaceUnset('goToURL');
 		}
 		
+		$session = new Zend_Session_Namespace('invites');
+		if ($session->sent) {
+			// From mailController inviteTypeAction, invites successfully sent, alert
+			$this->view->invitesSent = true;
+			Zend_Session::namespaceUnset('invites');
+		}
+		
 		$session = new Zend_Session_Namespace('addToGame');
 		if (isset($session->fail)) {
 			// From MailController addUserSubscribeGame action, user not added to game from email
 			if ($session->fail == 'already') {
 				// User is already in this game
 				$this->view->addToGame = 'You are already in this game.';
-			} else {
+			} elseif ($session->fail == 'full') {
 				// Game is full
 				$this->view->addToGame = 'This game is full.';
+			} else {
+				// Successfully added
+				$this->view->addToGame = 'You have been added to the roster.';
 			}
+			
 			
 			Zend_Session::namespaceUnset('addToGame');
 		}
@@ -75,6 +86,7 @@ class GamesController extends Zend_Controller_Action
 
 		$this->view->captain = $captain = $game->isCaptain($this->view->user->userID);
 		$this->view->subscribed = $game->isSubscriber($this->view->user->userID);
+		
 		
 		
 		if ($game->recurring && $userInGame && !$game->isSubscriber($this->view->user->userID)) {

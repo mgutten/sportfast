@@ -19,13 +19,13 @@ $this->placeholder('absolute')->captureEnd();
 
 
 if ($this->topAlert) {
-	$this->placeholder('topAlert')->captureStart();
+	$this->placeholder('topalert')->captureStart();
 		
 		$content = "<p class='white width-100 center'>Not enough games?  <span class='inherit heavy'>Try changing the filters on the right</span> (especially Time) or drag the map!</p>";
 	
 		echo $this->topalert('filter', $content);
 		
-	$this->placeholder('topAlert')->captureEnd();
+	$this->placeholder('topalert')->captureEnd();
 }
 
 

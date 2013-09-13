@@ -7,6 +7,8 @@
 
 @font-face {font-family: 'Futura-Heavy';src: url('/webfonts/futuraHeavy/25CEC6_0_0.eot');src: url('/webfonts/futuraHeavy/25CEC6_0_0.eot?#iefix') format('embedded-opentype'),url('/webfonts/futuraHeavy/25CEC6_0_0.woff') format('woff'),url('/webfonts/futuraHeavy/25CEC6_0_0.ttf') format('truetype');}
 
+@font-face {font-family: 'Nevis';src: url('/webfonts/nevis/nevis.eot');src: url('/webfonts/nevis/nevis.eot') format('embedded-opentype'),url('/webfonts/nevis/nevis.woff') format('woff'),url('/webfonts/nevis/nevis.ttf') format('truetype');}
+
 
 * {
 	margin: 0;
@@ -184,13 +186,22 @@ a.no-underline {
 }
 
 p.auto-center,
-a.auto-center {
+a.auto-center,
+div.auto-center {
 	margin-left: auto;
 	margin-right: auto;
 	display:block;
 	float:none;
 	clear:none;
 }
+
+p.auto-center.hidden,
+a.auto-center.hidden,
+div.auto-center.hidden {
+	display:none;
+}
+
+
 
 .justify {
 	text-align:justify;
@@ -427,11 +438,17 @@ div.selected-green,img.selected-green,p.selected-green {
 
 .body-column-wide {
 	width:74.95%;
+	
 }
 
 .back-arrow {
 	margin-bottom: -2px;
 	margin-right: 2px;
+}
+
+.transparent-black {
+	background: #000;
+	opacity: .7;
 }
 
 /* narrow column declarations */
@@ -663,7 +680,7 @@ div.nav-back:hover {
 
 
 .nav {
-	font-family:"nevis";
+	font-family:"Nevis";
 	font-size: 1.063em;
 }
 
@@ -872,7 +889,7 @@ a.header-dropdown-option,a.header-dropdown-option-cog {
 	float:left;
 	clear:both;
 	width: 94%;
-	padding: .2em 2% .2em 4%;
+	padding: 3px 2% 3px 4%;
 	border-bottom: 1px solid #000;
 	border-top: 1px solid #444;
 	font-size: .9em;
@@ -1154,7 +1171,7 @@ div#password-container {
 }
 
 #checkbox-container-rememberMe {
-	width:10em;
+	width:9.5em;
 }
 
 .checkbox-text {
@@ -1164,7 +1181,7 @@ div#password-container {
 
 input.dropdown-login-submit {
 	float:right;
-	margin-right: 1.15em;
+	margin-right: 18px;
 	font-size: .9em;
 }
 
@@ -1851,7 +1868,7 @@ div.dropdown-menu-container-reverse:hover {
 	background-image: -moz-linear-gradient(top, #fff, #e9e9e9);
 	background-image: -ms-linear-gradient(top, #fff, #e9e9e9);
 	background-image: -o-linear-gradient(top, #fff, #e9e9e9);
-	padding: .05em .9em 0 .85em;
+	padding: .05em .9em .05em .85em;
 	text-align:center;
 	float:left;
 	color: #8d8d8d;

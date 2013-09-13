@@ -211,6 +211,7 @@ class Application_View_Helper_MemberHomepage
 		$curDay   = date('w');
 		$schedule = $this->_view->userSchedule; 
 		$firstDayEvent = false;
+		$dayNum = 1;
 		
 		for ($i = $curDay; $i < ($curDay + 7);$i++) {
 			if ($i > 6) {
@@ -241,6 +242,9 @@ class Application_View_Helper_MemberHomepage
 					$firstDayEvent = true;
 				} elseif ($i == date('w', strtotime('+1 day')) && !$firstDayEvent) {
 					// Tomorrow				
+					$display = " style='display:block'";
+				} elseif ((date('w', strtotime('+1 day')) == 0) && !$firstDayEvent && $dayNum == 2) {
+					// Special case for Saturday - Sunday switch
 					$display = " style='display:block'";
 				}
 				$games   = $schedule[$b];
@@ -310,12 +314,12 @@ class Application_View_Helper_MemberHomepage
 						$type	 = " type='pickupGame'";
 						$typeID  = " typeID='" . $game->gameID . "'";
 					} elseif ($game->isTeamGame()) {
-						$team    = $this->_view->user->teams->teamExists($game->teamID);
-						$teamID  = " teamID='" . $team->teamID . "'";
+						$team    = $this->_view->user->teams->teamExists($game->teamID); // Not being used?
+						$teamID  = " teamID='" . $game->teamID . "'";
 						$output .= "<a href='/teams/" . $game->teamID . "' class='member-schedule-day-body-game-container schedule-container'>";
 						$output .= "<div class='member-schedule-day-body-game-left-container'>";
 						$output .= "<p class='darkest larger-text'>vs. <span class='heavy'>" . $game->getLimitedName('opponent', 25) . "</span></p>";
-						$output .= "<p class='clear medium'>" . $team->teamName . "</p>";
+						$output .= "<p class='clear medium'>" . $game->teamName . "</p>";
 						$output .= "<p class='clear darkest'>" . $game->getDay() . "</p>";
 						$output .= "<p class='clear darkest'>" . $game->getHour() . "</p>";
 						$output .= "<p class='clear medium'>" . $game->locationName . "</p>";
@@ -349,6 +353,7 @@ class Application_View_Helper_MemberHomepage
 				}
 				$output .= "<p class='member-schedule-day-none member-schedule-day-body-container light larger-text center' " . $display . ">You have no games scheduled for " . $dateCombo . ".</p>";
 			}
+			$dayNum++;
 			
 		}
 		$output .= '</div>';

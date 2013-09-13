@@ -32,3 +32,12 @@
 #pickup-notes {
 	margin-left: 4em;
 }
+
+/* about us */
+.about-team-member {
+	margin:1em 0 .5em 0;
+}
+
+.about-team-position {
+	margin-top: .2em;
+}

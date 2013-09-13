@@ -21,6 +21,7 @@ class Application_Model_Team extends Application_Model_ModelAbstract
 									'cityID'	   => '',
 									'league'	   => '',
 									'players'	   => '',
+									'reserves'     => '',
 									'messages'	   => '',
 									'games'		   => '',
 									'captains'	   => '',
@@ -155,6 +156,15 @@ class Application_Model_Team extends Application_Model_ModelAbstract
 		return $this->_attribs['players'];
 	}
 	
+	public function getReserves()
+	{
+		if (!$this->hasValue('reserves')) {
+			$this->_attribs['reserves'] = new Application_Model_Users();
+		}
+		
+		return $this->_attribs['reserves'];
+	}
+	
 	public function getGames()
 	{
 		if (!$this->hasValue('games')) {
@@ -219,6 +229,16 @@ class Application_Model_Team extends Application_Model_ModelAbstract
 	public function addMessage($resultRow)
 	{
 		return $this->messages->addMessage($resultRow);
+	}
+	
+	public function addReserve($userID)
+	{
+		return $this->getMapper()->addReserve($userID, $this);
+	}
+	
+	public function removeReserve($userID)
+	{
+		return $this->getMapper()->removeReserve($userID, $this);
 	}
 	
 	
@@ -318,6 +338,14 @@ class Application_Model_Team extends Application_Model_ModelAbstract
 		} else {
 			return 0;
 		}
+	}
+	
+	/**
+	 * test db if userID was invited to game or not
+	 */
+	public function isInvitedToGame($userID, $teamGameID)
+	{
+		return $this->getMapper()->isInvitedToGame($userID, $teamGameID);
 	}
 	
 	/**

@@ -78,6 +78,29 @@ class Application_Model_Games extends Application_Model_TypesAbstract
 		return $game;
 	}
 	
+	/**
+	 * get games ordered by date
+	 */
+	public function getGamesByDate()
+	{
+		$games = $this->attribs['games'];
+		usort($games, array('Application_Model_Games','dateSort'));
+		
+		return $games;
+		
+	}
+	
+	private static function dateSort($a,$b) 
+	{
+		$a = $a->gameDate->format('U');
+		$b = $b->gameDate->format('U');
+       	if ($a == $b) {
+			return 0;
+		}
+		
+		return ($a > $b ? 1 : -1);
+	}
+	
 	
 	/**
 	 * find games for Find controller given options

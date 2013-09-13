@@ -236,7 +236,7 @@ function createScatterChart(dataArray, initial, animation)
 				  baselineColor: '#3f3f3f',
 				  maxValue: 100,
 				  minValue: 60
-				  },
+				  }
 		  
         };
 

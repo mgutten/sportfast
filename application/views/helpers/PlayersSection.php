@@ -93,7 +93,7 @@ class Application_View_Helper_PlayersSection
 				
 				for($i = 0; $i < $guests; $i++) {
 					if ($counter >= 14 && $limited) {
-						$output .= "<a href='/" . $type . "/" . $typeID . "/players' class='medium margin-top clear-right smaler-text'>" . ($typeModel->totalPlayers - $counter) . " more players</a>";
+						$output .= "<a href='/" . $type . "/" . $typeID . "/players' class='medium margin-top clear-right smaller-text'>" . ($typeModel->totalPlayers - $counter) . " more players</a>";
 						break;
 					}
 					$player  = new Application_Model_User();					

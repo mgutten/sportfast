@@ -631,6 +631,18 @@ class Application_Model_User extends Application_Model_ModelAbstract
        return $this->getMapper()->checkPassword($password, $hash, $user_id);
     }
 
+	/**
+	 * delete user and all information
+	 */
+	public function delete()
+	{
+		
+		if (!$this->hasValue('userID')) {
+			return false;
+		}
+		
+		return $this->getMapper()->deleteUser($this->userID);
+	}
 
 
 }

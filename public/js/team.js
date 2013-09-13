@@ -29,6 +29,70 @@ $(function()
 		
 	})
 	
+	/* team reserves */
+	$('#team-show-reserves').click(function()
+	{
+		$(this).hide();
+		$('#team-hide-reserves').show();
+		$('#team-reserves-container').show();
+	})
+	
+	$('#team-hide-reserves').click(function()
+	{
+		$(this).hide();
+		$('#team-show-reserves').show();
+		$('#team-reserves-container').hide();
+	})
+	
+	/* highlight/remove highlight of reserve player */
+	$('.team-reserve-player').click(function()
+	{
+		var img = $(this).find('.animate-opacity');
+		
+		if (img.is('.clicked')) {
+			img.removeClass('clicked');
+		} else {
+			img.addClass('clicked');
+		}
+		
+		testReserveInvites();
+	});
+	
+	$('#team-reserve-invite').click(function()
+	{
+		
+	
+		var detailsEle = getDetailsEle();
+		var teamID = detailsEle.attr('teamID');
+		var teamGameID = detailsEle.attr('nextGameID');
+		
+		var reserves = getReserveInvites();
+		
+		inviteToTeamGame(teamID, teamGameID, reserves);
+	});
+	
+	/* show reserve alert on click of "add" in reserve list */
+	$('#team-reserve-add').click(function()
+	{
+		showAlert($('#reserves-alert-container'));
+	})
+	
+	
+	/* remove user from reserves */
+	$(document).on('click', '.team-reserve-remove', function()
+	{
+		var detailsEle = getDetailsEle();
+		var teamID = detailsEle.attr('teamID');
+		var userID = $(this).attr('userID');
+		
+		addUserToReserve(teamID, userID, true);
+		
+		$(this).parents('.team-reserve-player').remove();
+		
+		changedAlert = true;
+	})
+
+	
 	/* edit team img avatar */
 	$('.create-team-avatar').hover(function()
 	{
@@ -342,6 +406,8 @@ $(function()
 			showAlert($('#manage-remove-player-alert-container'));
 		} else if (val == 'edit team') {
 			showAlert($('#manage-team-info-alert-container'));
+		} else if (val == 'reserves') {
+			showAlert($('#reserves-alert-container'))
 		} else if (val == 'delete team') {
 			
 			confirmAction = function () {
@@ -403,6 +469,26 @@ $(function()
 	
 	
 })
+
+/**
+ * invite user(s) to team game
+ */
+function inviteToTeamGame(teamID, teamGameID, reserves)
+{
+	
+	var options = {teamID: teamID,
+				   teamGameID: teamGameID,
+				   reserves: reserves};
+	
+	$.ajax({
+		url: '/ajax/invite-to-team-game',
+		type: 'POST',
+		data: {options: options},
+		success: function(data) {
+			showConfirmationAlert('Invites sent');
+		}
+	})
+}
 
 /**
  * remove team games from db
@@ -509,6 +595,102 @@ function searchDbForLeagueLocation(name, address, callback)
 					callback(locations);
 				}
 	})
+}
+
+/**
+ * Ajax call to add user to reserve list of team
+ */
+function addUserToReserve(teamID, userID, remove)
+{
+	if (typeof remove == 'undefined') {
+		remove = '';
+	}
+	
+	$.ajax({
+		url: '/ajax/add-user-to-reserve',
+		type: 'POST',
+		data: {teamID: teamID,
+			   userID: userID,
+			   remove: remove},
+		success: function(data) {
+				
+				}
+	})
+}
+
+/**
+ * result clicked from search function in reserve alert
+ */
+function addUserToList(userID, userName)
+{
+	changedAlert = true;
+	
+	$('#team-reserve-none').hide();
+	
+	var detailsEle = getDetailsEle();
+	var teamID = detailsEle.attr('teamID');
+	
+	addUserToReserve(teamID, userID);
+	
+	//var copiedEle = $('#team-reserve-alert-container').children().first();
+	//var copiedHTML = copiedEle.html();
+	
+	//var div = "<div class='" + copiedEle.attr('class') + "'></div>";
+	//$('#team-reserve-alert-container').append(div);
+	
+	var space = userName.indexOf(" ")
+	var lastLetter = userName[space + 1];
+	var firstName = userName.substr(0,space);
+	userName = firstName + ' ' + lastLetter
+
+	
+	var newEle = $('#team-reserve-alert-container').children('.team-reserve-player').last().clone()
+												   .removeClass('hidden')
+												   .appendTo('#team-reserve-alert-container');
+	
+	newEle.find('.team-reserve-remove').attr('userID', userID);
+	
+	newEle.find('.team-reserve-name').html(userName);
+	
+	newEle.find('img').attr('onError', "this.src='/images/users/profile/pic/medium/default.jpg'")
+					  .attr('src', '/images/users/profile/pic/medium/' + userID + '.jpg');
+}
+	
+
+/**
+ * test if invites are available to be sent to reserve players
+ */
+function testReserveInvites()
+{
+	var shown = getReserveInvites();
+	
+	if (shown) {
+		// Show invites button
+		$('#team-reserve-invite').show();
+	} else {
+		$('#team-reserve-invite').hide();
+	}
+}
+
+/**
+ * get all the invited reserves
+ */
+function getReserveInvites()
+{
+	var returnArray = new Array();
+	$('.team-reserve-player').each(function()
+	{
+		if ($(this).find('img').is('.clicked')) {
+			var userID = $(this).attr('userID');
+			returnArray.push(userID);
+		}
+	})
+	
+	if (returnArray.length < 1) {
+		return false;
+	}
+	
+	return returnArray;
 }
 
 function populateLeagueLocationResults(locations)

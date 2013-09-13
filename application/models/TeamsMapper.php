@@ -260,6 +260,70 @@ class Application_Model_TeamsMapper extends Application_Model_TypesMapperAbstrac
 		}
 	}
 	
+	/**
+	 * is user invited to team game
+	 */
+	public function isInvitedToGame($userID, $teamGameID)
+	{
+		$table = $this->getDbTable();
+		$select = $table->select();
+		
+		$select->setIntegrityCheck(false);
+		
+		$select->from(array('nl' => 'notification_log'))
+			   ->join(array('n' => 'notifications'),
+			   		  'n.notificationID = nl.notificationID')
+			   ->where('n.action = ?', 'invite')
+			   ->where('n.type = ?', 'teamgame')
+			   ->where('nl.teamGameID = ?', $teamGameID)
+			   ->where('nl.receivingUserID = ?', $userID);
+
+		$results = $table->fetchAll($select);
+		
+		if (isset($results[0])) {
+			return true;
+		} else {
+			return false;
+		}
+		
+	}
+	
+	/**
+	 * add reserve player to team in db
+	 */
+	public function addReserve($userID, $teamModel)
+	{
+		$db = Zend_Db_Table::getDefaultAdapter();
+		
+		if (empty($userID)) {
+			return;
+		}
+		
+		$teamReserveID = $db->insert('team_reserves', array('teamID' => $teamModel->teamID,
+														    'userID' => $userID));
+															
+		return $teamReserveID;
+										   
+	}
+	
+	/**
+	 * add reserve player to team in db
+	 */
+	public function removeReserve($userID, $teamModel)
+	{
+		$db = Zend_Db_Table::getDefaultAdapter();
+		
+		if (empty($userID) || !$teamModel->hasValue('teamID')) {
+			return false;
+		}
+
+		$db->delete('team_reserves', array('teamID = ?' => $teamModel->teamID,
+										   'userID = ?' => $userID));
+															
+										   
+	}
+		
+	
 	
 	/**
 	 * delete game
@@ -389,8 +453,25 @@ class Application_Model_TeamsMapper extends Application_Model_TypesMapperAbstrac
 				$savingClass->addCaptain($player->userID, $player->creator);
 			}
 				
-		}	
+		}
 		
+		// Get reserves	
+		$select = $table->select();
+		$select->setIntegrityCheck(false);	
+			
+		$select->from(array('ut' => 'team_reserves'))
+			   ->join(array('u' => 'users'),
+			   		  'u.userID = ut.userID')
+			   ->where('ut.teamID = ?', $teamID)
+			   ->group('ut.userID');
+		
+		$reserves = $table->fetchAll($select);
+		
+		foreach ($reserves as $reserve) {
+
+			$savingClass->reserves->addUser($reserve);
+		}
+								
 		// Get all games as well as players playing/played in those games
 		$select = $table->select();
 		$select->setIntegrityCheck(false);	
@@ -522,6 +603,9 @@ class Application_Model_TeamsMapper extends Application_Model_TypesMapperAbstrac
 			   ->join(array('ut' => 'user_teams'),
 			   		  't.teamID = ut.teamID',
 					  array('COUNT(ut.userID) as totalPlayers'))
+			   ->join(array('u' => 'users'),
+			   		  'u.userID = ut.userID',
+					  array(''))
 			   ->where('t.teamID = ?', $savingClass->teamID);
 			  
 			   

@@ -218,6 +218,11 @@ textarea.post-message {
 	width: auto;
 	/*border: 1px solid #bbb;*/
 	padding: .4em .6em;
+	max-width:93%;
+}
+
+.profile-delete-message {
+	margin-top: .3em;
 }
 
 .newsfeed-notification-text-container {
@@ -362,9 +367,9 @@ input[type=text].profile-manage-team-info-roster-limit {
 }
 
 #addToGame-alert-container {
-	width: 34em;
+	width: 36em;
 	margin-top: -5em;
-	margin-left: -17em;
+	margin-left: -18em;
 }
 
 /* sub-players page */
@@ -432,5 +437,12 @@ input[type=text].profile-manage-team-info-roster-limit {
 
 #input-overlay-note {
 	margin-top: -2.1em;
+}
+
+/* alert */
+#invites-alert-container {
+	width: 20em;
+	margin-left: -10em;
+	margin-top: -7em;
 }
 	

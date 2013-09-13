@@ -53,7 +53,7 @@ class Application_Model_NotificationsMapper extends Application_Model_MapperAbst
 		$savingClass->isNewsfeed = true;
 		
 		foreach ($results as $result) {
-			
+
 			$notification = $savingClass->addNotification($result);
 			$notification->newsfeed = true;
 		}
@@ -122,6 +122,7 @@ class Application_Model_NotificationsMapper extends Application_Model_MapperAbst
 		 $db = Zend_Db_Table::getDefaultAdapter();
 		 
 		 if ($type == 'friend') {
+			 
 			 $query = "INSERT INTO friends (userID1, userID2, userName1, userName2)
 			 			(SELECT nl.actingUserID, 
 								nl.receivingUserID,
@@ -139,30 +140,74 @@ class Application_Model_NotificationsMapper extends Application_Model_MapperAbst
 								 (NOW() + INTERVAL " . $this->getTimeOffset() . " HOUR)
 						 	FROM notification_log as `nl`
 							WHERE nl.notificationLogID = '" . $notificationLogID . "')";
+			
+			/*		
+			// User joined team, ask if they still want to be listed as actively searching	
+			 $select = "SELECT nl.actingUserID,
+			 				   nl.receivingUserID
+							FROM notification_log as `nl`
+							INNER JOIN notifications n ON n.notificationID = nl.notificationID
+							WHERE nl.notificationLogID = '" . $notificationLogID . "'";
+		 	 $result = $db->fetchRow($select);	
+			 
+			 
+			 $notification = new Application_Model_Notification();
+			 $notification->action = 'friend';
+			 $notification->actingUserID = $result['actingUserID'];
+			 $notification->receivingUserID = $result['receivingUserID'];
+			 
+			 $notification->save();
+			 */
+			 
 		 } elseif ($type == 'team') {
 			 // Add user to team
 			 $query = "INSERT INTO user_teams (teamID, userID)
 			 			(SELECT nl.teamID,
-								COALESCE(nl.actingUserID,nl.receivingUserID)
+								CASE WHEN n.action = 'invite' THEN nl.receivingUserID ELSE nl.actingUserID END
 							FROM notification_log as `nl`
+							INNER JOIN notifications `n` ON n.notificationID = nl.notificationID
 							WHERE nl.notificationLogID = '" . $notificationLogID . "')";
 			
 			 $query2 = "INSERT INTO notification_log (actingUserID, teamID, notificationID, dateHappened)
-			 			 (SELECT COALESCE(nl.actingUserID,nl.receivingUserID), 
+			 			 (SELECT CASE WHEN n.action = 'invite' THEN nl.receivingUserID ELSE nl.actingUserID END, 
 						 		 nl.teamID, 
 								 (SELECT notificationID FROM notifications WHERE type ='team' AND action = 'join' AND details IS NULL), 
 								 (NOW() + INTERVAL " . $this->getTimeOffset() . " HOUR)
 						 	FROM notification_log as `nl`
+							INNER JOIN notifications n ON n.notificationID = nl.notificationID
 							WHERE nl.notificationLogID = '" . $notificationLogID . "')";
+							
+			 
 			 
 			 // User joined team, ask if they still want to be listed as actively searching	
-			 $select = "SELECT COALESCE(nl.actingUserID,nl.receivingUserID) as userID,
+			 $select = "SELECT CASE WHEN n.action = 'invite' THEN nl.receivingUserID ELSE nl.actingUserID END as userID,
 			 				   t.sport,
 							   t.teamID
 							FROM notification_log as `nl`
+							INNER JOIN notifications n ON n.notificationID = nl.notificationID
 							INNER JOIN teams t ON t.teamID = nl.teamID
 							WHERE nl.notificationLogID = '" . $notificationLogID . "'";
 		 	 $result = $db->fetchRow($select);	
+			 
+			 /*
+			 $notification = new Application_Model_Notification();
+			 $notification->action = 'join';
+			 $notification->type = 'team';
+			 $notification->actingUserID = $result['userID'];
+			 $notification->teamID = $result['teamID'];
+			 
+			 $notification->save();
+			 */
+			 
+			 $notifications = new Application_Model_Notifications();
+			 
+			 $details = array('n.action' => array('leave',
+			 									  'join'),
+							  'n.type'   => 'team',
+							  'nl.actingUserID' => $result['userID'],
+							  'nl.teamID' => $result['teamID']);
+							  
+			 $notifications->deleteAll($details);
 			 
 			 $notification = new Application_Model_Notification();
 			 $notification->action = 'check';
@@ -171,21 +216,45 @@ class Application_Model_NotificationsMapper extends Application_Model_MapperAbst
 			 $notification->teamID = $result['teamID'];
 			 
 			 $notification->save();
+			 
+			 
 							
 		 } elseif ($type == 'game') {
 			 $query = "INSERT INTO user_games (gameID, userID)
 			 			(SELECT nl.gameID,
-								nl.receivingUserID
+								CASE WHEN n.action = 'invite' THEN nl.receivingUserID ELSE nl.actingUserID END
 							FROM notification_log as `nl`
+							INNER JOIN notifications n ON n.notificationID = nl.notificationID
 							WHERE nl.notificationLogID = '" . $notificationLogID . "')";
 			
 			 $query2 = "INSERT INTO notification_log (actingUserID, gameID, notificationID, dateHappened)
-			 			 (SELECT nl.receivingUserID, 
+			 			 (SELECT CASE WHEN n.action = 'invite' THEN nl.receivingUserID ELSE nl.actingUserID END, 
 						 		 nl.gameID, 
 								 (SELECT notificationID FROM notifications WHERE type ='game' AND action = 'join' AND details IS NULL), 
 								 (NOW() + INTERVAL " . $this->getTimeOffset() . " HOUR)
 						 	FROM notification_log as `nl`
+							INNER JOIN notifications n ON n.notificationID = nl.notificationID
 							WHERE nl.notificationLogID = '" . $notificationLogID . "')";
+			
+			/*
+			 $select = "SELECT CASE WHEN n.action = 'invite' THEN nl.receivingUserID ELSE nl.actingUserID END as userID,
+			 				   g.sport,
+							   g.gameID
+							FROM notification_log as `nl`
+							INNER JOIN notifications n ON n.notificationID = nl.notificationID
+							INNER JOIN games g ON g.gameID = nl.gameID
+							WHERE nl.notificationLogID = '" . $notificationLogID . "'";
+		 	 $result = $db->fetchRow($select);	
+			 
+			 
+			 $notification = new Application_Model_Notification();
+			 $notification->action = 'join';
+			 $notification->type = 'game';
+			 $notification->actingUserID = $result['userID'];
+			 $notification->teamID = $result['gameID'];
+			 
+			 $notification->save();
+			 */
 							
 		 } elseif ($type == 'user' && $action == 'check') {
 			 // User has either confirmed or denied that they want to remain listed as actively searching for team
@@ -283,15 +352,16 @@ class Application_Model_NotificationsMapper extends Application_Model_MapperAbst
 	  */
 	 public function delete($details = false, $notificationLogID = false) 
 	 {
-		 $query = "DELETE notification_log FROM notification_log 
-		 			INNER JOIN notifications ON notifications.notificationID = notification_log.notificationID
+		 $query = "DELETE nl FROM notification_log nl 
+		 			INNER JOIN notifications n ON n.notificationID = nl.notificationID
 					WHERE ";
 					
 		 if ($notificationLogID) {
-			 $query .= "notification_log.notificationLogID = '" . $notificationLogID . "'";
+			 $query .= "nl.notificationLogID = '" . $notificationLogID . "'";
 		 } elseif ($details) {
 			 $counter = 0;
 			 foreach ($details as $column => $val) {
+				 
 				 if (empty($val)) {
 					 continue;
 				 }
@@ -299,13 +369,31 @@ class Application_Model_NotificationsMapper extends Application_Model_MapperAbst
 				 if ($counter != 0) {
 					 $query .= " AND ";
 				 }
-				 $query .= " " . $column . " = '" . $val . "' ";
+				 
+				 if (is_array($val)) {
+					 // Array of values, use OR
+					 $query .= '(';
+					 $innerCounter = 0;
+					 foreach ($val as $inner) {
+						 if ($innerCounter != 0) {
+							 $query .= " OR ";
+						 }
+						 $query .= " " . $column . " = '" . $inner . "' ";
+						 $innerCounter++;
+					 }
+					 $query .= ')';
+
+				 } else {
+					 // Plain AND
+					 $query .= " " . $column . " = '" . $val . "' ";
+				 }
 				 $counter++;
 			 }
 		 }
 
 		 $db = Zend_Db_Table::getDefaultAdapter();
 		 
+
 		 $db->query($query);
 	 }
 
