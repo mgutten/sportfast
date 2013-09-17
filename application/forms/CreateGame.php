@@ -68,6 +68,18 @@ class Application_Form_CreateGame extends Zend_Form
 				'value'			=> ''
 				));
 				
+		$this->addElement('hidden', 'skillLimitMin',  array(
+				'required'		=> false,
+				'decorators'    => array('Hidden'),
+				'value'			=> 60
+				));
+				
+		$this->addElement('hidden', 'skillLimitMax',  array(
+				'required'		=> false,
+				'decorators'    => array('Hidden'),
+				'value'			=> 100
+				));
+				
 		$this->addElement('text', 'parkName', array(
 				'filters'		=> array('StringTrim'),
 				'required'		=> false,
@@ -120,6 +132,7 @@ class Application_Form_CreateGame extends Zend_Form
 				'autocomplete'  => 'off'
 				));
 		
+		/*
 		$this->addElement('text', 'skillLimitMin', array(
 				'filters'		=> array('StringTrim'),
 				'required'		=> false,
@@ -139,7 +152,8 @@ class Application_Form_CreateGame extends Zend_Form
 				'class'			=> 'dropshadow ' . $detailsClass,
 				'autocomplete'  => 'off'
 				));
-				
+		*/
+	
 		$this->addElement('checkbox', 'ageLimitCheckbox',  array(
 				'required'		=> false,
 				'decorators'	=> array('Checkbox'),

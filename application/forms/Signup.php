@@ -47,6 +47,7 @@ class Application_Form_Signup extends Zend_Form
 				'decorators'	=> array('Overlay'),
 				'validators'	=> array('digits'),
 				'label'			=> 'mm',
+				'tooltip'		=> 'Date of birth',
 				'class'			=> 'short-input dropshadow',
 				'maxlength'		=> 2
 				));

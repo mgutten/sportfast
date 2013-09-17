@@ -32,7 +32,7 @@ class Application_View_Helper_Homepage
 						
 		$textArray = array('image'	=> 'green_magnifying',
 						   'header' => 'Find local pickup games, teams, and leagues.',
-						   'text'   => "We don't just give you a list and expect you to find a game or team.  Our system actively matches you
+						   'text'   => "Sportfast doesn't just give you a list and expect you to find a game or team.  Our system actively matches you
 						   				with other players in your area based on your age, skill, and availability, giving you the most competitive games possible.");
 		
 		$output   .= $this->homepageDescriptionContainer($textArray);
@@ -53,7 +53,7 @@ class Application_View_Helper_Homepage
 		
 		$textArray = array('image'	=> 'clipboard',
 						   'header' => "Organize your pre-existing games and teams.",
-						   'text'   => "We've made managing your weekly pickup game or league team easy.  Send automatic reminders for upcoming games.  See who's going.  Find more players.
+						   'text'   => "Sportfast makes managing your weekly pickup game or league team easy.  Send automatic reminders for upcoming games.  See who's going.  Find more players.
 						   				Track game stats.  It's all simple and easy with Sportfast.");
 										
 		$output   .= $this->homepageDescriptionContainer($textArray);

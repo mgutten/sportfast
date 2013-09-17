@@ -269,7 +269,7 @@ class UsersController extends Zend_Controller_Action
 		
 		$user->save(false);
 		
-		$user->city = $city;
+		//$user->city = $city;
 		
 		
 		$this->_redirect('/users/' . $user->userID . '/settings');

@@ -40,7 +40,7 @@ class Application_View_Helper_AvailabilityCalendar
 		foreach ($days as $day) {
 			$counter = $startHour;
 			$output .= "<div class='availability-calendar-day-container' day='" . $day . "' id='" . $sport . "-availability-calendar-day-container-" . $day . "' >";
-			$output .= "<p class=' medium'>" . $day . "</p>";
+			$output .= "<p class=' medium availability-calendar-day pointer'>" . $day . "</p>";
 			
 			for ($i = 0; $i < 4; $i++) {
 				// Create 4 sections

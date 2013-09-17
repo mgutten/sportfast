@@ -34,6 +34,7 @@ class Application_Model_User extends Application_Model_ModelAbstract
 									'plus'			=> '',
 									'fake'			=> '',
 									'joined'		=> '',
+									'avatar'		=> '',
 									'noEmail'		=> ''  // Do not email when game is created for them
 									);
 

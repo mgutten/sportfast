@@ -12,6 +12,24 @@ class Application_Model_CronMapper extends Application_Model_MapperAbstract
 	{
 		$db = Zend_Db_Table::getDefaultAdapter();
 		
+		$testGameUpdate = "SELECT MAX(gameID) FROM games 
+							HAVING top = (SELECT gameID FROM games WHERE parkID = 0 AND sportID = 0 AND public = 0)";
+		
+		$results = $db->query($testGameUpdate);
+		
+		if (!$results) {
+			// Max gameID != the holder game for bug fix, continue to move bug fix gameID to maxID
+		
+			// BUG FIX to move empty holder game in db to new position as max(id)
+			$moveGame = "UPDATE games SET gameID = ((
+														SELECT gameID
+														FROM (SELECT MAX(gameID) as gameID FROM games) AS g2
+														
+													) + 1) 
+							WHERE parkID = 0 AND sportID = 0 AND public = 0";
+			$db->query($moveGame);
+		}
+		
 		// Copy from games -> old_games
 		$insertGames = "INSERT INTO old_games (gameID, parkID, parkName, backupParkID, backupParkName, 
 											   public, sport, sportID, typeID, rosterLimit, maxSkill, 
@@ -29,58 +47,60 @@ class Application_Model_CronMapper extends Application_Model_MapperAbstract
 		$db->query($insertGames);
 		$oldGameID = $db->lastInsertId();
 		
-		$select = 
+		if ($oldGameID) {
 		
-		// Copy from user_games -> old_user_games					
-		$insertUserGames = "INSERT INTO old_user_games (oldGameID, gameID, userID, plus)
-								(SELECT og.oldGameID, ug.gameID, ug.userID, ug.plus
-									FROM user_games ug
-									INNER JOIN (SELECT * 
-													FROM old_games 
-													WHERE movedDate = (SELECT movedDate 
-																		FROM old_games 
-																		WHERE oldGameID = '" . $oldGameID . "')
-												) og ON og.gameID = ug.gameID)";
-												
-		$db->query($insertUserGames);
-		
-		// Delete from games table (non-recurring games)
-		$deleteGames = "DELETE FROM games 
-							WHERE games.gameID IN (SELECT gameID 
-													FROM old_games 
-													WHERE movedDate = (SELECT movedDate 
-																		FROM old_games 
-																		WHERE oldGameID = '" . $oldGameID . "')
-														AND (recurring = 0)
-												   )";
-		$db->query($deleteGames);
-		
-		// Delete from game_messages
-		$deleteMessages = "DELETE FROM game_messages 
-							WHERE gameID IN (SELECT gameID 
-													FROM old_games 
-													WHERE movedDate = (SELECT movedDate 
-																		FROM old_games 
-																		WHERE oldGameID = '" . $oldGameID . "')
-												   )";
-		
-		$db->query($deleteMessages);
-		
-		// Delete game notifications
-		$deleteNotifications = "DELETE FROM notification_log 
-							WHERE gameID IN (SELECT gameID 
-													FROM old_games 
-													WHERE movedDate = (SELECT movedDate 
-																		FROM old_games 
-																		WHERE oldGameID = '" . $oldGameID . "')
-												   )";
-		
-		$db->query($deleteNotifications);
+			// Copy from user_games -> old_user_games					
+			$insertUserGames = "INSERT INTO old_user_games (oldGameID, gameID, userID, plus)
+									(SELECT og.oldGameID, ug.gameID, ug.userID, ug.plus
+										FROM user_games ug
+										INNER JOIN (SELECT * 
+														FROM old_games 
+														WHERE movedDate = (SELECT movedDate 
+																			FROM old_games 
+																			WHERE oldGameID = '" . $oldGameID . "')
+													) og ON og.gameID = ug.gameID)";
+													
+			$db->query($insertUserGames);
+			
+			// Delete from games table (non-recurring games)
+			$deleteGames = "DELETE FROM games 
+								WHERE games.gameID IN (SELECT gameID 
+														FROM old_games 
+														WHERE movedDate = (SELECT movedDate 
+																			FROM old_games 
+																			WHERE oldGameID = '" . $oldGameID . "')
+															AND (recurring = 0)
+													   )";
+			$db->query($deleteGames);
+			
+			// Delete from game_messages
+			$deleteMessages = "DELETE FROM game_messages 
+								WHERE gameID IN (SELECT gameID 
+														FROM old_games 
+														WHERE movedDate = (SELECT movedDate 
+																			FROM old_games 
+																			WHERE oldGameID = '" . $oldGameID . "')
+													   )";
+			
+			$db->query($deleteMessages);
+			
+			// Delete game notifications
+			$deleteNotifications = "DELETE FROM notification_log 
+								WHERE gameID IN (SELECT gameID 
+														FROM old_games 
+														WHERE movedDate = (SELECT movedDate 
+																			FROM old_games 
+																			WHERE oldGameID = '" . $oldGameID . "')
+													   )";
+			
+			$db->query($deleteNotifications);
+		}
 		
 		// Delete from games table any games labeled "remove"
 		$deleteGames = "DELETE FROM games 
 							WHERE remove IS NOT NULL 
-								AND remove < now()";
+								AND remove < now()
+								AND remove != '0000-00-00'";
 		$db->query($deleteGames);
 		
 		// Update any recurring games
@@ -274,7 +294,7 @@ class Application_Model_CronMapper extends Application_Model_MapperAbstract
 						LEFT JOIN (SELECT u2.userID, ug2.gameID, ug2.plus FROM users u2
 									INNER JOIN user_games ug2 ON u2.userID = ug2.userID 
 									WHERE fake = 0) ug ON g.gameID = ug.gameID
-						WHERE CASE WHEN (HOUR((NOW() + INTERVAL " . $this->getTimeOffset() . " HOUR)) >= 19 AND MINUTE((NOW() + INTERVAL " . $this->getTimeOffset() . " HOUR)) > 31) THEN HOUR(TIMEDIFF(g.date, (NOW() + INTERVAL " . $this->getTimeOffset() . " HOUR))) <= 13 AND g.date >= (NOW() + INTERVAL " . $this->getTimeOffset() . " HOUR) ELSE (HOUR(TIMEDIFF(g.date, (NOW() + INTERVAL " . $this->getTimeOffset() . " HOUR))) = 1 and MINUTE(TIMEDIFF(g.date, (NOW() + INTERVAL " . $this->getTimeOffset() . " HOUR))) > 29) END
+						WHERE CASE WHEN (HOUR((NOW() + INTERVAL " . $this->getTimeOffset() . " HOUR)) >= 19 AND MINUTE((NOW() + INTERVAL " . $this->getTimeOffset() . " HOUR)) > 31) THEN HOUR(TIMEDIFF(g.date, (NOW() + INTERVAL " . $this->getTimeOffset() . " HOUR))) <= 13 AND g.date >= (NOW() + INTERVAL " . $this->getTimeOffset() . " HOUR) ELSE (HOUR(TIMEDIFF(g.date, (NOW() + INTERVAL " . $this->getTimeOffset() . " HOUR))) = 1 and MINUTE(TIMEDIFF(g.date, (NOW() + INTERVAL " . $this->getTimeOffset() . " HOUR))) > 29) AND g.date >= (NOW() + INTERVAL " . $this->getTimeOffset() . " HOUR) END
 							AND g.canceled = 0
 						GROUP BY g.gameID";
 		

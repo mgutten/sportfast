@@ -63,7 +63,7 @@ class MailController extends Zend_Controller_Action
 				
 				if (!in_array($user['userID'], $userIDs)) {
 					array_push($userIDs, $user['userID']);
-					array_push($userEmails, $user['email']);
+					$userEmails[$user['userID']] =  $user['email'];
 				}
 			}
 		}
@@ -79,7 +79,7 @@ class MailController extends Zend_Controller_Action
 			$typeModel = new Application_Model_Game();
 			$typeModel->getGameByID($typeID);
 		} else {
-			// is team
+			// Is team
 			$typeModel = new Application_Model_Team();
 			$typeModel->getTeamByID($typeID);
 		}		
@@ -106,7 +106,7 @@ class MailController extends Zend_Controller_Action
 			$headers .= "Reply-To: donotreply@sportfast.com" . "\r\n";
 					
 	
-			mail($userEmails[$counter], $subject, $message, $headers);
+			mail($userEmails[$userID], $subject, $message, $headers);
 			$counter++;
 		}
 		
@@ -247,53 +247,7 @@ class MailController extends Zend_Controller_Action
 								Sportfast is by athletes, for athletes.</p>
 						 </td>
 					 </tr>
-					 <tr>
-						 <td height='40px'></td>
-					 </tr>
-					 <tr>
-						 <td class='dark-back' style='background-color: #333;' bgcolor='#333'>
-							<p class='bold white larger-text' style='font-family: Arial, Helvetica, Sans-Serif; font-size: 1.25em; color: #fff; font-weight: bold; margin: 0;'>What is Sportfast?</p> 	
-						</td>
-					 </tr>
-					 <tr>
-					 	<td cellpadding='4'>
-							<p class='medium smaller-text' style='font-family: Arial, Helvetica, Sans-Serif; font-size: .8em; color: #8d8d8d; margin: 0;'>Sportfast is designed to simplify the way we find, organize, and manage our recreational sports.  
-							It will help you find new pickup games, manage your old ones,
-							and track your progress over time.  Our unique algorithms analyze users' age, skill, availability, and location to create competitive and enjoyable pickup games, as well as league teams, near you.  You'll always
-							know who is going and how you match up against them, so you never need to feel unwelcome or out-matched.  If you love sports as much as we do, then you should look no further.</p>
-						</td>
-					</tr>
-					<tr>
-						 <td height='20px'></td>
-					 </tr>
-					<tr>
-						 <td class='dark-back' style='background-color: #333;' bgcolor='#333'>
-							<p class='bold white larger-text' style='font-family: Arial, Helvetica, Sans-Serif; font-size: 1.25em; color: #fff; font-weight: bold; margin: 0;'>How much does it cost?</p> 	
-						</td>
-					 </tr>
-					 <tr>
-					 	<td cellpadding='4'>
-							<p class='medium smaller-text' style='font-family: Arial, Helvetica, Sans-Serif; font-size: .8em; color: #8d8d8d; margin: 0;'>It's free!  Totally and utterly free.  There aren't even ads!  We're in beta, so help us out by giving us your feedback!</p>
-						</td>
-					</tr>
-					<tr>
-						 <td height='20px'></td>
-					 </tr>
-					<tr>
-						 <td class='dark-back' style='background-color: #333;' bgcolor='#333'>
-							<p class='bold white larger-text' style='font-family: Arial, Helvetica, Sans-Serif; font-size: 1.25em; color: #fff; font-weight: bold; margin: 0;'>What sports?</p> 	
-						</td>
-					 </tr>
-					 <tr>
-					 	<td cellpadding='4'>
-							<p class='medium smaller-text' style='font-family: Arial, Helvetica, Sans-Serif; font-size: .8em; color: #8d8d8d; margin: 0;'>Currently, we support basketball, soccer, football, volleyball, tennis, and ultimate frisbee.  Again, we're in beta, so we don't quite have everything that we want yet, but keep checking back for more!</p>
-						</td>
-					</tr>
-					 <tr>
-					 	<td>
-							<p class='medium smaller-text' style='font-family: Arial, Helvetica, Sans-Serif; font-size: .8em; color: #8d8d8d; margin: 0;'>You can read more about us <a href='http://www.sportfast.com/how' class='darkest' style='font-family: Arial, Helvetica, Sans-Serif; color: #444; margin: 0;'>on our website</a>.</p>
-						</td>
-					</tr>";
+					 " . $this->sportfastExplanation();
 		} else {
 			$output .= "<tr>
 					 	<td height='10px'></td>
@@ -310,6 +264,95 @@ class MailController extends Zend_Controller_Action
 					 
 		
 		return $output;
+	}
+	
+	/**
+	 * invite to join sportfast
+	 */
+	public function inviteSportfastAction()
+	{
+		$post = $this->getRequest()->getPost();
+				
+		if (!empty($post['emails'])) {
+			// Emails have been posted
+			$emails = explode(',', $post['emails']);
+			
+
+			for ($i = 0; $i < count($emails); $i++) {
+				$emails[$i] = trim($emails[$i]);
+			}
+			
+			$users = new Application_Model_Users();
+			$emailsExist = $users->emailsExist($emails);
+			
+			foreach ($emailsExist as $user) {
+				$key = array_search($user['email'], $emails);
+				unset($emails[$key]);
+				
+			}
+		}
+		
+		$note = '';
+		if (!empty($post['note'])) {
+			// Personalized note was sent
+			$note = $post['note'];
+		}
+		
+		foreach ($emails as $email) {
+			$subject  = $this->view->user->fullName . ' invited you to join Sportfast';
+			$message  = $this->buildInviteSportfast($this->view->user, $note);
+			$headers  = "MIME-Version: 1.0" . "\r\n";
+			$headers .= "Content-type: text/html; charset=iso-8859-1" . "\r\n";
+			$headers .= "From: " . $this->view->user->fullName . " <support@sportfast.com>\r\n";	 
+			$headers .= "Reply-To: donotreply@sportfast.com" . "\r\n";
+					
+	
+			mail($email, $subject, $message, $headers);
+		}
+		
+		$session = new Zend_Session_Namespace('invites');
+		$session->sent = true;
+	}
+	
+	/**
+	 * mail for invite to a game or team
+	 * @params ($actingUser => Application_Model_User of user who invited,)
+	 */
+	public function buildInviteSportfast($actingUser, $note = false)
+	{
+		$output = $this->mailStart();
+		
+		$output .= "<tr>
+						<td>
+							<p style='text-align:center;font-family: Arial, Helvetica, Sans-Serif; font-size: 18px; color: #333; margin: 0;'>
+								<bold>" . $actingUser->fullName . "</bold> invited you to join <bold>Sportfast</bold>!
+							</p>
+						</td>
+					</tr>";
+					
+		if ($note) {
+			// Personalized note attached
+			$output .= "<tr height='20'>
+							<td width='20%'></td>
+							<td width='60%'><p style='text-align:center;font-family: Arial, Helvetica, Sans-Serif; font-size: 14px; color: #777; margin: 0;'>\"" . $note . "\"</p></td>
+							<td width='20%'></td>
+					    </tr>";
+		}
+		
+		$output .= " <tr>
+						 <td height='20px'></td>
+					 </tr>
+					 <tr>
+						<td align='center'>
+							<a href='http://www.sportfast.com/how' class='green-button largest-text bold' style='text-decoration: none; font-family: Arial, Helvetica, Sans-Serif; font-size: 2.5em; font-weight: bold; color: #fff; background-color: #58bf12; padding: .2em 1.25em;'>learn more</a>
+						</td>
+					 </tr>";
+					 
+		$output .= $this->sportfastExplanation();
+		
+		
+		
+					
 	}
 	
 	/**
@@ -395,7 +438,7 @@ class MailController extends Zend_Controller_Action
 			$subject = $sport . ' Game: Not Enough Players';
 			$players = ($model->totalPlayers == 1 ? 'player' : 'players');
 			
-			$top = "<p style='font-family: Arial, Helvetica, Sans-Serif; color: #333; margin: 0;'>There are only " . $model->totalPlayers . " " . $players . " attending.  Show up at your own risk.</p>
+			$top = "<p style='font-family: Arial, Helvetica, Sans-Serif; color: #333; margin: 0;'>There " . ($players == 'players' ? 'are' : 'is') . " only " . $model->totalPlayers . " " . $players . " attending.  Show up at your own risk.</p>
 					 <tr>
 					 	<td height='30'></td>
 					 </tr>";
@@ -1221,6 +1264,62 @@ class MailController extends Zend_Controller_Action
 				$this->mailGameOn($user->username, $game);
 			}
 		}
+	}
+	
+	/**
+	 * lower explanation of what sportfast is, how it works, etc
+	 */
+	public function sportfastExplanation()
+	{
+		$output = "<tr>
+						 <td height='40px'></td>
+					 </tr>
+					 <tr>
+						 <td class='dark-back' style='background-color: #333;' bgcolor='#333'>
+							<p class='bold white larger-text' style='font-family: Arial, Helvetica, Sans-Serif; font-size: 1.25em; color: #fff; font-weight: bold; margin: 0;'>What is Sportfast?</p> 	
+						</td>
+					 </tr>
+					 <tr>
+					 	<td cellpadding='4'>
+							<p class='medium smaller-text' style='font-family: Arial, Helvetica, Sans-Serif; font-size: .8em; color: #8d8d8d; margin: 0;'>Sportfast is designed to simplify the way we find, organize, and manage our recreational sports.  
+							It will help you find new pickup games, manage your old ones,
+							and track your progress over time.  Our unique algorithms analyze users' age, skill, availability, and location to create competitive and enjoyable pickup games, as well as league teams, near you.  You'll always
+							know who is going and how you match up against them, so you never need to feel unwelcome or out-matched.  If you love sports as much as we do, then you should look no further.</p>
+						</td>
+					</tr>
+					<tr>
+						 <td height='20px'></td>
+					 </tr>
+					<tr>
+						 <td class='dark-back' style='background-color: #333;' bgcolor='#333'>
+							<p class='bold white larger-text' style='font-family: Arial, Helvetica, Sans-Serif; font-size: 1.25em; color: #fff; font-weight: bold; margin: 0;'>How much does it cost?</p> 	
+						</td>
+					 </tr>
+					 <tr>
+					 	<td cellpadding='4'>
+							<p class='medium smaller-text' style='font-family: Arial, Helvetica, Sans-Serif; font-size: .8em; color: #8d8d8d; margin: 0;'>It's free!  Totally and utterly free.  There aren't even ads!  We're in beta, so help us out by giving us your feedback!</p>
+						</td>
+					</tr>
+					<tr>
+						 <td height='20px'></td>
+					 </tr>
+					<tr>
+						 <td class='dark-back' style='background-color: #333;' bgcolor='#333'>
+							<p class='bold white larger-text' style='font-family: Arial, Helvetica, Sans-Serif; font-size: 1.25em; color: #fff; font-weight: bold; margin: 0;'>What sports?</p> 	
+						</td>
+					 </tr>
+					 <tr>
+					 	<td cellpadding='4'>
+							<p class='medium smaller-text' style='font-family: Arial, Helvetica, Sans-Serif; font-size: .8em; color: #8d8d8d; margin: 0;'>Currently, we support basketball, soccer, football, volleyball, tennis, and ultimate frisbee.  Again, we're in beta, so we don't quite have everything that we want yet, but keep checking back for more!</p>
+						</td>
+					</tr>
+					 <tr>
+					 	<td>
+							<p class='medium smaller-text' style='font-family: Arial, Helvetica, Sans-Serif; font-size: .8em; color: #8d8d8d; margin: 0;'>You can read more about us <a href='http://www.sportfast.com/how' class='darkest' style='font-family: Arial, Helvetica, Sans-Serif; color: #444; margin: 0;'>on our website</a>.</p>
+						</td>
+					</tr>";
+		
+		return $output;
 	}
 	
 		

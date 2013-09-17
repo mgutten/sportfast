@@ -365,8 +365,9 @@ $(function()
 			$(this).parent().next('.dropdown-menu-option-default').show();
 			return;
 		}
+
 		var limit = new Array('users');
-		searchDatabase($(this).val(), populateSearchResultsInvite, limit);
+		searchDatabase($(this).val(), populateSearchResultsInviteButton, limit);
 	})
 	
 	$('#city-change-reset').click(function()
@@ -569,16 +570,19 @@ $(function()
 		e.stopPropagation(); // To prevent $('.notification-container').click from firing
 		
 		if (typeof $(this).attr('clicked') != 'undefined') {
+			
 			return false;
 		}
 		
-		$(this).attr('clicked') = true;
+		
+		$(this).attr('clicked', true);
 		
 		var notificationLogID = $(this).parent().attr('notificationLogID');
 		var type = $(this).parent().attr('type');
 		var action = $(this).parent().attr('action');
 		var confirmOrDeny 	  = $(this).text().toLowerCase();
 		var optionalID = '';
+		
 		
 		notificationConfirmDeny(notificationLogID, confirmOrDeny, type, action, optionalID);
 		
@@ -595,7 +599,7 @@ $(function()
 			return false;
 		}
 		
-		$(this).attr('clicked') = true;
+		$(this).attr('clicked', true);
 		
 		var notificationLogID = $(this).parent().attr('notificationLogID');
 		var type = $(this).parent().attr('type');
@@ -743,6 +747,20 @@ $(function()
 	{
 		$(this).children('input,textarea').focus();
 	});
+	
+	/* force tooltip to show on focus of input */
+	$('input, textarea').focus(function()
+	{
+		if ($(this).attr('tooltip') != '') {
+			$(this).trigger('mouseenter')
+		}
+	})	
+	.blur(function()
+	{
+		if ($(this).attr('tooltip') != '') {
+			$(this).trigger('mouseleave')
+		}
+	})
 	
 	
 	/* cause sibling checkbox to be selected when click accompanying text */
@@ -995,6 +1013,25 @@ $(function()
 		}
 	});
 	
+	
+	/* FIX FOR PADDING ISSUE WITH ALL MAC BROWSERS */
+	if (navigator.userAgent.indexOf('Mac OS X') != -1) {
+		
+		$("p,a,input[type=text],input[submit],span,textarea,button").each(function()
+		{
+			if ($(this).is('#nav-notification-indicator') ||
+				$(this).is('.calendar-day') ||
+				$(this).is('.header-dropdown-option,.header-dropdown-option-cog') ||
+				$(this).is('.cog-dropdown-account-text') ||
+				$(this).is('.header-dropdown-option-cog')) {
+				// Do not give padding to notification indicator
+				return;
+			}
+			var padding = parseInt($(this).css('padding-top'), 10);
+			padding += 2;
+			$(this).css('padding-top', padding + 'px');
+		})
+	}
 	
 	
 		
@@ -1585,10 +1622,11 @@ function populateSearchResults(results)
  * populate invite button's search results
  * @params (results => returned results from ajax)
  */
-function populateSearchResultsInvite(results) 
+function populateSearchResultsInviteButton(results) 
 {
+
 	var output = '';
-	
+
 	if (results.length < 1) {
 		// No results
 		output += "<div class='header-search-result dark-back medium'>No results found</div>";

@@ -11,7 +11,8 @@ $this->headLink()->prependStylesheet($this->baseUrl() . '/css/signup.css');
 	<?php
 	if ($this->success) {
 		//echo "<p class='clear largest-text green heavy width-100 center'>Almost done!</p>";
-		echo "<p class='darkest clear width-100 center larger-text larger-margin-top'>An email verification has been sent to: <br><span class='inherit heavy largest-text'>" . $this->username . "</span></p>";
+		echo "<p class='darkest clear width-100 center larger-text larger-margin-top'>An email verification has been sent to: <br><span class='inherit heavy largest-text'>" . $this->username . "</span></p>
+				<p class='clear darkest width-100 heavy center margin-top'>Please follow the link in this email to complete your signup.</p>";
 	} else {
 		echo "<p class='clear largest-text red heavy width-100 center'>An Error Occurred</p>";
 		echo "<p class='darkest clear width-100 center larger-text larger-margin-top'>An email could not be sent to " . $this->username . ".

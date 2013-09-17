@@ -51,6 +51,17 @@ p,div,span,input,textarea,select,option {
 	color:#333333;
 }
 
+/* crossbrowser font-rendering fix (mac has too little padding-top)*/
+.button,
+.green-button,
+.red-button,
+input,
+textarea,
+.dropdown-menu-option-text {
+	line-height: 1;
+}
+
+
 ul {
 	padding-left: 2em;
 }
@@ -61,7 +72,7 @@ ul {
 }
 
 .futura {
-	font-family: "Futura-Book", Arial, Helvetic;
+	font-family: "Futura-Book", Arial, Helvetica;
 }
 
 .arial {
@@ -1566,6 +1577,7 @@ input.header-search-bar {
 	padding: 0 3px 0 5px;
 	width: 93%;
 	color: #8d8d8d;	
+	border: solid 1px #eaeaea;
 }
 
 .dropdown-menu-selected.button {
@@ -1574,13 +1586,14 @@ input.header-search-bar {
 }
 
 .dropdown-menu-selected:hover {
-	background: #f0f0f0;
+	background: #e9e9e9;
 	
 }
 
 div.dropdown-menu-container-reverse{
-	background: #999;
-	color: #fff;
+	background: #8d8d8d;
+	color: #e9e9e9;
+	border: solid 1px #8d8d8d;
 }
 
 p.dropdown-menu-container-reverse-text{
@@ -1588,7 +1601,7 @@ p.dropdown-menu-container-reverse-text{
 }
 
 div.dropdown-menu-container-reverse:hover {
-	background: #999;
+	background: #8d8d8d;
 }
 
 .dropdown-menu-hidden-container {

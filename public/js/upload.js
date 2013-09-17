@@ -15,6 +15,26 @@ $(function()
 		$(this).parents('form').submit();
 	})
 	
+	$('#signup-import-alert-cancel').click(function()
+	{
+		$('#signup-import-main-img,.narrow-column-picture').css({width: 'auto',
+																 height: 'auto',
+																 marginTop: 0,
+																 marginLeft: 0})
+														   .attr('src', '/images/users/profile/pic/large/default.jpg');
+														   
+		$('.signup-alert-rotate').hide();
+		
+		fileInfo = new Object();
+		
+		jcropAPI.destroy();
+		
+		$('#signup-import-alert-img').css({width: 'auto',
+																 height: 'auto',
+																 marginTop: 0,
+																 marginLeft: 0})
+									 .attr('src','/images/global/profile/xl/default.jpg')
+	})
 	
 	/* ajax submit of import profile pic */
 	$('#upload-profile-pic').ajaxForm({success: function(data) {
@@ -41,6 +61,7 @@ $(function()
 													
 													$('.signup-alert-rotate').show();				
 													$('#signup-import-alert-accept').show();
+													$('#signup-import-alert-cancel').show();
 																				 
 													
 												}

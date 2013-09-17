@@ -39,9 +39,9 @@ echo $this->alert()->start('signup-import','Upload and crop your image.');
         <li>a clear shot of your face</li>
     </ul>
 	<div class='button import-button' id='signup-import-alert-button'>
-    	Choose photo
+    	Choose Photo
         <form action="/ajax/upload-temp-picture" enctype="multipart/form-data" name='file_upload' id='upload-profile-pic'>
-    		<input type='file' name='profilePic' id='profilePic' />
+    		<input type='file' name='profilePic' id='profilePic' accept="image/*"/>
         </form>
     </div>
     <div id='signup-alert-rotate-container' class='clear width-100 clear'>
@@ -51,8 +51,12 @@ echo $this->alert()->start('signup-import','Upload and crop your image.');
 	<p class='medium' id='signup-import-alert-warning'>
     	If players cannot recognize you by your picture, you <span class='heavy medium'>will not receive any ratings.</span>
     </p>
-    <div class='button green-button larger-text' id='signup-import-alert-accept'>
-        Accept
+    <div class='width-100 clear' id='signup-import-alert-accept-container'>
+    	<p class='red smaller-text right pointer hidden' id='signup-import-alert-cancel'>cancel</p>
+        <div class='button green-button larger-text right hidden' id='signup-import-alert-accept'>
+            Accept
+        </div>
+        
     </div>
     
     <div id='signup-import-loading' class='left'>
@@ -97,8 +101,8 @@ echo $this->form->lastName;
 echo $this->form->sex;
 ?>
 <div id='signup-sex-container' class='dropshadow'>
-    <img src='/images/signup/sex/male.png' class='signup-sex-img pointer' id='signup-sex-male' tooltip='Male'/>
-    <img src='/images/signup/sex/female.png' class='signup-sex-img pointer' id='signup-sex-female' tooltip='Female'/>
+    <div src='/images/signup/sex/male_sprite.png' class='signup-sex-img pointer' id='signup-sex-male' tooltip='Male'></div>
+    <div class='signup-sex-img pointer' id='signup-sex-female' tooltip='Female'></div>
 </div>
 <?php
 echo "<div class='clear'></div>";
@@ -198,7 +202,7 @@ $currentStep++;
     </p>
     <div id='signup-import-main-upload-button-container'>
         <div class='button larger-text' id='signup-import-main-upload-button'>
-            Upload
+            Upload Picture
         </div>
     </div>
     <p class='pointer width-100 center dark clear why-profile'>

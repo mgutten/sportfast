@@ -579,6 +579,10 @@ class AjaxController extends Zend_Controller_Action
 		$images = Zend_Controller_Action_HelperBroker::getStaticHelper('CreateImages');
 		
 		$images->createimages($fileInfo, $this->view->user->userID);
+		
+		$this->view->user->avatar += 1;
+		
+		$this->view->user->save(false);
 	}
 	
 	
@@ -1555,6 +1559,8 @@ class AjaxController extends Zend_Controller_Action
 		} else {
 			$game->movePlayerConfirmation($user->userID, $inOrOut);
 		}
+		
+		$game->confirmed = $inOrOut;
 	}
 	
 	

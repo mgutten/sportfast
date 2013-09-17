@@ -93,14 +93,14 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 		$userIDs = '("' . implode('","', $userIDs) . '")';
 		
 		$select->from(array('u' => 'users'),
-					  array('username'))
+					  array('username', 'userID'))
 			   ->where('u.userID IN ' . $userIDs);
 			   
 		$results = $table->fetchAll($select);
 		
 		$emails = array();
 		foreach ($results as $result) {
-			$emails[] = $result->username;
+			$emails[$result->userID] = $result->username;
 		}
 		
 		return $emails;
@@ -541,12 +541,18 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 		
 		if ($result) {
 			// Successful verification, change status to active
+			if ($result['active'] == 1) {
+				// Already active
+				return array('userID' => $result['userID'],
+					    	 'already' => true);
+			}
 			$data = array('active' => 1);
 			$where = array('userID = ?' => $result['userID']);
 			
 			$table->update($data, $where);
 			
-			return $result['userID'];
+			return array('userID' => $result['userID'],
+						 'already' => false);
 		} else {
 			// Failed verification
 			return false;
@@ -1125,7 +1131,8 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 			   ->where('ur.gameID = ?', $gameID);
 			   
 		$result = $table->fetchRow($select);
-
+		
+		
 		if ($result) {
 			// Rating was found
 			return false;
@@ -1154,7 +1161,7 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 						AND u.userID NOT IN (SELECT receivingUserID 
 												FROM user_ratings 
 												WHERE givingUserID = '" . $userID . "' 
-													AND dateHappened > NOW() - INTERVAL 1 MONTH
+													AND dateHappened > (NOW() - INTERVAL 2 MONTH)
 													AND sportID = '" . $game->sportID . "'
 											)";
 		

@@ -138,13 +138,20 @@ class Application_Controller_Helper_Dropdown extends Zend_Controller_Action_Help
 					$img = "<img src='" . $option['image'] . "' class='dropdown-menu-option-img " . $background . "' />";
 				}
 				
+				$attribs = '';
+				if (isset($option['attr'])) {
+					foreach ($option['attr'] as $attr => $val) {
+						$attribs .= " " . $attr . "='" . $val . "' ";
+					}
+				}
+				
 				if ($ucwords) {
 					// ucwords for option
 					$option['text'] = ucwords($option['text']);
 				}
 
 				
-				$text = '<p class="dropdown-menu-option-text ' . $textClass . '">' . $option['text'] . '</p>';
+				$text = '<p class="dropdown-menu-option-text ' . $textClass . '" ' . $attribs . '>' . $option['text'] . '</p>';
 			} else {
 				// Simple text
 				if ($ucwords) {

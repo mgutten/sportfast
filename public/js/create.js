@@ -117,6 +117,17 @@ $(function()
 		testDate();
 	})
 	
+	/* change skill limits */
+	$('#dropdown-menu-minSkill').find('.dropdown-menu-option-text').click(function()
+	{
+		$('#skillLimitMin').val($(this).attr('value'));
+	})
+	
+	$('#dropdown-menu-maxSkill').find('.dropdown-menu-option-text').click(function()
+	{
+		$('#skillLimitMax').val($(this).attr('value'));
+	})
+	
 	
 	$('#create-visibility,#create-recurring').find('.selectable-text').click(function()
 	{
@@ -472,7 +483,7 @@ function addMarkerListeners(marker, count)
 		
 		markerHoverListeners(marker, markerDetails[count][0])
 		
-		var content =  "<p class='darkest futura heavy'>" + markerDetails[count][0] + "</p><div class='clear'>" + markerDetails[count][1] + "</div>";
+		var content =  "<p class='left darkest futura heavy'>" + markerDetails[count][0] + "</p><div class='clear'>" + markerDetails[count][1] + "</div>";
 		
 		if (parseInt(markerDetails[count][2],10) == 1) {
 			content += "<div class='clear' tooltip='Stash available'><img src='/images/global/logo/logo/green/tiny.png' class='left indent'/> <p class='left light smaller-text larger-margin-top'>Stash Available</p></div>";
@@ -501,9 +512,7 @@ function markerClickListeners(marker, content, parkName, parkID)
 			}
 			
 			infowindow = new google.maps.InfoWindow({
-									  content: content,
-									  position: e.latLng,
-									  maxWidth: 200
+									  content: content
 								  });
 			
 			infowindow.open(gmap, marker)

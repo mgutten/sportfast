@@ -262,14 +262,30 @@ $this->placeholder('narrowColumn')->captureEnd();
 	
 	if ($this->currentUser->games->hasValue('games')) {
 		
-		echo $this->partial('partials/global/sectionHeaderBold.phtml',array('title'   => 'Upcoming Games'));
+		$output = $this->partial('partials/global/sectionHeaderBold.phtml',array('title'   => 'Upcoming Games'));
 		
 		$games = $this->currentUser->games->getGamesByDate();
 		
+		$success = false;
 		for ($i = 0; $i < 3; $i++) {
-			if (isset($games[$i])) {
-				echo $this->find()->createGame($games[$i]);
+			if (!isset($games[$i])) {
+				continue;
 			}
+
+			if ($games[$i]->isTeamGame() &&
+			    $games[$i]->confirmed != 1) {
+					// Not attending upcoming game, do not show
+					continue;
+				}
+			if (isset($games[$i])) {
+				$success = true;
+				$output .= $this->find()->createGame($games[$i]);
+			}
+		}
+		
+		if ($success) {
+			// There is actually a game
+			echo $output;
 		}
 	}
 	

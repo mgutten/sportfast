@@ -177,7 +177,7 @@ class Application_Model_NotificationsMapper extends Application_Model_MapperAbst
 							INNER JOIN notifications n ON n.notificationID = nl.notificationID
 							WHERE nl.notificationLogID = '" . $notificationLogID . "')";
 							
-			 
+			
 			 
 			 // User joined team, ask if they still want to be listed as actively searching	
 			 $select = "SELECT CASE WHEN n.action = 'invite' THEN nl.receivingUserID ELSE nl.actingUserID END as userID,
@@ -199,11 +199,13 @@ class Application_Model_NotificationsMapper extends Application_Model_MapperAbst
 			 $notification->save();
 			 */
 			 
+			 
 			 $notifications = new Application_Model_Notifications();
 			 
 			 $details = array('n.action' => array('leave',
 			 									  'join'),
 							  'n.type'   => 'team',
+							  'n.details' => NULL,
 							  'nl.actingUserID' => $result['userID'],
 							  'nl.teamID' => $result['teamID']);
 							  
@@ -227,11 +229,12 @@ class Application_Model_NotificationsMapper extends Application_Model_MapperAbst
 							INNER JOIN notifications n ON n.notificationID = nl.notificationID
 							WHERE nl.notificationLogID = '" . $notificationLogID . "')";
 			
-			 $query2 = "INSERT INTO notification_log (actingUserID, gameID, notificationID, dateHappened)
+			 $query2 = "INSERT INTO notification_log (actingUserID, gameID, notificationID, dateHappened, cityID)
 			 			 (SELECT CASE WHEN n.action = 'invite' THEN nl.receivingUserID ELSE nl.actingUserID END, 
 						 		 nl.gameID, 
 								 (SELECT notificationID FROM notifications WHERE type ='game' AND action = 'join' AND details IS NULL), 
-								 (NOW() + INTERVAL " . $this->getTimeOffset() . " HOUR)
+								 (NOW() + INTERVAL " . $this->getTimeOffset() . " HOUR),
+								 (SELECT cityID FROM users u WHERE u.userID = (CASE WHEN n.action = 'invite' THEN nl.receivingUserID ELSE nl.actingUserID END))
 						 	FROM notification_log as `nl`
 							INNER JOIN notifications n ON n.notificationID = nl.notificationID
 							WHERE nl.notificationLogID = '" . $notificationLogID . "')";
@@ -362,7 +365,7 @@ class Application_Model_NotificationsMapper extends Application_Model_MapperAbst
 			 $counter = 0;
 			 foreach ($details as $column => $val) {
 				 
-				 if (empty($val)) {
+				 if (empty($val) && !is_null($val)) {
 					 continue;
 				 }
 				 
@@ -385,11 +388,16 @@ class Application_Model_NotificationsMapper extends Application_Model_MapperAbst
 
 				 } else {
 					 // Plain AND
-					 $query .= " " . $column . " = '" . $val . "' ";
+					 if (is_null($val)) {
+						 $query .= " " . $column . " IS NULL ";
+					 } else {
+						 $query .= " " . $column . " = '" . $val . "' ";
+					 }
 				 }
 				 $counter++;
 			 }
 		 }
+
 
 		 $db = Zend_Db_Table::getDefaultAdapter();
 		 

@@ -14,7 +14,7 @@ class Application_View_Helper_MemberHomepage
 	{
 		
 		$user = $this->_view->user;
-		
+
 		if ($this->_view->firstVisit) {
 			// First visit
 			$this->_view->placeholder('absolute')->captureStart();

@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset
+      xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
+            http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
+<!-- created with Free Online Sitemap Generator www.xml-sitemaps.com -->
+
+<url>
+  <loc>http://sportfast.com/</loc>
+  <priority>1.00</priority>
+</url>
+<url>
+  <loc>http://sportfast.com/how</loc>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>http://sportfast.com/signup</loc>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>http://sportfast.com/login</loc>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>http://sportfast.com/login/forgot</loc>
+  <priority>0.60</priority>
+</url>
+<url>
+  <loc>http://sportfast.com/about/faq</loc>
+  <priority>0.70</priority>
+</url>
+<url>
+  <loc>http://sportfast.com/sports/</loc>
+  <priority>0.60</priority>
+</url>
+<url>
+  <loc>http://sportfast.com/about/</loc>
+  <priority>0.50</priority>
+</url>
+<url>
+  <loc>http://sportfast.com/about/jobs</loc>
+  <priority>0.50</priority>
+</url>
+<url>
+  <loc>http://sportfast.com/about/privacy</loc>
+  <priority>0.20</priority>
+</url>
+<url>
+  <loc>http://sportfast.com/about/terms</loc>
+  <priority>0.20</priority>
+</url>
+<url>
+  <loc>http://sportfast.com/about/leagues</loc>
+  <priority>0.5</priority>
+</url>
+<url>
+  <loc>http://sportfast.com/sports/basketball</loc>
+  <priority>0.5</priority>
+</url>
+<url>
+  <loc>http://sportfast.com/sports/football</loc>
+  <priority>0.5</priority>
+</url>
+<url>
+  <loc>http://sportfast.com/sports/soccer</loc>
+  <priority>0.5</priority>
+</url>
+<url>
+  <loc>http://sportfast.com/sports/tennis</loc>
+  <priority>0.5</priority>
+</url>
+<url>
+  <loc>http://sportfast.com/sports/volleyball</loc>
+  <priority>0.5</priority>
+</url>
+<url>
+  <loc>http://sportfast.com/sports/ultimate</loc>
+  <priority>0.5</priority>
+</url>
+</urlset>

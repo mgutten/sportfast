@@ -38,9 +38,9 @@ if ($this->pictureRequired) {
             <li>a clear shot of your face</li>
         </ul>
         <div class='button import-button' id='signup-import-alert-button'>
-            Choose photo
+            Choose Photo
             <form action="/ajax/upload-temp-picture" enctype="multipart/form-data" name='file_upload' id='upload-profile-pic'>
-                <input type='file' name='profilePic' id='profilePic' />
+                <input type='file' name='profilePic' id='profilePic' accept="image/*"/>
             </form>
         </div>
         <div id='signup-alert-rotate-container' class='clear width-100 clear'>
@@ -52,9 +52,13 @@ if ($this->pictureRequired) {
         </p>
         
         
-        <div class='button green-button larger-text hidden' id='signup-import-alert-accept'>
+        <div class='width-100 clear' id='signup-import-alert-accept-container'>
+    	<p class='red smaller-text right pointer hidden' id='signup-import-alert-cancel'>cancel</p>
+        <div class='button green-button larger-text right hidden' id='signup-import-alert-accept'>
             Accept
         </div>
+        
+    </div>
         
     </div>
 </div>

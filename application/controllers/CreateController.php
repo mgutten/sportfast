@@ -48,6 +48,24 @@ class CreateController extends Zend_Controller_Action
 		$this->view->minDropdown = $dropdown->dropdown('min',array('00','15','30','45'),'00');
 		$this->view->ampmDropdown = $dropdown->dropdown('ampm',array('am','pm'),'pm', false);
 		
+		$ratings = new Application_Model_Ratings();
+		$ratings = $ratings->getAvailableRatings('user', 'skill');
+
+		$minSkill = reset($ratings);
+		$minSkill = $minSkill['ratingName'];
+		$maxSkill = end($ratings);
+		$maxSkill = $maxSkill['ratingName'];
+		
+		$dropdownValues = array();
+		foreach ($ratings as $rating) {
+			$dropdownValues[] = array('text' => $rating['ratingName'],
+									  'attr' => array('value' => $rating['value']));
+		}
+			
+		
+		$this->view->minSkill = $dropdown->dropdown('minSkill', $dropdownValues, $minSkill, false);
+		$this->view->maxSkill = $dropdown->dropdown('maxSkill', $dropdownValues, $maxSkill, false);
+		
 		$form = $this->view->form = new Application_Form_CreateGame();
 		
 		
@@ -180,6 +198,18 @@ class CreateController extends Zend_Controller_Action
 		$this->view->sports = $sports->getAllSportsInfo(true);
 		
 		$dropdown = Zend_Controller_Action_HelperBroker::getStaticHelper('Dropdown');
+		
+		$userSports = $this->view->user->getSportNames();
+		$missingSports = array();
+		
+		foreach ($sports->getAll() as $sport) {
+			if (!in_array(strtolower($sport->sport), $userSports)) {
+				// User does not have this sport
+				$missingSports[strtolower($sport->sport)] = true;
+			}
+		}
+		
+		$this->view->missingSports = $missingSports;
 		
 		$avatarNames = array();
 		if ($handle = opendir(PUBLIC_PATH . '/images/teams/avatars/small')) {

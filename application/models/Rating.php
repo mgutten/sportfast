@@ -76,8 +76,8 @@ class Application_Model_Rating extends Application_Model_ModelAbstract
 	
 	public function setDateHappenedCurrent()
 	{
-		$this->_attribs['dateHappened'] = date("Y-m-d H:i:s", time());
-		return $this;
+		//$this->_attribs['dateHappened'] = date("Y-m-d H:i:s", time());
+		return $this->setCurrent('dateHappened');
 	}
 	
 	public function isUser()

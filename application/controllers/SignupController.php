@@ -198,7 +198,7 @@ class SignupController extends Zend_Controller_Action
 					// Convert rating from slider (0-6) to meaningful rating (64-100)
 					//$sportModel->skillInitial = $sportModel->convertSliderToRating($post[$sport . 'Rating']);
 					$value = $ratingArray[$ratings->skillRatings[$post[$sport . 'Rating']]]['value'];
-					$sportModel->skillInitial =  $value + ($value < 99 ? mt_rand(-2,2) : 0); 
+					$sportModel->skillInitial =  $value + ($value < 99 ? mt_rand(-1,1) : 0); 
 					$sportModel->skillCurrent = $sportModel->skillInitial;
 					
 					$sportModel->sportsmanship = 80;
@@ -392,10 +392,15 @@ class SignupController extends Zend_Controller_Action
 			$auth = Zend_Auth::getInstance();
 			
 			// if success, $verified stores userID
-			$user->getUserBy('u.userID',$verified);
+			$user->getUserBy('u.userID',$verified['userID']);
 			$user->login();
 			
 			$auth->getStorage()->write($user);
+			
+			if ($verified['already']) {
+				// User has already been verified, redirect w/o notifications
+				$this->_redirect('/');
+			}
 			
 			$session = new Zend_Session_Namespace('first_visit');
 			$session->firstVisit = true;

@@ -91,11 +91,29 @@ input.short-input {
 	width:30px;
 	height:30px;
 	margin: 0em 0 0 .2em;
-	background:#8d8d8d;
+	background:url('/images/signup/sex/male_sprite.png');
+	overflow:hidden;
+}
+
+#signup-sex-female {
+	background:url('/images/signup/sex/female_sprite.png');
+}
+
+#signup-sex-female.signup-sex-selected {
+	background-position: 0px -30px;
+}
+
+#signup-sex-male.signup-sex-selected {
+	background-position: 0px -29px;
+}
+	
+
+#signup-sex-female:hover {
+	background-position: 0px -30px;
 }
 
 .signup-sex-img:hover {
-	background:#58bf12;
+	background-position: 0px -29px;
 }
 
 .signup-sex-img#signup-sex-male {
@@ -118,15 +136,11 @@ input.short-input {
 	font-size:.8em;
 }
 	
-
-.signup-sex-selected {
-	background: #58bf12;
-}
-
+/*
 #signup-sex-container.signup-sex-container-fail {
-	border-color: #BF0404;
+	background: #BF0404;
 }
-
+*/
 .signup-clear-large {
 	height: 3em;
 	width: 100%;
@@ -378,6 +392,7 @@ div.signup-narrow-column-img-container {
 	clear:both;
 	margin: 4em 0 0 3em;
 	width: 7em;
+	padding-bottom: 0;
 }
 
 #signup-import-alert-guidelines {
@@ -409,9 +424,15 @@ div.signup-narrow-column-img-container {
 }
 
 #signup-import-alert-accept {
-	float:right;
-	clear:both;
-	margin: 2em 3em 0 0;	
+	margin: 0em 1.2em 0 0;	
+}
+
+#signup-import-alert-cancel {
+	margin-top: .8em;
+}
+
+#signup-import-alert-accept-container {
+	margin-top: 2.4em;
 }
 
 #signup-import-loading {
@@ -475,7 +496,7 @@ div.signup-narrow-column-img-container {
 #signup-import-main-upload-button {
 	float: none;
 	margin: 1.5em auto;
-	width: 4em;
+	width: 8em;
 }
 
 /* end signup import */

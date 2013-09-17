@@ -28,6 +28,7 @@
 	clear:both;
 	margin: 4em 0 0 3em;
 	width: 7em;
+	padding-bottom:0;
 }
 
 #signup-import-alert-guidelines {
@@ -59,9 +60,15 @@
 }
 
 #signup-import-alert-accept {
-	float:right;
-	clear:both;
-	margin: 2em 3.5em 0 0;	
+	margin: 0em 1.2em 0 0;	
+}
+
+#signup-import-alert-cancel {
+	margin-top: .8em;
+}
+
+#signup-import-alert-accept-container {
+	margin-top: 2.4em;
 }
 
 #upload-container {

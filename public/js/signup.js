@@ -138,8 +138,8 @@ $(function()
 	/* change color of sex icon onclick */
 	$('.signup-sex-img').mousedown(function() 
 	{
-		if ($(this).parent().is('.signup-sex-container-fail')) {
-			$(this).parent().removeClass('signup-sex-container-fail');
+		if ($(this).parent().is('.input-fail')) {
+			$(this).parent().removeClass('input-fail');
 		}
 		
 		$('.signup-sex-selected').removeClass('signup-sex-selected');
@@ -166,9 +166,8 @@ $(function()
 	{
 		$('#tooltip').children('#tooltip-body').html('<span class="heavy darkest">This email will be used to notify you of upcoming games.</span>');
 		startTooltipTimer($(this));
-	});
-	
-	$('#email').blur(function()
+	})
+	.blur(function()
 	{
 		endTooltipTimer();
 		$('#tooltip').hide();
@@ -348,9 +347,21 @@ $(function()
 		// Change hidden input for this sport to active
 		$('#' + sport + 'Active').val(false);
 		
-
-		
 	})
+	
+	/* select all hours of day on click of day name */
+	$('.availability-calendar-day').click(function()
+	{
+		if ($(this).attr('green') == 'true') {
+			// Have already been selected
+			$(this).siblings('.availability-calendar-section').find('.availability').removeClass('selected-green');
+			$(this).attr('green', 'false')
+		} else {
+			$(this).siblings('.availability-calendar-section').find('.availability').addClass('selected-green');
+			$(this).attr('green', 'true')
+		}
+	});
+
 	
 	$('.signup-sports-form').show();
 	buildSliders($('.signup-skill-slider'), updateSkillHiddenInput);
@@ -457,6 +468,27 @@ $(function()
 		$('.alert').hide();
 	});
 	
+	$('#signup-import-alert-cancel').click(function()
+	{
+		$('#signup-import-main-img,.narrow-column-picture').css({width: 'auto',
+																 height: 'auto',
+																 marginTop: 0,
+																 marginLeft: 0})
+														   .attr('src', '/images/users/profile/pic/large/default.jpg');
+														   
+		$('.signup-alert-rotate').hide();
+		
+		$('#fileName').val('');
+		
+		jcropAPI.destroy();
+		
+		$('#signup-import-alert-img').css({width: 'auto',
+																 height: 'auto',
+																 marginTop: 0,
+																 marginLeft: 0})
+									 .attr('src','/images/global/profile/xl/default.jpg')
+	})
+	
 	$('#profilePic').change(function()
 	{
 		if (this.files[0].size > 6291456) {
@@ -490,6 +522,7 @@ $(function()
 														if (jcropAPI) {
 															jcropAPI.destroy()
 														}
+														
 														$('#signup-import-loading').hide();
 														$('#fileName').val(data);
 														$('#signup-import-main-img,.narrow-column-picture').attr('src',data)
@@ -505,6 +538,7 @@ $(function()
 														
 														$('.signup-alert-rotate').show();				
 														$('#signup-import-alert-accept').show();
+														$('#signup-import-alert-cancel').show();
 																					 
 														
 													}
@@ -578,7 +612,7 @@ $(function()
 		})
 		
 		if (fail) {
-			$('.signup-sex-img').parent().addClass('signup-sex-container-fail');
+			$('.signup-sex-img').parent().addClass('input-fail');
 			if (scrollToEle.length < 1) {
 				// Same scroll spot for sex and inputs, only push if not already in array
 				scrollToEle.push($('.signup-sex-img').parents('.signup-section-container'));	

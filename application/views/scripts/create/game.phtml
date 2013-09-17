@@ -289,7 +289,7 @@ $class = 'left selectable-text light pointer create-details-selectable-text';
                 echo $this->form->skillLimitCheckbox;
             ?>
             <div class='clear hidden' id='create-details-skill-container'>
-            	<?php echo $this->form->skillLimitMin . "<p class='left create-details-separator'>-</p>" . $this->form->skillLimitMax;?>
+            	<?php echo $this->minSkill . "<p class='left create-details-separator medium'>to</p>" . $this->maxSkill;?>
             </div>
         </div>
     </div>
@@ -312,6 +312,8 @@ echo $this->form->typeSuffix;
 echo $this->form->datetime;
 echo $this->form->visibility;
 echo $this->form->recurring;
+echo $this->form->skillLimitMin;
+echo $this->form->skillLimitMax;
 
 ?>
 

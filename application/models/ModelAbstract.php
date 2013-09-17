@@ -21,6 +21,10 @@ abstract class Application_Model_ModelAbstract
 	}
 	
 	public function hasValue($attrib) {
+		
+		if (!isset($this->_attribs[$attrib])) {
+			return false;
+		}
 		$attrib = $this->_attribs[$attrib];
 		
 		if (is_object($attrib) || $attrib) {
@@ -203,7 +207,7 @@ abstract class Application_Model_ModelAbstract
 	public function setCurrent($attrib)
 	{
 		// MySQL server is set to denver timezone, adjust accordingly
-		$this->_attribs[$attrib] = date("Y-m-d H:i:s", strtotime('+1 hour'));
+		$this->_attribs[$attrib] = date("Y-m-d H:i:s", time());
 		return $this;
 	}
 	
@@ -350,6 +354,10 @@ abstract class Application_Model_ModelAbstract
 			$picture = $directory . 'default.jpg';
 		} else {
 			$picture = $directory . $id . '.jpg';
+		}
+		
+		if ($this->hasValue('avatar')) {
+			$picture .= "?" . $this->avatar;
 		}
 		
 		return $picture;

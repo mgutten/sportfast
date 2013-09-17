@@ -288,7 +288,7 @@ class Application_View_Helper_Find
 		$output .=			"<p class='clear darkest'>" . $match->city->city . ', ' . $match->city->state . "</p>";
 		$output .=			"<p class='clear light hover smaller-text'>last active " . $match->getLastActiveFromNow() . "</p>"; 
 		$output .=			"<div class='hidden clear hover'><p class='clear medium'>" . $match->age . " years old</p>";	
-		$output .=			"<p class='clear medium'>" . $match->getHeightInFeet() . ' ' . $match->weight . "lb</p></div>";	
+		$output .=			"<p class='clear medium'>" . $match->getHeightInFeet() . "</p></div>";	
 		$output .= 		"</div>";
 		if ($sport) {
 			$output .=		"<div class='right find-player-right-container'>";
