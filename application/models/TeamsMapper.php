@@ -317,6 +317,7 @@ class Application_Model_TeamsMapper extends Application_Model_TypesMapperAbstrac
 			return false;
 		}
 
+
 		$db->delete('team_reserves', array('teamID = ?' => $teamModel->teamID,
 										   'userID = ?' => $userID));
 															
@@ -502,6 +503,10 @@ class Application_Model_TeamsMapper extends Application_Model_TypesMapperAbstrac
 					$gameModel->addNotConfirmedPlayer($game->userID);
 				}
 			}
+			
+			/* bug fix to show all games on calendar for team page */
+			$gameModel->confirmed = '';
+			$gameModel->teamPage = '1';
 			
 		}
 		

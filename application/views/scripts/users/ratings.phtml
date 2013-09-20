@@ -123,6 +123,7 @@ $this->placeholder('narrowColumn')->captureEnd();
 <div class='width-100 clear ratings-container'>
 	<?php
 	echo $this->ratings()->loopUserRatings($this->ratings->getAll());
+	
 	?>
 </div>
 
@@ -131,6 +132,7 @@ sportID = '<?php echo $this->sport->sportID;?>';
 userID = '<?php echo $this->currentUser->userID;?>';
 <?php
 	foreach ($ratings as $rating) {
+		
 		echo '
 		chartData["' . strtolower($rating) . '"] = [["Month", "' . $rating . '"],';
 		$valuesName = 'chartRatings' . $rating;

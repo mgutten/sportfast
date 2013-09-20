@@ -68,6 +68,7 @@ $(function()
 	{
 		flagRemoval($(this).attr('userRatingID'));
 	})
+	
    
 	if ($('#chart').length > 0) {
 		// Only load charts on rating page
@@ -271,7 +272,7 @@ function setRatingWidth(event, ele)
 	
 	var width = event.pageX - parentOffset.left;
 	
-	width = roundWidth(width, eleWidth);
+	width = roundWidthFull(width, eleWidth);
 	
 	bar.css('width', width);
 	
@@ -286,6 +287,19 @@ function roundWidth(width, parentWidth)
 {
 	var percentage = width/parentWidth;
 	var roundedPercentage = (Math.round(percentage * 10))/10;
+	
+	return roundedPercentage * parentWidth;
+	
+}
+
+/**
+ * round width of rating star to full
+ */
+function roundWidthFull(width, parentWidth) 
+{
+	var percentage = width/parentWidth;
+	
+	var roundedPercentage = (Math.round(percentage * 5))/5;
 	
 	return roundedPercentage * parentWidth;
 	

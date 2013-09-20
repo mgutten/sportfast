@@ -289,7 +289,7 @@ $class = 'left selectable-text light pointer create-details-selectable-text';
                 echo $this->form->skillLimitCheckbox;
             ?>
             <div class='clear hidden' id='create-details-skill-container'>
-            	<?php echo $this->minSkill . "<p class='left create-details-separator medium'>to</p>" . $this->maxSkill;?>
+            	<?php echo $this->minSkill . "<p class='clear create-details-skill-separator light'>to</p><p class='clear'></p>" . $this->maxSkill;?>
             </div>
         </div>
     </div>
@@ -297,6 +297,7 @@ $class = 'left selectable-text light pointer create-details-selectable-text';
 
 
 <input type='submit' class='button green-button white heavy clear largest-text width-100' id='create-game-submit' value='Create Game' />
+<p class='smaller-text medium clear width-100 center margin-top'>Invite players on the next page</p>
 
 <?php
 

@@ -68,6 +68,8 @@ $(function()
 		
 		var reserves = getReserveInvites();
 		
+		$('#team-hide-reserves').trigger('click');
+		
 		inviteToTeamGame(teamID, teamGameID, reserves);
 	});
 	
@@ -478,7 +480,7 @@ function inviteToTeamGame(teamID, teamGameID, reserves)
 	
 	var options = {teamID: teamID,
 				   teamGameID: teamGameID,
-				   reserves: reserves};
+				   userIDs: reserves};
 	
 	$.ajax({
 		url: '/ajax/invite-to-team-game',

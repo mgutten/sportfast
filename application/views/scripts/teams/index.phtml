@@ -379,6 +379,7 @@ echo "<span id='team-details'
 			public='" . ($this->isPublic ? 'public' : 'private') . "'
 			teamName='" . $this->team->teamName . "'
 			nextGameID='" . ($this->nextGame ? $this->nextGame->teamGameID : '') . "'
+			" . ($this->firstTeam ? "firstType = 'true'" : '') . "
 	 </span>";
 ?>
 
@@ -572,8 +573,12 @@ if ($this->userOnTeam) {
 		
 		foreach ($this->team->reserves->getAll() as $player) {
 			$confirmed = '';
-			if ($this->nextGame->userConfirmed($player->userID)) {
-				$confirmed = "<div class='team-reserve-confirmed'></div>";
+			if ($this->nextGame) {
+				if ($this->nextGame->userConfirmed($player->userID)) {
+					$confirmed = "<div class='team-reserve-confirmed'></div>";
+				} elseif ($this->nextGame->userNotConfirmed($player->userID)) {
+					$confirmed = "<div class='team-reserve-not-confirmed'></div>";
+				}
 			}
 			echo "<div class='left team-reserve-player' tooltip='" . $player->shortName . "' userID='" . $player->userID . "'>" 
 					. $player->getBoxProfilePic('small', 'users', 'animate-opacity', 'dark-back')

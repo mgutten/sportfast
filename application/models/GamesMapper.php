@@ -395,6 +395,34 @@ class Application_Model_GamesMapper extends Application_Model_TypesMapperAbstrac
 	}
 	
 	/**
+	 * get team game info from db
+	 * @params ($teamGameID => teamGameID
+	 *			$savingClass => game model)
+	 */
+	public function getTeamGameByID($teamGameID, $savingClass)
+	{
+		$table   = $this->getDbTable();
+		$select  = $table->select();
+		$select->setIntegrityCheck(false);
+		
+		$select->from(array('tg'  => 'team_games'))
+			   ->join(array('t' => 'teams'),
+			          't.teamID = tg.teamID')
+			   ->join(array('ll' => 'league_locations'),
+			   		  'll.leagueLocationID = tg.leagueLocationID')
+			   ->where('tg.teamGameID = ?', $teamGameID)
+			   ->limit(1);
+			   
+		$results = $table->fetchAll($select);
+		
+		foreach ($results as $result) {
+			$savingClass->setAttribs($result);
+		}
+		
+		return $savingClass;
+	}
+	
+	/**
 	 * get game's players
 	 * @params ($onlyReal => return only real players? (boolean))
 	 */
@@ -837,6 +865,52 @@ class Application_Model_GamesMapper extends Application_Model_TypesMapperAbstrac
 		$db = Zend_Db_Table::getDefaultAdapter();
 		
 		$db->insert('user_games', $data);
+		
+		return false;
+	}
+	
+	/**
+	 * add user to team game
+	 */
+	public function addUserToTeamGame($teamGameID, $userID)
+	{
+		if (empty($gameID) || empty($userID)) {
+			return false;
+		}
+		
+		$table = $this->getDbTable();
+		$select = $table->select();
+		$select->setIntegrityCheck(false);
+		
+		$select->from(array('utg' => 'user_team_games'))
+			   ->where('utg.userID = ?', $userID)
+			   ->where('utg.teamGameID = ?', $teamGameID);
+			   
+		$result = $table->fetchRow($select);
+		
+		if ($result) {
+			// Already in game
+			return 'already';
+		}
+		
+		$select = $table->select();
+		$select->setIntegrityCheck(false);
+		
+		$select->from(array('utg' => 'user_team_games'))
+			   ->where('utg.teamGameID = ?', $teamGameID);
+			   
+		$result = $table->fetchRow($select);
+		
+		$teamID = $result['teamID'];
+		
+		$data = array('userID' => $userID,
+					  'teamGameID' => $gameID,
+					  'confirmed' => '1',
+					  'teamID' => $teamID);
+					  
+		$db = Zend_Db_Table::getDefaultAdapter();
+		
+		$db->insert('user_team_games', $data);
 		
 		return false;
 	}

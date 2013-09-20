@@ -105,6 +105,9 @@
 	margin-right: 0;
 }
 
+#dropdown-menu-manage > .dropdown-menu-option-container > p {
+	margin-top: .2em;
+}
 
 #user-buttons-container > #invite-to {
 	margin-right: 0;

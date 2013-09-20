@@ -64,7 +64,7 @@ class Application_View_Helper_Alert
 	public function ratingAlert($game)
 	{
 		$ratings = $this->getRandomRatings($game);
-		$details = "You recently played " . $game->sport . " on " . $game->gameDate->format('l') . ".  <span class='white'>Please rate some of the other players.</span>";
+		$details = "You recently played " . $game->sport . " on " . $game->gameDate->format('l') . ".  <br><span class='white'>Please rate some of the other players.</span>";
 		$output  = $this->start('rateGame', $details);
 		
 		$form = $this->_view->rateGameForm;
@@ -97,6 +97,7 @@ class Application_View_Helper_Alert
 						 </div>
 						 <div class='left overlay-pic overlay-pic-large'>
 							<p class='clear width-100 center white heavy largest-text margin-top'>" . $name . "</p>
+							<p class='clear width-100 center white smaller-text heavy rating-overlay-unidentifiable action pointer'>mark picture as unidentifiable</p>
 						 </div>";
 			$output .= "</div>";
 			$output .= "<div class='clear rating-main-container margin-top " . $typeClass . "'>";
@@ -104,9 +105,10 @@ class Application_View_Helper_Alert
 			if ($user) {
 				// Attendance
 				$output .=	"<div class='clear width-100 rating-section-container rating-attendance'>";
-				$output .=		"<p class='clear width-100 medium light-back'>Do you remember " . $rating->getHimOrHer() . "?</p>";
+				$output .=		"<p class='clear width-100 medium light-back'>Did " . $rating->getHeOrShe() . " show up?</p>";
 				$output .=		"<p class='clear button pointer button-small larger-margin-top rating-animate-trigger rating-remember-yes'>Yes</p>";
 				$output .=		"<p class='left button pointer button-small larger-margin-top rating-remember-no'>No</p>";
+				$output .=		"<p class='right pointer larger-margin-top smaller-text medium rating-remember-maybe action'>Not Sure</p>";
 				$output .= 	"</div>";
 				
 				// Skill
@@ -149,7 +151,9 @@ class Application_View_Helper_Alert
 				$output .=		"</div>";				
 				
 				$output .=	"</div>";
-
+				
+				$output .= "<p class='width-100 hidden center red smaller-text clear larger-margin-top rating-remember-no-penalize'>" . ucwords($rating->getHisOrHer()) . " attendance will be slightly penalized.</p>";
+				
 				$output .=	$form->skill;
 				$output .=	$form->sportsmanship;
 				$output .=	$form->id->setValue($rating->userID);

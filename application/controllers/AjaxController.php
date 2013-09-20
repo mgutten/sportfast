@@ -96,22 +96,36 @@ class AjaxController extends Zend_Controller_Action
 			$rating->sportID = $rating->getMapper()->getSportID($options['sport']);
 			$rating->setCurrent('dateHappened');
 			$rating->gameID = $options['gameID'];
-			
-			$rating->attendance = 1;
-			$rating->skill = $rating->getMapper()
-									->getForeignID('Application_Model_DbTable_Ratings','ratingID',array('type' => 'user',
-																									   'ratingType' => 'skill',
-																									   'ratingName' => $options['skill']));
-			$rating->sportsmanship = $rating->getMapper()
-											->getForeignID('Application_Model_DbTable_Ratings','ratingID',array('type' => 'user',
-																											   'ratingType' => 'sportsmanship',
-																											   'ratingName' => $options['sportsmanship']));
-																										   
-			$rating->bestSkill = $rating->getMapper()
-										->getForeignID('Application_Model_DbTable_SportSkills','sportSkillID',array('sport' => $options['sport'],
+			echo $options['noShow'];
+			if (!empty($options['noShow'])) {
+				$rating->attendance = 0;
+			}  elseif (empty($options['notSure'])) {
+				// Not sure was not selected
+				$rating->attendance = 1;
+				$rating->skill = $rating->getMapper()
+										->getForeignID('Application_Model_DbTable_Ratings','ratingID',array('type' => 'user',
+																										   'ratingType' => 'skill',
+																										   'ratingName' => $options['skill']));
+				$rating->sportsmanship = $rating->getMapper()
+												->getForeignID('Application_Model_DbTable_Ratings','ratingID',array('type' => 'user',
+																												   'ratingType' => 'sportsmanship',
+																												   'ratingName' => $options['sportsmanship']));
+																											   
+				$rating->bestSkill = $rating->getMapper()
+											->getForeignID('Application_Model_DbTable_SportSkills','sportSkillID',array('sport' => $options['sport'],
 																													'skilling' => $options['bestSkill']));
+			} else {
+				// Not sure was selected
+				
+				$rating->receivingUserID = '';
+			}
 																													
 			$rating->save(false);
+			
+			if (!empty($options['notSure'])) {
+				// Not sure was selected, return
+				return;
+			}
 			
 			$notification->receivingUserID = $options['userID'];
 			$notification->type = 'user';
@@ -121,8 +135,13 @@ class AjaxController extends Zend_Controller_Action
 			
 			$user = new Application_Model_User();
 			$user->userID = $options['userID'];
-			$user->setUserRating('skill', $rating->sportID);
-			$user->setUserRating('sportsmanship', $rating->sportID);
+			if (empty($options['noShow']) && empty($options['notSure'])) {
+				$user->setUserRating('skill', $rating->sportID);
+				$user->setUserRating('sportsmanship', $rating->sportID);
+			} else if (!empty($options['noShow'])) {
+				$user->setUserRating('attendance', $rating->sportID);
+			}
+			
 		} elseif ($type == 'park') {
 			// Park rating
 			$rating = new Application_Model_Rating();
@@ -1103,6 +1122,9 @@ class AjaxController extends Zend_Controller_Action
 				$mapper = new Application_Model_NotificationsMapper();
 				$mapper->notificationConfirm($options['notificationLogID'], $options['confirmOrDeny'],$options['type'], $options['action']);
 				
+				// Reset session var and force reload to account for new team, game, or teamGame
+				$reset = new Zend_Session_Namespace('reset');
+				$reset->reset = true;
 			}
 						
 		} else {
@@ -1143,7 +1165,7 @@ class AjaxController extends Zend_Controller_Action
 	{
 		$options = $this->getRequest()->getParam('options');
 		
-		if (!$options['reserves']) {
+		if (!$options['userIDs']) {
 			return false;
 		}
 		
@@ -1154,10 +1176,12 @@ class AjaxController extends Zend_Controller_Action
 		$notification->teamID = $options['teamID'];
 		$notification->teamGameID = $options['teamGameID'];
 		
-		foreach ($options['reserves'] as $userID) {
+		foreach ($options['userIDs'] as $userID) {
 			$notification->receivingUserID = $userID;
 			$notification->save();
 		}
+		
+		$this->_forward('invite-team-game','mail', null);
 		
 	}
 	

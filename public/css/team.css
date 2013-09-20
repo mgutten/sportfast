@@ -210,7 +210,8 @@
 	margin-top: 1px;
 }
 
-.team-reserve-confirmed {
+.team-reserve-confirmed,
+.team-reserve-not-confirmed {
 	width: 10px;
 	height: 10px;
 	background: #58bf12;
@@ -218,6 +219,10 @@
 	bottom: -1px;
 	left: -1px;
 	border: 1px solid white;
+}
+
+.team-reserve-not-confirmed {
+	background: #C60000;
 }
 
 .team-reserve-player > div > img.animate-opacity {

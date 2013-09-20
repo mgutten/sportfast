@@ -25,6 +25,13 @@ class TeamsController extends Zend_Controller_Action
 			return;
 		}
 		
+		$session = new Zend_Session_Namespace('firstTeam');
+		if ($session->first) {
+			// Is first team/game, show profile buttons
+			$this->view->firstTeam = true;
+			Zend_Session::namespaceUnset('firstTeam');
+		}
+		
 		$session = new Zend_Session_Namespace('invites');
 		if ($session->sent) {
 			// From mailController inviteTypeAction, invites successfully sent, alert
@@ -87,12 +94,19 @@ class TeamsController extends Zend_Controller_Action
 			if ($team->reserves->exists($this->view->user->userID)) {
 				// User is in reserves, see if was invited to next game
 				
-				$this->view->invitedToNextGame= $team->isInvitedToGame($this->view->user->userID, $nextGame->teamGameID);
+				$invited = $team->isInvitedToGame($this->view->user->userID, $nextGame->teamGameID);
+				
+				if ($invited ||
+					$nextGame->userConfirmed($this->view->user->userID) ||
+					$nextGame->userNotConfirmed($this->view->user->userID)) {
+						// Either pending invite, or is already confirmed/not confirmed
+						$this->view->invitedToNextGame = true;
+					}
 			}
 		}
 		
 		$this->view->previousGames = $team->games->getPreviousGames();
-		$this->view->events		   = $team->games->games;
+		$this->view->events		   = $team->games->getAll();
 		
 		
 		// Current user is captain

@@ -211,7 +211,7 @@ abstract class Application_Model_MapperAbstract
 									z.location
 									)
 								)
-							) * (5/8 * 100) < 12') // Multiply by 100 to get km, 5/8 to convert to miles
+							) * (5/8 * 100) < 15') // Multiply by 100 to get km, 5/8 to convert to miles
 			   ->group('z.cityID')
 			   ->order('GLength(LineStringFromWKB(
 								  LineString(
@@ -220,7 +220,7 @@ abstract class Application_Model_MapperAbstract
 									)
 								)
 							) ASC')
-			   ->limit(20);
+			   ->limit(30);
 		
 		$results = $table->fetchAll($select);
 		

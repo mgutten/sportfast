@@ -51,6 +51,7 @@ class Application_Model_Game extends Application_Model_ModelAbstract
 									'canceled'		=> '',
 									'cancelReason'  => '',
 									'remove'		=> '',
+									'teamPage'		=> '', // Used in getTeamByID for Calendar.php to show future games on team page
 									'sportfastCreated' => '',
 									'doNotEmail'    => ''
 									);
@@ -97,7 +98,11 @@ class Application_Model_Game extends Application_Model_ModelAbstract
 	 */
 	public function addUserToGame($gameID, $userID)
 	{
-		return $this->getMapper()->addUserToGame($gameID, $userID);
+		if ($this->isTeamGame()) {
+			return $this->getMapper()->addUserToTeamGame($gameID, $userID);
+		} else {
+			return $this->getMapper()->addUserToGame($gameID, $userID);
+		}
 	}
 	
 	
@@ -175,7 +180,12 @@ class Application_Model_Game extends Application_Model_ModelAbstract
 	
 	public function getGameByID($gameID)
 	{
-		return $this->getMapper()->getGameByID($gameID, $this);
+		if ($this->isTeamGame()) {
+			return $this->getMapper()->getTeamGameByID($gameID, $this);
+		} else {
+			// Is pickup
+			return $this->getMapper()->getGameByID($gameID, $this);
+		}
 	}
 	
 	public function searchDbForLeagueLocation($locationName = false, $address = false, $cityID = false)
@@ -196,6 +206,20 @@ class Application_Model_Game extends Application_Model_ModelAbstract
 		}
 		
 		return $this->_attribs['messages'];
+	}
+	
+	/**
+	 * e.g. return Team Space Work's v. Hustlers'
+	 */
+	public function getTeamNamePossession()
+	{
+		$teamName = $this->getTeamName();
+		
+		if (substr($teamName, -1) == 's') {
+			return $teamName . "'";
+		} else {
+			return $teamName . "'s";
+		}
 	}
 
 	public function getTeamName()

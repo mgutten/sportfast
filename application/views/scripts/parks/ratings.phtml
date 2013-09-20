@@ -23,9 +23,35 @@ $this->placeholder('narrowColumn')->captureEnd();
 <header class='width-100 left'>
 	<p class='jumbo-text heavy darkest left'><?php echo $this->numRatings;?></p>
     <p class='left largest-text darkest profile-header-sub'>for <?php echo $this->park->parkName;?> </p>
-    <?php echo $this->ratingstar('large', $this->ratingWidth, $this->currentURI, '');?>
     
 </header>
+
+<div class='clear width-100 larger-margin-top'>
+    <div class='auto-center' style='width:200px;'>
+		<?php echo $this->ratingstar('large', $this->ratingWidth, $this->currentURI, '');?>
+    </div>
+    <div class='clear width-100'>
+    	<div class='auto-center' style='width: 156px;'>
+	<?php
+		foreach ($this->ratingBreakdown['breakdown'] as $key => $val) {
+			if (!is_numeric($key)) {
+				// Prevent ['total'] key from showing
+				continue;
+			}
+			$width = round($val/$this->ratingBreakdown['total'] * 100);
+			
+			echo "<div class='clear margin-top'>";
+			echo	"<p class='left margin-top smaller-text medium'>" . $key . " stars</p>";
+			echo	"<div class='left rating-breakdown-outer indent light-back'>
+						<div class='left rating-breakdown-inner green-back' style='width:" . $width . "%'></div>
+					 </div>";
+			echo	"<p class='left indent medium smaller-text margin-top'>(" . $val . ")</p>";
+			echo "</div>";
+		}
+		?>
+        </div>
+        </div>
+</div>
 
 <div class='width-100 clear ratings-container'>
 	<div class='rating-container width-100 clear ratings-user-container'>

@@ -221,6 +221,17 @@ class Application_Model_NotificationsMapper extends Application_Model_MapperAbst
 			 
 			 
 							
+		 } elseif ($type == 'teamgame') {
+			 // Add user to team game
+			 $query = "INSERT INTO user_team_games (teamGameID, teamID, userID, confirmed)
+			 			(SELECT nl.teamGameID,
+								nl.teamID,
+								nl.receivingUserID,
+								'1'
+							FROM notification_log as `nl`
+							WHERE nl.notificationLogID = '" . $notificationLogID . "')";
+
+							
 		 } elseif ($type == 'game') {
 			 $query = "INSERT INTO user_games (gameID, userID)
 			 			(SELECT nl.gameID,

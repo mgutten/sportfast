@@ -89,3 +89,13 @@
 .rating-chart-option.light {
 	margin-top: .95em;
 }
+
+/* rating breakdown */
+.rating-breakdown-inner {
+	height:16px;
+}
+
+.rating-breakdown-outer {
+	width: 6em;
+	height: 16px;
+}

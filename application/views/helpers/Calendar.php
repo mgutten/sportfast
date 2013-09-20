@@ -98,6 +98,10 @@ class Application_View_Helper_Calendar
 				if ($tooltips) {
 					if (!empty($event->_attribs['teamGameID'])) {
 						// Is team game
+						if (($event->confirmed == '0' || !$event->hasValue('confirmed')) && $date->format('U') > $curDate->format('U') && $event->teamPage != '1') {
+							// Do not show games not attending
+							continue;
+						}
 						$tooltip  = '<p class="left darkest">vs. <span class="heavy inherit">' . $event->opponent . '</span></p>';
 						
 						$extraTooltip = '';

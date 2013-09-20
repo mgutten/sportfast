@@ -82,18 +82,26 @@ $this->placeholder('narrowColumn')->captureEnd();
    		<p class='left light'>courts and fields</p>
         
         <p class='park-sport-small clear '>basketball</p>
-        <p class='park-sport-large largest-text heavy left'><?php echo $this->park->totalBasketball;?></p>
+        <p class='park-sport-large largest-text heavy left' tooltip='<?php echo $this->park->totalBasketball;?> basketball courts'><?php echo $this->park->totalBasketball;?></p><?php echo ($this->park->basketballLights == '1' ? "<img src='/images/park/sun.png' class='left indent larger-margin-top' tooltip='Has lights'/>" : '');?>
         <p class='park-sport-small clear '>tennis</p>
-        <p class='park-sport-large largest-text heavy left'><?php echo $this->park->tennis;?></p>
+        <p class='park-sport-large largest-text heavy left' tooltip='<?php echo $this->park->tennis;?> tennis courts'><?php echo $this->park->tennis;?></p> <?php echo ($this->park->tennisLights == '1' ? "<img src='/images/park/sun.png' class='left indent larger-margin-top' tooltip='Has lights'/>" : '');?>
         <p class='park-sport-small clear '>fields</p>
-        <p class='park-sport-large largest-text heavy left'><?php echo $this->park->field;?></p>
+        <p class='park-sport-large largest-text heavy left' tooltip='<?php echo $this->park->field;?> usable fields'><?php echo $this->park->field;?></p><?php echo ($this->park->fieldLights == '1' ? "<img src='/images/park/sun.png' class='left indent larger-margin-top' tooltip='Has lights'/>" : '');?>
         
         
     </div>
     
     <div class='left park-details-middle'>
    		<a href='<?php echo $this->currentURI;?>/ratings' class='left light'>reviews</a>
-    	<p class='clear medium park-details-review'><?php echo $this->ratingText;?></p>
+        <?php 
+		$class = 'park-details-review';
+		if ($this->randomRating->hasValue('parkRatingID')) {
+			$class = 'margin-top';
+			echo "<img src='" . $this->randomRating->user->getProfilePic('tiny') . "' class='clear larger-margin-top'/>";
+			echo "<div class='left park-random-rating-star indent'><p class='clear light smaller-text'>" . $this->randomRating->user->shortName . "</p>" . $this->ratingstar('small', $this->randomRating->getStarWidth('quality')) . "</div>";
+        }
+		?>
+    	<p class='clear light <?php echo $class;?>'><?php echo $this->randomRating->comment;?></p>
     </div>
     
     <div class='right inherit'>

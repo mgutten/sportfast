@@ -52,6 +52,18 @@ class Application_View_Helper_Ratings
 				$class = 'light-back';
 			}
 			
+			if ($rating->attendance == '1') {
+				$main  =	$this->_view->ratingbar($rating->skillRatingName, $availableSkillRatings, 'skill');
+				$main .=	$this->_view->ratingbar($rating->sportsmanshipRatingName, $availableSportsmanshipRatings, 'sportsmanship');
+				$main .=	"<p class='clear larger-margin-top medium'>" . $rating->getQuotedComment() . "</p>";
+			} else {
+				// No show
+				$main  = "<p class='clear red larger-text heavy'>Did Not Show</p>";
+				if ($this->_view->isUser) {
+					$main .= "<p class='clear smaller-text red'>If you must miss a game, be sure to leave that game before game time.</p>";
+				}
+			}
+			
 			if ($rating->incorrect == '1') {
 				// has been flagged
 				$flagClass = 'clear-right';
@@ -68,9 +80,8 @@ class Application_View_Helper_Ratings
 			$output .=			"<p class='smaller-text right light'>" . $rating->getTimeFromNow() . "</p>";
 			//$output .=			$this->_view->ratingstar('small', $width, $this->_view->currentURI);
 			$output .=			"<p class='clear dark heavy larger-text' tooltip='Anonymous rated this as your best skill.'>" . ucwords($rating->skiller) . "</p>";
-			$output .=			$this->_view->ratingbar($rating->skillRatingName, $availableSkillRatings, 'skill');
-			$output .=			$this->_view->ratingbar($rating->sportsmanshipRatingName, $availableSportsmanshipRatings, 'sportsmanship');
-			$output .=			"<p class='clear larger-margin-top medium'>" . $rating->getQuotedComment() . "</p>";
+			$output .=			$main;
+			
 			$output .=			($this->_view->isUser  ? "<div class='" . $flagClass . "' userRatingID='" . $rating->userRatingID . "'><p class='light clear-right smaller-text action'>" . $flagText . "</p><img src='/images/global/flag.png' class='right'/></div>" : '');
 			$output .=		"</div>";
 			$output .= "</div>";

@@ -12,7 +12,7 @@ class Application_Model_CronMapper extends Application_Model_MapperAbstract
 	{
 		$db = Zend_Db_Table::getDefaultAdapter();
 		
-		$testGameUpdate = "SELECT MAX(gameID) FROM games 
+		$testGameUpdate = "SELECT MAX(gameID) as top FROM games 
 							HAVING top = (SELECT gameID FROM games WHERE parkID = 0 AND sportID = 0 AND public = 0)";
 		
 		$results = $db->query($testGameUpdate);
@@ -364,7 +364,7 @@ class Application_Model_CronMapper extends Application_Model_MapperAbstract
 			   ->joinLeft(array('utg' => 'user_team_games'),
 			   			  'utg.userID = ut.userID AND tg.teamGameID = utg.teamGameID',
 						  array())
-			   ->where('DATE(DATE_ADD(tg.date, INTERVAL -1 DAY)) = CURDATE()')
+			   ->where('DATE(DATE_ADD(tg.date, INTERVAL -2 DAY)) = CURDATE()')
 			   ->where('utg.teamGameID IS NULL');
 		
 		$results = $table->fetchAll($select);

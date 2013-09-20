@@ -221,6 +221,10 @@ input[type=text].create-input {
 	margin: .4em .4em 0 .4em;
 }
 
+.create-details-skill-separator {
+	margin: .2em 0 .2em 3.4em;
+}
+
 .create-details-checkbox {
 	margin-top: .3em;
 }

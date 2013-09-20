@@ -54,7 +54,12 @@ $(function()
 			var index = $(this).parents('.alert-body-container').index('.alert-body-container');
 			index += 2;
 			
+			
 			$(this).parents('#rateGame-alert-container').find('.alert-body-container:eq(' + index + ')').show();
+			
+			$('.alert-body-container').find('.rating-remember-no-penalize').hide();
+			
+			$(this).siblings('.rating-remember-maybe').removeClass('green-b');
 		})
 		
 		$('.rating-remember-no').click(function()
@@ -68,9 +73,51 @@ $(function()
 			
 			$(this).parents('#rateGame-alert-container').find('.alert-body-container:eq(' + index + ')').show();
 			
+			
+			$('.alert-body-container').find('.rating-remember-no-penalize').show();
+			
+			$(this).siblings('.rating-remember-maybe').removeClass('underline');
+			
 		})
 		
-		$('.rating-attendance').find('.button').click(function()
+		$('.rating-remember-maybe').click(function()
+		{
+			var index = $(this).parents('.alert-body-container').index('.alert-body-container');
+			index += 2;
+			
+			var parentEle = $(this).parents('.rating-section-container');
+			
+			parentEle.siblings('.rating-section-container').hide();
+			
+			$(this).parents('#rateGame-alert-container').find('.alert-body-container:eq(' + index + ')').show();
+			
+			$('.alert-body-container').find('.rating-remember-no-penalize').hide();
+			
+			$(this).addClass('underline');
+			
+		})
+		
+		/**
+		 * picture is unidentifiable
+		 */
+		$('.rating-overlay-unidentifiable').click(function()
+		{
+			var parentEle = $(this).parents('.alert-body-container');
+			
+			var idType = '';
+			var typeID = '';
+			var actingUserID = '';
+			var receivingUserID = parentEle.find('#id').val();
+			var action = 'mark';
+			var type = 'user';
+			var details = 'unidentifiable';
+			
+			createNotification(idType, typeID, actingUserID, receivingUserID, action, type, details)
+			
+			showConfirmationAlert('A message has been sent');
+		});
+		
+		$('.rating-attendance').find('.button,.rating-remember-maybe').click(function()
 		{
 			$(this).siblings('.button').removeClass('inner-shadow schedule-button-selected');
 		})
@@ -119,16 +166,26 @@ $(function()
 				ratePark(parkID, gameID, sport, quality, comment, success)
 			} else {
 				// Is user rating
-				if (!parentEle.find('.rating-remember-no').is('.inner-shadow')) {
-					// "No" is not clicked
-					var sport = parentEle.find('#sport').val();
+				var sport = parentEle.find('#sport').val();
+				var userID = parentEle.find('#id').val();
+				var gameID = $('#rateGame-details').attr('gameID');
+					
+				if (parentEle.find('.rating-remember-yes').is('.inner-shadow')) {
+					// "Yes" is clicked
 					var skill = parentEle.find('#skill').val();
 					var sportsmanship = parentEle.find('#sportsmanship').val();
 					var best  = parentEle.find('.rating-dropdown').val();
-					var userID = parentEle.find('#id').val();
-					var gameID = $('#rateGame-details').attr('gameID');
 								
-					rateUser(userID, gameID, sport, skill, sportsmanship, best)
+					rateUser(userID, gameID, sport, skill, sportsmanship, best, '', '')
+				} else if (parentEle.find('.rating-remember-no').is('.inner-shadow')) {
+					// No is clicked
+					var noShow = '1';
+					
+					rateUser(userID, gameID, sport, '', '', '', noShow);
+				} else if (parentEle.find('.rating-remember-maybe').is('.underline')) {
+					// Not sure is clicked
+					var notSure = '1';
+					rateUser(userID, gameID, sport, '', '', '', '', notSure);
 				}
 			}
 			
@@ -151,15 +208,17 @@ $(function()
 /**
  * ajax to rate user
  */
-function rateUser(userID, gameID, sport, skill, sportsmanship, best)
+function rateUser(userID, gameID, sport, skill, sportsmanship, best, noShow, notSure)
 {
 	var options = {userID: userID,
 				   sport: sport,
 				   skill: skill,
 				   sportsmanship: sportsmanship,
 				   bestSkill: best,
-				   gameID: gameID};
-			   
+				   gameID: gameID,
+				   noShow: noShow,
+				   notSure: notSure};
+				   	   
 	$.ajax({
 		url: '/ajax/rate-type',
 		type: 'POST',

@@ -98,6 +98,10 @@ class Application_Model_Ratings extends Application_Model_ModelAbstract
 		$combo = $rating . 'Value';
 			
 		foreach ($this->getAll() as $ratingModel) {
+				if ($ratingModel->attendance == '0') {
+				
+					continue;
+				}
 				
 				if ($rating == 'overall') {
 					$skill = $ratingModel->skillValue;
@@ -137,8 +141,10 @@ class Application_Model_Ratings extends Application_Model_ModelAbstract
 		$skill		   = $weight['skillCurrent'] * $skillCurrent;
 		
 		$overall = $sportsmanship + $attendance + $skill;
+		$overall = ceil($overall);	
+		//$overall = round($overall * 10)	/ 10;
 		
-		return ceil($overall);
+		return $overall;
 	}
 	
 	public function addRating($resultRow)
@@ -216,6 +222,31 @@ class Application_Model_Ratings extends Application_Model_ModelAbstract
 			return $count;
 		}
 		
+	}
+	
+	/**
+	 * get rating breakdown (how many 5 stars, how many 4, etc) for park
+	 */
+	public function getRatingBreakdown($attrib = 'quality')
+	{
+		$total = count($this->ratings);
+		
+		$returnArray = array('total' => $total,
+							 'breakdown' => array(5 => 0,
+												 4 => 0,
+												 3 => 0,
+												 2 => 0,
+												 1 => 0)
+							);
+		
+		foreach ($this->getAll() as $rating) {
+			$ratingValue = round($rating->$attrib);
+			
+			$returnArray['breakdown'][$ratingValue] += 1;
+		}
+		
+		
+		return $returnArray;
 	}
 	
 	/**

@@ -1,0 +1,23 @@
+<?php
+/** 
+ * controller => mail
+ * action => add-user-team-game
+ */
+$this->headTitle('Add to Game');
+$this->headLink()->prependStylesheet($this->baseUrl() . '/css/mail.css');
+?>
+
+<div id='mail-add-user-success-container' class='white-back alert-container dropshadow'>
+<?php
+if (!$this->fail) {
+	// added to game
+	$upper = 'You have been added to the roster.';
+}
+?>
+
+<p class='width-100 center clear largest-text darkest heavy'><?php echo $upper;?></p>
+<div class='clear width-100'>
+    <a href='/teams/<?php echo $this->teamID;?>' class='clear larger-margin-top button auto-center larger-text heavy' style='width:8em'>view team</a>
+</div>
+
+</div>

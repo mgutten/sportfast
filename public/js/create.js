@@ -104,7 +104,7 @@ $(function()
 		
 	})
 	
-	$('.dropdown-menu-options-container').children('.dropdown-menu-option-container').click(function()
+	$('.dropdown-menu-options-container').find('.dropdown-menu-option-container').click(function()
 	{
 		var parentID  = $(this).parents('.dropdown-menu-options-container').attr('dropdown-menu')
 		var selectEle = $('#' + parentID).find('p.dropdown-menu-option-text');
@@ -114,18 +114,23 @@ $(function()
 		
 		$(document).trigger('click');
 		
-		testDate();
+		if ($(this).parents('#dropdown-menu-hidden-container-hour').length > 0 ||
+			$(this).parents('#dropdown-menu-hidden-container-min').length > 0 ||
+			$(this).parents('#dropdown-menu-hidden-container-ampm').length > 0) {
+				// Test date for hour dropdowns
+				testDate();
+			}
 	})
 	
 	/* change skill limits */
 	$('#dropdown-menu-minSkill').find('.dropdown-menu-option-text').click(function()
 	{
-		$('#skillLimitMin').val($(this).attr('value'));
+		limitSkills($(this), 'min');
 	})
 	
 	$('#dropdown-menu-maxSkill').find('.dropdown-menu-option-text').click(function()
 	{
-		$('#skillLimitMax').val($(this).attr('value'));
+		limitSkills($(this), 'max');
 	})
 	
 	
@@ -770,6 +775,44 @@ function isGame()
 	}
 }
 
+/**
+ * limit max and min values for skill limits
+ * @params(clickedEle => $(this) of clicked element from dropdown,
+ *		   minOrMax => str 'min' or 'max' that was clicked)
+ */
+function limitSkills(clickedEle,minOrMax) {
+	
+	var value = parseInt(clickedEle.attr('value'),10);
+	var oppositeSkill = (minOrMax == 'min' ? $('#skillLimitMax') : $('#skillLimitMin'));
+	var currentSkill = (minOrMax == 'min' ? $('#skillLimitMin') : $('#skillLimitMax'));
+	var oppositeName = (minOrMax == 'min' ? 'max' : 'min');
+		
+	if (value == currentSkill.val()) {
+		return;
+	}
+	
+	currentSkill.val(value);
+	
+	var left,right;
+	
+	if (minOrMax == 'min') {
+		left = value;
+		right = $('#skillLimitMax').val();
+	} else {
+		left = $('#skillLimitMin').val();
+		right = value;
+	}
+	
+	if (left > right) {
+		$('#dropdown-menu-' + oppositeName + 'Skill').find('.dropdown-menu-option-text').each(function()
+		{
+			if (parseInt($(this).attr('value'),10) == parseInt(value,10)) {
+				$(this).trigger('click');
+			} 
+		})
+	}
+}
+	
 function populateNarrowColumnTime()
 {
 	if (selectedDay) {

@@ -96,8 +96,8 @@ class LoginController extends Zend_Controller_Action
 			$user = $auth->getIdentity();
 			
 			if ($request->getPost('rememberMe')) {
-				// Set cookie if user wants to be remembered
-				setcookie('user', $user->userID, time() + (60*60*24*14), '/');
+				// Set cookie if user wants to be remembered (40 days)
+				setcookie('user', $user->userID, time() + (60*60*24*40), '/');
 			} else {
 				// Unset cookie (if existing from previous visit)
 				setcookie('user', '', time() - 1, '/');

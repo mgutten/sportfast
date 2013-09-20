@@ -58,6 +58,10 @@
 	width: 11.2em;
 }
 
+.park-random-rating-star {
+	margin-top: .2em;
+}
+
 /* nearby parks */
 .park-short-container {
 	width: auto;

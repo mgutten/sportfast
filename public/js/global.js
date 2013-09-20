@@ -1258,6 +1258,7 @@ function notificationConfirmDeny(notificationLogID, confirmOrDeny, type, action,
 		type: 'POST',
 		data: {options: options},
 		success: function(data) {
+
 			showConfirmationAlert(capitalize(confirmOrDeny) + ' processed');	
 			reloadPage();
 		}

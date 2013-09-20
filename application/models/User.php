@@ -35,7 +35,8 @@ class Application_Model_User extends Application_Model_ModelAbstract
 									'fake'			=> '',
 									'joined'		=> '',
 									'avatar'		=> '',
-									'noEmail'		=> ''  // Do not email when game is created for them
+									'noEmail'		=> '',  // Do not email when game is created for them
+									'ratingSet'		=> ''   // Used by setUserRating to not update old_user_ratings twice
 									);
 
 	protected $_primaryKey = 'userID';	
@@ -120,9 +121,30 @@ class Application_Model_User extends Application_Model_ModelAbstract
 					$returnArray[$game->gameDate->format('w')][] = $game;
 				}
 			}
+			for ($i = 0; $i < 7; $i++) {
+				if (!isset($returnArray[$i])) {
+					continue;
+				}
+				
+				usort($returnArray[$i], array('Application_Model_User','gameDateSort'));
+			}
+				
 		}
 		
 		return $returnArray;
+	}
+	
+	private static function gameDateSort($a,$b) 
+	{
+		// Weight order based on skillDifference and # of players (weight skillDifference more)
+		$a = $a->gameDate->format('U');
+		$b = $b->gameDate->format('U');
+		
+       	if ($a == $b) {
+			return 0;
+		}
+		
+		return ($a > $b ? 1 : -1);
 	}
 
 	public function getMessages()
@@ -178,7 +200,14 @@ class Application_Model_User extends Application_Model_ModelAbstract
 			$sportID = $sportIDOrSportName;
 		}
 		
-		return $this->getMapper()->setUserRating($rating, $sportID, $this->userID);
+		if (!$this->hasValue('ratingSet')) {
+			$insertOld = true;
+			$this->ratingSet = true;
+		} else {
+			$insertOld = false;
+		}
+		
+		return $this->getMapper()->setUserRating($rating, $sportID, $this->userID, $insertOld);
 	}
 	
 	/**
@@ -270,6 +299,15 @@ class Application_Model_User extends Application_Model_ModelAbstract
 			return 'his';
 		} else {
 			return 'her';
+		}
+	}
+	
+	public function getHeOrShe()
+	{
+		if (strtolower($this->sex) == 'm') {
+			return 'he';
+		} else {
+			return 'she';
 		}
 	}
 	

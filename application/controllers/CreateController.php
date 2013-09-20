@@ -156,8 +156,8 @@ class CreateController extends Zend_Controller_Action
 		
 		if (!empty($post['skillLimitCheckbox'])) {
 			// Limit skill was checked
-			$game->minSkill = $post['skillLimitMin'];
-			$game->maxSkill = $post['skillLimitMax'];
+			$game->minSkill = $post['skillLimitMin'] - 3;
+			$game->maxSkill = $post['skillLimitMax'] + 3;
 		} else {
 			$game->minSkill = 63;
 			$game->maxSkill = 100;
@@ -334,10 +334,16 @@ class CreateController extends Zend_Controller_Action
 		
 		$success = new Zend_Session_Namespace('createSuccess');
 		
-		$this->view->type = $success->type;
+		$this->view->type = $type = $success->type;
 		$typeID = strtolower($success->type) . 'ID';
 		$this->view->typeID = $success->$typeID;
+		$types = $type . 's';
 		
+		if (count($this->view->user->$types->getAll()) <= 1) {
+			// Is first team/game, will show options button on the page
+			$session = new Zend_Session_Namespace('first' . ucwords($type));
+			$session->first = true;
+		}
 		
 		
 		$form = new Application_Form_General();

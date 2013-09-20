@@ -288,26 +288,55 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 		$select->from(array('tg' => 'team_games'))
 			   ->join(array('t' => 'teams'),
 			   		  't.teamID = tg.teamID')
+			   ->join(array('ut' => 'user_teams'),
+			   		  'ut.teamID = t.teamID')
 			   ->join(array('ll' => 'league_locations'),
 			   		  'll.leagueLocationID = tg.leagueLocationID')
 			   ->joinLeft(array('utg' => 'user_team_games'),
-			   		  'utg.teamGameID = tg.teamGameID',
+			   		  'utg.teamGameID = tg.teamGameID AND utg.userID = ut.userID',
 					  array('(SELECT COUNT(utg2.userID) FROM user_team_games as utg2 WHERE utg2.teamID = tg.teamID AND utg2.confirmed = 1 AND utg2.teamGameID = tg.teamGameID) as confirmedPlayers',
 					  		'utg.confirmed as confirmed'))
-			   ->where('utg.userID = ?', $savingClass->userID)
+			   ->where('ut.userID = ?', $savingClass->userID)
 			   //->where('utg.userID = ?' ,  $savingClass->userID)
 			   ->where('tg.date > (NOW() + INTERVAL ' . $this->getTimeOffset() . ' HOUR)')
 			   ->group('tg.teamGameID');
 		
-
 		$results = $table->fetchAll($select);
 		
 		
 		foreach ($results as $result) {
-			
+		
 			$savingClass->games->addGame($result);
 		}
-
+		
+		
+		$select  = $table->select();
+		
+		$select->setIntegrityCheck(false);
+		$select->from(array('tg' => 'team_games'))
+			   ->join(array('t' => 'teams'),
+			   		  't.teamID = tg.teamID')
+			   ->join(array('tr' => 'team_reserves'),
+			   		  'tr.teamID = t.teamID')
+			   ->join(array('ll' => 'league_locations'),
+			   		  'll.leagueLocationID = tg.leagueLocationID')
+			   ->joinLeft(array('utg' => 'user_team_games'),
+			   		  'utg.teamGameID = tg.teamGameID AND utg.userID = tr.userID',
+					  array('(SELECT COUNT(utg2.userID) FROM user_team_games as utg2 WHERE utg2.teamID = tg.teamID AND utg2.confirmed = 1 AND utg2.teamGameID = tg.teamGameID) as confirmedPlayers',
+					  		'utg.confirmed as confirmed'))
+			   ->where('tr.userID = ?', $savingClass->userID)
+			   ->where('utg.userID = ?' ,  $savingClass->userID)
+			   ->where('tg.date > (NOW() + INTERVAL ' . $this->getTimeOffset() . ' HOUR)')
+			   ->group('tg.teamGameID');
+		
+		$results = $table->fetchAll($select);
+		
+		foreach ($results as $result) {
+		
+			$savingClass->games->addGame($result);
+		}
+		
+		
 		return $savingClass;
 		
 	}
@@ -687,14 +716,11 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 		
 		$select->setIntegrityCheck(false);
 		$select->from(array('ur'  => 'user_ratings'))
-			   ->join(array('r' => 'ratings'),
+			   ->joinLeft(array('r' => 'ratings'),
 			   		  'ur.sportsmanship = r.ratingID',
 					  array('r.value as sportsmanshipValue',
 					  		'r.ratingName as sportsmanshipRatingName'))
-			   ->join(array('r2' => 'ratings'),
-			   		  'ur.attendance = r2.ratingID',
-					  array('r2.value as attendanceValue'))
-			   ->join(array('r3' => 'ratings'),
+			   ->joinLeft(array('r3' => 'ratings'),
 			   		  'ur.skill = r3.ratingID',
 					  array('r3.value as skillValue',
 					  		'r3.ratingName as skillRatingName'))
@@ -703,7 +729,7 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 					  array('skiller', 'skilling'))
 			   ->where('ur.receivingUserID = ?', $savingClass->userID)
 			   ->order('ur.dateHappened DESC');
-		
+
 		$results = $table->fetchAll($select);
 		
 		foreach ($results as $result) {
@@ -1180,7 +1206,7 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 	/**
 	 * set skillCurrent, sportsmanship, or attendance based on all reviews
 	 */
-	public function setUserRating($rating, $sportID, $userID)
+	public function setUserRating($rating, $sportID, $userID, $insertOld = false)
 	{
 		
 		$db = Zend_Db_Table::getDefaultAdapter();
@@ -1190,25 +1216,70 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 		}
 		
 		$rating = strtolower($rating);
-		if ($rating == 'skill') {
-			$pre = '+ us.skillInitial';
-			$final = 'skillCurrent';
-			$post = 'skill';
-			$plus = '+ 1';
-		} else {
-			$post = $final = $rating;
-			$plus = $pre = '';
-		}
-	
 		
-		$sql = "UPDATE user_sports as us
-				INNER JOIN (SELECT FLOOR((SUM(r.value)" . $pre . ")/(COUNT(ur." . $post . ")" . $plus . ")) as ratingValue,
-									us.userSportID 
-					FROM user_sports us 
-						INNER JOIN user_ratings ur ON us.userID = ur.receivingUserID AND us.sportID = ur.sportID 
-						INNER JOIN ratings r ON r.ratingID = ur." . $post . " 
-					WHERE us.userID = '" . $userID . "' AND us.sportID = '" . $sportID . "') as us2 ON us.userSportID = us2.userSportID 
-					SET us." . $final . " = us2.ratingValue WHERE us.userID = '" . $userID . "' AND us.sportID = '" . $sportID . "'";
+		if ($rating == 'attendance') {
+			// Special case for attendance
+			$positive = "SELECT COUNT(ur.userRatingID) as positive 
+							FROM user_ratings ur
+							WHERE ur.receivingUserID = '" . $userID . "'
+								AND ur.sportID = '" . $sportID . "'
+								AND ur.attendance = '1'";
+			$positiveResult = $db->fetchRow($positive);
+			
+			$negative = "SELECT COUNT(ur.userRatingID) as negative 
+							FROM user_ratings ur
+							WHERE ur.receivingUserID = '" . $userID . "'
+								AND ur.sportID = '" . $sportID . "'
+								AND ur.attendance = '0'";
+			$negativeResult = $db->fetchRow($negative);
+			
+			$attendance = 100;
+			
+			// Weight no shows as -10 per no show
+			$attendance = $attendance + $positiveResult['positive'] - ($negativeResult['negative'] * 10);
+			
+			$attendance = ($attendance > 100 ? 100 : $attendance);
+			
+			$sql = "UPDATE user_sports as us
+					SET us.attendance = " . $attendance . " WHERE us.userID = '" . $userID . "' AND us.sportID = '" . $sportID . "'";
+					
+		} else {
+		
+			if ($rating == 'skill') {
+				$pre = '+ us.skillInitial';
+				$final = 'skillCurrent';
+				$post = 'skill';
+				$plus = '+ 1';
+			} else {
+				$post = $final = $rating;
+				$plus = $pre = '';
+			}
+		
+			
+			$sql = "UPDATE user_sports as us
+					INNER JOIN (SELECT FLOOR((SUM(r.value)" . $pre . ")/(COUNT(ur." . $post . ")" . $plus . ")) as ratingValue,
+										us.userSportID 
+						FROM user_sports us 
+							INNER JOIN user_ratings ur ON us.userID = ur.receivingUserID AND us.sportID = ur.sportID 
+							INNER JOIN ratings r ON r.ratingID = ur." . $post . " 
+						WHERE us.userID = '" . $userID . "' AND us.sportID = '" . $sportID . "' AND ur.attendance = '1') as us2 ON us.userSportID = us2.userSportID 
+						SET us." . $final . " = us2.ratingValue WHERE us.userID = '" . $userID . "' AND us.sportID = '" . $sportID . "'";
+		}
+		
+		if ($insertOld) {
+			$insertOld = "INSERT INTO old_user_ratings (userID, sportID, skill, sportsmanship, attendance, dateMoved) 
+							(SELECT userID,
+									sportID,
+									skillCurrent,
+									sportsmanship,
+									attendance,
+									(NOW() + INTERVAL " . $this->getTimeOffset() . " HOUR)
+							FROM user_sports
+							WHERE userID = '" . $userID . "' 
+								AND sportID = '" . $sportID . "')";
+								
+			$db->query($insertOld);	
+		}
 	
 		$results = $db->query($sql);		
 		

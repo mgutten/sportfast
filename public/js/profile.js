@@ -81,6 +81,10 @@ $(function()
 	{
 		e.preventDefault();
 		
+		if ($(this).attr('clicked') == 'true') {
+			return false;
+		}
+		
 		var inputEle = $(this).find('textarea');
 
 		if (inputEle.val().length <= 0) {
@@ -96,6 +100,8 @@ $(function()
 		var message = inputEle.val();
 		
 		addPost(idType, typeID, actingUserID, message);
+		
+		$(this).attr('clicked', 'true');
 
 	})
 	
@@ -553,18 +559,36 @@ $(function()
 	$('.profile-animate-buttons').click(function()
 	{
 		animateProfileButtons();
-	});
+	})
+	.mouseenter(function()
+	{
+		if (parseInt($('.profile-buttons-inner-container').css('margin-left'), 10) > 0) {
+			animateProfileButtons();
+		}
+	})
+	
+	/* show animatable options container for first time team/game */
+	var detailsEle = getDetailsEle();
+	if (detailsEle) {
+		// Bug fix with failed js on ratings page
+		if (detailsEle.attr('firstType') == 'true') {
+			animateProfileButtons();
+		}
+	}
 	
 	
 	$(document).click(function(e)
 	{
 		if ((($(e.target).parents('.profile-buttons-innermost-container').length > 0 && !$(e.target).is('a')) ||
-			 $(e.target).is('.profile-buttons-innermost-container'))) {
+			 $(e.target).is('.profile-buttons-innermost-container')) ||
+					$(e.target).is('.alert-black-back') || 
+					$(e.target).is('.alert-x')) {
 				 // For animating div on games page
 				 return false;
 		} else if (parseInt($('.profile-buttons-inner-container').css('margin-left'),10) == 0) {
 				animateProfileButtons();
 		} else if ($(e.target).parents('#profile-buttons-container').length > 0) {
+
 				return false;
 		}
 		
@@ -613,6 +637,8 @@ function getDetailsEle()
 	} else if ($('#user-details').length > 0) {
 		// User page
 		ele = $('#user-details')
+	} else {
+		return false;
 	}
 	
 	return ele;

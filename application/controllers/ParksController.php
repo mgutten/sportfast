@@ -30,6 +30,7 @@ class ParksController extends Zend_Controller_Action
 		$this->view->parkRatingWidth = $parkRatings->getStarWidth('quality') . '%';
 		
 		$defaultText = 'No ratings have been given.';
+		$randomRating = new Application_Model_Rating();
 		if ($parkRatings->hasValue('ratings')) {
 			// There are ratings
 			$randomRating = $parkRatings->getRandomRating();
@@ -39,10 +40,11 @@ class ParksController extends Zend_Controller_Action
 				$ratingText = $defaultText;
 			}
 		} else {
-			$ratingText = $defaultText;
+			$randomRating->comment = $defaultText;
+			//$ratingText = $defaultText;
 		}
 		
-		$this->view->ratingText = $ratingText;
+		$this->view->randomRating = $randomRating;
 		
 		$this->view->parkLocation = $park->location;
 		
@@ -88,6 +90,8 @@ class ParksController extends Zend_Controller_Action
 		$this->view->ratings = $ratings = $park->getParkRatings();
 		$this->view->numRatings = $ratings->countRatings();
 		$this->view->ratingWidth = $ratings->getStarWidth('quality') . '%';
+		
+		$this->view->ratingBreakdown = $ratings->getRatingBreakdown();
 	}
 	
 	public function stashAction()
