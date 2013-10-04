@@ -26,6 +26,7 @@ class CronController extends Zend_Controller_Action
         
     }
 	
+	
 	/**
 	 * move old games and old teams to "old_" tables, also reset recurring games
 	 * OFTEN: PER HALF HOUR
@@ -60,7 +61,6 @@ class CronController extends Zend_Controller_Action
 		}
 		// CLOSE THE DIRECTORY
 		closedir($dirHandle); 
-		
 		
 	}
 	
@@ -140,10 +140,13 @@ class CronController extends Zend_Controller_Action
 		$mapper = $this->getMapper();
 		
 		$teamGames = $mapper->getUserTeamGames();
+		$teamGamesToday = $mapper->getUserTeamGames(0);
+		
 		$subscribedGames = $mapper->getUserSubscribedGames();
 		
 		$games = array('games' => $subscribedGames,
-					   'teamGames' => $teamGames);
+					   'teamGames' => array('twoDays' => $teamGames,
+					   						'today'	  => $teamGamesToday));
 		
 		return $this->_forward('upcoming-game', 'mail', null, array('games' => $games));
 	}

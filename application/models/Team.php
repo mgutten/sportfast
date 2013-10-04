@@ -416,6 +416,14 @@ class Application_Model_Team extends Application_Model_ModelAbstract
 	}
 	
 	/**
+	 * save sent invites to db
+	 */
+	public function saveInvites($emails, $actingUserID)
+	{
+		return $this->getMapper()->saveInvites($emails, $actingUserID, $this->teamID);
+	}
+	
+	/**
 	 * delete (and move) all of team's games
 	 */
 	public function deleteGames()

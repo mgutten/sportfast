@@ -16,12 +16,14 @@ class CreateController extends Zend_Controller_Action
 	
 	public function gameAction()
 	{
+		/*
 		if (!$this->view->user->hasProfilePic()) {
 			// Do not allow to create game without profile pic
 			$session = new Zend_Session_Namespace('pictureRequired');
 			$session->fail = 'create';
 			$this->_helper->_redirector->goToUrl('/users/' . $this->view->user->userID . '/upload');
 		}
+		*/
 		$sports = new Application_Model_Sports();
 		$this->view->sports = $sports->getAllSportsInfo(true);
 		
@@ -140,7 +142,7 @@ class CreateController extends Zend_Controller_Action
 		$game->recurring = ($post['recurring'] == 'yes' ? '1' : '0');
 		$game->public = ($post['visibility'] == 'public' ? '1' : '0');
 		$game->minPlayers = $post['minPlayers'];
-		$game->rosterLimit = $post['rosterLimit'];
+		$game->rosterLimit = (!empty($post['rosterLimit']) ? $post['rosterLimit'] : '99');
 		$game->cityID = $this->view->user->city->cityID;
 
 		$game->typeID = $game->getSportTypeID($post['sportID'], $post['typeName'], $post['typeSuffix']);
@@ -174,6 +176,13 @@ class CreateController extends Zend_Controller_Action
 		$table = new Application_Model_DbTable_GameCaptains();
 		$table->insert(array('gameID' => $game->gameID,
 		 					 'userID' => $this->view->user->userID));
+							 
+		if ($game->isRecurring()) {
+			$table = new Application_Model_DbTable_GameSubscribers();
+			$table->insert(array('gameID' => $game->gameID,
+								 'userID' => $this->view->user->userID,
+								 'joinDate' => new Zend_Db_Expr('now()')));
+		}
 		
 		
 		$notification = new Application_Model_Notification();

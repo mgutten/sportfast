@@ -32,6 +32,7 @@ class Application_Model_Game extends Application_Model_ModelAbstract
 									'confirmed'		=> '',
 									'confirmedPlayers' 	  => '0',
 									'notConfirmedPlayers' => '',
+									'maybeConfirmedPlayers' => '',
 									'opponent'		=> '',
 									'locationName'  => '',
 									'streetAddress' => '',
@@ -490,16 +491,19 @@ class Application_Model_Game extends Application_Model_ModelAbstract
 		}
 	}
 	
-	public function getPlayersNeeded()
+	/**
+	 * @params ($secondWord => "# " . $secondWord)
+	 */
+	public function getPlayersNeeded($secondWord = 'players')
 	{
 		$difference = $this->minPlayers - $this->totalPlayers;
 		
-		if ($difference == 1) {
+		if ($difference == 1 && $secondWord == 'players') {
 			return $difference . ' player';
 		} elseif ($difference <= 0) {
 			return false;
 		} else {
-			return $difference . ' players';
+			return $difference . ' ' . $secondWord;
 		}
 	}
 
@@ -591,6 +595,14 @@ class Application_Model_Game extends Application_Model_ModelAbstract
 		$this->_attribs['subscribers'][$userID] = true;
 		return $this;
 	}
+	
+	/**
+	 * remove subcriber from game (in db)
+	 */
+	public function unsubscribe($userID) 
+	{
+		return $this->getMapper()->unsubscribe($userID, $this->gameID);
+	}
 
 	/**
 	 * test $userID to see if user is captain of team
@@ -656,6 +668,17 @@ class Application_Model_Game extends Application_Model_ModelAbstract
 		return $player;
 	}
 	
+	public function addMaybeConfirmedPlayer($userID)
+	{
+		if (!is_array($this->_attribs['maybeConfirmedPlayers'])) {
+			$this->_attribs['maybeConfirmedPlayers'] = array();
+		}
+		
+		$player = $this->_attribs['maybeConfirmedPlayers'][$userID] = true;
+		
+		return $player;
+	}
+	
 	public function userConfirmed($userID)
 	{
 		return !empty($this->_attribs['confirmedPlayers'][$userID]);
@@ -664,6 +687,11 @@ class Application_Model_Game extends Application_Model_ModelAbstract
 	public function userNotConfirmed($userID)
 	{
 		return !empty($this->_attribs['notConfirmedPlayers'][$userID]);
+	}
+	
+	public function userMaybeConfirmed($userID)
+	{
+		return !empty($this->_attribs['maybeConfirmedPlayers'][$userID]);
 	}
 	
 	/**
@@ -685,6 +713,14 @@ class Application_Model_Game extends Application_Model_ModelAbstract
 		}
 		
 		return $this;
+	}
+	
+	/**
+	 * save sent invites to db
+	 */
+	public function saveInvites($emails, $actingUserID)
+	{
+		return $this->getMapper()->saveInvites($emails, $actingUserID, $this->gameID);
 	}
 	
 	/**

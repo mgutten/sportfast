@@ -98,12 +98,12 @@ echo $this->placeholder('absolute')->captureStart();
 	
 	if (!$this->user->hasProfilePic()) {
 		echo $this->alert()->start('upload');
-			echo "<p class='darkest width-100 center heavy'>You must upload a profile picture before joining a game.</p>";
+			echo "<p class='darkest width-100 center heavy'>You must upload a profile picture to receive any ratings.</p>";
 
 			echo "<a href='/users/" . $this->user->userID . "/upload' class='clear right larger-text larger-margin-top heavy green-button white' id='game-canceled-back'>Upload Now</a>";
 		echo $this->alert()->end();
 		
-		$content = "<a href='/users/" . $this->user->userID . "/upload' class='width-100 center white left heavy'>You need a profile picture to play.  <span class='white'>Click here to add one.</span></p>";
+		$content = "<a href='/users/" . $this->user->userID . "/upload' class='width-100 center white left heavy'>You need a profile picture to receive ratings.  <span class='white'>Click here to add one.</span></p>";
 		echo $this->topalert('upload', $content);
 	}
 	
@@ -132,8 +132,9 @@ $this->placeholder('narrowColumn')->captureStart();
 		echo "<div class='green-back white heavy narrow-overlay-container dropshadow'>" . $this->totalPlayers . " " . ($this->totalPlayers == 1 ? 'player' : 'players') . $gameFull .  "</div>";
 	} else {
 		echo "<div class='dark-red-back white heavy narrow-overlay-container dropshadow' tooltip='" . ($this->game->minPlayers - $this->totalPlayers) . " more players are needed in order for this game to happen.'>"
-			 . $this->playersNeeded  . " needed
-			 </div>";
+			 . $this->playersNeeded  . " needed"
+			 . ($this->game->canceled ? "<br>CANCELED" : '') .
+			 "</div>";
 	}
 //}
 
@@ -189,7 +190,8 @@ echo "<span id='game-details'
 			rosterLimit='" . $this->game->rosterLimit . "'
 			sport='" . $this->game->sport . "'
 			public='" . ($this->isPublic ? 'public' : 'private') . "'
-			picture='" . (!$this->user->hasProfilePic() ? 'true' : '') . "'
+			recurring = '" . ($this->game->isRecurring() ? 'true' : '') . "' 
+			picture='" /*. (!$this->user->hasProfilePic() ? 'true' : '')*/ . "'>
 	 </span>";
 	 
 
@@ -198,11 +200,12 @@ echo "<span id='game-details'
 <?php
 if ($this->topAlert && $this->userInGame) {
 	// Game is recurring 
+	/*
 	echo $this->placeholder('topalert')->captureStart();
-		$content = "<p class='white heavy width-100 center'>This game happens every week. <span class='white'> Click here to subscribe for weekly reminders.</span></p>";
+		$content = "<p class='white heavy width-100 center'>This game happens every week. <span class='white'> Click here to subscribe for weekly email reminders.</span></p>";
 		echo $this->topalert('subscribe', $content);
 	echo $this->placeholder('topalert')->captureEnd();
-	/*
+	
 	$buttonID = 'subscribe-button';
 	$buttonText = '+Subscribe';
 	echo "<div class='dark-alert-box white heavy'>
@@ -216,6 +219,53 @@ if ($this->topAlert && $this->userInGame) {
 }
 ?>
 
+<?php
+if ($this->userInGame || 
+	$this->subscribed ||
+	$this->captain) {
+	$options = array();
+	$basicOptions = array(array('text' => 'invite',
+								'img'  => 'invite'));
+								
+	$recurringOptions = array(array('text' => 'stats',
+									'img'  => 'stats',
+									'href' => '/games/' . $this->game->gameID . '/stats'),
+							  array('text' => 'reminders',
+									'img'  => 'reminder')
+							  );
+									
+	$captainOptions = array(array('text' => 'edit game',
+								  'img'  => 'edit',
+								  'href' => '/games/' . $this->game->gameID . '/edit'),
+							array('text' => 'message',
+								  'img'  => 'message'),
+							array('text' => 'cancel',
+								  'img'  => 'cancel'));
+	
+	
+	if ($this->captain) {
+		// Is captain
+		foreach ($captainOptions as $option) {
+			$options[] = $option;
+		}
+	
+	}
+	
+	if ($this->game->isRecurring()) {
+		foreach ($recurringOptions as $option) {
+			$options[] = $option;
+		}
+	}
+	
+	
+	foreach ($basicOptions as $option) {
+		$options[] = $option;
+	}
+	
+	
+	echo $this->partial('partials/profile/options.phtml', array('options' => $options));
+}
+?>
 
 <header class='clear profile-name-container'>
 	<p class='profile-name heavy darkest clear'>
@@ -249,11 +299,31 @@ if ($this->topAlert && $this->userInGame) {
     </div>
 </header>
 
+
+<div class='right profile-in-out-container'>
+	  <?php 
+          $in = $out = $maybe = '';
+          $selected = 'member-schedule-button-selected';
+          if ($this->game->userConfirmed($this->user->userID)) {
+              $in = $selected;
+          } elseif ($this->game->userNotConfirmed($this->user->userID)) {
+              $out = $selected;
+          } elseif ($this->game->userMaybeConfirmed($this->user->userID)) {
+              $maybe = $selected;
+          }
+          ?>
+      <p class='clear-right button schedule-out larger-text heavy <?php echo $out;?>'>out</p>
+      <p class='right button schedule-in larger-text heavy <?php echo $in;?>'>in</p>
+      <p class='clear-right button smaller-text schedule-maybe <?php echo $maybe;?>'>maybe</p>
+</div>
 <?php
             
 if ($this->userInGame) {
 ?>
+<!--
 <div id='profile-buttons-container-holder' class='right'></div>
+				
+
 <div id='profile-buttons-container' holder='profile-buttons-container-holder' class='absolute'>
 	<div class='profile-buttons-inner-container left'>
         <div class='profile-animate-buttons light-back pointer' tooltip='Show options'>
@@ -288,7 +358,7 @@ if ($this->userInGame) {
                 </p>
             <?php 	
 			if ($this->subscribed) {
-				echo "<p class='light margin-top right pointer' id='unsubscribe-button'>Unsubscribe</p>";
+				echo "<p class='medium margin-top right pointer' id='unsubscribe-button'>Unsubscribe</p>";
 				}
 			?>
                 <div class='larger-margin-top clear-right-only right'>
@@ -304,8 +374,11 @@ if ($this->userInGame) {
         </div>
     </div>
 </div>
+-->
+
 <?php
 	} elseif (!$this->userInGame) {
+		/*
 		echo "<div class='right'>";
                 $lower = '';
                 $class = '';
@@ -341,20 +414,44 @@ if ($this->userInGame) {
 						$id   = 'join-sport-needed';
 						$tooltip = "tooltip='You do not have this sport included in your profile.  Add it under Account Settings.'";
 					}
-						
+					
+					/*
 					if (!$this->user->hasProfilePic()) {
 						// User does not have profile pic, do not allow to join
 						$class = 'transparent default';
 						$tooltip = "tooltip='You must upload a picture before you can join any games.'";
 					}
+					
+					
+					if ($this->subscribed) {
+						$lower = "<p class='medium margin-top clear-right pointer' style='margin-right:.4em' id='unsubscribe-button'>Unsubscribe</p>";
+					}
 					?>
 					<p class='green-button right larger-text join-button heavy <?php echo $class;?>' <?php echo $tooltip;?> id='<?php echo $id;?>'>
 						<?php echo $text;?>
 					</p>
+                    <div class='right profile-in-out-container'>
+                    	<?php 
+							$in = $out = $maybe = '';
+							$selected = 'member-schedule-button-selected';
+							if ($this->game->userConfirmed($this->user->userID)) {
+								$in = $selected;
+							} elseif ($this->game->userNotConfirmed($this->user->userID)) {
+								$out = $selected;
+							} elseif ($this->game->userMaybeConfirmed($this->user->userID)) {
+								$maybe = $selected;
+							}
+							?>
+
+                        <p class='clear-right button schedule-out larger-text heavy <?php echo $out;?>'>out</p>
+                        <p class='right button schedule-in larger-text heavy <?php echo $in;?>'>in</p>
+                        <p class='clear-right button smaller-text schedule-maybe <?php echo $maybe;?>'>maybe</p>
+                    </div>
 					<?php echo $lower; ?>
                 <?php } ?>
            </div>
-        <?php } ?>
+        <?php*/ } ?>
+
 <!--
     <div class='clear width-100 larger-margin-top'>
     	<div class='left game-rating-box green-back rounded-corners'>
@@ -368,6 +465,13 @@ if ($this->userInGame) {
         </div>
     </div>-->
 <?php
+if ($this->showSubscribe) {
+	echo "<div class='green-alert-box ' id='subscribe-container'>
+			<p class='white heavy'>This game happens every week.  <br><span class='white action pointer' id='subscribe'>Click here for weekly email reminders.</span></p>
+			<p class='pointer white' id='subscribe-x'>x</p>
+		  </div>";
+}
+
 // Create header for players section
 $playersHeader  = "<div class='right profile-section-bold-subheader'>";
 $playersHeader .= 		"<p class='right heavy darkest'>" . $this->totalPlayers . " out of " . $this->rosterLimit . "</p>";

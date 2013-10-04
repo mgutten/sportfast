@@ -25,6 +25,7 @@ class GamesController extends Zend_Controller_Action
 			return;
 		}
 		
+		
 		if (!$this->view->user->hasProfilePic()) {
 			// No profile pic, set this page as go to url if upload
 			$session = new Zend_Session_Namespace('goToURL');
@@ -85,13 +86,12 @@ class GamesController extends Zend_Controller_Action
 		$this->view->newsfeed   = $game->messages->getGameMessages($game->gameID);
 
 		$this->view->captain = $captain = $game->isCaptain($this->view->user->userID);
-		$this->view->subscribed = $game->isSubscriber($this->view->user->userID);
+		$this->view->subscribed = $subscribed = $game->isSubscriber($this->view->user->userID);
 		
-		
-		
-		if ($game->recurring && $userInGame && !$game->isSubscriber($this->view->user->userID)) {
+		if ($game->isRecurring() && !$subscribed) {
 			// Show subscribe button
 			$this->view->topAlert = true;
+			$this->view->showSubscribe = true;
 		}
 		
 		

@@ -337,6 +337,11 @@ abstract class Application_Model_ModelAbstract
 	 */
 	public function getProfilePic($size, $id, $type = 'users')
 	{
+		$avatar = '';
+		if ($this->hasValue('avatar')) {
+			$avatar .= "?" . $this->avatar;
+		}
+		
 		if ($type == 'logo') {
 			// Show logo
 			$directory   = '/images/global/logo/logo/' . $size . '.png';
@@ -353,12 +358,10 @@ abstract class Application_Model_ModelAbstract
 			// No profile set, get default
 			$picture = $directory . 'default.jpg';
 		} else {
-			$picture = $directory . $id . '.jpg';
+			$picture = $directory . $id . '.jpg' . $avatar;
 		}
 		
-		if ($this->hasValue('avatar')) {
-			$picture .= "?" . $this->avatar;
-		}
+		
 		
 		return $picture;
 	}

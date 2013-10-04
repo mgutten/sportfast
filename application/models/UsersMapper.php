@@ -483,7 +483,7 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 			*/
 			
 			$user = $savingClass->players->addUser($result);
-			$user->getCity()->setAttribs($result);
+			//$user->getCity()->setAttribs($result);
 		}
 
 		return $savingClass;
@@ -1187,7 +1187,7 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 						AND u.userID NOT IN (SELECT receivingUserID 
 												FROM user_ratings 
 												WHERE givingUserID = '" . $userID . "' 
-													AND dateHappened > (NOW() - INTERVAL 2 MONTH)
+													AND dateHappened > (NOW() - INTERVAL 45 DAY)
 													AND sportID = '" . $game->sportID . "'
 											)";
 		
@@ -1196,12 +1196,41 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 		$results = $db->query($sql);
 		
 		foreach ($results as $result) {
-			$game->addPlayer($result);
+			$user = new Application_Model_User();
+			$user->userID = $result['userID'];
+			
+			if ($user->hasProfilePic()) {
+				// User must have profile pic to be rated
+				$game->addPlayer($result);
+			}
 		}
 		
 		return $game;
 	}
+	
+	/**
+	 * is there an active friend request between $currentUserID and $otherUserID?
+	 * @returns boolean
+	 */
+	public function pendingFriendRequest($otherUserID, $currentUserID)
+	{
+		$db = Zend_Db_Table::getDefaultAdapter();
 		
+		$sql = "SELECT * FROM notification_log nl
+				INNER JOIN notifications n ON n.notificationID = nl.notificationID
+				WHERE ((nl.actingUserID = '" . $otherUserID . "' AND nl.receivingUserID = '" . $currentUserID . "')
+						OR (nl.actingUserID = '" . $currentUserID . "' AND nl.receivingUserID = '" . $otherUserID . "'))
+					AND (n.action = 'friend' AND n.type='friend')";
+
+		$results = $db->fetchAll($sql);
+		
+		if ($results) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
 		
 	/**
 	 * set skillCurrent, sportsmanship, or attendance based on all reviews
@@ -1578,6 +1607,9 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 		$db->delete('user_team_games', array('userID = ?' => $userID));
 		
 		$db->delete('game_subscribers', array('userID = ?' => $userID));
+		
+		$db->delete('messages', array('receivingUserID = ?' => $userID,
+									  'sendingUserID = ?' => 0));
 		
 		
 		

@@ -233,6 +233,13 @@ class Application_View_Helper_SignupSportForm
 						
 			$output .= "</div>";
 			
+			$output .= "<div class='signup-sports-ratings signup-sports-form-section' section='ratings' id='signup-sports-ratings-" . $sport['sport'] . "'>
+						<p class='signup-sports-form-section-title'>Do you want to receive ratings from other users?</p>  <p class='pointer right what-ratings medium'>What are ratings?</p>";
+			
+			$output .=  $this->selectableText(array('yes' => array('selected' => true),
+													'no'), true);
+			$output .= "</div>";
+			
 			
 			// Create hidden inputs for each section
 			$output .= $this->_view->signupSportForm->sport->setName($sport['sport'])      			  ->setAttrib('id',$sport['sport'] . 'Active');
@@ -241,6 +248,11 @@ class Application_View_Helper_SignupSportForm
 			$output .= $this->_view->signupSportForm->sport->setName($sport['sport'] . 'Position')    ->setAttrib('id',$sport['sport'] . 'Position');
 			$output .= $this->_view->signupSportForm->sport->setName($sport['sport'] . 'What')        ->setAttrib('id',$sport['sport'] . 'What');
 			$output .= $this->_view->signupSportForm->sport->setName($sport['sport'] . 'Often')       ->setAttrib('id',$sport['sport'] . 'Often');
+			$output .= $this->_view->signupSportForm->sport->setName($sport['sport'] . 'Ratings')     ->setAttrib('id',$sport['sport'] . 'Ratings')
+																									  ->setValue('Yes');
+			
+			// Fix bug where all hidden inputs would be given default value of "yes"
+			$this->_view->signupSportForm->sport->setValue('');
 			
 			/*$days    = array('Su','M','T','W','Th','F','Sa');
 			foreach ($days as $day) {*/
@@ -248,6 +260,8 @@ class Application_View_Helper_SignupSportForm
 				$output .= $this->_view->signupSportForm->sport->setName($sport['sport'] . 'Availability' . $i)->setAttrib('id',$sport['sport'] . 'Availability' . $i);
 			}
 			$output .= "</div></div>";
+			
+			
 			
 			$counterOuter++;
 			

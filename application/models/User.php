@@ -110,7 +110,8 @@ class Application_Model_User extends Application_Model_ModelAbstract
 			// User has games scheduled
 			$curDate = new DateTime();
 			foreach ($this->games->getAll() as $game) {
-				if ($game->gameDate->format('U') > (time() + (60*60*24*7))) {
+				if ($game->gameDate->format('U') > (time() + (60*60*24*7)) ||
+					($game->gameDate->format('w') == date('w') && $game->gameDate->format('U') > (date('U') + (60*60*24)))) {
 					// Fail safe to prevent games from NEXT month from showing up this month
 					continue;
 				}
@@ -146,7 +147,15 @@ class Application_Model_User extends Application_Model_ModelAbstract
 		
 		return ($a > $b ? 1 : -1);
 	}
-
+	
+	/**
+	 * is there an active friend request between User model and $otherUserID?
+	 */
+	public function pendingFriendRequest($otherUserID)
+	{
+		return $this->getMapper()->pendingFriendRequest($otherUserID, $this->userID);
+	}
+	
 	public function getMessages()
 	{
 		if (empty($this->_attribs['message'])) {
@@ -470,7 +479,11 @@ class Application_Model_User extends Application_Model_ModelAbstract
 	
 	public function getCity()
 	{
-		if (!is_object($this->_attribs['city'])) {			
+		/*if (!is_object($this->_attribs['city'])) {			
+			$this->_attribs['city'] = new Application_Model_City();
+		}
+		*/
+		if (!$this->hasValue('city')) {			
 			$this->_attribs['city'] = new Application_Model_City();
 		}
 		return $this->_attribs['city'];

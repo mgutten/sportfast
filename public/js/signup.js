@@ -369,8 +369,9 @@ $(function()
 												 
 	
 	/* handle onclick for sports-form elements */
-	$('.signup-sports-position,.signup-sports-often,.signup-sports-what,.signup-sports-type').find('.signup-sports-selectable').click(function() 
+	$('.signup-sports-position,.signup-sports-often,.signup-sports-what,.signup-sports-type,.signup-sports-ratings').find('.signup-sports-selectable').click(function() 
 	{
+		
 		var greenEles  = $(this).parent().children('.signup-sports-selectable.green-bold');
 		var countGreen = greenEles.length;
 		var limit      = 20;
@@ -392,6 +393,7 @@ $(function()
 				$(this).addClass('green-bold');
 			}
 		}
+		
 		
 		var sectionEle = $(this).parents('.signup-sports-form-section');
 
@@ -1095,7 +1097,7 @@ function updateSportHiddenInputSelectable(sectionEle)
 			values.push(value);
 		})
 	} else {
-
+		
 		selectedChildren.each(function()
 		{
 			// Replace any internal tags and their content with blank
@@ -1110,6 +1112,7 @@ function updateSportHiddenInputSelectable(sectionEle)
 	}
 	
 	var idStart = sectionEle.attr('id').replace(/signup-sports-/,'');
+	
 	var sport   = getSportName(sectionEle);
 	
 	var hiddenInputSection = idStart.replace(/-\w+/,'');

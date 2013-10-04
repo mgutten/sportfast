@@ -41,6 +41,7 @@ var notificationPoll; // used as setInterval for notificationPoll
 var pageTitle;
 var notificationTitle;
 var titleInterval;
+var confirmAction;
 
 
 $(function()
@@ -862,7 +863,7 @@ $(function()
 	/* show explanation of profile pics onclick of special class */
 	$('.why-profile').click(function()
 	{
-		window.open('http://sportfast.com/about/picture', 'Why a profile picture?', 'width=600,height=200');
+		window.open('http://sportfast.com/about/picture', 'Why a profile picture?', 'width=600,height=230');
 	})
 	
 	/* show explanation of profile pics onclick of special class */
@@ -871,6 +872,11 @@ $(function()
 		window.open('http://sportfast.com/about/ratings', 'Ratings', 'width=600,height=300');
 	})
 	
+	
+	$('.what-ratings').click(function()
+	{
+		window.open('http://sportfast.com/about/signup-ratings', 'What are ratings?', 'width=600,height=200');
+	})
 	
 	
 	/* allow users to use arrow keys to move between ajax return results */
@@ -1017,7 +1023,7 @@ $(function()
 	/* FIX FOR PADDING ISSUE WITH ALL MAC BROWSERS */
 	if (navigator.userAgent.indexOf('Mac OS X') != -1) {
 		
-		$("p,a,input[type=text],input[submit],span,textarea,button").each(function()
+		$("p,a,input[type=text],input[type=submit],span,textarea,button").each(function()
 		{
 			if ($(this).is('#nav-notification-indicator') ||
 				$(this).is('.calendar-day') ||
@@ -1189,18 +1195,20 @@ function addUserToTeam(teamID, userID)
  *		   idType => "teamGameID" or "gameID"
  *		   userID => userID)
  */
-function addUserToGame(idType, typeID, userID)
+function addUserToGame(idType, typeID, userID, confirmed)
 {
 	var options = new Object();
 	options.idType = idType;
 	options.typeID = typeID;
 	options.userID = userID;
+	options.confirmed = (typeof confirmed == 'undefined' ? '' : confirmed);
 	
 	$.ajax({
 		url: '/ajax/add-user-to-game',
 		type: 'POST',
 		data: {options: options},
 		success: function(data) {
+
 			var action = 'join';
 			var type   = 'game';
 			var details;

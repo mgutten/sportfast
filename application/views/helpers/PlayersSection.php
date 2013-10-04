@@ -74,9 +74,9 @@ class Application_View_Helper_PlayersSection
 				
 				$output .= 	"<div class='hover-dark profile-player-overlay-container'>";
 				$output .=		"<div class='profile-player-overlay'>";
-				$output .=			"<p class='white width-100 center left'>" . $player->shortName . "</p>";
-				$output .=			"<p class='white width-100 center left smaller-text'>age " . $player->age . "</p>";
-				$output .=			"<p class='white width-100 center left largest-text heavy'>" . $player->getSport($typeModel->sport)->overall . "</p>";
+				$output .=			"<p class='white width-100 center left margin-top'>" . $player->shortName . "</p>";
+				//$output .=			"<p class='white width-100 center left smaller-text'>age " . $player->age . "</p>";
+				$output .=			"<p class='white width-100 center left largest-text heavy margin-top'>" . $player->getSport($typeModel->sport)->overall . "</p>";
 				$output .=		"</div>";
 				$output .=	"</div>";
 				$output .= "</a>";

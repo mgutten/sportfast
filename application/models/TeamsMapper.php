@@ -653,6 +653,28 @@ class Application_Model_TeamsMapper extends Application_Model_TypesMapperAbstrac
 		
 		return $returnArray;
 	}
-
+	
+	/**
+	 * save sent invites to db
+	 */
+	public function saveInvites($emails, $actingUserID, $teamID)
+	{
+		$db = Zend_Db_Table::getDefaultAdapter();
+		
+		$sql = "INSERT INTO team_invites 
+					(teamInviteID, email, actingUserID, teamID, firstSent) 
+				VALUES ";
+		
+		$counter = 0;
+		foreach ($emails as $email) {
+			if ($counter != 0) {
+				$sql .= ',';
+			}
+			$sql .= "('', '" . $email . "', " . $actingUserID . ", " . $teamID . ", CURDATE())";
+			$counter++;
+		}
+		
+		$db->query($sql);
+	}
 			
 }

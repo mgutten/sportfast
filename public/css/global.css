@@ -198,7 +198,9 @@ a.no-underline {
 
 p.auto-center,
 a.auto-center,
-div.auto-center {
+div.auto-center,
+img.auto-center,
+.auto-center {
 	margin-left: auto;
 	margin-right: auto;
 	display:block;
@@ -331,7 +333,7 @@ p.default,div.default {
 }
 
 .clear-right {
-	float:right;
+	float:right !important;
 	clear:both;
 }
 
@@ -349,7 +351,7 @@ p.default,div.default {
 }
 
 .right {
-	float:right;
+	float:right !important;
 }
 
 div.no-clear,span.no-clear,p.no-clear,img.no-clear {
@@ -1365,18 +1367,21 @@ input.header-search-bar {
 	text-align:center;
 	background:#58bf12; /* #E6FFE6*/
 	/*border:2px dashed #58bf12;*/
-	border: 1px solid #0A0;
+	/*border: 1px solid #0A0;*/
 	margin-bottom: 1.5em;
 	-moz-box-shadow:    1px 1px 3px 1px rgba(0,0,0,0.35); /* #CECECE */
  	-webkit-box-shadow: 1px 1px 3px 1px rgba(0,0,0,0.35);
   	box-shadow:         1px 1px 3px 1px rgba(0,0,0,0.35);
+	/*
 	background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#58bf12), to(#1C931F));
 	background-image: -webkit-linear-gradient(top, #58bf12, #1C931F); 
 	background-image: -moz-linear-gradient(top, #58bf12, #1C931F);
 	background-image: -ms-linear-gradient(top, #58bf12, #1C931F);
 	background-image: -o-linear-gradient(top, #58bf12, #1C931F);
+	*/
 	
 }
+
 
 .red-alert-box {
 	border: 1px solid #B00;
@@ -1963,6 +1968,12 @@ div.dropdown-menu-container-reverse:hover {
 	cursor:pointer;
 }
 
+.button.clicked {
+	background:#f9f9f9;
+	color:#ccc;
+	border-color:#ccc;
+}
+
 .schedule-in,.schedule-out {
 	margin-top: .2em;
 }
@@ -1970,12 +1981,15 @@ div.dropdown-menu-container-reverse:hover {
 .schedule-in {
 	float:left;
 	margin-left: 1.5em;
+	padding-left: .95em;
+	padding-right: 1em
 }
 
 .schedule-out {
 	float:right;
 	margin-right: 1.5em;
 }
+
 
 .schedule-button-selected {
 	background: #e9e9e9;
@@ -2373,6 +2387,12 @@ input.city-change-input {
 	border: solid 1px #459B0B;
 }
 
+.member-schedule-button-selected.schedule-maybe {
+	background:#E4E413;
+	color: #fff;
+	border: solid 1px #CECE0D;
+}
+
 .schedule-in,.schedule-out {
 	margin-top: .2em;
 }
@@ -2385,6 +2405,10 @@ input.city-change-input {
 .schedule-out {
 	float:right;
 	margin-right: 1.5em;
+}
+
+.schedule-maybe {
+	width: 9.5em;
 }
 
 /* span for "confirmed" number */

@@ -51,7 +51,7 @@ class Application_Form_CreateTeam extends Zend_Form
 				
 		$this->addElement('text', 'rosterLimit', array(
 				'filters'		=> array('StringTrim'),
-				'required'		=> true,
+				'required'		=> false,
 				'decorators'	=> array('Overlay'),
 				'label'			=> '',
 				'value'			=> '',

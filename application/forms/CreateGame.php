@@ -97,18 +97,18 @@ class Application_Form_CreateGame extends Zend_Form
 				'label'			=> '',
 				'value'			=> '',
 				'class'			=> 'dropshadow ' . $detailsClass,
-				'tooltip'		=> 'How many players are needed in order for the game to happen.',
+				'tooltip'		=> '(optional) How many players are needed in order for the game to happen.',
 				'autocomplete'  => 'off'
 				));
 				
 		$this->addElement('text', 'rosterLimit', array(
 				'filters'		=> array('StringTrim'),
-				'required'		=> true,
+				'required'		=> false,
 				'decorators'	=> array('Overlay'),
 				'label'			=> '',
 				'value'			=> '',
 				'class'			=> 'dropshadow ' . $detailsClass,
-				'tooltip'		=> 'Maximum number of players allowed.',
+				'tooltip'		=> '(optional) Maximum number of players allowed.',
 				'autocomplete'  => 'off'
 				));
 				

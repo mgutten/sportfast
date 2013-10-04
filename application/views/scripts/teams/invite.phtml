@@ -14,17 +14,19 @@ $this->headScript()->prependFile($this->baseUrl() . '/js/createsuccess.js');
     <?php
 	//echo $this->partial('partials/global/sectionHeaderBold.phtml',array('title'   => 'Invite players')); 
 	?>
-    <a href='/<?php echo $this->type;?>s/<?php echo $this->typeID;?>' class='left smaller-text medium'><img src='/images/global/body/single_left_arrow.png' class='back-arrow'/>Back to team</a>
+    
     <form action='/mail/invite-type' method='post'>
     
-    <p class='clear larger-margin-top dark heavy'>Copy and paste emails here <span class='dark'>(comma separated)</span></p>
+    <p class='clear larger-margin-top darkest heavy'>Copy and paste emails here <span class='dark'>(comma separated)</span></p>
     <textarea class='white-back dropshadow clear' id='profile-invite-emails' name='emails'></textarea>
     
     <?php echo $this->note;?>
-    <p class='clear light pointer margin-top' id='create-success-addNote'>+add personal note</p>
-    <p class='clear light pointer margin-top hidden' id='create-success-removeNote'>remove personal note</p>
+    <p class='clear medium pointer margin-top' id='create-success-addNote'>+add personal note</p>
+    <p class='clear medium pointer margin-top hidden' id='create-success-removeNote'>remove personal note</p>
     
-    <input type='submit' class='clear right green-button largest-text heavy larger-margin-top' id='profile-send-invites' value='Send Invites' />
+    <a href='/<?php echo $this->type;?>s/<?php echo $this->typeID;?>' class='clear smaller-text medium profile-invite-back'><img src='/images/global/body/single_left_arrow.png' class='back-arrow'/>Back to team</a>
+    
+    <input type='submit' class='right green-button largest-text heavy larger-margin-top' id='profile-send-invites' value='Send Invites' />
 
     <input type='hidden' name='<?php echo $this->type . 'ID';?>' value='<?php echo $this->typeID;?>' />
     

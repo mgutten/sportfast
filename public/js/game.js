@@ -102,6 +102,36 @@ $(function() {
 		//reloadPage();
 	})
 	
+	$('.schedule-in').bind('click.in',function()
+	{
+		var detailsEle = getDetailsEle();
+		var idType = detailsEle.attr('idType');
+		var typeID = detailsEle.attr(idType);
+		var actingUserID = detailsEle.attr('actingUserID');
+		var confirmed = '1';
+		var type;
+
+		addUserToGame(idType, typeID, actingUserID, confirmed);
+		type = 'game';
+		
+		//showConfirmationAlert('Added to ' + type);
+	})
+	
+	$('.schedule-out').bind('click.out',function()
+	{
+		var detailsEle = getDetailsEle();
+		var idType = detailsEle.attr('idType');
+		var typeID = detailsEle.attr(idType);
+		var actingUserID = detailsEle.attr('actingUserID');
+		var confirmed = '0';
+		var type;
+
+		addUserToGame(idType, typeID, actingUserID, confirmed);
+		type = 'game';
+		
+		//showConfirmationAlert('Added to ' + type);
+	})
+	
 	/* override join capability */
 	if (getDetailsEle().attr('picture') != '') {
 		$('#join-button').unbind('click.join')
@@ -115,9 +145,9 @@ $(function() {
 		// Game has been canceled
 		showAlert($('#canceled-alert-container'));
 		
-		$('.alert-black-back,.alert-x').unbind('click.default');
+		//$('.alert-black-back,.alert-x').unbind('click.default');
 		
-		$('.alert-x').hide();
+		//$('.alert-x').hide();
 	}
 		
 	if ($('#stash-available-alert-container').length > 0) {

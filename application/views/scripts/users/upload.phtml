@@ -12,6 +12,14 @@ $this->headScript()->prependFile($this->baseUrl() . '/js/plugins/jcrop.min.js');
 $this->headScript()->prependFile($this->baseUrl() . '/js/plugins/jform.js');
 ?>
 
+<?php
+echo $this->placeholder('absolute')->captureStart();
+
+	echo $this->partial('partials/global/alertBack.phtml');
+	echo $this->alert()->confirmAlert();
+	
+echo $this->placeholder('absolute')->captureEnd();
+?>
 
 
 <header class='left jumbo-text darkest heavy'>
@@ -43,6 +51,13 @@ if ($this->pictureRequired) {
                 <input type='file' name='profilePic' id='profilePic' accept="image/*"/>
             </form>
         </div>
+        <?php
+		
+			if ($this->user->hasProfilePic()) {
+				?>
+               
+                    <div class='clear width-100 center smaller-text action margin-top medium pointer' id='upload-delete-picture'>delete picture</div>
+        <?php }?>
         <div id='signup-alert-rotate-container' class='clear width-100 clear'>
             <img src='/images/global/img_upload/rotate_left.png' class='clear signup-alert-rotate pointer hidden' id='signup-alert-rotate-left' tooltip='Rotate image left'/>
             <img src='/images/global/img_upload/rotate_right.png' class='right signup-alert-rotate pointer hidden' id='signup-alert-rotate-right' tooltip='Rotate image right'/>

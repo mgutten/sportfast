@@ -8,7 +8,7 @@
 	font-size: 3em;
 	line-height: .9em;
 }
-
+/*
 #user-buttons-container,#profile-buttons-container {
 	position:absolute;
 	right: 1.5em;
@@ -18,7 +18,62 @@
 	height: 30em;
 	padding-right: .3em;
 	/*margin-top: .2em;*/
+	/*
 }
+*/
+
+.profile-options-outer-container {
+	position:relative;
+	top: 0;
+	right:0;
+	float:left;
+	clear:both;
+	overflow:hidden;
+	height: 1.5em;
+	margin-top:-1.2em;
+}
+
+.profile-options-inner-container {
+	padding-top: 1em;
+	margin-top: -5em;
+}
+
+.profile-options-button {
+	background: #e9e9e9;
+	padding: .1em 0 .1em 0;
+	width: 8.2em;
+}
+
+.profile-option-container {
+	width: 7em;
+	padding-bottom: .2em;
+}
+
+.profile-options-container {
+	margin-bottom: .3em;
+}
+
+.profile-in-out-container {
+	margin-top: .5em;
+}
+
+.profile-name-container {
+	margin-bottom: 3em;
+}
+
+#user-buttons-container,#profile-buttons-container {
+	position:absolute;
+	right: 0;
+	width: 1em;
+	float:right;
+	overflow-x:hidden;
+	height: 30em;
+	padding-right: .3em;
+	overflow-y:hidden;
+	/*margin-top: .2em;*/
+	
+}
+
 
 #user-buttons-container {
 	width: 17em;
@@ -29,9 +84,16 @@
 	height: 7em;
 }
 
+/*
 .profile-buttons-inner-container {
 	width: 100%;
 	margin-left: 15em;
+}
+*/
+
+.profile-buttons-inner-container {
+	width: 100%;
+	margin-left: 0;
 }
 
 .profile-buttons-innermost-container {
@@ -421,6 +483,10 @@ input[type=text].profile-manage-team-info-roster-limit {
 	max-width: 96.5%;
 	height: 5em;
 	max-height: 5em;
+}
+
+.profile-invite-back {
+	margin-top: 3.2em;
 }
 	
 #note-container {

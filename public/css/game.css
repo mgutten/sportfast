@@ -1,3 +1,19 @@
+/* overwrite */
+.schedule-out {
+	margin-right: 0;
+}
+
+.schedule-in {
+	margin-right: .5em;
+	margin-left:0;
+}
+
+.schedule-maybe {
+	margin-right:0em;
+	margin-top:.5em;
+	width: 9em;
+}
+
 /* top section */
 /*
 .game-title-suffix {
@@ -42,6 +58,18 @@
 #subscribe-button {
 	margin-left: 40%;
 	margin-top: .5em;
+}
+
+#subscribe-container {
+	margin-top: 1.5em;
+	margin-bottom: -1em;
+	position: relative;
+}
+
+#subscribe-x {
+	position:absolute;
+	top: 0;
+	right: 10px;
 }
 
 #unsubscribe-button:hover {

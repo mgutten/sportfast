@@ -290,7 +290,7 @@ class Application_View_Helper_MemberHomepage
 							$confirm = 'GAME ON';
 							$confirmClass = ' heavy';
 						} else {
-							$confirm = $game->getPlayersNeeded() . " needed";
+							$confirm = $game->getPlayersNeeded('more') . " needed";
 						}
 						
 						if ($game->canceled) {
@@ -307,9 +307,9 @@ class Application_View_Helper_MemberHomepage
 						$output .= "<p class='clear medium'>" . $game->getPark()->parkName . "</p>";
 						$output .= "</div>";
 						$output .= "<div class='member-schedule-day-body-players-container darkest bold'>";
-						$output .= "<p class='member-schedule-day-body-players largest-text center'>" . $game->totalPlayers . "/" . $game->rosterLimit . "</p>";
+						$output .= "<p class='member-schedule-day-body-players largest-text center'>" . $game->totalPlayers . "</p>";
 						$output .= "<p class='member-schedule-day-body-players-text center clear larger-text'>players</p>";
-						$output .= "<p class='center clear green smaller-text member-schedule-day-body-players-confirmed margin-top " . $confirmClass . "'>" . $confirm . "</p>";
+						$output .= "<p class='center clear green smaller-text member-schedule-day-body-players-confirmed larger-margin-top " . $confirmClass . "'>" . $confirm . "</p>";
 						$output .= "</div>";
 						$type	 = " type='pickupGame'";
 						$typeID  = " typeID='" . $game->gameID . "'";
@@ -451,7 +451,7 @@ class Application_View_Helper_MemberHomepage
 			$output .= "<p class='member-find-game-sport darkest bold'>" . $match->sport . "</p>";
 			$output .= "<p class='member-find-game-type darkest " . $typeClass . "'>" . $type . "</p>";
 			$output .= "<div class='member-find-game-date medium' tooltip='" . $dateDesc . "'>" . $dateHTML . "</div>";
-			$output .= "<p class='member-find-game-players darkest bold'>" . $match->totalPlayers . "/" . $match->rosterLimit . "</p>";
+			$output .= "<p class='member-find-game-players darkest bold'>" . $match->totalPlayers . "<span class='darkest smaller-text'>/" . ($match->rosterLimit > 30 ? "&infin;" : $match->rosterLimit) . "</span></p>";
 			$output .= "<img src='" . $match->getMatchImage() . "' class='member-find-game-match' tooltip='" . $match->getMatchDescription() . "'/>";
 			$output .= "<p class='member-find-game-park medium'>" . $location . "</p>";
 			$output .= "<img src='/images/global/body/single_arrow.png' class='member-find-game-arrow'/>";

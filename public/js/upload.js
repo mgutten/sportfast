@@ -15,6 +15,27 @@ $(function()
 		$(this).parents('form').submit();
 	})
 	
+	/* delete profile picture */
+	$('#upload-delete-picture').click(function()
+	{
+		confirmAction = function()
+		{
+			deleteProfilePicture();
+		};
+		
+		populateConfirmActionAlert('delete your current profile picture', "<p class='clear margin-top medium width-100 center'>You will not be able to join any games.</p>");
+	})
+	
+	$('#confirm-action').click(function()
+	{
+		confirmAction();
+	})
+	
+	$('#deny-action').click(function()
+	{
+		$(this).parents('.alert-container').find('.alert-x').trigger('click');
+	})
+	
 	$('#signup-import-alert-cancel').click(function()
 	{
 		$('#signup-import-main-img,.narrow-column-picture').css({width: 'auto',
@@ -81,6 +102,21 @@ $(function()
 	});
 	
 })
+
+/**
+ * delete profile picture
+ */
+function deleteProfilePicture()
+{
+	$.ajax({
+		url: '/ajax/delete-profile-picture',
+		type: 'POST',
+		data: {},
+		success: function(data) {
+			window.location = '/';
+		}
+	})
+}
 
 
 /**

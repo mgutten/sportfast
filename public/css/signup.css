@@ -347,7 +347,11 @@ div.signup-narrow-column-img-container {
 }
 
 .signup-sports-availability {
-	border-bottom: none;
+	/*border-bottom: none;*/
+}
+
+.signup-sports-ratings {
+	border-bottom:none;
 }
 
 .signup-sports-availability-copy-container {

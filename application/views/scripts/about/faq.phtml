@@ -132,6 +132,18 @@ $answer   = "If you go to your game's page, there will be a small arrow in the t
 				
 echo $this->faq()->create($question, $answer);
 
+$question = "What does subscribing to a game do?";
+$answer   = "Subscribing to a game will send you email reminders every week asking if you are \"in\" or \"out\" for that week.  It is a quick and easy way to let other players know that
+				you will either be there or not.";
+				
+echo $this->faq()->create($question, $answer);
+
+$question = "How do I unsubscribe from a game?";
+$answer   = "There are 3 ways to unsubscribe. 1) On the game page in the upper right will be an unsubscribe option.  2) Under the \"Games\" section of your account settings you can click
+				the red X next to a game to unsubscribe. 3) For emails sent to remind you of the game, you will see a link on the bottom that will unsubscribe you.";
+				
+echo $this->faq()->create($question, $answer);
+
 $question = "How can I edit the game that I created?";
 $answer   = "If you go to your game's page, there will be a small arrow in the top right of the page that, when clicked, will show some options.  One of those options is
 				a dropdown that says \"Manage\".  In that dropdown you can either \"Remove Players\", \"Cancel Game\", or \"Edit Details\".";
@@ -174,6 +186,10 @@ $answer   = "League teams are tricky.  They require a little bit of effort on be
 				
 echo $this->faq()->create($question, $answer);
 
+$question = "How do the automatic reminders work?";
+$answer   = "Automatic reminders (via email) are sent twice: 2 days before a team has a game and the morning of the game.  Emails are only sent to players who have not RSVPed \"in\" or \"out\". ";
+				
+echo $this->faq()->create($question, $answer);
 
 $question = "I've never played in a league.  What's it like?";
 $answer   = "You can read about leagues <a href='/about/leagues' class='medium underline'>here</a>.  A league is a group of teams that play against one another

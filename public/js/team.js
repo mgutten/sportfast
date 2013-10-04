@@ -141,9 +141,23 @@ $(function()
 		}
 		
 		clickedDay = $(this);
+		var hour = 24;
+		var date = new Date();
 		
-		if ($(this).is('a.calendar-transparent,a.calendar-more-transparent') && !$(this).is('a.calendar-no-select')) {
-			// Old event, let change win or loss
+		
+		if (typeof $(this).attr('time') != 'undefined' &&
+			$(this).is('.calendar-today')) {
+				// Is today and there was an event, should show win/loss?
+				var timeArray = parseTimeAttrib($(this).attr('time'));
+				hour = parseInt(timeArray.hour, 10) + (timeArray.ampm == 'p' ? 12 : 0);
+			}
+				
+		
+		if (($(this).is('a.calendar-transparent,a.calendar-more-transparent') && !$(this).is('a.calendar-no-select'))
+			|| ($(this).is('.calendar-today') && 
+				$(this).is('.calendar-dark') &&
+				hour < date.getHours())) {
+			// Old event (or event that happened earlier in the day today), let change win or loss
 			var tooltip = $('#tooltip-team-manage-winOrLoss');
 			tooltip.css({left: $(this).position().left,
 						 top:  $(this).position().top + $(this).height()});

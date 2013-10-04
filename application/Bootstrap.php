@@ -70,9 +70,12 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 				$auth->getStorage()->write($user);
 			}
 			
+			
 			$headerLayout  = 'header/short';
 			$user		   = $auth->getIdentity();
 			
+			// Reset cookie
+			setcookie('user', $user->userID, time() + (60*60*24*40), '/');
 			
 			$session = new Zend_Session_Namespace('active');
 			if (!isset($session->active)) {
@@ -95,7 +98,7 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 				$game = $user->getLastGame();
 				if ($game) {
 					if ($game->players->hasValue('users')) {
-						// Game happened in the last week that user played in, make rate 2 users or park and users
+						// Game happened in the last week that user played in, make rate 2 users or park and user
 						$this->view->rateGame = $game;
 						
 						$sport = new Application_Model_Sport();

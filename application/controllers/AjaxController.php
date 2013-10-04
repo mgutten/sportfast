@@ -331,7 +331,7 @@ class AjaxController extends Zend_Controller_Action
 			 // Subscribe
 			 $data = array('userID' => $options['userID'],
 			 			   $options['idType'] => $options['typeID'],
-						   'joinDate' => 'now()');
+						   'joinDate' => new Zend_Db_Expr('now()'));
 			 $table->insert($data);
 		 }
 	 }
@@ -400,10 +400,6 @@ class AjaxController extends Zend_Controller_Action
 			 return false;
 		 }
 		 
-		 $table = new Application_Model_DbTable_UserGames();
-		 $table->insert(array($options['idType'] => $options['typeID'],
-		 					  'userID'		     => $options['userID']));
-		 
 		 if ($options['idType'] == 'gameID') {
 			 // Add user to game, and add game to user's auth session
 			 $game = new Application_Model_Game();
@@ -411,7 +407,25 @@ class AjaxController extends Zend_Controller_Action
 			 $this->view->user->games->addGame($game);
 		 }
 		 
+		 $data = array($options['idType'] => $options['typeID'],
+		 			   'userID'		      => $options['userID']);
+					   
+		 if (!empty($options['confirmed']) || $options['confirmed'] == '0') {
+			 $data['confirmed'] = $options['confirmed'];
+		 }
 		 
+		 $table = new Application_Model_DbTable_UserGames();
+		 
+		 if ($game->players->exists($options['userID'])) {
+			 // User is in game, update row in db
+		 	 $table->update($data, array('userID = ?' => $options['userID'],
+			 							 'gameID = ?' => $options['typeID']));
+		 } else {
+		 
+			 $table->insert($data);
+		 }
+		 
+		 return;
 		 $notifications = new Application_Model_Notifications();				  
 		 $notifications->deleteAll(array('n.action' => array('leave',
 															  'join'),
@@ -1131,6 +1145,7 @@ class AjaxController extends Zend_Controller_Action
 			// Join action
 			$mapper = new Application_Model_NotificationsMapper();
 			
+			/*
 			if (!$this->view->user->hasProfilePic()) {
 				// No profile pic, prevent newly invited user from joining game without profile pic
 				$session = new Zend_Session_Namespace('pictureRequired');
@@ -1138,6 +1153,7 @@ class AjaxController extends Zend_Controller_Action
 				echo '/users/' . $this->view->user->userID . '/upload';
 				return;
 			}
+			*/
 
 			$mapper->notificationConfirm($options['notificationLogID'], false, $options['type']);	
 		}
@@ -1204,6 +1220,34 @@ class AjaxController extends Zend_Controller_Action
 		$this->view->user->notifications->deleteNotificationByID($notificationLogID);
 		
 	}
+	
+	/**
+	 * delete profile picture
+	 */
+	public function deleteProfilePictureAction()
+	{
+		$userID = $this->view->user->userID;
+		
+		if (empty($userID)) {
+			return false;
+		}
+		
+		$folders = array('large',
+						 'medium',
+						 'small',
+						 'tiny');
+		
+		$dir = 'images/users/profile/pic/';
+		//$dir = 'X:/Program Files (x86)/wamp/www/Local_Site/sportfast.com/public/images/users/profile/pic/';
+		
+		foreach ($folders as $folder) {
+			
+			if (is_file($dir . $folder . '/' . $userID . '.jpg')) {
+				unlink($dir . $folder . '/' . $userID . '.jpg');
+			}
+		}
+	}
+		
 	
 	/**
 	 * delete team/game message

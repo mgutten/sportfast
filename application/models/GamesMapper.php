@@ -71,7 +71,8 @@ class Application_Model_GamesMapper extends Application_Model_TypesMapperAbstrac
 								' . $bounds["upper"] . ' , ' . $bounds["lower"] . '
 								), pl.location
 								)')
-			   ->where('g.date > (NOW() + INTERVAL ' . $this->getTimeOffset() . ' HOUR)');
+			   ->where('g.date > (NOW() + INTERVAL ' . $this->getTimeOffset() . ' HOUR)')
+			   ->where('g.date < (NOW() + INTERVAL 6 DAY)');
 			   
 		if ($gameIDs) {
 			// User is in games, do not show those
@@ -455,9 +456,6 @@ class Application_Model_GamesMapper extends Application_Model_TypesMapperAbstrac
 							'us.sportsmanship'))
 			   ->join(array('s' => 'sports'),
 			   		  's.sportID = g.sportID')
-			   ->joinLeft(array('gs' => 'game_subscribers'),
-			   		  'ug.userID = gs.userID AND ug.gameID = gs.gameID',
-					  array('userID as subscribed'))
 			   ->joinLeft(array('gc' => 'game_captains'),
 			   		  'ug.gameID = gc.gameID AND ug.userID = gc.userID',
 					  array('userID as captain'))
@@ -483,11 +481,22 @@ class Application_Model_GamesMapper extends Application_Model_TypesMapperAbstrac
 			$savingClass->addPlayer($player)
 						->getSport($player->sport)
 						->setAttribs($player);
+						
+			if ($player->confirmed == '1') {
+				$savingClass->addConfirmedPlayer($player->userID);
+			} elseif ($player->confirmed == '0') {
+				$savingClass->addNotConfirmedPlayer($player->userID);
+			} elseif ($player->confirmed == '2') {
+				// Maybe
+				$savingClass->addMaybeConfirmedPlayer($player->userID);
+			}
 			
+			/*
 			if ($player->subscribed !== null) {
 				// player is subscribed
 				$savingClass->addSubscriber($player->userID);
 			}
+			*/
 
 			if ($player->captain !== null) {
 				$savingClass->addCaptain($player->userID);
@@ -495,9 +504,38 @@ class Application_Model_GamesMapper extends Application_Model_TypesMapperAbstrac
 				
 		}
 		
+		$select = $table->select();
+		$select->setIntegrityCheck(false);
+		
+		$select->from(array('gs' => 'game_subscribers'))
+			   ->where('gs.gameID = ?', $gameID);
+			   
+		$players = $table->fetchAll($select);
+		
+		foreach ($players as $player) {
+			$savingClass->addSubscriber($player->userID);
+		}
+		
 		return $savingClass;
 	}
-
+	
+	/**
+	 * remove subcriber from game (in db)
+	 */
+	public function unsubscribe($userID, $gameID) 
+	{
+		$table = new Application_Model_DbTable_GameSubscribers();
+		
+		if (empty($userID) || empty($gameID)) {
+			return false;
+		}
+		
+		$where = array('userID = ?' => $userID,
+						'gameID = ?' => $gameID);
+						
+		return $table->delete($where);
+		
+	}
 	
 	/**
 	 * save user confirmation (confirmed or not) to db for pickup game
@@ -847,12 +885,12 @@ class Application_Model_GamesMapper extends Application_Model_TypesMapperAbstrac
 		$select->setIntegrityCheck(false);
 		
 		$select->from(array('g' => 'games'))
-			   ->join(array('ug' => 'user_games'),
+			   ->joinLeft(array('ug' => 'user_games'),
 			   		  'ug.gameID = g.gameID',
 					  array('COUNT(ug.userID) as totalPlayers'))
 			   ->where('g.gameID = ?', $gameID)
 			   ->group('g.gameID');
-			   
+	
 		$result = $table->fetchRow($select);
 		
 		if ($result['rosterLimit'] <= $result['totalPlayers']) {
@@ -937,6 +975,30 @@ class Application_Model_GamesMapper extends Application_Model_TypesMapperAbstrac
 		
 		return $returnArray;
 	}
+	
+	/**
+	 * save sent invites to db
+	 */
+	public function saveInvites($emails, $actingUserID, $gameID)
+	{
+		$db = Zend_Db_Table::getDefaultAdapter();
+		
+		$sql = "INSERT INTO game_invites 
+					(gameInviteID, email, actingUserID, gameID, firstSent) 
+				VALUES ";
+		
+		$counter = 0;
+		foreach ($emails as $email) {
+			if ($counter != 0) {
+				$sql .= ',';
+			}
+			$sql .= "('', '" . $email . "', " . $actingUserID . ", " . $gameID . ", CURDATE())";
+			$counter++;
+		}
+		
+		$db->query($sql);
+	}
+					
 	
 	/**
 	 * delete game

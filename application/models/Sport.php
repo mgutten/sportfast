@@ -21,7 +21,8 @@ class Application_Model_Sport extends Application_Model_ModelAbstract
 									'attendance'	  => '',
 									'formats'		  => '',
 									'overall'		  => '',
-									'ratings'		  => ''
+									'ratings'		  => '',
+									'noRatings'		  => ''
 									);
 									
 	protected $_primaryKey = 'userSportID';	

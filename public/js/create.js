@@ -867,7 +867,7 @@ function populateSportInfo(data)
 	
 	
 	
-	$('#rosterLimit').val(rosterLimit);
+	//$('#rosterLimit').val(rosterLimit); Commented out to default roster limit to nothing
 	$('#minPlayers').val(data.minPlayers);
 	
 }

@@ -440,7 +440,8 @@ $(function()
 		var captains = detailsEle.attr('captains');
 		
 		if ((captains.search(detailsEle.attr('actingUserID')) !== -1) && 
-			 captains.length == 1) {
+			 captains.length == 1 &&
+			 detailsEle.attr('recurring') != 'true') {
 			// User is still team captain, do not let leave without passing the torch
 			showConfirmationAlert('You must choose someone to be the new ' + type + ' captain (under Manage)');
 			return;
@@ -474,11 +475,11 @@ $(function()
 		$('#profile-buttons-container').css('top', top);
 	}
 	
-	$('#unsubscribe-button, #top-alert-subscribe').click(function()
+	$('#unsubscribe-button, #top-alert-subscribe, #subscribe').click(function()
 	{
 		
 		var detailsEle = getDetailsEle();
-		var subscribe = ($(this).is('#top-alert-subscribe') ? 1 : 0);
+		var subscribe = ($(this).is('#top-alert-subscribe') || $(this).is('#subscribe') ? 1 : 0);
 		
 		confirmAction = function () {
 				var detailsEle = getDetailsEle();
@@ -501,6 +502,12 @@ $(function()
 		var name = (typeof detailsEle.attr('teamName') == 'undefined' ? 'this game' : detailsEle.attr('teamName'));
 		populateConfirmActionAlert('unsubscribe');
 	});
+	
+	/* close subscribe green-alert-box on game page */
+	$('#subscribe-x').click(function()
+	{
+		$(this).parents('.green-alert-box').hide();
+	})
 	
 	
 	$('.profile-join-player-container').click(function()
@@ -556,7 +563,7 @@ $(function()
 		showAlert($('#invites-alert-container'));
 	}
 	
-	$('.profile-animate-buttons').click(function()
+	$('.profile-animate-buttons, .profile-options-button').click(function()
 	{
 		animateProfileButtons();
 	})
@@ -914,6 +921,47 @@ function testAdvancedChanges()
  */
 function animateProfileButtons()
 {
+	//$('.profile-options-outer-container').animate({'height': '6em'}, 300);
+	var downMargin = -5;
+	var upMargin = '-5em';
+	var marginTop = parseInt($('.profile-options-inner-container').css('margin-top'),10) - downMargin;
+	
+	if (marginTop < 0) {
+		// Is down, move up
+		$('.profile-options-outer-container').animate({'height': '7em'}, 300);
+		
+		$('.profile-options-button').text('hide options')
+		
+		$('.profile-options-inner-container').animate({marginTop: downMargin + 'px'}, 300);
+	} else {
+		$('.profile-options-outer-container').animate({'height': '1.5em'}, 300);
+		
+		$('.profile-options-button').text('show options')
+		
+		$('.profile-options-inner-container').animate({marginTop: upMargin}, 300);
+	}
+	/*
+	var width = parseInt($('.profile-buttons-innermost-container').innerWidth(),10) + parseInt($('.profile-animate-buttons').innerWidth(), 10);
+	var marginLeft = '14em';
+	
+	if ($('#profile-buttons-container').width() < width) {
+		$('#profile-buttons-container').css('width', width);
+		$('.profile-buttons-inner-container').css('margin-left', marginLeft);
+		
+		$('.profile-buttons-inner-container').animate({marginLeft: 0}, 300);
+		//$('#profile-buttons-container').animate({'width': width}, 300);
+	} else {
+		//$('#profile-buttons-container').animate({'width': $('.profile-animate-buttons').width()}, 300);
+		
+		$('.profile-buttons-inner-container').animate({marginLeft: marginLeft}, {duration: 300, complete: function() {
+																													$(this).css('margin-left', 0);
+																													$('#profile-buttons-container').css('width', '1em')
+		}});
+	}
+	*/
+	
+	return;
+	
 	var innerEle = $('.profile-buttons-inner-container');
 	var marginLeft = parseInt(innerEle.css('margin-left'), 10);
 	

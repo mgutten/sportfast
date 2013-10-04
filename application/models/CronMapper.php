@@ -43,6 +43,8 @@ class Application_Model_CronMapper extends Application_Model_MapperAbstract
 									LEFT JOIN user_games ug ON ug.gameID = g.gameID 
 									WHERE g.date < (NOW() + INTERVAL " . $this->getTimeOffset() . " HOUR) 
 									AND g.gameID != (SELECT MAX(gameID) FROM games)
+									AND g.parkID != 0
+									AND g.sportID != 0
 									GROUP BY g.gameID)";
 		$db->query($insertGames);
 		$oldGameID = $db->lastInsertId();
@@ -55,9 +57,8 @@ class Application_Model_CronMapper extends Application_Model_MapperAbstract
 										FROM user_games ug
 										INNER JOIN (SELECT * 
 														FROM old_games 
-														WHERE movedDate = (SELECT movedDate 
-																			FROM old_games 
-																			WHERE oldGameID = '" . $oldGameID . "')
+														WHERE movedDate BETWEEN (SELECT movedDate - INTERVAL 1 MINUTE FROM old_games WHERE oldGameID = '" . $oldGameID . "')
+																		 AND (SELECT movedDate + INTERVAL 1 MINUTE FROM old_games WHERE oldGameID = '" . $oldGameID . "')
 													) og ON og.gameID = ug.gameID)";
 													
 			$db->query($insertUserGames);
@@ -109,7 +110,8 @@ class Application_Model_CronMapper extends Application_Model_MapperAbstract
 										 cancelReason = '' 
 							WHERE date < (NOW() + INTERVAL " . $this->getTimeOffset() . " HOUR)
 								AND recurring = 1
-								AND (remove IS NULL)";
+								AND (remove IS NULL OR
+									 remove = '0000-00-00')";
 							
 		$db->query($updateGames);
 		
@@ -346,7 +348,7 @@ class Application_Model_CronMapper extends Application_Model_MapperAbstract
 	/**
 	 * get users who are on a team that has a game tomorrow (and have not responded yet)
 	 */				
-	public function getUserTeamGames()
+	public function getUserTeamGames($days = 2)
 	{
 		$table = $this->getDbTable();
 		$select = $table->select();
@@ -364,8 +366,10 @@ class Application_Model_CronMapper extends Application_Model_MapperAbstract
 			   ->joinLeft(array('utg' => 'user_team_games'),
 			   			  'utg.userID = ut.userID AND tg.teamGameID = utg.teamGameID',
 						  array())
-			   ->where('DATE(DATE_ADD(tg.date, INTERVAL -2 DAY)) = CURDATE()')
+			   ->where('DATE(DATE_ADD(tg.date, INTERVAL -' . $days . ' DAY)) = CURDATE()')
+			   ->where('(TIME_TO_SEC( TIMEDIFF( tg.date, (NOW() + INTERVAL ' . $this->getTimeOffset() . ' HOUR))) /3600) > 2')
 			   ->where('utg.teamGameID IS NULL');
+		
 		
 		$results = $table->fetchAll($select);
 		
@@ -373,7 +377,7 @@ class Application_Model_CronMapper extends Application_Model_MapperAbstract
 		
 		foreach ($results as $result) {
 			if (!isset($returnArray[$result->teamGameID])) {
-				// new game
+				// New game
 				$team = new Application_Model_Team();
 				$team->teamID = $result->teamID;
 				$team->teamName = $result->teamName;

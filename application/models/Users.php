@@ -17,6 +17,13 @@ class Application_Model_Users extends Application_Model_TypesAbstract
 		//$user = $this->_attribs['users'][] = new Application_Model_User($resultRow);
 
 		$user = $this->_attribs['users'][] = new Application_Model_User($resultRow);
+		
+		if ($user->hasValue('city')) {
+			$city = $user->city;
+			$user->city = new Application_Model_City();
+			$user->city->city;
+		}
+		
 		return $user;
 	}
 	

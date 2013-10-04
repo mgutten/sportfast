@@ -142,6 +142,8 @@ class SignupController extends Zend_Controller_Action
 				$user->cityID = $user->getCity()
 								     ->getCityFromZipcode($post['zipcode'])
 									 ->cityID;
+									 
+				$user->city = $user->city->city;
 				
 				// Set verifyHash for user
 				$user->verifyHash = md5($_POST['email']);
@@ -193,6 +195,7 @@ class SignupController extends Zend_Controller_Action
 					$sportModel = $user->getSport($sport);
 					
 					$sportModel->often = $post[$sport . 'Often'];
+					$sportModel->noRatings = (strtolower($post[$sport . 'Ratings']) == 'yes' ? '0' : '1');
 					$sportModel->sport = $sport;
 					
 					// Convert rating from slider (0-6) to meaningful rating (64-100)
@@ -267,6 +270,7 @@ class SignupController extends Zend_Controller_Action
 							// Loop through types and create models
 							$positionModel = $sportModel->getPosition($position);
 							$positionModel->positionAbbreviation = $position;
+							
 						}
 
 					} else {
@@ -337,14 +341,45 @@ class SignupController extends Zend_Controller_Action
 									</table>
 								</body>
 						     </html>";
+							 
+				$text  = "Thank you for joining the Sportfast team!  We'll get you up and running in no time.";
+				$text .= "\n You're almost done.  To verify your account, please follow the link below:";
+				$text .= "\n \n \t http://www.sportfast.com/signup/verify/" . $user->verifyHash;
+				
+				
 				$headers  = 'MIME-Version: 1.0' . "\r\n";
 				$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";	 
 				$headers .= "From: support@sportfast.com \r\n";
 				
 				
+				require($_SERVER['DOCUMENT_ROOT'] . '/plugins/PHPMailer/class.phpmailer.php');		
+		
+				
+				$mail = new PHPMailer;
+				$mail->isSMTP();                                      
+				$mail->Host = 'box774.bluehost.com';  				 
+				$mail->SMTPAuth = true;                               
+				$mail->Username = 'support@sportfast.com';                            
+				$mail->Password = 'sportfast.9';                           
+				//$mail->SMTPSecure = "ssl";
+				
+				
+				$mail->From = 'support@sportfast.com';
+				$mail->FromName = 'Sportfast';
+				$mail->addAddress($user->username);  
+				$mail->addReplyTo('donotreply@sportfast.com');
+				
+				$mail->isHTML(true);                                  
+				
+				$mail->Subject = $subject;
+				
+				$mail->Body    = $message;
+				$mail->AltBody = $text;
+				
+				
 				$this->view->whiteBacking = false;
 				$this->view->username = $user->username;
-				if(mail($user->username, $subject, $message, $headers)) {
+				if($mail->send()) {
 					$this->view->success = true;
 					//echo 'An email verification has been sent to ' . $user->username . '.';
 				} else {

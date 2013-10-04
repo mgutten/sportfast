@@ -46,6 +46,8 @@ class UsersController extends Zend_Controller_Action
 			}
 		}
 		
+		$this->view->friendRequest = $user->pendingFriendRequest($this->view->user->userID);
+		
 
         $dropdown = Zend_Controller_Action_HelperBroker::getStaticHelper('Dropdown');
 		$this->view->inviteButton = $dropdown->dropdownButton('invite-to', '', 'Invite to');
@@ -315,6 +317,7 @@ class UsersController extends Zend_Controller_Action
 				
 			}
 			
+			$sportModel->noRatings = (strtolower($post[$sport . 'Ratings']) == 'yes' ? '0' : '1');
 			$sportModel->often = $post[$sport . 'Often'];
 			$sportModel->sport = $sport;
 			

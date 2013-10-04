@@ -64,5 +64,11 @@ class AboutController extends Zend_Controller_Action
 		$this->_helper->layout()->disableLayout(); 
 	}
 	
+	public function signupRatingsAction()
+	{
+		/* what ratings for signup explained */
+		$this->_helper->layout()->disableLayout(); 
+	}
+	
 }
 

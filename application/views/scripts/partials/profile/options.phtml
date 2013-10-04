@@ -1,0 +1,26 @@
+<div class='width-100 profile-options-outer-container'>
+	<div class='profile-options-inner-container white-background left width-100'>
+    	<div class='profile-options-container left width-100'>
+    	<?php
+			foreach (array_reverse($this->options) as $option) {
+				if (isset($option['href'])) {
+					// Is link
+					$href = " href='" . $option['href'] . "' ";
+					$tag = "a";
+				} else {
+					$href = " ";
+					$tag = "div";
+				}
+				echo "<" . $tag . " " . $href . " class='right profile-option-container white-background animate-darker pointer' >
+							<div class='left width-100'>
+								<img src='/images/games/icons/" . $option['img'] . ".png' class='profile-options-img auto-center'  />
+							</div>
+							<p class='medium left heavy width-100 center smaller-text'>" . strtoupper($option['text']) . "</p>
+						</" . $tag . ">
+						";
+			}
+		?>
+        </div>
+        <p class='profile-options-button pointer clear-right medium center animate-darker'>show options</p>
+	</div>
+</div>

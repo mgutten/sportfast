@@ -19,7 +19,8 @@ class Application_Model_SportPosition extends Application_Model_ModelAbstract
 	
 	public function save($loopSave = false)
 	{
-		if (empty($this->positionAbbreviation) && empty($this->positionID)) {
+		if ((!$this->hasValue('positionAbbreviation') || $this->positionAbbreviation == 'null') && 
+			 !$this->hasValue('positionID')) {
 			// Has not been set, do not save
 			return false;
 		} elseif (empty($this->positionID)) {

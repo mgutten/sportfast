@@ -27,9 +27,9 @@ abstract class Application_Model_MapperAbstract
 		foreach ($attribs as $column => $value) {
 			// Loop through savingClass attributes and determine what is an individual object
 			// and what is a valid column for this table
-
 			if (is_object($value) && (!($value instanceof DateTime))) {
 				array_push($models, $value);
+				
 				continue;
 			} elseif(is_array($value)) {
 				
@@ -37,6 +37,7 @@ abstract class Application_Model_MapperAbstract
 				
 				if (is_object($firstValue)) {
 					// First value of array is object, valid
+					
 					foreach($value as $key => $val) {
 						array_push($models, $val);
 					}
@@ -83,7 +84,7 @@ abstract class Application_Model_MapperAbstract
 			
 		}
 
-		
+
 		$primaryColumn = $table->info('primary');
 		$primaryColumn = $primaryColumn[1];
 		$primaryKey    = $savingClass->$primaryColumn;
@@ -103,10 +104,11 @@ abstract class Application_Model_MapperAbstract
 		if ($loopSave) {
 			// Loop through children objects and save as well
 			foreach ($models as $key => $model) {
+				
 				$modelAttribs = $model->getAttribs();
 				
 				foreach ($attribs as $attrib => $val) {
-					
+
 					if (array_key_exists($attrib, $modelAttribs) && !is_object($val)) {
 						// Both parent class ($savingClass) and child class have same columns, set child to parents
 						$model->$attrib = $savingClass->$attrib;
