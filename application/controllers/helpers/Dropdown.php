@@ -8,9 +8,11 @@ class Application_Controller_Helper_Dropdown extends Zend_Controller_Action_Help
 	 * create typical dropdown
 	 * @params ($id => id for dropdown
 	 *			$options => array of options (could container sub arrays of text, image, and class),
-	 *			$selected=> which value is selected (str))
+	 *			$selected=> which value is selected (str),
+	 *			$ucwords => upper case each option
+	 *			$changeSelected => when click on option, should change selected and close dropdown?)
 	 */
-	public function dropdown($id, $options, $selected = false, $ucwords = true)
+	public function dropdown($id, $options, $selected = false, $ucwords = true, $changeSelected = false)
 	{
 		if (!$selected) {
 			if (is_array($options[0])) {
@@ -21,14 +23,25 @@ class Application_Controller_Helper_Dropdown extends Zend_Controller_Action_Help
 			}
 		}
 		
+		$class = '';
+		
+		if (is_array($selected)) {
+			
+			if (isset($selected['class'])) {
+				$class = $selected['class'];
+			}
+			
+			$selected = $selected['text'];
+		}
+		
 		$output = "<div id='" . $id . "' class='dropdown-menu-container' dropdown-id='dropdown-menu-hidden-container-" . $id . "'>
 						<div  class='dropdown-menu-selected dropshadow'>
-						   <p class='dropdown-menu-option-text medium'>" . $selected . "</p>
+						   <p class='dropdown-menu-option-text medium " . $class . "'>" . $selected . "</p>
 						   <img src='/images/global/dropdown/dropdown_arrow.png' class='dropdown-menu-option-img' id='dropdown-menu-arrow'/>
 					   </div>
 				   </div>";
 		
-		$output .= $this->createLowerDropdown($id, $options, $ucwords);
+		$output .= $this->createLowerDropdown($id, $options, $ucwords, $changeSelected);
 		
 		//$output .= "</div>";
 					
@@ -78,10 +91,12 @@ class Application_Controller_Helper_Dropdown extends Zend_Controller_Action_Help
 	/**
 	 * create lower (hidden) portion of custom dropdown
 	 */
-	public function createLowerDropdown($id, $options, $ucwords = true)
+	public function createLowerDropdown($id, $options, $ucwords = true, $changeSelected = false)
 	{
+		$changeSelected = (!$changeSelected ? '' : 'true');
+		
 		$output  = '';
-		$output .= "<div class='dropdown-menu-hidden-container' id='dropdown-menu-hidden-container-" . $id . "'>
+		$output .= "<div class='dropdown-menu-hidden-container' change = '" . $changeSelected . "' id='dropdown-menu-hidden-container-" . $id . "'>
 				    <img src='/images/global/dropdown/dropdown_tip.png' class='dropdown-menu-tip' />
 				    <div dropdown-menu='" . $id . "' id='dropdown-menu-" . $id . "' class='dropdown-menu-options-container dropshadow'>";
 					
@@ -104,7 +119,7 @@ class Application_Controller_Helper_Dropdown extends Zend_Controller_Action_Help
 				$outerClass = ' ' . $option['outerClass'];
 			}
 			
-			$output   .= $pre . " class='dropdown-menu-option-container medium animate-darker " . $outerClass . "'>";
+			$output   .= $pre . "  change = '" . $changeSelected . "' class='dropdown-menu-option-container medium animate-darker " . $outerClass . "'>";
 			$img       = '';
 			$textClass = 'medium';
 		
@@ -151,14 +166,14 @@ class Application_Controller_Helper_Dropdown extends Zend_Controller_Action_Help
 				}
 
 				
-				$text = '<p class="dropdown-menu-option-text ' . $textClass . '" ' . $attribs . '>' . $option['text'] . '</p>';
+				$text = '<p class="dropdown-menu-option-text ' . $textClass . '" ' . $attribs . ' change="' . $changeSelected . '">' . $option['text'] . '</p>';
 			} else {
 				// Simple text
 				if ($ucwords) {
 					// ucwords for option
 					$option = ucwords($option);
 				}
-				$text      = '<p class="dropdown-menu-option-text ' . $textClass . '">' . $option . '</p>';
+				$text      = '<p class="dropdown-menu-option-text ' . $textClass . '" change="' . $changeSelected . '">' . $option . '</p>';
 			}
 			
 			if (isset($option['imageLocation'])) {

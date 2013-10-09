@@ -8,6 +8,22 @@ $(function()
 	teamID = $('#team-details').attr('teamID');
 	
 	
+	/* OPTIONS ONCLICK SHOW ALERT/REDIRECT */
+	$('#profile-option-reserves').click(function()
+	{
+		showAlert($('#reserves-alert-container'));
+	})
+	
+	$('#profile-option-schedule').click(function()
+	{
+		showAlert($('#manage-schedule-alert-container'));
+	})
+	
+	$('#profile-option-edit').click(function()
+	{
+		showAlert($('#manage-team-info-alert-container'));
+	})
+	
 	$('.schedule-in,.schedule-out').click(function()
 	{
 		reloadPage();

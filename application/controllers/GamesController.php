@@ -75,18 +75,23 @@ class GamesController extends Zend_Controller_Action
 		$this->view->isPublic  = ($game->public == '1' ? true : false);
 		
 		$this->view->totalPlayers  = $game->totalPlayers;
+		$this->view->confirmedPlayers = $game->countConfirmedPlayers();
+		$this->view->notConfirmedPlayers = $game->countNotConfirmedPlayers();
+		$this->view->maybeConfirmedPlayers = $game->countMaybeConfirmedPlayers();
 		$this->view->rosterLimit   = $game->rosterLimit;
 		$this->view->minPlayers    = $game->minPlayers;
-		
-		$this->view->gameOn		   = ($game->totalPlayers >= $game->minPlayers ? true : false);
+
+		$this->view->gameOn		   = ($this->view->confirmedPlayers >= $game->minPlayers ? true : false);
 		$this->view->playersNeeded = $game->getPlayersNeeded();
 		$this->view->gameFull	   = ($game->rosterLimit <= $game->totalPlayers ? true : false);
 		
 		
 		$this->view->newsfeed   = $game->messages->getGameMessages($game->gameID);
-
 		$this->view->captain = $captain = $game->isCaptain($this->view->user->userID);
+		
 		$this->view->subscribed = $subscribed = $game->isSubscriber($this->view->user->userID);
+		
+		$game->sortPlayersByConfirmed();
 		
 		if ($game->isRecurring() && !$subscribed) {
 			// Show subscribe button
@@ -115,25 +120,32 @@ class GamesController extends Zend_Controller_Action
 			
 			Zend_Session::namespaceUnset('joinedGame');
 			
+			
+			//$this->view->inviteButton = $dropdown->dropdownButton('invite', '', 'Invite');
+			
+		}
+		
+		if ($captain) {
+			// Allow captain to manage
+			/*
+			$this->view->manageButton = $dropdown->dropdownButton('manage', array(array('text' => 'Edit Game',
+																						'href' => '/games/' . $gameID . '/edit',
+																						'image' => '/images/team/icons/edit.png',
+																						'background' => '',
+																						'imageLocation' => 'left'),
+																				  array('text' => 'Remove Player',
+																					'image' => '/images/team/icons/x.png',
+																					'background' => '',
+																					'imageLocation' => 'left'), 
+																				  array('text' => 'Cancel Game',
+																					'image' => '/images/team/icons/trash.png',
+																					'background' => '',
+																					'imageLocation' => 'left')), 'Manage');
+			*/
 			$dropdown = Zend_Controller_Action_HelperBroker::getStaticHelper('Dropdown');
-			$this->view->inviteButton = $dropdown->dropdownButton('invite', '', 'Invite');
-			if ($captain) {
-				// Allow captain to manage
-				$this->view->manageButton = $dropdown->dropdownButton('manage', array(array('text' => 'Edit Game',
-																					  		'href' => '/games/' . $gameID . '/edit',
-																							'image' => '/images/team/icons/edit.png',
-																							'background' => '',
-																							'imageLocation' => 'left'),
-																					  array('text' => 'Remove Player',
-																						'image' => '/images/team/icons/x.png',
-																						'background' => '',
-																						'imageLocation' => 'left'), 
-																					  array('text' => 'Cancel Game',
-																						'image' => '/images/team/icons/trash.png',
-																						'background' => '',
-																						'imageLocation' => 'left')), 'Manage');
-					
-			}
+			$sendReminder = $game->getSendReminder(true);
+			$this->view->reminderHourDropdown = $dropdown->dropdown('reminder-hour', range(1,12), $sendReminder['hour'], false, true);
+			$this->view->reminderAmpmDropdown = $dropdown->dropdown('reminder-ampm', array('am', 'pm'), $sendReminder['ampm'], false, true);					
 		}
 			
 		$this->view->userHasSport = $this->view->user->hasSport($game->sport);
@@ -250,6 +262,8 @@ class GamesController extends Zend_Controller_Action
 		$gameID = $this->getRequest()->getParam('id');
         $game = new Application_Model_Game();
 		$game->getGameByID($gameID);
+		
+		$game->sortPlayersByConfirmed();
 		
 		$this->view->game = $game;
 		

@@ -180,6 +180,7 @@ $(function()
 	
 	$(document).on('click','.dropdown-menu-option-text',function()
 	{
+		
 		if ($(this).parent().is('a')) {
 			// Option is nested in an anchor tag, redirect to anchor tag (fixes bug where would not fire anchor href onclick)
 			window.location = $(this).parent().attr('href');
@@ -214,9 +215,10 @@ $(function()
 	
 	$(document).on('click.swapValue','.dropdown-menu-option-container',function()
 	{
-		//Option has been clicked
+		//Option has been clicked		
 		var value = $(this).children('p').text();
-		$(this).parents('.dropdown-menu-container').children('.dropdown-menu-selected').children('p').text(value);
+		$(this).parents('.dropdown-menu-hidden-container').prev('.dropdown-menu-container').children('.dropdown-menu-selected').children('p').text(value);
+
 	})
 	
 	
@@ -243,7 +245,7 @@ $(function()
 	)
 	
 	/* schedule "in" and "out" button on click */
-	$('.schedule-in,.schedule-out').click(function(e)
+	$('.schedule-in,.schedule-out,.schedule-maybe').click(function(e)
 	{
 		e.preventDefault();
 		
@@ -1001,11 +1003,15 @@ $(function()
 		
 		if (dropdowns.dropdownMenuDown) {
 			// Dropdown menu is down
-			if ($(e.target).parents('.dropdown-menu-options-container').length > 0 || 
-				$(e.target).is('.dropdown-menu-options-container')) {
+			
+			if (($(e.target).parents('.dropdown-menu-options-container').length > 0 || 
+				$(e.target).is('.dropdown-menu-options-container')) && 
+				(typeof $(e.target).attr('change') == 'undefined')) {
 					// Clicked on search bar for dropdown-menu
+					alert();
 					return;
 				}
+			
 			dropdowns.dropdownMenuDown.children('.dropdown-menu-selected').removeClass('dropdown-menu-container-reverse');
 			dropdowns.dropdownMenuDown.children('.dropdown-menu-selected').children('p').removeClass('dropdown-menu-container-reverse-text');
 
@@ -1208,11 +1214,13 @@ function addUserToGame(idType, typeID, userID, confirmed)
 		type: 'POST',
 		data: {options: options},
 		success: function(data) {
-
+			
+			/*
 			var action = 'join';
 			var type   = 'game';
 			var details;
 			createNotification(idType, typeID, userID, '', action, type, details);
+			*/
 			reloadPage();
 		}
 	})
@@ -1355,9 +1363,10 @@ function getCity(zipcodeOrCity, callback)
 /**
  * Ajax call to search database for username, park, league, game, team, or group
  * @params (search => search term to look for
- *			limit  => array with names of types of things to look for (eg "users", "teams", etc))
+ *			limit  => array with names of types of things to look for (eg "users", "teams", etc),
+ *			param => optional param to be sent to callback)
  */
-function searchDatabase(searchTerm, callback, limit)
+function searchDatabase(searchTerm, callback, limit, param)
 {
 
 	$.ajax({
@@ -1367,7 +1376,11 @@ function searchDatabase(searchTerm, callback, limit)
 			   limit: limit},
 		success: function(data) {
 			data = JSON.parse(data);
-			callback(data);
+			if (typeof param != 'undefined') {
+				callback(data, param);
+			} else {
+				callback(data);
+			}
 		}
 	})
 }
@@ -1434,15 +1447,17 @@ function buildSliders(ele, callback, options)
  */
 function dropdownMenu(dropdownEle)
 {
-	
+
 		var dropdown = dropdownEle;
 		var hiddenID = dropdownEle.attr('dropdown-id');
 		var selected = dropdown.children('.dropdown-menu-selected');
 		var options  = dropdown.next('#' + hiddenID);
 		
 		if (dropdowns.dropdownMenuDown) {
+			
 			if (dropdowns.dropdownMenuDown.attr('id') == dropdown.attr('id')) {
 				// Dropdown is already down
+				
 				options.animate({opacity: 0}, {duration: 200, complete: function() {
 																			options.hide();
 

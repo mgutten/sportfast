@@ -307,7 +307,7 @@ class Application_View_Helper_MemberHomepage
 						$output .= "<p class='clear medium'>" . $game->getPark()->parkName . "</p>";
 						$output .= "</div>";
 						$output .= "<div class='member-schedule-day-body-players-container darkest bold'>";
-						$output .= "<p class='member-schedule-day-body-players largest-text center'>" . $game->totalPlayers . "</p>";
+						$output .= "<p class='member-schedule-day-body-players largest-text center'>" . $game->confirmedPlayers . "</p>";
 						$output .= "<p class='member-schedule-day-body-players-text center clear larger-text'>players</p>";
 						$output .= "<p class='center clear green smaller-text member-schedule-day-body-players-confirmed larger-margin-top " . $confirmClass . "'>" . $confirm . "</p>";
 						$output .= "</div>";

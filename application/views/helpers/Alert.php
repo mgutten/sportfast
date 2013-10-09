@@ -58,6 +58,56 @@ class Application_View_Helper_Alert
 	}
 	
 	/**
+	 * invite players to game/team alert
+	 */
+	public function inviteAlert()
+	{
+		$href = '';
+		if ($this->_view->game) {
+			// Is game page
+			$href = '/games/' . $this->_view->game->gameID . '/invite';
+		} elseif ($this->_view->team) {
+			$href = '/teams/' . $this->_view->team->teamID . '/invite';
+		}
+		
+		$form = new Application_Form_General();
+		
+		$output  = $this->start('invite','Invite players');
+		$output .= 	"<div class='clear width-100'>"
+						. $form->text->setAttrib('id', 'inviteSearchAlert')
+							   		 ->setLabel("Start typing a player's name...")
+					. "</div>";
+		$output .= "<div class='clear width-100' id='invite-alert-results'>";
+		$output .= "</div>";
+		$output .= "<a href='" . $href . "' class='clear width-100 center medium smaller-text larger-margin-top'>or by email</a>";
+		$output .= $this->end();
+		
+		return $output;
+	}
+	
+	/**
+	 * message players of game/team
+	 */
+	public function messageAlert()
+	{
+		
+		$form = new Application_Form_General();
+		
+		$output  = $this->start('message','Message players');
+		$output .= 	"<div class='clear width-100'>"
+						. $form->text->setAttrib('id', 'messageSubject')
+							   		 ->setLabel("Subject")
+					. "</div>";
+		$output .= "<div class='clear width-100'>";
+		$output .= $form->textarea->setAttrib('id', 'messageBody')
+							 	  ->setLabel("Write message here..."); 
+		$output .= "</div>";
+		$output .= $this->end();
+		
+		return $output;
+	}
+	
+	/**
 	 * alert for post-game ratings of users or park that game was played at
 	 * @params ($game => game model with stored park and players)
 	 */

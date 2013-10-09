@@ -279,24 +279,6 @@ function removeSportFromUser(userID, sport)
 	})
 }
 
-/**
- * update game_subscribers doNotEmail for game
- * @params (onOrOff => 1 = no emails, 0 = emails)
- */
-function updateEmailAlert(gameID, onOrOff)
-{
-	var options = {gameID: gameID,
-				   onOrOff: onOrOff};
-				   
-	$.ajax({
-		url: '/ajax/update-email-alert-subscribed-game',
-		type: 'POST',
-		data: {options: options},
-		success: function(data) {
-			showConfirmationAlert('Updated');
-		}
-	})
-}
 
 /**
  * custom callback function from slider to update hidden input skill

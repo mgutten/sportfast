@@ -1,6 +1,6 @@
 <?php
 
-class Application_Model_Game extends Application_Model_ModelAbstract
+class Application_Model_Game extends Application_Model_ConfirmationsAbstract
 {
 	protected $_mapperClass = 'Application_Model_GamesMapper';
 	
@@ -54,7 +54,8 @@ class Application_Model_Game extends Application_Model_ModelAbstract
 									'remove'		=> '',
 									'teamPage'		=> '', // Used in getTeamByID for Calendar.php to show future games on team page
 									'sportfastCreated' => '',
-									'doNotEmail'    => ''
+									'doNotEmail'    => '',
+									'sendReminder'  => ''
 									);
 									
 	protected $_primaryKey = 'gameID';
@@ -96,13 +97,14 @@ class Application_Model_Game extends Application_Model_ModelAbstract
 	
 	/**
 	 * add user to game in db
+	 * @params ($confirmed => '0' = out, '1' = in, or '2' = maybe
 	 */
-	public function addUserToGame($gameID, $userID)
+	public function addUserToGame($gameID, $userID, $confirmed = false)
 	{
 		if ($this->isTeamGame()) {
-			return $this->getMapper()->addUserToTeamGame($gameID, $userID);
+			return $this->getMapper()->addUserToTeamGame($gameID, $userID, $confirmed);
 		} else {
-			return $this->getMapper()->addUserToGame($gameID, $userID);
+			return $this->getMapper()->addUserToGame($gameID, $userID, $confirmed);
 		}
 	}
 	
@@ -257,6 +259,24 @@ class Application_Model_Game extends Application_Model_ModelAbstract
 		return $this->_attribs['park'];
 	}
 
+	/**
+	 * get sendReminder 
+	 * @params ($asArray => will return time as array of hour => 1-12, ampm => am or pm)
+	 */
+	public function getSendReminder($asArray = false) {
+		if (!$asArray) {
+			return $this->_attribs['sendReminder'];
+		} else {
+			// Return as array
+			$hour = $this->_attribs['sendReminder'];
+			$ampm = ($hour >= 12 ? 'pm' : 'am');
+			$hour = ($hour > 12 ? $hour - 12 : $hour);
+			$returnArray = array('hour' => $hour,
+								 'ampm' => $ampm);
+								 
+			return $returnArray;
+		}
+	}
 
 	/**
 	 * get reason for cancelation
@@ -496,7 +516,7 @@ class Application_Model_Game extends Application_Model_ModelAbstract
 	 */
 	public function getPlayersNeeded($secondWord = 'players')
 	{
-		$difference = $this->minPlayers - $this->totalPlayers;
+		$difference = $this->minPlayers - $this->countConfirmedPlayers();
 		
 		if ($difference == 1 && $secondWord == 'players') {
 			return $difference . ' player';

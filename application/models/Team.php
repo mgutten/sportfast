@@ -1,6 +1,6 @@
 <?php
 
-class Application_Model_Team extends Application_Model_ModelAbstract
+class Application_Model_Team extends Application_Model_ConfirmationsAbstract
 {
 	protected $_mapperClass = 'Application_Model_TeamsMapper';
 	
@@ -283,50 +283,7 @@ class Application_Model_Team extends Application_Model_ModelAbstract
 		return ucwords($this->_attribs['city']);
 	}
 			
-	
-	/**
-	 * order players by whether they are confirmed or not
-	 */
-	public function sortPlayersByConfirmed()
-	{
-		$nextGame = $this->getNextGame();
-		if ($this->hasValue('players')) {
-			// There are players stored, sort them
-			$players = $this->_attribs['players']->_attribs['users'];
-			
-			$playerArray = $undecided = $notConfirmed = array();
-			
-			foreach ($players as $player) {
-				
-				if ($nextGame->userConfirmed($player->userID)) {
-					// User is confirmed
-
-					array_unshift($playerArray, $player);
-				} elseif ($nextGame->userNotConfirmed($player->userID)) {
-					// User is not going
-					array_unshift($notConfirmed, $player);
-				} else {
-					array_push($undecided, $player);
-				}
-			}
-			
-			foreach ($undecided as $player) {
-				array_push($playerArray, $player);
-			}
-			
-			foreach ($notConfirmed as $player) {
-				array_push($playerArray, $player);
-			}
-			
-			$players = $this->_attribs['players'];
-			$players->users = $playerArray;
-			
-			return $this->_attribs['players'];
-		} else {
-			return false;
-		}
-	}
-	
+		
 	private static function sortByConfirmed ($a, $b)
 	{
 		

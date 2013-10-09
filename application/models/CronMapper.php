@@ -413,10 +413,11 @@ class Application_Model_CronMapper extends Application_Model_MapperAbstract
 			   			  'ug.userID = gs.userID AND g.gameID = ug.gameID',
 						  array(''))
 			   ->where('DATE(DATE_ADD(g.date, INTERVAL -1 DAY)) = CURDATE()')
+			   ->where('g.sendReminder = 19')
 			   ->where('g.recurring = 1')
-			   ->where('ug.userGameID IS NULL')
+			   ->where('ug.userGameID IS NULL OR ug.confirmed = 2')
 			   ->where('gs.doNotEmail = 0');
-			   
+		 
 		$results = $table->fetchAll($select);
 		
 		$returnArray = array();

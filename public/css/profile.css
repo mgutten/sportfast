@@ -45,7 +45,7 @@
 }
 
 .profile-option-container {
-	width: 7em;
+	width: 6em;
 	padding-bottom: .2em;
 }
 
@@ -58,7 +58,82 @@
 }
 
 .profile-name-container {
-	margin-bottom: 3em;
+	/*margin-bottom: 3em;*/
+}
+
+/* common alerts */
+
+#inviteSearchAlert-container {
+	width: 20em;
+	margin: 1em auto;
+	display:block;
+	float:none;
+
+}
+
+#inviteSearchAlert-container > .input-overlay,
+#inviteSearchAlert-container > input {
+	background: #fff;
+}
+
+#inviteSearchAlert {
+	width: 19.3em;
+	background: #fff;
+}
+
+#invite-alert-container,
+#reminders-alert-container,
+#message-alert-container{
+	width: 34em;
+	min-height: 6em;
+	margin-top: -8em;
+	margin-left: -17em;
+}
+
+#invite-alert-results {
+	width: 95%;
+}
+
+.userName-search-result {
+	padding: .5em;
+	width: 100%;
+	background:#fff;
+	border-top: 1px solid #e9e9e9;
+}
+
+.userName-search-result.selected {
+	background: #e9e9e9 !important;
+}
+
+
+#reminders-alert-yesno-container > .selectable-text:first-child {
+	margin-left: 10.5em;
+}
+
+#reminders-alert-yesno-container > .selectable-text:nth-child(2) {
+	margin-left: 2em;
+}
+
+#messageSubject-container {
+	width: 20em;
+}
+
+#messageSubject-container > input {
+	width: 19.5em;
+}
+
+#messageBody-container {
+	width: 36em;
+	height: 7em;
+}
+
+#messageBody-container > textarea {
+	width: 35em;
+	height: 6.5em;
+}
+
+#messageBody-container > .input-overlay {
+	margin-top: -5.3em;
 }
 
 #user-buttons-container,#profile-buttons-container {
@@ -185,7 +260,8 @@
 
 
 /* player styling */
-.profile-player-overlay-container {
+.profile-player-overlay-container,
+.profile-player-overlay-container-small {
 	width: 96px;
 	height: 96px;
 	position:relative;
@@ -194,6 +270,19 @@
 	left:0;
 	opacity: 0;
 	filter: alpha(opacity=0);
+}
+
+.profile-player-overlay-container-small {
+	width: 48px;
+	height:45px;
+}
+
+.team-player-container-small {
+	margin-top: 30px;
+}
+
+.team-player-container-small > .box-img-container-small {
+	width: 48px;
 }
 
 .profile-player-overlay {
@@ -242,15 +331,17 @@ textarea.post-message {
 	margin: .3em 1em 0 .3em;
 }
 
-.team-player-container {
-	padding: 2px 1px 0 0;
+.team-player-container,
+.team-player-container-small {
+	padding: 1px 1px 0 0;
 }
 
 .team-confirm-img {
 	margin: -15px 0 0 -1px;
 	width:14px;
 	height:14px;
-	border:solid 1px #fff
+	border:solid 1px #fff;
+	border-bottom: none;
 }
 
 .profile-confirm {

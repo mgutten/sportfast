@@ -283,6 +283,13 @@ if ($this->fail) {
 		echo $this->alert()->end();
 	}
 	
+	if ($this->captain) {
+		$this->headScript()->prependFile($this->baseUrl() . '/js/createsuccess.js');
+		//$this->headLink()->prependStylesheet($this->baseUrl() . '/css/create.css');
+		
+		echo $this->alert()->inviteAlert();
+	}
+	
 	
 	echo $this->placeholder('absolute')->captureEnd();
 ?>
@@ -383,6 +390,61 @@ echo "<span id='team-details'
 	 </span>";
 ?>
 
+<?php
+if ($this->userOnTeam) {
+	$options = array();
+	$basicOptions = array(array('text' => 'leave',
+						  		'img'  => 'leave',
+								'tooltip' => 'Leave this team')
+						  );
+	
+								
+	$recurringOptions = array(array('text' => 'reminders',
+									'img'  => 'reminder',
+									'tooltip' => 'Manage any reminders for this game')
+							  );
+									
+	$captainOptions = array(array('text' => 'schedule',
+								  'img'  => 'schedule',
+								  'tooltip' => "Edit the schedule"),
+							array('text' => 'reserves',
+								  'img'  => 'reserves',
+								  'tooltip' => "Edit the reserves list"),
+							array('text' => 'edit team',
+								  'img'  => 'edit',
+								  'tooltip' => "Edit this team's details"),
+							array('text' => 'message',
+								  'img'  => 'message',
+								  'tooltip' => "Send an email message to the players"),
+							array('text' => 'delete',
+								  'img'  => 'delete',
+								  'tooltip' => 'Delete this team'),
+							array('text' => 'invite',
+								'img'  => 'invite',
+								'tooltip' => 'Invite other players'));
+	
+	
+	if ($this->captain) {
+		// Is captain
+		foreach ($captainOptions as $option) {
+			$options[] = $option;
+		}
+	
+	}
+	
+	
+	foreach ($basicOptions as $option) {
+		$options[] = $option;
+	}
+	
+	
+	
+	echo $this->partial('partials/profile/options.phtml', array('options' => $options));
+}
+?>
+
+
+
 <header class='clear profile-name-container'>
 	<p class='profile-name heavy darkest clear'>
     	<?php echo $this->team->teamName;?>
@@ -401,6 +463,7 @@ echo "<span id='team-details'
 	if ($this->userOnTeam) {
 		// You are on team
 		?>
+        <!--
 		<div id='profile-buttons-container-holder' class='right'></div>
 			<div id='profile-buttons-container' holder='profile-buttons-container-holder' class='absolute'>
 				<div class='profile-buttons-inner-container left'>
@@ -423,7 +486,7 @@ echo "<span id='team-details'
         	</div>
         </div>
     </div>
-   
+   -->
     <?php } else {
 			$lower = '';
 			$class = '';

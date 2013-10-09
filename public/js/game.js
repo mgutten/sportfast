@@ -1,5 +1,5 @@
 // game.js
-var postContent = "<p class='dark clear larger-margin-top game-cancel-reason'>Reason <span class='light'>optional</span></p><textarea class='darkest clear game-cancel-reason' id='cancel-reason'></textarea><p class='clear width-100 center margin-top light'>This action cannot be undone.</p>";
+var postContent = "<p class='dark clear larger-margin-top game-cancel-reason'>Reason <span class='light'>optional</span></p><textarea class='darkest clear game-cancel-reason' id='cancel-reason'></textarea>";
 var confirmClicked;
 
 $(function() {
@@ -13,6 +13,58 @@ $(function() {
 		
 		updateUserGamePlus(value, gameID, userID);
 		showConfirmationAlert('Updated');
+	})
+	
+	
+	/* OPTIONS ONCLICK SHOW ALERT/REDIRECT */
+	$('#profile-option-cancel').click(function()
+	{
+		if ($('#cancel-game').length > 0) {
+				// is recurring game, show special alert
+				$('#game-cancel-subscribe-container').html(postContent);
+				showAlert($('#manage-cancel-alert-container'));
+			} else {
+				// non recurring, use basic confirm alert
+				confirmAction = function () {
+						var detailsEle = getDetailsEle();
+						var userID = detailsEle.attr('actingUserID');
+						var idType = detailsEle.attr('idType');
+						var typeID = detailsEle.attr(idType);
+						var actingUserID = userID;
+						var receivingUserID;
+						var action = 'delete';
+						var type   = idType.replace(/ID/, '');
+						var details;		
+						
+						var onceOrAlways = true;
+						
+						//createNotification(idType, typeID, actingUserID, receivingUserID, action, type, details);
+						
+						cancelType(idType, typeID, onceOrAlways);
+						changedAlert = true;
+						//reloadPage();
+				}
+				
+				var detailsEle = getDetailsEle();
+				var text = (typeof detailsEle.attr('teamName') == 'undefined' ? 'cancel this game' : 'delete' + detailsEle.attr('teamName'));
+				
+				populateConfirmActionAlert(text, postContent);
+				
+			}
+	})
+	
+	/* change reminder time */
+	$('#dropdown-menu-hidden-container-reminder-hour, #dropdown-menu-hidden-container-reminder-ampm').find('.dropdown-menu-option-container').click(function()
+	{
+		// Delay getHour because selected text needs to change before we can access it
+		setTimeout(function() {
+			var hour = getReminderHour();
+			var detailsEle = getDetailsEle();
+			var gameID = detailsEle.attr('gameID');
+			
+			updateSendReminder(gameID, hour);
+			showConfirmationAlert('Updated');
+		}, 100)
 	})
 	
 	/* manage button was clicked */
@@ -132,6 +184,32 @@ $(function() {
 		//showConfirmationAlert('Added to ' + type);
 	})
 	
+	$('.schedule-maybe').bind('click.maybe',function()
+	{
+		var detailsEle = getDetailsEle();
+		var idType = detailsEle.attr('idType');
+		var typeID = detailsEle.attr(idType);
+		var actingUserID = detailsEle.attr('actingUserID');
+		var confirmed = '2';
+		var type;
+
+		addUserToGame(idType, typeID, actingUserID, confirmed);
+		type = 'game';
+		
+		//showConfirmationAlert('Added to ' + type);
+	})
+	
+	$('#reminders-alert-yesno-container').children('.selectable-text').click(function()
+	{
+		
+		var doNotEmail = ($(this).text().toLowerCase() == 'yes' ? '0' : '1');
+		var detailsEle = getDetailsEle();
+		var gameID = detailsEle.attr('gameID');
+		
+		updateEmailAlert(gameID, doNotEmail);
+		
+	})
+	
 	/* override join capability */
 	if (getDetailsEle().attr('picture') != '') {
 		$('#join-button').unbind('click.join')
@@ -179,4 +257,43 @@ function updateUserGamePlus(plus, gameID, userID)
 			reloadPage();
 		}
 	})
+}
+
+/**
+ * Ajax call to update sendReminder of game
+ */
+function updateSendReminder(gameID, hour)
+{
+	var options = {gameID: gameID,
+				   hour: hour};
+	
+	$.ajax({
+		url: '/ajax/update-send-reminder',
+		type: 'POST',
+		data: {options: options},
+		success: function(data) {
+		}
+	})
+}
+
+/**
+ * convert time to military time from reminder alert
+ */
+function getReminderHour()
+{
+	var hour = parseInt($('#reminder-hour').find('.dropdown-menu-option-text').text(), 10);
+	var ampm = $('#reminder-ampm').find('.dropdown-menu-option-text').text().toLowerCase();
+	
+	if (ampm == 'pm') {
+		hour += 12;
+	}
+	
+	if (hour == 24) {
+		// is noon
+		hour = 12;
+	} else if (hour == 12) {
+		hour = 0;
+	}
+	
+	return hour;
 }

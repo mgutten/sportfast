@@ -114,6 +114,52 @@ echo $this->placeholder('absolute')->captureStart();
 
 		echo $this->alert()->end();
 	}
+	
+	if ($this->userInGame ||
+		$this->captain) {
+			
+		$this->headScript()->prependFile($this->baseUrl() . '/js/createsuccess.js');
+		//$this->headLink()->prependStylesheet($this->baseUrl() . '/css/create.css');
+		
+		echo $this->alert()->inviteAlert();
+		
+		echo $this->alert()->messageAlert();
+		
+		if ($this->game->isRecurring()) {
+			echo $this->alert()->start('reminders', 'Reminders');
+			
+			echo "<p class='light width-100 center clear margin-top'>This game happens every week.</p>
+					<p class='heavy darkest width-100 center clear'>Would you like to receive weekly email reminders for this game?</p>";
+			
+			$yes = $no = false;
+			if ($this->isSubscribed) {
+				$yes = true;
+			} else {
+				$no = true;
+			}
+			
+			$options = array('yes' => array('selected' => $yes),
+							 'no' => array('selected' => $no));	
+			echo "<div class='clear margin-top' id='reminders-alert-yesno-container'>";
+			echo	$this->signupsportform()->selectableText($options, true);
+			echo "</div>";
+			
+			if ($this->captain) {
+				echo "<div class='clear larger-margin-top width-100'>
+						<p class='clear margin-top light width-100 center'>Email reminders are sent to subscribed players the day before.</p>
+						<p class='clear darkest heavy width-100 center'>What time would you like these reminders sent to your players?</p>
+					  </div>";
+				
+				echo "<div class='clear width-100 larger-margin-top'>";
+				echo $this->reminderHourDropdown;
+				echo $this->reminderAmpmDropdown;
+				echo "</div>";
+			}
+			
+			echo $this->alert()->end();
+		}
+		
+	}
 		
 
 	
@@ -125,11 +171,15 @@ $this->placeholder('narrowColumn')->captureStart();
 //if ($this->userInGame) {
 	// User is attending, show quick stats
 	if ($this->gameOn) {	
-		$gameFull = '';
+		$gameFull = $maybe = '';
 		if ($this->gameFull) {
 			$gameFull = ' (FULL)';
 		}
-		echo "<div class='green-back white heavy narrow-overlay-container dropshadow'>" . $this->totalPlayers . " " . ($this->totalPlayers == 1 ? 'player' : 'players') . $gameFull .  "</div>";
+		if ($this->maybeConfirmedPlayers > 0) {
+			$maybe = "<p class='white smaller-text clear'>+" . $this->maybeConfirmedPlayers . " maybe</p>";
+		}
+		
+		echo "<div class='green-back white heavy narrow-overlay-container dropshadow'><p class='left inherit'>" . $this->confirmedPlayers . " confirmed" . $gameFull .   "</p>" . $maybe . "</div>";
 	} else {
 		echo "<div class='dark-red-back white heavy narrow-overlay-container dropshadow' tooltip='" . ($this->game->minPlayers - $this->totalPlayers) . " more players are needed in order for this game to happen.'>"
 			 . $this->playersNeeded  . " needed"
@@ -165,10 +215,11 @@ if ($this->game->players->hasValue('users')) {
 
 echo $this->narrowcolumnsection()->end();
 
-
-echo "<div class='width-100 left narrow-column-calendar-container'>";
-echo 	$this->calendar()->createCalendar(array($this->game), true);
-echo "</div>";
+if (!$this->game->isRecurring()) {
+	echo "<div class='width-100 left narrow-column-calendar-container'>";
+	echo 	$this->calendar()->createCalendar(array($this->game), true, true, false, false, false, false, $this->game->gameID);
+	echo "</div>";
+}
 
 
 
@@ -225,22 +276,34 @@ if ($this->userInGame ||
 	$this->captain) {
 	$options = array();
 	$basicOptions = array(array('text' => 'invite',
-								'img'  => 'invite'));
+								'img'  => 'invite',
+								'tooltip' => 'Invite other players'),
+						  );
+	
+	$playingOptions = array(array('text' => 'leave',
+						  		'img'  => 'leave',
+								'tooltip' => 'Leave this game')
+							);
 								
 	$recurringOptions = array(array('text' => 'stats',
 									'img'  => 'stats',
-									'href' => '/games/' . $this->game->gameID . '/stats'),
+									'href' => '/games/' . $this->game->gameID . '/stats',
+									'tooltip' => 'View historical stats for this game'),
 							  array('text' => 'reminders',
-									'img'  => 'reminder')
+									'img'  => 'reminder',
+									'tooltip' => 'Manage any reminders for this game')
 							  );
 									
 	$captainOptions = array(array('text' => 'edit game',
 								  'img'  => 'edit',
-								  'href' => '/games/' . $this->game->gameID . '/edit'),
+								  'href' => '/games/' . $this->game->gameID . '/edit',
+								  'tooltip' => "Edit this game's details"),
 							array('text' => 'message',
-								  'img'  => 'message'),
+								  'img'  => 'message',
+								  'tooltip' => "Send an email message to the players"),
 							array('text' => 'cancel',
-								  'img'  => 'cancel'));
+								  'img'  => 'cancel',
+								  'tooltip' => 'Cancel this game'));
 	
 	
 	if ($this->captain) {
@@ -260,6 +323,12 @@ if ($this->userInGame ||
 	
 	foreach ($basicOptions as $option) {
 		$options[] = $option;
+	}
+	
+	if ($this->userInGame) {
+		foreach ($playingOptions as $option) {
+			$options[] = $option;
+		}
 	}
 	
 	
@@ -303,7 +372,7 @@ if ($this->userInGame ||
 <div class='right profile-in-out-container'>
 	  <?php 
           $in = $out = $maybe = '';
-          $selected = 'member-schedule-button-selected';
+          $selected = 'member-schedule-button-selected inner-shadow';
           if ($this->game->userConfirmed($this->user->userID)) {
               $in = $selected;
           } elseif ($this->game->userNotConfirmed($this->user->userID)) {
@@ -474,7 +543,7 @@ if ($this->showSubscribe) {
 
 // Create header for players section
 $playersHeader  = "<div class='right profile-section-bold-subheader'>";
-$playersHeader .= 		"<p class='right heavy darkest'>" . $this->totalPlayers . " out of " . $this->rosterLimit . "</p>";
+$playersHeader .= 		"<p class='right heavy darkest'>" . $this->confirmedPlayers . " confirmed <span class='medium smaller-text'>" . ($this->maybeConfirmedPlayers > 0 ? '+' . $this->maybeConfirmedPlayers . ' maybe' : '') . "</span></p>";
 $playersHeader .= "</div>";
 /*
 if ($this->nextGame) {

@@ -17,6 +17,7 @@ class Application_View_Helper_PlayersSection
 	{
 		$output = '';
 		$counter = 0;
+		$firstNotConfirmed = false;
 		$totalPlayers = count($players);
 		
 		if ($this->_view->team) {
@@ -42,12 +43,12 @@ class Application_View_Helper_PlayersSection
 				
 				if ($counter >= 14 && $limited) {
 					// Only show 14 players
-									
 					$output .= "<a href='/" . $type . "/" . $typeID . "/players' class='medium margin-top clear-right smaler-text'>" . ($totalPlayers - $counter) . " more players</a>";
 					break;
 				}
-				$output .= "<a href='/users/" . $player->userID . "' class='left team-player-container'>";
+				/*$output .= "<a href='/users/" . $player->userID . "' class='left team-player-container'>";
 				$output .= 	$player->getBoxProfilePic('medium');
+				*/
 				
 				$success = false;
 				
@@ -63,8 +64,42 @@ class Application_View_Helper_PlayersSection
 						//$src = "/images/team/deny/small.png";
 						$background = 'dark-red-back';
 						$success = true;
+					} elseif ($nextGame->userMaybeConfirmed($player->userID)) {
+						$background = 'light-background';
+						$success = true;
 					}
 				}
+				
+				$size = 'medium';
+				$float = 'left';
+				$tooltip = '';
+				if ($type == 'games') {
+					/* only $success is in use, $src is for green check and red X instead of colored box */
+					
+					if ($typeModel->userConfirmed($player->userID)) {
+						// User is going to next game
+						//$src = "/images/team/confirm/small.png";
+						$background = 'green-back';
+						$success = true;
+					} elseif ($typeModel->userNotConfirmed($player->userID)) {
+						// User is confirmed as not going
+						//$src = "/images/team/deny/small.png";
+						$background = 'dark-red-back';
+						$size = 'small';
+						$success = true;
+						$tooltip = "tooltip = '$player->shortName'";
+						if (!$firstNotConfirmed) {
+							$firstNotConfirmed = true;
+							$float = 'clear';
+						}
+					} elseif ($typeModel->userMaybeConfirmed($player->userID)) {
+						$background = 'light-background';
+						$success = true;
+					}
+				}
+				
+				$output .= "<a href='/users/" . $player->userID . "' class='" . $float . " team-player-container" . ($size == 'small' ? '-small' : '') . "' " . $tooltip . ">";
+				$output .= 	$player->getBoxProfilePic($size);
 				
 				if ($success) {
 					// User is either confirmed or not
@@ -72,7 +107,7 @@ class Application_View_Helper_PlayersSection
 					$output .= "<div class='" . $background . " clear team-confirm-img'></div>";
 				}
 				
-				$output .= 	"<div class='hover-dark profile-player-overlay-container'>";
+				$output .= 	"<div class='hover-dark profile-player-overlay-container" . ($size == 'small' ? '-small' : '') . "'>";
 				$output .=		"<div class='profile-player-overlay'>";
 				$output .=			"<p class='white width-100 center left margin-top'>" . $player->shortName . "</p>";
 				//$output .=			"<p class='white width-100 center left smaller-text'>age " . $player->age . "</p>";

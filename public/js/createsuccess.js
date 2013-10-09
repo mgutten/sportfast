@@ -16,6 +16,10 @@ $(function()
 	
 	$('#userName').keyup(function(e)
 	{
+		if (e.keyCode == 8) {
+			// Do nothing on backspace
+			return;
+		}
 		
 		if ($('.create-userName-result').length > 0 && 
 			((e.keyCode >= 37 && e.keyCode <= 40) || e.keyCode == 13)) {
@@ -65,8 +69,66 @@ $(function()
 		
 		
 		var limit = new Array('users');
-		searchDatabase($(this).val(), populateSearchResultsInvite, limit);
-	})
+		searchDatabase($(this).val(), populateSearchResultsInvite, limit, $('#create-userName-results-container'));
+	});
+	
+	$('#inviteSearchAlert').keyup(function(e)
+	{
+		if (e.keyCode == 8) {
+			// Do nothing on backspace
+			return;
+		}
+		
+		if ($('.profile-invite-result').length > 0 && 
+			((e.keyCode >= 37 && e.keyCode <= 40) || e.keyCode == 13)) {
+							  
+			  var ele;
+			  if ($('.profile-invite-result.selected').length > 0) {
+				  
+				  // Already result selected
+				  if (e.keyCode == 40) {
+					  // down 
+					  if ($('.profile-invite-result.selected').next('.profile-invite-result').length > 0) {
+						  ele = $('.profile-invite-result.selected').next('.profile-invite-result')
+					  } else {
+						  // There is no next ele, return
+						  return;
+					  }
+				  }
+				  if (e.keyCode == 38) {
+					  // up
+					  ele = $('.profile-invite-result.selected').prev('.profile-invite-result');
+				  }
+				  if (e.keyCode == 13) {
+					  // enter key, redirect to this
+					  $('.profile-invite-result.selected').trigger('click');
+				  }
+				  
+			  } else if (e.keyCode == 40 && $('.profile-invite-result').length > 0) {
+				  // No result already selected
+				  ele = $('.profile-invite-result').first();
+			  } 
+				
+			  
+			  $('.profile-invite-result').removeClass('selected');
+			  ele.addClass('selected');
+		}
+		
+		if (e.keyCode >= 37 && e.keyCode <= 40) {
+			// Arrow keys
+			return false;
+		}
+		
+		
+		if ($(this).val().length < 3) {
+			return;
+		}
+		
+		
+		
+		var limit = new Array('users');
+		searchDatabase($(this).val(), populateSearchResultsInvite, limit, $('#invite-alert-results'));
+	});
 	
 	$('#create-success-emails').focus(function()
 	{
@@ -142,9 +204,10 @@ $(function()
 
 /**
  * populate invite button's search results
- * @params (results => returned results from ajax)
+ * @params (results => returned results from ajax,
+ *			container => $(obj) that will receive the results)
  */
-function populateSearchResultsInvite(results) 
+function populateSearchResultsInvite(results, container) 
 {
 	var output = '';
 	
@@ -154,10 +217,18 @@ function populateSearchResultsInvite(results)
 	} else {
 		// Results found
 		var limit = (results.length > 5 ? 5 : results.length);
-		var src;
+		var src, classy;
+		
+		if (container.is('#create-userName-results-container')) {
+			// Add player to reserve list or invite list
+			classy = 'create-userName-result';
+		} else if (container.is('#invite-alert-results')) {
+			classy = 'profile-invite-result';
+		}
+		
 		for (i = 0; i < limit; i++) {
 					
-			output += "<div class='clear create-userName-result pointer animate-darker' userID='" + results[i]['id'] + "' username = '" + results[i]['name'] + "'>\
+			output += "<div class='clear " + classy + " userName-search-result pointer animate-darker' userID='" + results[i]['id'] + "' username = '" + results[i]['name'] + "'>\
 							<img src='/images/users/profile/pic/small/" + results[i]['id'] + ".jpg' onerror=\"this.src='/images/users/profile/pic/small/default.jpg'\" class='left' />\
 							<div class='larger-indent left'>\
 								<p class='larger-text left darkest heavy'>" + results[i]['name'] + "</p>\
@@ -170,11 +241,11 @@ function populateSearchResultsInvite(results)
 		}
 	}
 	
-	$('#create-userName-results-container').html(output);
+	container.html(output);
 	
 	if ($('#inviteSearchBar').is(':focus') && $('#inviteSearchBar').val().length >= 3) {
 		// Search bar has focus and val is greater than 2 (protect against accidently overfire due to ajax delay
-		$('#create-userName-results-container').show();
+		container.show();
 	}
 	
 	

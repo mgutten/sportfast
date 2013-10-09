@@ -322,18 +322,20 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 		
 		// Games page
 		$r = new Zend_Controller_Router_Route_Regex(
-				'mail(?:/([a-z]+[-+[a-z]+]?))?(?:/(\d+))?(?:/(.+))?',
+				'mail(?:/([a-z]+[-+[a-z]+]?))?(?:/(\d+))?(?:/(\d+))?(?:/(.+))?',
 				array(
 						'action' => 'index',
 						'controller' => 'mail',
 						'module' => 'default',
 						'id'	 => '1',
-						'param2' => '1'
+						'param2' => '1',
+						'param3' => '1'
 				),
 				array(
 						1 => 'action',
 						2 => 'id',
-						3 => 'param2'
+						3 => 'param2',
+						4 => 'param3'
 				),
 				'mail/%s');
 				

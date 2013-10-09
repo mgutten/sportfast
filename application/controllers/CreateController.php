@@ -46,9 +46,12 @@ class CreateController extends Zend_Controller_Action
 		
 		$dropdown = Zend_Controller_Action_HelperBroker::getStaticHelper('Dropdown');
 		
-		$this->view->hourDropdown = $dropdown->dropdown('hour',range(1,12),'1');
-		$this->view->minDropdown = $dropdown->dropdown('min',array('00','15','30','45'),'00');
-		$this->view->ampmDropdown = $dropdown->dropdown('ampm',array('am','pm'),'pm', false);
+		$this->view->hourDropdown = $dropdown->dropdown('hour',range(1,12),array('text' => '1',
+																				 'class' => 'heavy'));
+		$this->view->minDropdown = $dropdown->dropdown('min',array('00','15','30','45'),array('text' => '00',
+																							  'class' => 'heavy'));
+		$this->view->ampmDropdown = $dropdown->dropdown('ampm',array('am','pm'),array('text' => 'pm',
+																					  'class' => 'heavy'), false);
 		
 		$ratings = new Application_Model_Ratings();
 		$ratings = $ratings->getAvailableRatings('user', 'skill');

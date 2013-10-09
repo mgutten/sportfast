@@ -11,7 +11,13 @@
 					$href = " ";
 					$tag = "div";
 				}
-				echo "<" . $tag . " " . $href . " class='right profile-option-container white-background animate-darker pointer' >
+				
+				$tooltip = '';
+				if (isset($option['tooltip'])) {
+					$tooltip = 'tooltip="' . $option['tooltip'] . '"';
+				}
+				
+				echo "<" . $tag . " " . $href . " id='profile-option-" . $option['img'] . "' class='right profile-option-container white-background animate-darker pointer' " . $tooltip . ">
 							<div class='left width-100'>
 								<img src='/images/games/icons/" . $option['img'] . ".png' class='profile-options-img auto-center'  />
 							</div>

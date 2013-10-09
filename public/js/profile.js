@@ -172,8 +172,24 @@ $(function()
 
 		deleteMessage(type, messageID);
 	});
+	
+	
+	/* ONCLICK OPTIONS SHOW ALERTS/REDIRECT */
+	$('#profile-option-invite').click(function()
+	{
+		showAlert($('#invite-alert-container'));
+	})
 		
-		
+	$('#profile-option-reminder').click(function()
+	{
+		showAlert($('#reminders-alert-container'));
+	})
+	
+	$('#profile-option-message').click(function()
+	{
+		showAlert($('#message-alert-container'));
+	})
+	
 	
 	$(document).on('click', '.team-manage-team-info-captain-real',function()
 	{
@@ -432,7 +448,7 @@ $(function()
 	})
 	
 	/* user willingly leaves team */
-	$('#leave-button').click(function()
+	$('#leave-button, #profile-option-leave').click(function()
 	{
 		
 		var detailsEle = getDetailsEle();
@@ -532,13 +548,24 @@ $(function()
 	}
 	
 	/* invite user from invite button */
-	$(document).on('click','.invite-search-result',function()
+	$(document).on('click','.invite-search-result,.profile-invite-result',function()
 	{
+		var classy;
+		var searchBar;
 		
-		$('.invite-search-result').remove();
+		if ($(this).is('.invite-search-result')) {
+			classy = $('.invite-search-result');
+			searchBar = $('#inviteSearchBar');
+		} else {
+			// Is new profile-invite-result from invite alert
+			classy = $('.profile-invite-result');
+			searchBar = $('#inviteSearchAlert');
+		}
+		
+		classy.remove();
 		 
-		$('#inviteSearchBar').val('')
-							 .focus();
+		searchBar.val('')
+				 .focus();
 							
 		
 		var detailsEle = getDetailsEle();
@@ -557,6 +584,8 @@ $(function()
 		
 		return false; // prevent bug that closes animated div after selecting a name from the results
 	})
+	
+
 	
 	if ($('#invites-alert-container').length > 0) {
 		// Invites were sent on previous page, show alert
@@ -608,6 +637,26 @@ $(function()
 	
 })
 
+
+/**
+ * update game_subscribers doNotEmail for game
+ * @params (onOrOff => 1 = no emails, 0 = emails)
+ */
+function updateEmailAlert(gameID, onOrOff)
+{
+	var options = {gameID: gameID,
+				   onOrOff: onOrOff};
+				   
+	$.ajax({
+		url: '/ajax/update-email-alert-subscribed-game',
+		type: 'POST',
+		data: {options: options},
+		success: function(data) {
+			alert(data);
+			showConfirmationAlert('Updated');
+		}
+	})
+}
 
 /**
  * ajax function to delete user message
@@ -865,6 +914,59 @@ function changeTypeAttribs(options)
 		}
 	})
 }
+
+/**
+ * populate invite alert with results from db search
+
+function populateSearchResultsInviteAlert(results)
+{
+	var output = '';
+
+	if (results.length < 1) {
+		// No results
+		output += "<div class='header-search-result dark-back medium'>No results found</div>";
+	} else {
+		// Results found
+		var limit = (results.length > 7 ? 7 : results.length);
+		for (i = 0; i < limit; i++) {
+			
+			var tooltip = '';
+			if (results[i]['name'].length > 22) {
+				// Limit any name to 20 characters
+				tooltip = "tooltip='" + results[i]['name'] + "'";
+				results[i]['name'] = results[i]['name'].substring(0,21) + '..';
+				
+			}
+			
+			output += "<div class='invite-search-result clear medium pointer animate-darker' userID='" + results[i]['id'] + "'>\
+							<p class='medium clear invite-search-result-name' " + tooltip + ">" + results[i]['name'] + "</p>";
+			
+			if (results[i]['prefix'] !== 'users') {
+				// Not users, show what "type" result is
+				output += "<p class='clear-right medium smaller-text header-search-result-subtext'>" + capitalize(results[i]['prefix'].slice(0,-1)) + "</p>";
+			}
+			
+			output += "</div>";
+						
+
+		}
+	}
+	
+	$('.dropdown-menu-option-default').hide();
+	
+	$('#invite-alert-results').html(output);
+	
+	if ($('#inviteSearchAlert').is(':focus') && $('#inviteSearchResult').val().length >= 3) {
+		// Search bar has focus and val is greater than 2 (protect against accidently overfire due to ajax delay
+		$('#invite-alert-results').show();
+	}
+	
+	
+	var searchBar = $('#inviteSearchAlert');
+	var searchVal = searchBar.val();
+	$('.invite-search-result').highlight(searchVal);
+}
+	 */
 
 
 /**

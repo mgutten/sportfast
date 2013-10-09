@@ -369,6 +369,25 @@ class AjaxController extends Zend_Controller_Action
 		$table->update($data, $where);
 	 }
 	 
+	 /**
+	  * update sendReminder for game
+	  */
+	 public function updateSendReminderAction()
+	 {
+		 $options = $this->getRequest()->getPost('options'); 
+		 
+		 if (empty($options['gameID']) ||
+		 	 empty($options['hour'])) {
+				 return;
+			 }
+			 
+		$game = new Application_Model_Game();
+		$game->gameID = $options['gameID'];
+		$game->sendReminder = $options['hour'];
+				
+		$game->save(false);
+	 }
+	 
 	  /**
 	  * update user's "plus" category for game
 	  */

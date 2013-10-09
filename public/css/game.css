@@ -61,8 +61,8 @@
 }
 
 #subscribe-container {
-	margin-top: 1.5em;
-	margin-bottom: -1em;
+	margin-top: 0em;
+	margin-bottom: 0em;
 	position: relative;
 }
 
@@ -153,4 +153,20 @@
 	width:34em;
 	margin-top: -5em;
 	margin-left:-17em;
+}
+
+/* reminders */
+#reminder-hour,
+#reminder-ampm {
+	width: 3.4em;
+	margin-left:12.2em;
+}
+
+#reminder-ampm {
+	margin-left: 1em;
+}
+
+#dropdown-menu-reminder-hour,
+#dropdown-menu-reminder-ampm{
+	width: 3.5em;
 }

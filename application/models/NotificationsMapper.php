@@ -233,9 +233,10 @@ class Application_Model_NotificationsMapper extends Application_Model_MapperAbst
 
 							
 		 } elseif ($type == 'game') {
-			 $query = "INSERT INTO user_games (gameID, userID)
+			 $query = "INSERT INTO user_games (gameID, userID, confirmed)
 			 			(SELECT nl.gameID,
-								CASE WHEN n.action = 'invite' THEN nl.receivingUserID ELSE nl.actingUserID END
+								CASE WHEN n.action = 'invite' THEN nl.receivingUserID ELSE nl.actingUserID END,
+								'1'
 							FROM notification_log as `nl`
 							INNER JOIN notifications n ON n.notificationID = nl.notificationID
 							WHERE nl.notificationLogID = '" . $notificationLogID . "')";

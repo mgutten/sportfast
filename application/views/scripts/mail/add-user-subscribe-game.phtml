@@ -9,19 +9,33 @@ $this->headLink()->prependStylesheet($this->baseUrl() . '/css/mail.css');
 
 <div id='mail-add-user-success-container' class='white-back alert-container dropshadow'>
 <?php
+$upper = $lower = $lowerClass = '';
 if (!$this->fail) {
 	// added to game
-	$upper = 'You have been added to the roster.';
+	$upper = 'You will be counted as:';
+	
+	if ($this->confirmed == '1') {
+		$lower = 'IN';
+		$lowerClass = 'green';
+	} elseif ($this->confirmed == '2') {
+		$lower = 'MAYBE';
+		$lowerClass = 'medium';
+	} elseif ($this->confirmed == '0') {
+		$lower = 'OUT';
+		$lowerClass = 'red';
+	}
 } elseif ($this->fail == 'already') {
-	$upper = 'You are already in this game.';
+	$lower = 'You are already in this game.';
 } elseif ($this->fail == 'full') {
-	$upper = 'This game is full.';
+	$lower = 'This game is full.';
 }
 ?>
 
-<p class='width-100 center clear largest-text darkest heavy'><?php echo $upper;?></p>
+<p class='width-100 center clear medium'><?php echo $upper;?></p>
+<p class='clear width-100 center darkest largest-text heavy margin-top <?php echo $lowerClass;?>'><?php echo $lower;?></p> 
 <div class='clear width-100'>
     <a href='/games/<?php echo $this->gameID;?>' class='clear larger-margin-top button auto-center larger-text heavy' style='width:8em'>view game</a>
 </div>
+<p class='clear smaller-text larger-margin-top medium'>Please <a href='/games/<?php echo $this->gameID;?>' class='darkest underline'>login</a> for more details.</p>
 
 </div>

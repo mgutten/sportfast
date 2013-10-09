@@ -364,6 +364,9 @@ class Application_Model_GamesMapper extends Application_Model_TypesMapperAbstrac
 			   ->join(array('pl' => 'park_locations'),
 			   		  'g.parkID = pl.parkID',
 					  array('AsText(location) as location'))
+			   ->joinLeft(array('gc' => new Zend_Db_Expr("(SELECT GROUP_CONCAT(gc2.userID separator ',') as captainsFirst, gc2.gameID as gameID FROM game_captains gc2 WHERE gc2.gameID = '" . $gameID . "')")),
+			   	     'gc.gameID = g.gameID',
+					 array('captainsFirst as captainsSecond', 'gameID'))
 			   ->joinLeft(array('ug' => 'user_games'),
 			   		 'ug.gameID = g.gameID',
 					 array(''))
@@ -388,6 +391,12 @@ class Application_Model_GamesMapper extends Application_Model_TypesMapperAbstrac
 		$savingClass->park->setAttribs($result);
 		$savingClass->park->location->setAttribs($result);
 		$savingClass->type->setAttribs($result);
+		
+		$captains = explode(',', $result['captainsSecond']);
+		
+		foreach ($captains as $captain) {
+			$savingClass->addCaptain($captain);
+		}
 		
 		$this->getGamePlayers($savingClass);
 				
@@ -456,9 +465,9 @@ class Application_Model_GamesMapper extends Application_Model_TypesMapperAbstrac
 							'us.sportsmanship'))
 			   ->join(array('s' => 'sports'),
 			   		  's.sportID = g.sportID')
-			   ->joinLeft(array('gc' => 'game_captains'),
+			   /*->joinLeft(array('gc' => 'game_captains'),
 			   		  'ug.gameID = gc.gameID AND ug.userID = gc.userID',
-					  array('userID as captain'))
+					  array('userID as captain'))*/
 			   ->where('ug.gameID = ?', $gameID)
 			   ->group('ug.userID');
 		
@@ -496,19 +505,20 @@ class Application_Model_GamesMapper extends Application_Model_TypesMapperAbstrac
 				// player is subscribed
 				$savingClass->addSubscriber($player->userID);
 			}
-			*/
+			
 
 			if ($player->captain !== null) {
 				$savingClass->addCaptain($player->userID);
 			}
-				
+			*/	
 		}
 		
 		$select = $table->select();
 		$select->setIntegrityCheck(false);
 		
 		$select->from(array('gs' => 'game_subscribers'))
-			   ->where('gs.gameID = ?', $gameID);
+			   ->where('gs.gameID = ?', $gameID)
+			   ->where('gs.doNotEmail = ?', 0);
 			   
 		$players = $table->fetchAll($select);
 		
@@ -860,7 +870,7 @@ class Application_Model_GamesMapper extends Application_Model_TypesMapperAbstrac
 	/**
 	 * add user to game
 	 */
-	public function addUserToGame($gameID, $userID)
+	public function addUserToGame($gameID, $userID, $confirmed = false)
 	{
 		if (empty($gameID) || empty($userID)) {
 			return false;
@@ -876,9 +886,10 @@ class Application_Model_GamesMapper extends Application_Model_TypesMapperAbstrac
 			   
 		$result = $table->fetchRow($select);
 		
+		$already = false;
 		if ($result) {
 			// Already in game
-			return 'already';
+			$already = true;
 		}
 		
 		$select = $table->select();
@@ -889,20 +900,29 @@ class Application_Model_GamesMapper extends Application_Model_TypesMapperAbstrac
 			   		  'ug.gameID = g.gameID',
 					  array('COUNT(ug.userID) as totalPlayers'))
 			   ->where('g.gameID = ?', $gameID)
+			   ->where('ug.confirmed = ?', '1')
 			   ->group('g.gameID');
 	
 		$result = $table->fetchRow($select);
 		
-		if ($result['rosterLimit'] <= $result['totalPlayers']) {
+		if (($result['rosterLimit'] <= $result['totalPlayers']) && 
+			 $confirmed == '1' &&
+			 !$already) {
 			// Game is full
 			return 'full';
 		}
 		
 		$data = array('userID' => $userID,
-					  'gameID' => $gameID);
+					  'gameID' => $gameID,
+					  'confirmed' => $confirmed);
 		$db = Zend_Db_Table::getDefaultAdapter();
 		
-		$db->insert('user_games', $data);
+		if ($already) {
+			$db->update('user_games', $data, array('userID = ?' => $userID,
+												   'gameID = ?' => $gameID));
+		} else {
+			$db->insert('user_games', $data);
+		}
 		
 		return false;
 	}

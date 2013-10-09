@@ -1,6 +1,6 @@
 #mail-add-user-success-container {
 	width: 34em;
-	height: 6em;
-	margin-top: -5em;
+	min-height: 6em;
+	margin-top: -6em;
 	margin-left: -17em;
 }

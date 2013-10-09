@@ -75,7 +75,7 @@ class Application_View_Helper_Calendar
 			
 	}
 	
-	public function setScheduledDays($eventsArray, $tooltips = true) {
+	public function setScheduledDays($eventsArray, $tooltips = true, $gameID = false) {
 			if (empty($eventsArray)) {
 				return false;
 			}
@@ -124,6 +124,17 @@ class Application_View_Helper_Calendar
 						$winOrLoss = false;
 					}
 					$this->scheduledDays[$eventDate] = array($tooltip, $url, $winOrLoss);
+					
+					if ($event->isRecurring() &&
+						$gameID == $event->gameID) {
+						// Is recurring, show it happening every week on calendar
+						for ($i = 0; $i < 5; $i++) {
+							$date->add(new DateInterval('P7D'));
+							$eventDate = $date->format('mjy');
+							$this->scheduledDays[$eventDate] = array($tooltip, $url, $winOrLoss);
+						}
+					}
+							
 				} else {
 					// No tooltips wanted, store necessary info into element itself (if need for game, not teamgame, then add code)
 					if (!empty($event->_attribs['teamGameID'])) {
@@ -163,11 +174,12 @@ class Application_View_Helper_Calendar
 	 *			$selectedMonth => what month (1 for january, 12 for december) is selected,
 	 *			$selectedYear  => move forward or back years (+1 or -1 etc), 
 	 *			$numberedDays  => add number of day to top corner of calendar day,
-	 *			$changeMonth   => should user be allowed to change month?)
+	 *			$changeMonth   => should user be allowed to change month?,
+	 *			$gameID => if on game page, have gameID set so recurring games will show on each day)
 	 */
-    public function createCalendar($eventsArray, $days = false, $tooltips = true, $selectedMonth = false, $selectedYear = false, $numberedDays = false, $changeMonth = false) {
+    public function createCalendar($eventsArray, $days = false, $tooltips = true, $selectedMonth = false, $selectedYear = false, $numberedDays = false, $changeMonth = false, $gameID = false) {
 		
-		$this->setScheduledDays($eventsArray, $tooltips);
+		$this->setScheduledDays($eventsArray, $tooltips, $gameID);
 		$this->setImportantDates($selectedMonth, $selectedYear);
 		
 		$output = '';

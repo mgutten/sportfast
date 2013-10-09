@@ -142,11 +142,27 @@ class CronController extends Zend_Controller_Action
 		$teamGames = $mapper->getUserTeamGames();
 		$teamGamesToday = $mapper->getUserTeamGames(0);
 		
+		//$subscribedGames = $mapper->getUserSubscribedGames();
+		
+		$games = array('games' => array(),
+					   'teamGames' => array('twoDays' => $teamGames,
+					   						'today'	  => $teamGamesToday));
+		
+		return $this->_forward('upcoming-game', 'mail', null, array('games' => $games));
+	}
+	
+	/**
+	 * inform users that they have a game tomorrow
+	 * OFTEN: PER HOUR
+	 */
+	public function informUsersSubscribedGameAction()
+	{
+		$mapper = $this->getMapper();
+		
 		$subscribedGames = $mapper->getUserSubscribedGames();
 		
 		$games = array('games' => $subscribedGames,
-					   'teamGames' => array('twoDays' => $teamGames,
-					   						'today'	  => $teamGamesToday));
+					   'teamGames' => array());
 		
 		return $this->_forward('upcoming-game', 'mail', null, array('games' => $games));
 	}
