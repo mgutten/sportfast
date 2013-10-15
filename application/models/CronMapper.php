@@ -52,8 +52,8 @@ class Application_Model_CronMapper extends Application_Model_MapperAbstract
 		if ($oldGameID) {
 		
 			// Copy from user_games -> old_user_games					
-			$insertUserGames = "INSERT INTO old_user_games (oldGameID, gameID, userID, plus)
-									(SELECT og.oldGameID, ug.gameID, ug.userID, ug.plus
+			$insertUserGames = "INSERT INTO old_user_games (oldGameID, gameID, userID, confirmed, plus)
+									(SELECT og.oldGameID, ug.gameID, ug.userID, ug.confirmed, ug.plus
 										FROM user_games ug
 										INNER JOIN (SELECT * 
 														FROM old_games 
@@ -413,7 +413,7 @@ class Application_Model_CronMapper extends Application_Model_MapperAbstract
 			   			  'ug.userID = gs.userID AND g.gameID = ug.gameID',
 						  array(''))
 			   ->where('DATE(DATE_ADD(g.date, INTERVAL -1 DAY)) = CURDATE()')
-			   ->where('g.sendReminder = 19')
+			   ->where('g.sendReminder = HOUR(NOW() + INTERVAL ' . $this->getTimeOffset() . ' HOUR)')
 			   ->where('g.recurring = 1')
 			   ->where('ug.userGameID IS NULL OR ug.confirmed = 2')
 			   ->where('gs.doNotEmail = 0');

@@ -494,13 +494,16 @@ class Application_Model_TeamsMapper extends Application_Model_TypesMapperAbstrac
 			$gameModel = $savingClass->addGame($game);
 			
 			if ($game->userID !== NULL) {
-				if ($game->confirmed == true) {
+				if ($game->confirmed == '1') {
 					// Player is going
 					
 					$gameModel->addConfirmedPlayer($game->userID);	
-				} else {
+				} elseif ($game->confirmed == '0') {
 					// Player is confirmed not going
 					$gameModel->addNotConfirmedPlayer($game->userID);
+				} elseif ($game->confirmed == '2') {
+					// Player is confirmed maybe going
+					$gameModel->addMaybeConfirmedPlayer($game->userID);
 				}
 			}
 			

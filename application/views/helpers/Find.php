@@ -145,7 +145,7 @@ class Application_View_Helper_Find
 			$button = '';
 		}
 		$limit = '';
-		if ($match->hasValue('rosterLimit')) {
+		if ($match->hasValue('rosterLimit') && !($match instanceof Application_Model_Game)) {
 			// Is a limit, show limit
 			$limit = '/' . $match->rosterLimit;
 		}

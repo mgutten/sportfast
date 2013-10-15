@@ -16,7 +16,7 @@ class Application_Model_ConfirmationsAbstract extends Application_Model_ModelAbs
 			$game = $this->getNextGame();
 		}
 		
-		if ($this->hasValue('players')) {
+		if ($this->players->hasValue('users')) {
 			// There are players stored, sort them
 			$players = $this->_attribs['players']->_attribs['users'];
 			
@@ -39,11 +39,11 @@ class Application_Model_ConfirmationsAbstract extends Application_Model_ModelAbs
 				}
 			}
 			
-			foreach ($undecided as $player) {
+			foreach ($maybeConfirmed as $player) {
 				array_push($playerArray, $player);
 			}
 			
-			foreach ($maybeConfirmed as $player) {
+			foreach ($undecided as $player) {
 				array_push($playerArray, $player);
 			}
 			

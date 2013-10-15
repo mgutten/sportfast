@@ -2,6 +2,10 @@
 
 /* schedule section */
 
+.schedule-container {
+	margin-top:.2em;
+}
+
 #member-schedule-days-container {
 	float:right;
 	width:auto;
@@ -80,7 +84,7 @@
 
 .member-schedule-day-body-game-left-container {
 	float:left;
-	
+	width:55%;
 }
 
 .member-schedule-day-body-game-right-container {
@@ -88,10 +92,11 @@
 	width: 28%;
 }
 
-.member-schedule-day-body-players-container,.member-schedule-day-body-team-players-container {
-	float:right;
-	width: 6em;
-	margin: .4em 0 0 2em;
+.member-schedule-day-body-players-container,
+.member-schedule-day-body-team-players-container {
+	float:left;
+	width: 20%;
+	margin: .4em 0 0 0;
 }
 
 .member-schedule-day-body-team-players-container {
@@ -120,17 +125,28 @@
 	margin-right: 1.5em;
 }
 
+.member-game-schedule-in,
+.member-game-schedule-out {
+	margin-top: .6em;
+}
+
+
 .member-schedule-button-selected {
 	background: #e9e9e9;
 	padding-top: .1em;
 }
 
-.member-schedule-day-body-players,.member-schedule-day-body-players-text {
+.member-schedule-day-body-players,
+.member-schedule-day-body-players-text {
 	float:left;
 	width: 100%;
 	color:inherit;
 	font-family: inherit;
-	height: .75em;
+	height: 1em;
+}
+
+.member-schedule-day-body-players {
+	margin-top:-.2em;
 }
 
 

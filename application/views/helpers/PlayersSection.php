@@ -15,7 +15,7 @@ class Application_View_Helper_PlayersSection
 	 */
 	public function playerssection($players, $nextGame = false, $limited = true)
 	{
-		$output = '';
+		$output = $lowerOutput = '';
 		$counter = 0;
 		$firstNotConfirmed = false;
 		$totalPlayers = count($players);
@@ -30,11 +30,6 @@ class Application_View_Helper_PlayersSection
 			$type = 'games';
 			$typeID = $this->_view->game->gameID;
 			$typeModel = $this->_view->game;
-		} else {
-			// Players for group page
-			$type = 'groups';
-			$typeID = $this->_view->group->groupID;
-			$typeModel = $this->_view->group;
 		}
 		
 		if ($players) {
@@ -65,14 +60,14 @@ class Application_View_Helper_PlayersSection
 						$background = 'dark-red-back';
 						$success = true;
 					} elseif ($nextGame->userMaybeConfirmed($player->userID)) {
-						$background = 'light-background';
+						$background = 'white-background';
 						$success = true;
 					}
 				}
 				
 				$size = 'medium';
 				$float = 'left';
-				$tooltip = '';
+				$tooltip = $playerHTML = '';
 				if ($type == 'games') {
 					/* only $success is in use, $src is for green check and red X instead of colored box */
 					
@@ -85,6 +80,7 @@ class Application_View_Helper_PlayersSection
 						// User is confirmed as not going
 						//$src = "/images/team/deny/small.png";
 						$background = 'dark-red-back';
+						
 						$size = 'small';
 						$success = true;
 						$tooltip = "tooltip = '$player->shortName'";
@@ -93,35 +89,48 @@ class Application_View_Helper_PlayersSection
 							$float = 'clear';
 						}
 					} elseif ($typeModel->userMaybeConfirmed($player->userID)) {
-						$background = 'light-background';
+						$background = 'white-background';
 						$success = true;
 					}
 				}
-				
-				$output .= "<a href='/users/" . $player->userID . "' class='" . $float . " team-player-container" . ($size == 'small' ? '-small' : '') . "' " . $tooltip . ">";
-				$output .= 	$player->getBoxProfilePic($size);
+					
+				$playerHTML .= "<a href='/users/" . $player->userID . "' class='" . $float . " team-player-container" . ($size == 'small' ? '-small' : '') . "' " . $tooltip . ">";
+				$playerHTML .= 	$player->getBoxProfilePic($size, 'users', ($size == 'small' ? 'animate-opacity' : ''));
 				
 				if ($success) {
 					// User is either confirmed or not
 					//$output .= "<img src='" . $src . "' class='clear team-confirm-img' />";
-					$output .= "<div class='" . $background . " clear team-confirm-img'></div>";
+					$playerHTML .= "<div class='" . $background . " clear team-confirm-img'></div>";
 				}
 				
-				$output .= 	"<div class='hover-dark profile-player-overlay-container" . ($size == 'small' ? '-small' : '') . "'>";
-				$output .=		"<div class='profile-player-overlay'>";
-				$output .=			"<p class='white width-100 center left margin-top'>" . $player->shortName . "</p>";
-				//$output .=			"<p class='white width-100 center left smaller-text'>age " . $player->age . "</p>";
-				$output .=			"<p class='white width-100 center left largest-text heavy margin-top'>" . $player->getSport($typeModel->sport)->overall . "</p>";
-				$output .=		"</div>";
-				$output .=	"</div>";
-				$output .= "</a>";
+				$playerHTML .= 	"<div class='hover-dark profile-player-overlay-container" . ($size == 'small' ? '-small' : '') . "'>";
+				if ($size != 'small') {
+					$playerHTML .=		"<div class='profile-player-overlay'>";
+					$playerHTML .=			"<p class='white width-100 center left margin-top'>" . $player->shortName . "</p>";
+					//$output .=			"<p class='white width-100 center left smaller-text'>age " . $player->age . "</p>";
+					$playerHTML .=			"<p class='white width-100 center left largest-text heavy margin-top'>" . $player->getSport($typeModel->sport)->overall . "</p>";
+					$playerHTML .=		"</div>";
+				}
+				$playerHTML .=	"</div>";
+				$playerHTML .= "</a>";
 				
-				$counter ++;
+				if ($size == 'small') {
+					$lowerOutput .= $playerHTML;
+				} else {
+					$output .= $playerHTML;
+				}
+				
+				if ($typeModel instanceof Application_Model_Game &&
+					$size == 'small') {
+						// Do not include "out" players in count of players
+						continue;
+					}
+				$counter++;
 			}
 		}
 
 		if ($typeModel instanceof Application_Model_Game) {
-			if ($counter < $typeModel->totalPlayers) {
+			/*if ($counter < $typeModel->totalPlayers) {
 				// There are "plus-ones"
 				
 				$guests = $typeModel->totalPlayers - $counter;
@@ -144,6 +153,8 @@ class Application_View_Helper_PlayersSection
 					$counter++;
 				}
 			}
+			*/
+
 		}
 		
 		$remaining = ($typeModel->rosterLimit >= 7 ? 7 - $counter : $typeModel->rosterLimit - $counter);
@@ -161,7 +172,8 @@ class Application_View_Helper_PlayersSection
 				$output .= "<div class='left " . $class . " light animate-opacity'>" . $text . "</div>";
 			}
 		}
-
+		
+		$output .= $lowerOutput;
 					
 		return $output;
 	}

@@ -107,6 +107,25 @@ class Application_Model_Users extends Application_Model_TypesAbstract
 	}
 	
 	/**
+	 * get all players userIDs
+	 * @params ($userIDs => array of userIDs to compare against
+	 */
+	public function getUserIDs($userIDs = false)
+	{
+		if (!$userIDs) {
+			$userIDs = array();
+		}
+		
+		foreach ($this->getAll() as $player) {
+			if (!in_array($player->userID, $userIDs)) {
+				$userIDs[] = $player->userID;
+			}
+		}
+		
+		return $userIDs;
+	}
+	
+	/**
      * Create a hash (encrypt) of a plain text password.
      *
      * @param string $password Plain text user password to hash

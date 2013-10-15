@@ -16,7 +16,6 @@ rosterLimits.ultimate 	= {upper: 22};
 
 $(function()
 {
-
 	/* fade in user description on mouseover */
 	$(document).on('mouseenter.overlay','.profile-player-overlay-container',function() 
 	{
@@ -459,7 +458,7 @@ $(function()
 			 captains.length == 1 &&
 			 detailsEle.attr('recurring') != 'true') {
 			// User is still team captain, do not let leave without passing the torch
-			showConfirmationAlert('You must choose someone to be the new ' + type + ' captain (under Manage)');
+			showConfirmationAlert('You must choose someone to be the new ' + type + ' captain (under EDIT ' + type.toUpperCase() + ')');
 			return;
 		}
 		
@@ -587,9 +586,9 @@ $(function()
 	
 
 	
-	if ($('#invites-alert-container').length > 0) {
+	if ($('#success-alert-container').length > 0) {
 		// Invites were sent on previous page, show alert
-		showAlert($('#invites-alert-container'));
+		showAlert($('#success-alert-container'));
 	}
 	
 	$('.profile-animate-buttons, .profile-options-button').click(function()
@@ -652,7 +651,6 @@ function updateEmailAlert(gameID, onOrOff)
 		type: 'POST',
 		data: {options: options},
 		success: function(data) {
-			alert(data);
 			showConfirmationAlert('Updated');
 		}
 	})

@@ -154,6 +154,12 @@ $(function() {
 		//reloadPage();
 	})
 	
+	$('.profile-join-player-container').click(function()
+	{
+		$('.schedule-in').trigger('click');
+	})
+	
+	/*
 	$('.schedule-in').bind('click.in',function()
 	{
 		var detailsEle = getDetailsEle();
@@ -198,6 +204,7 @@ $(function() {
 		
 		//showConfirmationAlert('Added to ' + type);
 	})
+	*/
 	
 	$('#reminders-alert-yesno-container').children('.selectable-text').click(function()
 	{

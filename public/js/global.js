@@ -257,20 +257,25 @@ $(function()
 		$(this).parent().children('.member-schedule-button-selected').removeClass('member-schedule-button-selected inner-shadow');
 		
 		$(this).addClass('member-schedule-button-selected inner-shadow');
-
+		
+		
+		
 		var inOrOut = $(this).text().toLowerCase();
-		var type	= $(this).parent().attr('type');
+		var idType	= $(this).parent().attr('idType');
 		var id		= $(this).parent().attr('typeID');
-		var insertOrUpdate = 'insert';
-		var teamID  = $(this).parent().attr('teamID');
+		
+		//var insertOrUpdate = 'insert';
+		//var teamID  = $(this).parent().attr('teamID');
 	
+		/*
 		if (typeof $(this).parent().attr('existingID') !== 'undefined') {
 			// Row exists in db, update
 			insertOrUpdate = $(this).parent().attr('existingID');
 		}
+		*/
 		
-		confirmUserToGame(inOrOut, type, id, insertOrUpdate, teamID);
-		
+		//confirmUserToGame(inOrOut, type, id, insertOrUpdate, teamID);
+		confirmUserToGame(inOrOut, idType, id);
 		/*
 		var confirmed = $(this).parents('.schedule-container').find('.confirmed');
 		var confirmedNum = parseInt(confirmed.text(), 10);
@@ -1242,10 +1247,9 @@ function confirmUserToGame(inOrOut, type, id, insertOrUpdate, teamID)
 		type: 'POST',
 		data: {inOrOut: inOrOut,
 			   type: type, 
-			   id: id, 
-			   insertOrUpdate: insertOrUpdate,
-			   teamID: teamID},
-		success: function() {
+			   id: id},
+		success: function(data) {
+
 			reloadPage();
 		}
 	})

@@ -11,8 +11,13 @@ class SignupController extends Zend_Controller_Action
     public function indexAction()
     {
 		$this->view->narrowColumn = 'right';
+		
+		$inviteSession = new Zend_Session_Namespace('signupInvite');
+		if ($inviteSession->type) {
+			$this->view->invited = $inviteSession->type;
+		}
+		
 		$signupSession = new Zend_Session_Namespace('signup');
-
 		
 		// Create general signup form
 		$form = new Application_Form_Signup();
@@ -460,6 +465,29 @@ class SignupController extends Zend_Controller_Action
 				if ($session->type == 'game') {
 					$typeModel = new Application_Model_Game();
 					$typeModel->gameID = $session->id;
+					
+					$game->addUserToGame($user->userID, $confirmed);
+				} else {
+					$typeModel = new Application_Model_Team();
+					$typeModel->teamID = $session->id;
+					$captains = $typeModel->getTeamCaptains();
+					$actingUserID = $captains[0];
+					
+					$typeID = $session->type . 'ID';
+					$notification = new Application_Model_Notification();
+					$notification->receivingUserID = $user->userID;
+					$notification->actingUserID = $actingUserID;
+					$notification->action = 'invite';
+					$notification->type = $session->type;
+					$notification->$typeID = $session->id;
+					$notification->cityID = $user->city->cityID;
+					$notification->save();
+				}
+				
+				
+				/*if ($session->type == 'game') {
+					$typeModel = new Application_Model_Game();
+					$typeModel->gameID = $session->id;
 					$captains = $typeModel->getGameCaptains();
 					$actingUserID = $captains[0];
 				} else {
@@ -478,6 +506,7 @@ class SignupController extends Zend_Controller_Action
 				$notification->$typeID = $session->id;
 				$notification->cityID = $user->city->cityID;
 				$notification->save();
+				*/
 				
 				Zend_Session::namespaceUnset('signupInvite');
 			}

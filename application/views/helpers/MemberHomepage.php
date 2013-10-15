@@ -264,8 +264,7 @@ class Application_View_Helper_MemberHomepage
 				$output .= "<div class='member-schedule-day-body-outer-container'>
 							<div class='member-schedule-day-body-inner-container'>";
 				foreach ($games as $game) {
-					$inClass  = '';
-					$outClass = '';
+					$inClass  = $outClass = $maybeClass = '';
 					$existingID = '';
 					$type   = '';
 					$typeID = '';
@@ -275,70 +274,99 @@ class Application_View_Helper_MemberHomepage
 						// User is confirmed, change class of in button
 						$inClass = 'inner-shadow member-schedule-button-selected';
 						$existingID = " existingID='update'";
-					}
-					
-					if ($game->confirmed == '0') {
+					} elseif ($game->confirmed == '0') {
 						// User is not confirmed
 						$outClass = 'inner-shadow member-schedule-button-selected';
+						$existingID = " existingID='update'";
+					} elseif ($game->confirmed == '2') {
+						// User is not confirmed
+						$maybeClass = 'inner-shadow member-schedule-button-selected';
 						$existingID = " existingID='update'";
 					}
 					
 					if ($game->isPickup()) {
+						
 						$confirmClass = '';
 						if ($game->isGameOn()) {
 							// Enough players for game
-							$confirm = 'GAME ON';
-							$confirmClass = ' heavy';
+							//$confirm = 'GAME ON';
+							$confirm = '';
+							$confirmClass = ' heavy green';
 						} else {
 							$confirm = $game->getPlayersNeeded('more') . " needed";
+							$confirmClass = ' red';
 						}
+						
 						
 						if ($game->canceled) {
 							$canceled = '<img class="left larger-indent" src="/images/global/canceled.png" tooltip="This game has been canceled. Reason: ' . $game->getCancelReason(true) . '"/>';
 						} else {
 							$canceled = '';
 						}
+						/*
+						$selectedButton = 'member-schedule-button-selected inner-shadow';
+						$confirmed = $notConfirmed = $maybeConfirmed = '';
 						
-						$output .= "<a href='/games/" . $game->gameID . "' class='member-schedule-day-body-game-container schedule-container'>";
+						if ($game->isConfirmed($this->_view->user->userID)) {
+							$confirmed = $selectedButton;
+						} elseif ($game->isNotConfirmed($this->_view->user->userID)) {
+							$notConfirmed = $selectedButton;
+						} elseif ($game->isMaybeConfirmed($this->_view->user->userID)) {
+							$maybeConfirmed = $selectedButton;
+						}
+						*/
+						
+						
+						$output .= "<a href='/games/" . $game->gameID . "' class='member-schedule-day-body-game-container schedule-outer-container'>";
 						$output .= "<div class='member-schedule-day-body-game-left-container'>";
 						$output .= "<p class='left bold darkest largest-text'>" . $game->getGameTitle() . '</p>' . $canceled;
 						$output .= "<p class='clear'>" . $game->getDay() . "</p>";
 						$output .= "<p class='clear'>" . $game->getHour() . "</p>";
 						$output .= "<p class='clear medium'>" . $game->getPark()->parkName . "</p>";
 						$output .= "</div>";
-						$output .= "<div class='member-schedule-day-body-players-container darkest bold'>";
-						$output .= "<p class='member-schedule-day-body-players largest-text center'>" . $game->confirmedPlayers . "</p>";
+						$output .= "<div class='member-schedule-day-body-players-container darkest heavy'>";
+						$output .= "<p class='member-schedule-day-body-players largest-text center'>" . $game->countConfirmedPlayers() . "</p>";
 						$output .= "<p class='member-schedule-day-body-players-text center clear larger-text'>players</p>";
-						$output .= "<p class='center clear green smaller-text member-schedule-day-body-players-confirmed larger-margin-top " . $confirmClass . "'>" . $confirm . "</p>";
+						$output .= "<p class='center clear smaller-text member-schedule-day-body-players-confirmed larger-margin-top " . $confirmClass . "'>" . $confirm . "</p>";
 						$output .= "</div>";
+						/*$output .= "<p class='button schedule-in left larger-text member-game-schedule-in " . $confirmed . "'>in</p>";
+						$output .= "<p class='button schedule-out right larger-text member-game-schedule-out " . $notConfirmed . "'>out</p>";
+						$output .= "<p class='clear button schedule-maybe right smaller-text member-game-schedule-maybe " . $maybeConfirmed . "'>maybe</p>";
+						*/
+						$output .= $this->_view->partial('partials/global/confirmed.phtml', array('game' => $game,
+																								  'userID' => $this->_view->user->userID));
+						//$output .= "</div>";
 						$type	 = " type='pickupGame'";
 						$typeID  = " typeID='" . $game->gameID . "'";
 					} elseif ($game->isTeamGame()) {
 						$team    = $this->_view->user->teams->teamExists($game->teamID); // Not being used?
 						$teamID  = " teamID='" . $game->teamID . "'";
-						$output .= "<a href='/teams/" . $game->teamID . "' class='member-schedule-day-body-game-container schedule-container'>";
+						$output .= "<a href='/teams/" . $game->teamID . "' class='member-schedule-day-body-game-container schedule-outer-container'>";
 						$output .= "<div class='member-schedule-day-body-game-left-container'>";
-						$output .= "<p class='darkest larger-text'>vs. <span class='heavy'>" . $game->getLimitedName('opponent', 25) . "</span></p>";
+						$output .= "<p class='darkest largest-text heavy'><span class='darkest smaller-text'>vs. </span>" . $game->getLimitedName('opponent', 20) . "</p>";
 						$output .= "<p class='clear medium'>" . $game->teamName . "</p>";
-						$output .= "<p class='clear darkest'>" . $game->getDay() . "</p>";
-						$output .= "<p class='clear darkest'>" . $game->getHour() . "</p>";
+						$output .= "<p class='clear darkest'>" . $game->getDay() . " at " . $game->getHour() . "</p>";
 						$output .= "<p class='clear medium'>" . $game->locationName . "</p>";
 						$output .= "</div>";
-						$output .= "<div class='member-schedule-day-body-team-players-container darkest bold'>";
+						$output .= "<div class='member-schedule-day-body-players-container darkest heavy'>";
 
-						$output .= "<p class='center clear darkest member-schedule-day-body-players-confirmed' tooltip='" . $game->countConfirmedPlayers() . " players are going to this game'>
-										<span class='confirmed larger-text heavy member-teamGame-confirmed left width-100 center'>" . $game->countConfirmedPlayers() . "</span> 
-										<span class='clear darkest width-100 heavy center'>confirmed</span>
-									</p>";
+						$output .= "<p tooltip='" . $game->countConfirmedPlayers() . " players are going to this game' class='confirmed largest-text heavy left width-100 center member-schedule-day-body-players'>
+										" . $game->countConfirmedPlayers() . "</p> 
+										<p class='clear darkest width-100 larger-text heavy center'>players</p>";
 						$output .= "</div>";
-						$type	 = " type='teamGame'";
-						$typeID	 = " typeID='" . $game->teamGameID . "'";
+						//$type	 = " type='teamGame'";
+						//$typeID	 = " typeID='" . $game->teamGameID . "'";
 						
-						$output .= "<div class='member-schedule-day-body-game-right-container' " . $type . $typeID . $existingID . $teamID . ">";
-						$output .= "<p class='darkest center'>Are you in, or are you out?</p>";
-						$output .= "<p class='button larger-text member-schedule-in schedule-in " . $inClass . "'>in</p>";
-						$output .= "<p class='button larger-text member-schedule-out schedule-out " . $outClass . "'>out</p>";
+						/*$output .= "<div class='member-schedule-day-body-game-right-container' " . $type . $typeID . $existingID . $teamID . ">";
+						$output .= 	"<p class='darkest center'>Are you in, or are you out?</p>";
+						$output .= 	"<p class='button larger-text member-schedule-in schedule-in " . $inClass . "'>in</p>";
+						$output .= 	"<p class='button larger-text member-schedule-out schedule-out " . $outClass . "'>out</p>";
+						$output .= 	"<p class='button smaller-text member-schedule-maybe schedule-maybe " . $maybeClass . "'>maybe</p>";
 						$output .= "</div>";
+						*/
+						$output .= $this->_view->partial('partials/global/confirmed.phtml', array('game' => $game,
+																								  'userID' => $this->_view->user->userID));
+						
 					}
 
 					

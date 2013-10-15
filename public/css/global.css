@@ -2379,6 +2379,12 @@ input.city-change-input {
 	padding-top: .1em;
 }
 
+.schedule-container {
+	width:150px;
+	float:right;
+	margin-top: .5em;
+}
+
 .member-schedule-button-selected.schedule-out {
 	background:#C60000;
 	color: #fff;
@@ -2403,16 +2409,20 @@ input.city-change-input {
 
 .schedule-in {
 	float:left;
-	margin-left: 1.5em;
+	/*margin-left: 1.5em;*/
+	margin-left:.5em;
 }
 
 .schedule-out {
 	float:right;
-	margin-right: 1.5em;
+	/*margin-right: 1.5em;*/
+	margin-right: .5em;
 }
 
 .schedule-maybe {
-	width: 9.5em;
+	width: 9em;
+	margin-right:.75em;
+	margin-top:.5em;
 }
 
 /* span for "confirmed" number */

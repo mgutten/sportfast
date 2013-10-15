@@ -85,7 +85,15 @@ if (!empty($this->errors)) {
 	echo "</div>";
 }
 ?>
-<p class='larger-text green heavy clear width-100 center'>Sportfast is free and easy.</p>
+<?php
+$class = '';
+if ($this->invited) {
+	echo "<p class='green-alert-box clear white heavy'>To join your " . $this->invited . ", please signup below.</p>";
+	$class = 'larger-margin-top';
+}
+?>
+
+<p class='larger-text green heavy clear width-100 center <?php echo $class;?>'>Sportfast is free and easy.</p>
 <?php
 
 $totalSteps = 4;

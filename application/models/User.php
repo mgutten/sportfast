@@ -36,7 +36,8 @@ class Application_Model_User extends Application_Model_ModelAbstract
 									'joined'		=> '',
 									'avatar'		=> '',
 									'noEmail'		=> '',  // Do not email when game is created for them
-									'ratingSet'		=> ''   // Used by setUserRating to not update old_user_ratings twice
+									'ratingSet'		=> '',   // Used by setUserRating to not update old_user_ratings twice
+									'tempAttribs'	=> array()  // Used to store temporary attribs in
 									);
 
 	protected $_primaryKey = 'userID';	
@@ -650,6 +651,27 @@ class Application_Model_User extends Application_Model_ModelAbstract
 		$this->players->remove($friendUserID);
 		
 		return $this->getMapper()->removeFriend($friendUserID, $this->userID);
+	}
+	
+	
+	/**
+	 * get tempAttrib
+	 */
+	public function getTempAttrib($attrib)
+	{
+		if (!isset($this->_attribs['tempAttribs'][$attrib])) {
+			return false;
+		} else {
+			return $this->_attribs['tempAttribs'][$attrib];
+		}
+	}
+	
+	/**
+	 * set tempAttrib
+	 */
+	public function setTempAttrib($attrib, $val)
+	{
+		$this->_attribs['tempAttribs'][$attrib] = $val;
 	}
 	
 	/**

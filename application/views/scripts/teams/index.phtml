@@ -199,6 +199,10 @@ if ($this->fail) {
 			echo $this->alert()->end();
 			
 			
+			// Message
+			echo $this->alert()->messageAlert();
+			
+			
 			// Reserves
 			echo $this->alert()->start('reserves', "Edit " . $this->team->teamName . "'" . (substr($this->team->teamName, -1) == 's' ? '' : 's') . " Reserves");
 			
@@ -275,10 +279,11 @@ if ($this->fail) {
 	echo $this->alert()->confirmAlert();
 	
 	
-	if ($this->invitesSent) {
+	if ($this->invitesSent ||
+		$this->messageSent) {
 		// Invites sent from previous page, show alert
-		echo $this->alert()->start('invites');
-		echo "<p class='largest-text darkest width-100 center heavy'>Invites sent.</p>";
+		echo $this->alert()->start('success');
+		echo "<p class='largest-text darkest width-100 center heavy'>" . ($this->invitesSent ? 'Invites' : 'Message') . " sent.</p>";
 
 		echo $this->alert()->end();
 	}
@@ -526,7 +531,7 @@ $nextGameHeader = '';
 if ($this->nextGame) {
 	// Next game exists
 	$nextGameHeader .= "<div class='right profile-section-bold-subheader'>";
-	$nextGameHeader .= 		"<p class='right medium'><span class='confirmed'>" . $this->countConfirmedPlayers . "</span> confirmed</p>";
+	$nextGameHeader .= 		"<p class='right darkest heavy'><span class='inherit confirmed'>" . $this->countConfirmedPlayers . "</span> " . ($this->countConfirmedPlayers == 1 ? 'player' : 'players') . " " . ($this->nextGame->countMaybeConfirmedPlayers() > 0 ? "<span class='smaller-text medium'>+" . $this->nextGame->countMaybeConfirmedPlayers() . " maybe</span>" : '') . "</p>";
 	$nextGameHeader .= "</div>";
 }
 echo $this->partial('partials/global/sectionHeaderBold.phtml',array('title'   => 'next game',
@@ -574,11 +579,18 @@ echo $this->partial('partials/global/sectionHeaderBold.phtml',array('title'   =>
 		if ($this->userOnTeam || $this->invitedToNextGame) {
 			// User is on team or is reserve invited to play
 	?>
+    <!--
     <div class='team-next-game-right-container right' <?php echo $this->nextGameType . $this->nextGameTypeID . $this->nextGameTeamID . $existingID;?>>
         <p class='darkest center'>Are you in, or are you out?</p>
         <p class='button larger-text schedule-in <?php echo $inClass;?>'>in</p>
         <p class='button larger-text schedule-out <?php echo $outClass;?>'>out</p>
 	</div>
+    -->
+    
+    <?php
+	echo $this->partial('partials/global/confirmed.phtml', array('game' => $this->nextGame,
+																 'userID' => $this->user->userID));
+	?>
 
 
 <?php 

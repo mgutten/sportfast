@@ -3,6 +3,10 @@
 	height: 10em;
 }
 
+.profile-name-container {
+	margin-top: .2em;
+}
+
 /* ratings */
 
 .park-num-ratings {

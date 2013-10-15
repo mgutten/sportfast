@@ -173,7 +173,8 @@ class CreateController extends Zend_Controller_Action
 		// Insert user to game
 		$table = new Application_Model_DbTable_UserGames();
 		$table->insert(array('gameID' => $game->gameID,
-		 					 'userID' => $this->view->user->userID));
+		 					 'userID' => $this->view->user->userID,
+							 'confirmed' => '1'));
 							 
 		// Insert user as game captain
 		$table = new Application_Model_DbTable_GameCaptains();
@@ -184,7 +185,8 @@ class CreateController extends Zend_Controller_Action
 			$table = new Application_Model_DbTable_GameSubscribers();
 			$table->insert(array('gameID' => $game->gameID,
 								 'userID' => $this->view->user->userID,
-								 'joinDate' => new Zend_Db_Expr('now()')));
+								 'joinDate' => new Zend_Db_Expr('now()'),
+								 'doNotEmail' => '0'));
 		}
 		
 		

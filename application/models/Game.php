@@ -95,16 +95,25 @@ class Application_Model_Game extends Application_Model_ConfirmationsAbstract
 		return $this->getMapper()->updateCaptains($this);
 	}
 	
+	/** 
+	 * get subscribers from db
+	 * @returns Application_Model_Users
+	 */
+	public function getGameSubscribers()
+	{
+		return $this->getMapper()->getGameSubscribers($this->gameID);
+	}
+	
 	/**
 	 * add user to game in db
 	 * @params ($confirmed => '0' = out, '1' = in, or '2' = maybe
 	 */
-	public function addUserToGame($gameID, $userID, $confirmed = false)
+	public function addUserToGame($userID, $confirmed = false)
 	{
 		if ($this->isTeamGame()) {
-			return $this->getMapper()->addUserToTeamGame($gameID, $userID, $confirmed);
+			return $this->getMapper()->addUserToTeamGame($this->teamGameID, $userID, $confirmed);
 		} else {
-			return $this->getMapper()->addUserToGame($gameID, $userID, $confirmed);
+			return $this->getMapper()->addUserToPickupGame($this->gameID, $userID, $confirmed);
 		}
 	}
 	
@@ -157,13 +166,16 @@ class Application_Model_Game extends Application_Model_ConfirmationsAbstract
 	{
 		$finalRating = 0;
 		$totalCount  = 0;
-		if (!$this->hasValue('players')) {
+		if (!$this->hasValue('confirmedPlayers')) {
 			// There are no players
 			return $finalRating;
 		}
 		
 		$sport = $this->sport;
 		foreach ($this->players->users as $player) {
+			if (!isset($this->confirmedPlayers[$player->userID])) {
+				continue;
+			}
 			$finalRating += $player->getSport($sport)->$rating;
 			$totalCount++;
 		}
@@ -349,7 +361,7 @@ class Application_Model_Game extends Application_Model_ConfirmationsAbstract
 	
 	public function isGameOn()
 	{
-		if ($this->totalPlayers >= $this->minPlayers) {
+		if ($this->countConfirmedPlayers() >= $this->minPlayers) {
 			return true;
 		} else {
 			return false;
@@ -656,6 +668,51 @@ class Application_Model_Game extends Application_Model_ConfirmationsAbstract
 			return false;
 		}
 	}
+	
+	public function isConfirmed($userID)
+	{
+		if ($this->isTeamGame() &&
+		    $this->confirmed == '1') {
+				return true;
+			}
+			
+		if (isset($this->_attribs['confirmedPlayers'][$userID])) {
+			// User is subscribed
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	public function isNotConfirmed($userID)
+	{
+		if ($this->isTeamGame() &&
+		    $this->confirmed == '0') {
+				return true;
+			}
+			
+		if (isset($this->_attribs['notConfirmedPlayers'][$userID])) {
+			// User is subscribed
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	public function isMaybeConfirmed($userID)
+	{
+		if ($this->isTeamGame() &&
+		    $this->confirmed == '2') {
+				return true;
+			}
+		
+		if (isset($this->_attribs['maybeConfirmedPlayers'][$userID])) {
+			// User is subscribed
+			return true;
+		} else {
+			return false;
+		}
+	}
 
 	public function hasCaptain()
 	{
@@ -724,12 +781,35 @@ class Application_Model_Game extends Application_Model_ConfirmationsAbstract
 		$userID = (int)$userID;
 		$this->confirmed = $inOrOut;
 		
-		if ($inOrOut) {
+		/*if ($inOrOut) {
 			// Now confirmed			
 			$this->confirmedPlayers += 1;
 		} else {
 			// Now not confirmed
 			$this->confirmedPlayers -= 1;
+		}
+		*/
+		if (isset($this->_attribs['confirmedPlayers'][$userID])) {
+			unset($this->_attribs['confirmedPlayers'][$userID]);
+		}
+		
+		if (isset($this->_attribs['notConfirmedPlayers'][$userID])) {
+			unset($this->_attribs['notConfirmedPlayers'][$userID]);
+		}
+		
+		if (isset($this->_attribs['maybeConfirmedPlayers'][$userID])) {
+			unset($this->_attribs['maybeConfirmedPlayers'][$userID]);
+		}
+		
+		if ($inOrOut == '1') {
+			// Confirmed
+			$this->addConfirmedPlayer($userID);
+		} elseif ($inOrOut == '0') {
+			// Not
+			$this->addNotConfirmedPlayer($userID);
+		} else {
+			// Maybe
+			$this->addMaybeConfirmedPlayer($userID);
 		}
 		
 		return $this;
@@ -742,6 +822,33 @@ class Application_Model_Game extends Application_Model_ConfirmationsAbstract
 	{
 		return $this->getMapper()->saveInvites($emails, $actingUserID, $this->gameID);
 	}
+	
+	/**
+	 * save user confirmation to db
+	 * @params ($confirm => 1 = in, 0 = out, 2 = maybe)
+	 */
+	public function saveUserConfirmation($userID, $confirm)
+	{
+		$already = false;
+		
+		if ($this->userConfirmed($userID) ||
+			$this->userNotConfirmed($userID) ||
+			$this->userMaybeConfirmed($userID)) {
+				$already = true;
+			}
+			
+		if ($already) {
+			
+		}
+		
+		if ($this->isTeamGame()) {
+			return $this->getMapper()->saveTeamGameConfirmation($this->teamGameID, $userID, $confirm);
+		} else {
+			return $this->getMapper()->savePickupGameConfirmation($this->gameID, $userID, $confirm, $this->isRecurring());
+		}
+		
+	}
+		
 	
 	/**
 	 * get correct type name for sport (ie basketball GAME, football GAME, tennis MATCH

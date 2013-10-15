@@ -264,21 +264,23 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 					  array('typeName',
 					  		'typeSuffix',
 							'typeDescription'))
-			   ->join(array('ug2' => 'user_games'),
+			   /*->join(array('ug2' => 'user_games'),
 			   		  'ug2.gameID = ug.gameID',
 					  array('(COUNT(ug2.userID) + SUM(ug2.plus)) as totalPlayers',
-					  		'(SELECT COUNT(userID) FROM user_games WHERE gameID = ug.gameID AND confirmed = "1") AS confirmedPlayers'))
+					  		'(SELECT COUNT(userID) FROM user_games WHERE gameID = ug.gameID AND confirmed = "1") AS confirmedPlayers'))*/
 			   ->where('ug.userID = ?', $savingClass->userID)
 			   ->where('g.date > (NOW() + INTERVAL ' . $this->getTimeOffset() . ' HOUR)')
 			   ->group('ug.gameID');
 
-		
+
 		$results = $table->fetchAll($select);
 		
 		
 		foreach ($results as $result) {
 			//$savingClass->games->addGame($result, $byDay); true = by day
-			$savingClass->games->addGame($result);
+			$game = $savingClass->games->addGame($result);
+			
+			$game->getGamePlayers();
 		}
 		
 		// Get team games also
@@ -1132,7 +1134,7 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 		$select->from(array('og' => 'old_games'))
 			   ->join(array('oug' => 'old_user_games'),
 			   		  'og.oldGameID = oug.oldGameID')
-			   ->where('og.date > (now() - INTERVAL 1 WEEK) AND og.date < (NOW() + INTERVAL ' . $this->getTimeOffset() . ' HOUR)')
+			   ->where('og.date > (now() - INTERVAL 5 DAY) AND og.date < (NOW() + INTERVAL ' . $this->getTimeOffset() . ' HOUR)')
 			   ->where('og.canceled = ?', 0)
 			   ->where('oug.userID = ?', $userID)
 			   ->order('og.date desc')
@@ -1147,6 +1149,8 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 		
 		$game = new Application_Model_Game($result);
 		$gameID = $game->gameID;
+		
+		$oldGameID = $result['oldGameID'];
 
 		// Test if user has already rated for this game
 		$select = $table->select();
@@ -1154,7 +1158,8 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 		
 		$select->from(array('ur' => 'user_ratings'))
 			   ->where('ur.givingUserID = ?', $userID)
-			   ->where('ur.gameID = ?', $gameID);
+			   ->where('ur.gameID = ?', $gameID)
+			   ->where('ur.dateHappened > (now() - INTERVAL 6 DAY)');
 			   
 		$result = $table->fetchRow($select);
 		
@@ -1181,7 +1186,7 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 					FROM `old_user_games` AS `oug` 
 					INNER JOIN `users` AS `u` ON oug.userID = u.userID 
 					INNER JOIN `user_sports` AS `us` ON (us.sportID = '" . $game->sportID . "' AND us.userID = oug.userID)
-					WHERE (oug.gameID = '" . $game->gameID . "') 
+					WHERE (oug.oldGameID = '" . $oldGameID . "') 
 						AND (u.fake != 1) 
 						AND u.userID != '" . $userID . "'
 						AND u.userID NOT IN (SELECT receivingUserID 

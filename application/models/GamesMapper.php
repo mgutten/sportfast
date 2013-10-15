@@ -366,7 +366,7 @@ class Application_Model_GamesMapper extends Application_Model_TypesMapperAbstrac
 					  array('AsText(location) as location'))
 			   ->joinLeft(array('gc' => new Zend_Db_Expr("(SELECT GROUP_CONCAT(gc2.userID separator ',') as captainsFirst, gc2.gameID as gameID FROM game_captains gc2 WHERE gc2.gameID = '" . $gameID . "')")),
 			   	     'gc.gameID = g.gameID',
-					 array('captainsFirst as captainsSecond', 'gameID'))
+					 array('captainsFirst as captainsSecond'))
 			   ->joinLeft(array('ug' => 'user_games'),
 			   		 'ug.gameID = g.gameID',
 					 array(''))
@@ -379,8 +379,9 @@ class Application_Model_GamesMapper extends Application_Model_TypesMapperAbstrac
 						   ))
 				->where('g.gameID = ?', $gameID)
 				->limit(1);
-				
+			
 		$result = $table->fetchRow($select);
+		
 		
 		if (empty($result['gameID'])) {
 			// No game found
@@ -543,22 +544,68 @@ class Application_Model_GamesMapper extends Application_Model_TypesMapperAbstrac
 		$where = array('userID = ?' => $userID,
 						'gameID = ?' => $gameID);
 						
-		return $table->delete($where);
+		return $table->update(array('doNotEmail' => '1'), $where);
 		
 	}
 	
 	/**
 	 * save user confirmation (confirmed or not) to db for pickup game
 	 * @params ($userID => user's id,
-	 *			$typeID => gameID,
-	 *			$inOrOut=> 0 for not in, 1 for in
+	 *			$gameID => gameID,
+	 *			$confirmed => 0 = not, 1 = in, 2 = maybe
 	 *			$insertOrUpdate => "insert" or "update"
 	 */
-	public function savePickupGameConfirmation($userID, $typeID, $inOrOut, $insertOrUpdate)
+	public function savePickupGameConfirmation($gameID, $userID, $confirmed, $recurring = false)
 	{
-		$this->setDbTable('Application_Model_DbTable_UserGames');
-		$table    = $this->getDbTable();
-		$insertOrUpdate = strtolower($insertOrUpdate);
+		$db = Zend_Db_Table::getDefaultAdapter();
+		
+		$sql = "INSERT INTO user_games (gameID, userID, confirmed) VALUES (" . $gameID . ", " . $userID . ", '" . $confirmed . "')
+		  		ON DUPLICATE KEY UPDATE confirmed = '" . $confirmed . "'";
+		
+		
+		$result = $db->query($sql);
+		
+		// If rowCount = 1 row was inserted, elseif rowCount = 2 row was updated
+		$rowCount = $result->rowCount();
+		
+		if ($rowCount == 1) {
+			// Row was inserted, not updated
+			$notifications = new Application_Model_Notifications();
+			
+			$notifications->deleteAll(array('nl.actingUserID' => $userID,
+											'nl.gameID'		  => $gameID,
+											'n.action'		  => 'leave',
+											'n.type'		  => 'game'));
+											
+			$notifications->deleteAll(array('nl.actingUserID' => $userID,
+											'nl.gameID'		  => $gameID,
+											'n.action'		  => 'join',
+											'n.type'		  => 'game'));
+			
+			if ($confirmed == '1' ||
+				$confirmed == '2') {
+					// Is "in" or "maybe"
+					$notification = new Application_Model_Notification();
+					
+					$notification->actingUserID = $userID;
+					$notification->gameID = $gameID;
+					$notification->action = 'join';
+					$notification->type = 'game';
+					
+					$notification->save();
+				}
+		}
+		
+		if ($recurring) {
+			// Add user to subscribers list as default
+			$sql = "INSERT INTO game_subscribers (gameID, userID, doNotEmail) VALUES (" . $gameID . ", " . $userID . ", '0')
+		  		ON DUPLICATE KEY UPDATE gameID = " . $gameID;
+				
+			$db->query($sql);
+		}
+	
+		
+		/*$insertOrUpdate = strtolower($insertOrUpdate);
 	
 		if ($insertOrUpdate == 'update') {
 			$data  = array('confirmed' => $inOrOut);
@@ -576,6 +623,7 @@ class Application_Model_GamesMapper extends Application_Model_TypesMapperAbstrac
 						);
 			$table->insert($data);
 		}
+		*/
 		
 		return $this;
 		
@@ -588,13 +636,13 @@ class Application_Model_GamesMapper extends Application_Model_TypesMapperAbstrac
 	 *			$inOrOut=> 0 for not in, 1 for in
 	 *			$insertOrUpdate => "insert" or "update"
 	 */
-	public function saveTeamGameConfirmation($userID, $typeID, $inOrOut, $insertOrUpdate = false, $teamID = false)
+	public function saveTeamGameConfirmation($userID, $typeID, $inOrOut)
 	{
 		
 		
 		$db = Zend_Db_Table::getDefaultAdapter();
 		
-		$sql = "INSERT INTO user_team_games (teamID, userID, teamGameID, confirmed) VALUES ((SELECT teamID FROM team_games WHERE teamGameID = :teamGameID),:userID,:teamGameID,:confirmed)
+		$sql = "INSERT INTO user_team_games (userID, teamGameID, confirmed) VALUES (:userID,:teamGameID,:confirmed)
 				  ON DUPLICATE KEY UPDATE confirmed = :confirmed;";
 		
 		$values = array('teamGameID' => $typeID,
@@ -870,7 +918,7 @@ class Application_Model_GamesMapper extends Application_Model_TypesMapperAbstrac
 	/**
 	 * add user to game
 	 */
-	public function addUserToGame($gameID, $userID, $confirmed = false)
+	public function addUserToPickupGame($gameID, $userID, $confirmed = false)
 	{
 		if (empty($gameID) || empty($userID)) {
 			return false;
@@ -879,10 +927,132 @@ class Application_Model_GamesMapper extends Application_Model_TypesMapperAbstrac
 		$table = $this->getDbTable();
 		$select = $table->select();
 		$select->setIntegrityCheck(false);
-		
+		/*
 		$select->from(array('ug' => 'user_games'))
 			   ->where('ug.userID = ?', $userID)
 			   ->where('ug.gameID = ?', $gameID);
+		*/
+			   
+		$select->from(array('g' => 'games'))
+			   ->joinLeft(array('ug' => 'user_games'),
+			   			  'ug.gameID = g.gameID AND ug.userID = "' . $userID . '"')
+			   ->where('g.gameID = ?', $gameID);
+			   
+		$result = $table->fetchRow($select);
+		
+		$recurring = $result['recurring'];
+		
+		$already = false;
+		if (!is_null($result['userID'])) {
+			// Already in game
+			$already = true;
+		}
+		
+		if (!$already) {
+		
+			$select = $table->select();
+			$select->setIntegrityCheck(false);
+			
+			$select->from(array('g' => 'games'))
+				   ->joinLeft(array('ug' => 'user_games'),
+						  'ug.gameID = g.gameID AND ug.confirmed = 1',
+						  array('COUNT(ug.userID) as totalPlayers'))
+				   ->where('g.gameID = ?', $gameID)
+				   ->group('g.gameID');
+			
+			$result = $table->fetchRow($select);
+			
+			if (($result['rosterLimit'] <= $result['totalPlayers']) && 
+				 $confirmed == '1') {
+				// Game is full
+				return 'full';
+			}
+		}
+		
+		$data = array('userID' => $userID,
+					  'gameID' => $gameID,
+					  'confirmed' => $confirmed);
+		$update = $insert = false;
+		$db = Zend_Db_Table::getDefaultAdapter();
+		
+		if ($already) {
+			$update = true;
+			$db->update('user_games', $data, array('userID = ?' => $userID,
+												   'gameID = ?' => $gameID));
+		} else {
+			$insert = true;
+			$db->insert('user_games', $data);
+		}
+		
+		if ($recurring == '1') {
+			// Add user to subscribers list as default
+			$sql = "INSERT INTO game_subscribers (gameID, userID, doNotEmail) VALUES (" . $gameID . ", " . $userID . ", '0')
+		  		ON DUPLICATE KEY UPDATE gameID = " . $gameID;
+				
+			$db->query($sql);
+		}
+		
+		if ($insert) {
+			// Row was inserted, not updated, create notifications
+			$notifications = new Application_Model_Notifications();
+			
+			$notifications->deleteAll(array('nl.actingUserID' => $userID,
+											'nl.gameID'		  => $gameID,
+											'n.action'		  => 'leave',
+											'n.type'		  => 'game'));
+											
+			$notifications->deleteAll(array('nl.actingUserID' => $userID,
+											'nl.gameID'		  => $gameID,
+											'n.action'		  => 'join',
+											'n.type'		  => 'game'));
+			
+			if ($confirmed == '1' ||
+				$confirmed == '2') {
+					// Is "in" or "maybe"
+					$notification = new Application_Model_Notification();
+					
+					$notification->actingUserID = $userID;
+					$notification->gameID = $gameID;
+					$notification->action = 'join';
+					$notification->type = 'game';
+					
+					$auth = Zend_Auth::getInstance();
+					
+					if ($auth->hasIdentity()) {
+						// User logged in, get their cityID
+						$notification->cityID = $auth->getIdentity()->cityID;
+					}
+					
+					$notification->save();
+				}
+		}
+		
+		
+		return false;
+	}
+	
+	/**
+	 * add user to team game
+	 */
+	public function addUserToTeamGame($teamGameID, $userID, $confirmed)
+	{
+		if (empty($teamGameID) || empty($userID)) {
+			return false;
+		}
+		$this->setDbTable('Application_Model_DbTable_UserTeamGames');
+		$table = $this->getDbTable();
+		$select = $table->select();
+		$select->setIntegrityCheck(false);
+		/*
+		$select->from(array('ug' => 'user_games'))
+			   ->where('ug.userID = ?', $userID)
+			   ->where('ug.gameID = ?', $gameID);
+		*/
+		
+		$select->from(array('utg' => 'user_team_games'))
+			   ->where('utg.userID = ?', $userID)
+			   ->where('utg.teamGameID = ?', $teamGameID);
+
 			   
 		$result = $table->fetchRow($select);
 		
@@ -892,46 +1062,25 @@ class Application_Model_GamesMapper extends Application_Model_TypesMapperAbstrac
 			$already = true;
 		}
 		
-		$select = $table->select();
-		$select->setIntegrityCheck(false);
-		
-		$select->from(array('g' => 'games'))
-			   ->joinLeft(array('ug' => 'user_games'),
-			   		  'ug.gameID = g.gameID',
-					  array('COUNT(ug.userID) as totalPlayers'))
-			   ->where('g.gameID = ?', $gameID)
-			   ->where('ug.confirmed = ?', '1')
-			   ->group('g.gameID');
-	
-		$result = $table->fetchRow($select);
-		
-		if (($result['rosterLimit'] <= $result['totalPlayers']) && 
-			 $confirmed == '1' &&
-			 !$already) {
-			// Game is full
-			return 'full';
-		}
 		
 		$data = array('userID' => $userID,
-					  'gameID' => $gameID,
+					  'teamGameID' => $teamGameID,
 					  'confirmed' => $confirmed);
+		$update = $insert = false;
 		$db = Zend_Db_Table::getDefaultAdapter();
 		
 		if ($already) {
-			$db->update('user_games', $data, array('userID = ?' => $userID,
-												   'gameID = ?' => $gameID));
+			$update = true;
+			$db->update('user_team_games', $data, array('userID = ?' => $userID,
+												   		'teamGameID = ?' => $teamGameID));
 		} else {
-			$db->insert('user_games', $data);
+			$insert = true;
+			$db->insert('user_team_games', $data);
 		}
+
 		
 		return false;
-	}
-	
-	/**
-	 * add user to team game
-	 */
-	public function addUserToTeamGame($teamGameID, $userID)
-	{
+		/*
 		if (empty($gameID) || empty($userID)) {
 			return false;
 		}
@@ -971,7 +1120,59 @@ class Application_Model_GamesMapper extends Application_Model_TypesMapperAbstrac
 		$db->insert('user_team_games', $data);
 		
 		return false;
+		*/
 	}
+	
+	
+	/**
+	 * get game subscribers (used on games/subscribers page)
+	 */
+	public function getGameSubscribers($gameID)
+	{
+		$table = $this->getDbTable();
+		$select = $table->select();
+		$select->setIntegrityCheck(false);
+		
+		$oldUserGames = "SELECT COUNT(oug2.userID) as totalGames, oug2.userID, MAX(og.date) as date
+						 FROM old_user_games oug2
+						 INNER JOIN old_games og ON og.oldGameID = oug2.oldGameID
+						 WHERE oug2.gameID = '" . $gameID . "' AND
+						 	oug2.confirmed = '1'
+						 GROUP BY oug2.userID";
+		
+		$select->from(array('gs' => 'game_subscribers'))
+			   ->join(array('u' => 'users'),
+			   		  'u.userID = gs.userID')
+			   ->joinLeft(array('oug' => new Zend_Db_Expr('(' . $oldUserGames . ')')),
+			   		  'oug.userID = u.userID',
+					  array('totalGames', 'date'))
+			   ->where('gs.gameID = ?', $gameID);
+
+		
+		$results = $table->fetchAll($select);
+		
+		$users = new Application_Model_Users();
+		
+		foreach ($results as $result) {
+			
+			$user = $users->addUser($result);
+			
+			$user->setTempAttrib('doNotEmail', $result->doNotEmail);
+			
+			if (!is_null($result->totalGames)) {
+				$user->setTempAttrib('totalGames', $result->totalGames);
+				$user->setTempAttrib('lastPlayed', $result->date);
+			} else {
+				$user->setTempAttrib('totalGames', 0);
+			}
+			
+			
+		}
+		
+		return $users;
+		
+	}
+		
 	
 	/**
 	 * get game captains

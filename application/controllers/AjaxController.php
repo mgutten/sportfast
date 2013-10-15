@@ -409,7 +409,7 @@ class AjaxController extends Zend_Controller_Action
 	 }
 	 
 	 /**
-	  * add user to game
+	  * add user to game INACTIVE
 	  */
 	 public function addUserToGameAction()
 	 {
@@ -1620,34 +1620,58 @@ class AjaxController extends Zend_Controller_Action
 	{
 		$post = $this->getRequest()->getPost();
 		
-		$inOrOut = ($post['inOrOut'] == 'in' ? 1 : 0);
-		$type	 = $post['type'];
+		$post['inOrOut'] = strtolower($post['inOrOut']);
+		
+		if ($post['inOrOut'] == 'in') {
+			$inOrOut = '1';
+		} elseif ($post['inOrOut'] == 'out') {
+			$inOrOut = '0';
+		} else {
+			// Maybe
+			$inOrOut = '2';
+		}
+		
+		$idType	 = $post['type'];
 		$typeID  = $post['id'];
-		$insertOrUpdate = $post['insertOrUpdate'];
-		$teamID  = $post['teamID'];
+		//$insertOrUpdate = $post['insertOrUpdate'];
+		//$teamID  = $post['teamID'];
 		
 		$auth = Zend_Auth::getInstance();
 		$user = $auth->getIdentity();
 		
+		$game = $user->games->gameExists($typeID, $idType);
+		
+		if (!$game) {
+			$game = new Application_Model_Game();
+			
+			if ($idType = 'gameID') {
+				$game->getGameByID($typeID);
+			}
+			
+			$this->view->user->games->addGame($game);
+		}
+		
+		$game->$idType = $typeID;
+		
+		
+		$game->addUserToGame($this->view->user->userID, $inOrOut);
+			
+		/*
 		$mapper  = new Application_Model_GamesMapper();
 		
-		if ($type == 'pickupGame') {
+		if ($idType == 'gameID') {
 			// Pickup game
-			$mapper->savePickupGameConfirmation($this->view->user->userID, $typeID, $inOrOut, $insertOrUpdate);
-			$idType = 'gameID';
-		} elseif ($type == 'teamGame') {
-			$mapper->saveTeamGameConfirmation($this->view->user->userID, $typeID, $inOrOut, $insertOrUpdate, $teamID);
-			$idType = 'teamGameID';
+			$mapper->savePickupGameConfirmation($this->view->user->userID, $typeID, $inOrOut);
+			
+		} elseif ($idType == 'teamGameID') {
+			$mapper->saveTeamGameConfirmation($this->view->user->userID, $typeID, $inOrOut);
+			
 		}
+		*/
 				
-		$game = $user->games->gameExists($typeID, $idType);
-		if ($insertOrUpdate == 'insert') {
-			$game->confirmedPlayers = $game->confirmedPlayers + 1;
-		} else {
-			$game->movePlayerConfirmation($user->userID, $inOrOut);
-		}
+		$game->movePlayerConfirmation($user->userID, $inOrOut);
+
 		
-		$game->confirmed = $inOrOut;
 	}
 	
 	

@@ -2,6 +2,11 @@
 	<div class='profile-options-inner-container white-background left width-100'>
     	<div class='profile-options-container left width-100'>
     	<?php
+			$class = 'profile-option-container';
+			if (count($this->options) > 7) {
+				$class = 'profile-option-container-narrow';
+			}
+			
 			foreach (array_reverse($this->options) as $option) {
 				if (isset($option['href'])) {
 					// Is link
@@ -17,7 +22,9 @@
 					$tooltip = 'tooltip="' . $option['tooltip'] . '"';
 				}
 				
-				echo "<" . $tag . " " . $href . " id='profile-option-" . $option['img'] . "' class='right profile-option-container white-background animate-darker pointer' " . $tooltip . ">
+				
+				
+				echo "<" . $tag . " " . $href . " id='profile-option-" . $option['img'] . "' class='right " . $class . " white-background animate-darker pointer' " . $tooltip . ">
 							<div class='left width-100'>
 								<img src='/images/games/icons/" . $option['img'] . ".png' class='profile-options-img auto-center'  />
 							</div>

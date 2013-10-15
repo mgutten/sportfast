@@ -28,6 +28,32 @@ $this->placeholder('narrowColumn')->captureEnd();
 	  actingUserID='<?php echo $this->user->userID;?>'>
 </span>
 
+<?php
+
+	$options = array(array('text' => 'create game',
+							'img'  => 'create',
+							'tooltip' => 'Create game at this location',
+							'href' => '/create/game'),
+					 array('text' => 'review',
+							'img'  => 'review',
+							'tooltip' => 'Write a review of this location',
+							'href' => '/parks/' . $this->park->parkID . '/ratings'),
+					 array('text' => 'directions',
+							'img'  => 'directions',
+							'tooltip' => 'Get directions',
+							'href' => 'http://www.google.com/maps?f=d&q=' . $this->parkLocation->latitude . ',' . $this->parkLocation->longitude)
+						  );
+	
+	if ($this->stashExists) {
+		$options[] = array('text' => 'stash',
+							'img'  => 'stash',
+							'tooltip' => 'View stash details');
+	}
+
+	
+	echo $this->partial('partials/profile/options.phtml', array('options' => $options));
+	
+?>
 
 <header class='clear profile-name-container'>
 	<p class='profile-name heavy darkest clear'>
@@ -48,7 +74,7 @@ $this->placeholder('narrowColumn')->captureEnd();
     </div>
     <?php } ?>
 </header>
-
+<!--
 <div id='profile-buttons-container-holder' class='right'></div>
 <div id='profile-buttons-container' holder='profile-buttons-container-holder' class='absolute'>
 	<div class='profile-buttons-inner-container left'>
@@ -71,6 +97,8 @@ $this->placeholder('narrowColumn')->captureEnd();
         </div>
     </div>
 </div>
+-->
+
 
 <div class='park-details-tab-container clear'>
     <p class='park-details-tab park-details-tab-selected light-back rounded-corners light left larger-text pointer'>Sports</p>

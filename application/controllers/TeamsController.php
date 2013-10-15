@@ -39,6 +39,13 @@ class TeamsController extends Zend_Controller_Action
 			Zend_Session::namespaceUnset('invites');
 		}
 		
+		$session = new Zend_Session_Namespace('message');
+		if ($session->sent) {
+			// From mailController inviteTypeAction, invites successfully sent, alert
+			$this->view->messageSent = true;
+			Zend_Session::namespaceUnset('message');
+		}
+		
 		$session = new Zend_Session_Namespace('addToTeam');
 		if (isset($session->fail)) {
 			// From MailController addUserSubscribeGame action, user not added to game from email

@@ -1,0 +1,64 @@
+<?php
+/** 
+ * controller => games
+ * action => subscribers
+ */
+$this->headTitle('Game Subscribers');
+$this->headLink()->prependStylesheet($this->baseUrl() . '/css/profile.css');
+$this->headLink()->prependStylesheet($this->baseUrl() . '/css/game.css');
+$this->headScript()->prependFile($this->baseUrl() . '/js/profile.js');
+
+?>
+
+<?php
+
+$this->placeholder('narrowColumn')->captureStart();
+
+echo "<img src='" . $this->game->park->getProfilePic('large') . "' class='clear narrow-column-picture' />";
+
+echo "<div class='clear larger-margin-top larger-text width-100'>
+		<p class='clear heavy darkest width-100 center'>" . $this->game->getGameTitle() . "</p>
+		<p class='clear darkest width-100 center smaller-text'>" . $this->game->gameDate->format('l') . "s at " . $this->game->gameDate->format('g') . ($this->game->gameDate->format('i') != 0 ? ':' . $this->game->gameDate->format('i') : '') . $this->game->gameDate->format('a') . "</p>
+	  	<p class='clear medium width-100 center smaller-text'>" . $this->game->park->parkName . "</p>
+	  </div>";
+
+$this->placeholder('narrowColumn')->captureEnd();
+
+echo $this->partial('partials/global/backTo.phtml', array('type' => 'game',
+														  'id' => $this->game->gameID));
+
+
+$content = "<p class='right heavy darkest profile-section-bold-subheader'>" . count($this->game->subscribers) . " players receive weekly emails</p>";
+
+echo "<div class='clear width-100' id='game-subscribers-header-container'>";
+echo $this->partial('partials/global/sectionHeaderBold.phtml', array('title' => 'subscribers',
+																	 'content' => $content));
+
+echo "</div>";																 
+?>
+
+<?php
+
+foreach ($this->subscribers->getAll() as $user)
+{
+	if ($user->getTempAttrib('doNotEmail') == '1') {
+		continue;
+	}
+	echo "<a href='/users/" . $user->userID . "' class='clear width-100 game-subscribers-container animate-darker'>
+			<img src='" . $user->getProfilePic('tiny') . "' class='left'/>
+			<p class='left larger-indent larger-text heavy darkest margin-top game-subscribers-name'>" . $user->shortName . "</p>";
+	
+
+	echo "<p class='left game-subscribers-total-subheader medium smaller-text'>total games:</p>
+		  <p class='left game-subscribers-total medium  indent heavy'>" . $user->getTempAttrib('totalGames') . "</p>";
+	
+	if ($lastPlayed = $user->getTempAttrib('lastPlayed')) {
+		// Has played before
+		echo "<div class='right'><p class='left game-subscribers-total-subheader medium smaller-text'>last played</p>
+			  <p class='left game-subscribers-lastPlayed medium indent smaller-text'>" . $user->getTimeFromNow($lastPlayed, 30) . "</p>
+			  </div>";
+	}
+	
+	echo "</a>";
+}
+																	 

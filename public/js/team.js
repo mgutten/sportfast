@@ -24,6 +24,33 @@ $(function()
 		showAlert($('#manage-team-info-alert-container'));
 	})
 	
+	$('#profile-option-delete').click(function()
+	{
+		confirmAction = function () {
+						var detailsEle = getDetailsEle();
+						var userID = detailsEle.attr('actingUserID');
+						var idType = detailsEle.attr('idType');
+						var typeID = detailsEle.attr(idType);
+						var actingUserID = userID;
+						var receivingUserID;
+						var action = 'delete';
+						var type   = idType.replace(/ID/, '');
+						var details;		
+						
+						//createNotification(idType, typeID, actingUserID, receivingUserID, action, type, details);
+						
+						cancelType(idType, typeID);
+						changedAlert = true;
+						//reloadPage();
+				}
+				
+		var detailsEle = getDetailsEle();
+		var text = 'delete ' + detailsEle.attr('teamName');
+		var postContent = "<p class='clear margin-top light width-100 center'>This action cannot be undone.</p>";
+		
+		populateConfirmActionAlert(text, postContent);
+	})
+	
 	$('.schedule-in,.schedule-out').click(function()
 	{
 		reloadPage();
@@ -517,6 +544,7 @@ function inviteToTeamGame(teamID, teamGameID, reserves)
 		type: 'POST',
 		data: {options: options},
 		success: function(data) {
+			alert(data);
 			showConfirmationAlert('Invites sent');
 		}
 	})

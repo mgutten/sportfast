@@ -44,9 +44,14 @@
 	width: 8.2em;
 }
 
-.profile-option-container {
+.profile-option-container,
+.profile-option-container-narrow {
 	width: 6em;
 	padding-bottom: .2em;
+}
+
+.profile-option-container-narrow {
+	width: 5.2em;
 }
 
 .profile-options-container {
@@ -116,6 +121,7 @@
 
 #messageSubject-container {
 	width: 20em;
+
 }
 
 #messageSubject-container > input {
@@ -125,6 +131,7 @@
 #messageBody-container {
 	width: 36em;
 	height: 7em;
+	margin-left:.4em;
 }
 
 #messageBody-container > textarea {
@@ -134,6 +141,11 @@
 
 #messageBody-container > .input-overlay {
 	margin-top: -5.3em;
+}
+
+#messageSubmit {
+	margin-right:.5em;
+	float:right;
 }
 
 #user-buttons-container,#profile-buttons-container {
@@ -273,16 +285,30 @@
 }
 
 .profile-player-overlay-container-small {
-	width: 48px;
+	width: 47px;
 	height:45px;
+	opacity:1;
+	z-index:0;
 }
 
 .team-player-container-small {
 	margin-top: 30px;
 }
 
+.team-player-container-small > .team-confirm-img {
+	position:relative;
+	z-index:5;
+	opacity:1
+}
+
+.team-player-container-small > .hover-dark {
+	background: #000;
+}
+
 .team-player-container-small > .box-img-container-small {
 	width: 48px;
+	position:relative;
+	z-index:4;
 }
 
 .profile-player-overlay {
@@ -600,7 +626,7 @@ input[type=text].profile-manage-team-info-roster-limit {
 }
 
 /* alert */
-#invites-alert-container {
+#success-alert-container {
 	width: 20em;
 	margin-left: -10em;
 	margin-top: -7em;

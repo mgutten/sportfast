@@ -37,6 +37,18 @@ class Application_Form_General extends Zend_Form
 				'checked'		=> false,
 				'class'			=> 'medium'
 				));
+				
+		$this->addElement('submit', 'submit', array(
+				'label'			=> '',
+				'class'			=> '',
+				'autocomplete'  => 'off'
+				));
+				
+		$this->addElement('hidden', 'hidden', array(
+				'label'			=> '',
+				'class'			=> '',
+				'autocomplete'  => 'off'
+				));
 	}
 	
 }

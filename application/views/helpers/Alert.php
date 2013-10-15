@@ -90,18 +90,38 @@ class Application_View_Helper_Alert
 	 */
 	public function messageAlert()
 	{
+		if ($this->_view->game) {
+			// Is game
+			$typeID = $this->_view->game->gameID;
+			$idType = 'gameID';
+		} else {
+			// Team
+			$typeID = $this->_view->team->teamID;
+			$idType = 'teamID';
+		}
 		
 		$form = new Application_Form_General();
 		
 		$output  = $this->start('message','Message players');
-		$output .= 	"<div class='clear width-100'>"
-						. $form->text->setAttrib('id', 'messageSubject')
-							   		 ->setLabel("Subject")
-					. "</div>";
+		
+		$output .= "<form action='/mail/message' method='post'>";
+		
 		$output .= "<div class='clear width-100'>";
 		$output .= $form->textarea->setAttrib('id', 'messageBody')
+								  ->setName('messageBody')
 							 	  ->setLabel("Write message here..."); 
+		$output .= "<p class='clear smaller-text medium larger-indent'>This message will be sent to all subscribers and currently attending players.</p>";
 		$output .= "</div>";
+		
+		$output .= $form->hidden->setAttrib('id', $idType)
+								->setName($idType)
+								->setValue($typeID);
+		
+		$output .= $form->submit->setAttrib('id', 'messageSubmit')
+								->setAttrib('class', 'button larger-text heavy')
+								->setLabel('Send');
+		
+		$output .= "</form>";
 		$output .= $this->end();
 		
 		return $output;
@@ -154,6 +174,7 @@ class Application_View_Helper_Alert
 			
 			if ($user) {
 				// Attendance
+				$output .=  "<p class='clear width-100 center smaller-text medium'>All user ratings are anonymous.</p>";
 				$output .=	"<div class='clear width-100 rating-section-container rating-attendance'>";
 				$output .=		"<p class='clear width-100 medium light-back'>Did " . $rating->getHeOrShe() . " show up?</p>";
 				$output .=		"<p class='clear button pointer button-small larger-margin-top rating-animate-trigger rating-remember-yes'>Yes</p>";

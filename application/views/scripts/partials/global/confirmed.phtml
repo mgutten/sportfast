@@ -1,0 +1,34 @@
+<?php
+	/**
+	 * create in, out, and maybe buttons
+	 * @params ($game => Application_Model_Game,
+	 *			$userID => userID of current user)
+	 */ 
+	
+	$selectedClass = 'member-schedule-button-selected inner-shadow';
+	$confirmed = $notConfirmed = $maybeConfirmed = '';
+	 
+	$game = $this->game; 
+	
+	if ($game->isConfirmed($this->userID)) {
+		$confirmed = $selectedClass;
+	} elseif ($game->isNotConfirmed($this->userID)) {
+		$notConfirmed = $selectedClass;
+	} elseif ($game->isMaybeConfirmed($this->userID)) {
+		$maybeConfirmed = $selectedClass;
+	}
+	
+	if ($game->isPickup()) {
+		$typeID = $game->gameID;
+		$idType = 'gameID';
+	} else {
+		$typeID = $game->teamGameID;
+		$idType = 'teamGameID';
+	}
+?>
+
+<div class='schedule-container' <?php echo "idType='" . $idType . "' typeID='" . $typeID . "' userID='" . $this->userID . "'";?>>
+    <p class='button schedule-in left larger-text heavy <?php echo $confirmed;?>'>in</p>
+    <p class='button schedule-out right larger-text heavy <?php echo $notConfirmed;?>'>out</p>
+    <p class='clear button schedule-maybe right smaller-text <?php echo $maybeConfirmed;?>'>maybe</p>
+</div>

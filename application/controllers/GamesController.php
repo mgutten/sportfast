@@ -15,6 +15,7 @@ class GamesController extends Zend_Controller_Action
 		$gameID = $this->getRequest()->getParam('id');
         $game = new Application_Model_Game();
 		$game->getGameByID($gameID);
+
 		
 		$this->view->game = $game;
 		
@@ -42,21 +43,27 @@ class GamesController extends Zend_Controller_Action
 			$this->view->invitesSent = true;
 			Zend_Session::namespaceUnset('invites');
 		}
+	
+		$session = new Zend_Session_Namespace('message');
+		if ($session->sent) {
+			// From mailController messageAction, email message successfully sent, alert
+			$this->view->messageSent = true;
+			Zend_Session::namespaceUnset('message');
+		}
 		
 		$session = new Zend_Session_Namespace('addToGame');
 		if (isset($session->fail)) {
 			// From MailController addUserSubscribeGame action, user not added to game from email
-			if ($session->fail == 'already') {
-				// User is already in this game
-				$this->view->addToGame = 'You are already in this game.';
-			} elseif ($session->fail == 'full') {
+			if ($session->fail == 'full') {
 				// Game is full
 				$this->view->addToGame = 'This game is full.';
+			} elseif ($session->fail == 'out') {
+				// Confirmed as "out"
+				$this->view->addToGame = 'You will be counted as "out".';
 			} else {
 				// Successfully added
 				$this->view->addToGame = 'You have been added to the roster.';
 			}
-			
 			
 			Zend_Session::namespaceUnset('addToGame');
 		}
@@ -82,8 +89,8 @@ class GamesController extends Zend_Controller_Action
 		$this->view->minPlayers    = $game->minPlayers;
 
 		$this->view->gameOn		   = ($this->view->confirmedPlayers >= $game->minPlayers ? true : false);
-		$this->view->playersNeeded = $game->getPlayersNeeded();
-		$this->view->gameFull	   = ($game->rosterLimit <= $game->totalPlayers ? true : false);
+		$this->view->playersNeeded = $game->getPlayersNeeded('more');
+		$this->view->gameFull	   = ($game->rosterLimit <= $game->countConfirmedPlayers() ? true : false);
 		
 		
 		$this->view->newsfeed   = $game->messages->getGameMessages($game->gameID);
@@ -93,11 +100,13 @@ class GamesController extends Zend_Controller_Action
 		
 		$game->sortPlayersByConfirmed();
 		
+		/*
 		if ($game->isRecurring() && !$subscribed) {
 			// Show subscribe button
 			$this->view->topAlert = true;
 			$this->view->showSubscribe = true;
 		}
+		*/
 		
 		
 		if ($userInGame) {
@@ -292,6 +301,22 @@ class GamesController extends Zend_Controller_Action
 		$history = $game->getHistoryData(6, $this->view->user->userID);
 		
 		$this->view->history = $history;
+	}
+	
+	public function subscribersAction()
+	{
+		//$this->view->narrowColumn = false;
+		
+		$gameID = $this->getRequest()->getParam('id');
+        $game = new Application_Model_Game();
+		$game->getGameByID($gameID);
+		
+		$subscribers = $game->getGameSubscribers();
+		
+		$this->view->subscribers = $subscribers;
+		
+		$this->view->game = $game;
+		
 	}
 	
 	public function inviteAction()

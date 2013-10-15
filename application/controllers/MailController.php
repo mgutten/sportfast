@@ -26,247 +26,142 @@ class MailController extends Zend_Controller_Action
 		}
 	}
 	
-	public function testAction()
+	
+	/**
+	 * message all players of team/game
+	 */
+	public function messageAction()
 	{
-		/*
-		$subject  = $this->view->user->fullName . " invited you to Team Space Work upcoming basketball game";
-		$message  = 'Hey dude, good to see you';
-		$headers  = "MIME-Version: 1.0" . "\r\n";
-		$headers .= "Content-type: text/html; charset=iso-8859-1" . "\r\n";
-		$headers .= "From: support@sportfast.com\r\n";	 
-		$headers .= "Reply-To: donotreply@sportfast.com" . "\r\n";
+		$post = $this->getRequest()->getPost();
 		
-		
-		$notice_text = "This is a multi-part message in MIME format.";
-		$plain_text = "This is a plain text email.\r\nIt is very cool.";
-		$html_text = "<html><body>This is an <b style='color:purple'>HTML</b> text email.\r\nIt is very cool.</body></html>";
-		
-		$semi_rand = md5(time());
-		$mime_boundary = $semi_rand;
-		//$mime_boundary_header = $mime_boundary;
-		
-		$to = "guttenbergm@hotmail.com";
-		//$from = "support@sportfast.com";
-		$subject = "My Email";
-		
-		$headers  = "MIME-Version: 1.0" . "\r\n";
-		$headers .= "From: support@sportfast.com\r\n";	 
-		$headers .= "Reply-To: donotreply@sportfast.com" . "\r\n";
-		$headers .= "Content-Type: multipart/alternative;" . "
-					boundary='" . $mime_boundary . "'";
-		
-		
-		$body = "$notice_text
-		
-		--$mime_boundary
-		Content-Type: text/plain; charset=us-ascii
-		Content-Transfer-Encoding: 7bit
-		
-		$plain_text
-		
-		--$mime_boundary
-		Content-Type: text/html; charset=us-ascii
-		Content-Transfer-Encoding: 7bit
-		
-		$html_text
-		
-		--$mime_boundary--";
-		
-		
-		if (@mail($to, $subject, $body, $headers))
-			echo "Email sent successfully.";
-		else
-			echo "Email NOT sent successfully!";
-							
-		//mail('guttenbergm@hotmail.com', $subject, $message, $headers);
-		*/
-		
-		require($_SERVER['DOCUMENT_ROOT'] . '/plugins/PHPMailer/class.phpmailer.php');
-
-		$mail = new PHPMailer;
-		
-		$mail->isSMTP();                                      // Set mailer to use SMTP
-		$mail->Host = 'box774.bluehost.com';  				  // Specify main and backup server
-		$mail->SMTPAuth = true;                               // Enable SMTP authentication
-		$mail->Username = 'support@sportfast.com';                            // SMTP username
-		$mail->Password = 'sportfast.9';                           // SMTP password
-		//$mail->SMTPSecure = "ssl";
-		
-		
-		$mail->From = 'support@sportfast.com';
-		$mail->FromName = 'Sportfast';
-		$mail->addAddress('guttenbergm@hotmail.com', 'Marsh Gutt');  // Add a recipient
-		$mail->addReplyTo('donotreply@sportfast.com');
-		
-		$mail->isHTML(true);                                  // Set email format to HTML
-		
-		$mail->Subject = 'Marshall Guttenberg invited you to join his football team';
-		$mail->Body    = "<html>
-					<body><style>
-					.ExternalClass  {line-height: 100%;
-									  -webkit-margin-after: 0;
-									  -webkit-margin-before: 0;} 
-					
-					p {
-						margin: 0;
-					}
-					
-					p,div,span,li,ul,a {
-						font-family: Arial, Helvetica, Sans-Serif;
-						font-size: 14px;
-					}
-					
-					p,div,span,li,ul {
-						color: #333;
-						
-					}
-					
-					.medium {
-						color: #8d8d8d;
-					}
-					
-					.light {
-						color: #bbb;
-					}
-					
-					.darkest {
-						color: #333;
-					}
-					
-					.white {
-						color: #fff;
-					}
-					
-					.bold {
-						font-weight: bold;
-					}
-					
-					.larger-text {
-						font-size: 1.25em;
-					}
-					
-					.largest-text {
-						font-size: 2.5em;
-					}
-					
-					.smaller-text {
-						font-size: .8em;
-					}
-					
-					.center {
-						width: 100%;
-						text-align: center;
-					}
-					
-					.green-button {
-						padding: .2em 1.25em;
-						background: #58bf12;
-						color: #fff;
-					}
-					
-					.dark-back {
-						background: #333;
-					}
-					
-					</style><table width='98%'>
-						<tr><td style='display: block; clear: both;' align='center'>
-						<table style='width:100%;max-width: 650px !important;'  border='0' cellpadding='0' cellspacing='0' align='center'>
-								
-								<tr><td><p style='font-family: Arial, Helvetica, Sans-Serif; font-size: 14px; color: #333; margin: 0;'>I've moved our Basketball team to Sportfast so we can coordinate easier.  With Sportfast, you can:</p>
-							<ul class='bold' style='font-family: Arial, Helvetica, Sans-Serif; font-size: 14px; color: #333; font-weight: bold;'><li style='font-family: Arial, Helvetica, Sans-Serif; font-size: 14px; color: #333;'>see who is 'in' or 'out' for our next game</li><li style='font-family: Arial, Helvetica, Sans-Serif; font-size: 14px; color: #333;'>view our upcoming schedule</li><li style='font-family: Arial, Helvetica, Sans-Serif; font-size: 14px; color: #333;'>receive automatic reminders for upcoming games</li><li style='font-family: Arial, Helvetica, Sans-Serif; font-size: 14px; color: #333;'>track our progress over the season</li><li style='font-family: Arial, Helvetica, Sans-Serif; font-size: 14px; color: #333;'>find local pickup games for different sports</li></ul>
-							<p style='font-family: Arial, Helvetica, Sans-Serif; font-size: 14px; color: #333; margin: 0;'>Signup is required, but it only takes a minute and it's going to make our lives much easier.
-							<br><br>Emily S</p>
-						</td></tr><tr>
-						 <td height='30px'></td>
-					 </tr>
-					  <tr><td align='center'>
-							<p class='largest-text bold' style='font-family: Arial, Helvetica, Sans-Serif; font-size: 2.5em; color: #333; font-weight: bold; margin: 0; -webkit-margin-after: 0;'>Charlies</p>
-							<p class='larger-text bold' style='font-family: Arial, Helvetica, Sans-Serif; font-size: 1.75em; color: #333; font-weight: bold; margin: 0;'>Basketball Team</p>
-						</td></tr>
-					 <tr>
-						 <td height='20px'></td>
-					 </tr>
-					 <tr>
-						<td align='center'>
-							<a href='http://www.sportfast.com/mail/invite-user-team/9' class='green-button largest-text bold' style='text-decoration: none; font-family: Arial, Helvetica, Sans-Serif; font-size: 2.5em; font-weight: bold; color: #fff; background-color: #58bf12; padding: .2em 1.25em;'>Join</a>
-						</td>
-					 </tr><tr>
-						 <td height='10px'></td>
-					 </tr>
-					 <tr>
-						 <td>
-						 	<p style='font-family: Arial, Helvetica, Sans-Serif; font-size: 14px; color: #58bf12; font-weight: bold;text-align:center'>You will not receive any future reminders regarding this team or be able to view its details until you join. 
-								</p>
-						 </td>
-					 </tr>
-					 <tr>
-						 <td height='40px'></td>
-					 </tr>
-					 <tr>
-						 <td class='dark-back' style='background-color: #333;' bgcolor='#333'>
-							<p class='bold white larger-text' style='font-family: Arial, Helvetica, Sans-Serif; font-size: 1.25em; color: #fff; font-weight: bold; margin: 0;'>What is Sportfast?</p> 	
-						</td>
-					 </tr>
-					 <tr>
-					 	<td cellpadding='4'>
-							<p class='medium smaller-text' style='font-family: Arial, Helvetica, Sans-Serif; font-size: .8em; color: #8d8d8d; margin: 0;'>Sportfast is designed to simplify the way we find, organize, and manage our recreational sports.  
-							It will help you find new pickup games, manage your old ones,
-							and track your progress over time.  Our unique algorithms analyze users' age, skill, availability, and location to create competitive and enjoyable pickup games, as well as league teams, near you.  You'll always
-							know who is going and how you match up against them, so you never need to feel unwelcome or out-matched.  If you love sports as much as we do, then you should look no further.</p>
-						</td>
-					</tr>
-					<tr>
-						 <td height='20px'></td>
-					 </tr>
-					<tr>
-						 <td class='dark-back' style='background-color: #333;' bgcolor='#333'>
-							<p class='bold white larger-text' style='font-family: Arial, Helvetica, Sans-Serif; font-size: 1.25em; color: #fff; font-weight: bold; margin: 0;'>How much does it cost?</p> 	
-						</td>
-					 </tr>
-					 <tr>
-					 	<td cellpadding='4'>
-							<p class='medium smaller-text' style='font-family: Arial, Helvetica, Sans-Serif; font-size: .8em; color: #8d8d8d; margin: 0;'>Nothing!  There is no cost.  There aren't even ads!  We're in beta, so help us out by giving us your feedback!</p>
-						</td>
-					</tr>
-					<tr>
-						 <td height='20px'></td>
-					 </tr>
-					<tr>
-						 <td class='dark-back' style='background-color: #333;' bgcolor='#333'>
-							<p class='bold white larger-text' style='font-family: Arial, Helvetica, Sans-Serif; font-size: 1.25em; color: #fff; font-weight: bold; margin: 0;'>What sports?</p> 	
-						</td>
-					 </tr>
-					 <tr>
-					 	<td cellpadding='4'>
-							<p class='medium smaller-text' style='font-family: Arial, Helvetica, Sans-Serif; font-size: .8em; color: #8d8d8d; margin: 0;'>Currently, we support basketball, soccer, football, volleyball, tennis, and ultimate frisbee.  Again, we're in beta, so we don't quite have everything that we want yet, but keep checking back for more!</p>
-						</td>
-					</tr>
-					 <tr>
-					 	<td>
-							<p class='medium smaller-text' style='font-family: Arial, Helvetica, Sans-Serif; font-size: .8em; color: #8d8d8d; margin: 0;'>You can read more about us <a href='http://www.sportfast.com/how' class='darkest' style='font-family: Arial, Helvetica, Sans-Serif; color: #444; margin: 0;'>on our website</a>.</p>
-						</td>
-					</tr>		</table>
-						</td>
-						</tr>
-					</table>
-					
-					</body>
-					</html>";
-		$mail->AltBody = "I've moved our Basketball team to Sportfast so we can coordinate easier.  With Sportfast, you can:
-						Signup is required, but it only takes a minute and it's going to make our lives much easier.
-						Sportfast is designed to simplify the way we find, organize, and manage our recreational sports.  
-							It will help you find new pickup games, manage your old ones,
-							and track your progress over time.  Our unique algorithms analyze users' age, skill, availability, and location to create competitive and enjoyable pickup games, as well as league teams, near you.  You'll always
-							know who is going and how you match up against them, so you never need to feel unwelcome or out-matched.  If you love sports as much as we do, then you should look no further.";
-		
-		if(!$mail->send()) {
-		   echo 'Message could not be sent.';
-		   echo 'Mailer Error: ' . $mail->ErrorInfo;
-		   exit;
+		if (isset($post['gameID'])) {
+			// Is game
+			$typeModel = new Application_Model_Game();
+			$typeModel->getGameByID($post['gameID']);
+			
+			$subscribers = array_keys($typeModel->subscribers);
+			
+			$confirmed = array_keys($typeModel->confirmedPlayers);
+			
+			$userIDs = array_unique(array_merge($subscribers, $confirmed));
+			
+			$subject = $this->view->user->fullName . ' sent a message to your ' . $typeModel->sport . ' game';
+			
+			$returnURL = "/games/" . $post['gameID'] . "";
+		} else {
+			$typeModel = new Application_Model_Team();
+			$typeModel->getTeamByID($post['teamID']);
+			
+			$userIDs = $typeModel->players->getUserIDs();
+			
+			$subject = $this->view->user->fullName . ' sent a message to ' . $typeModel->teamName;
+			
+			$returnURL = "/teams/" . $post['teamID'] . "";
 		}
 		
-		echo 'Message has been sent';
+		unset($userIDs[array_search($this->view->user->userID, $userIDs)]);
+		
+		$users = new Application_Model_Users();
+		$userEmails = $users->getUserEmails($userIDs);
+		
+		
+		require($_SERVER['DOCUMENT_ROOT'] . '/plugins/PHPMailer/class.phpmailer.php');	
+		
+		foreach ($userEmails as $userID => $email) {
+			
+			$mail = new PHPMailer;
+			$mail->isSMTP();                                      
+			$mail->Host = 'box774.bluehost.com';  				 
+			$mail->SMTPAuth = true;                               
+			$mail->Username = 'support@sportfast.com';                            
+			$mail->Password = 'sportfast.9';                           
+			//$mail->SMTPSecure = "ssl";
+			
+			
+			$mail->From = 'support@sportfast.com';
+			$mail->FromName = 'Sportfast';
+			$mail->addAddress($email);  
+			$mail->addReplyTo('donotreply@sportfast.com');
+			
+			$mail->isHTML(true);                                  
+			
+			$mail->Subject = $subject;
+			
+			$body = $this->buildMessage($post['messageBody'], $typeModel, $userID);
+			
+			$mail->Body    = $body['html'];
+			$mail->AltBody = $body['text'];
+			
+			$mail->send();
+			
+			//mail($email, $subject, $body['html']);
+		}
+		
+		$session = new Zend_Session_Namespace('message');
+		$session->sent = true;
+		
+		$this->_redirect($returnURL);
 	}
+	
+	public function buildMessage($message, $typeModel, $userID = false)
+	{
+		$output = $text = '';
+		
+		$output = $this->mailStart();
+		
+		$lower = "<p style='font-family: Arial, Helvetica, Sans-Serif; color: #8d8d8d;font-size:11px;'>";
+		
+		if ($typeModel instanceof Application_Model_Game) {
+			
+			if ($typeModel->isSubscriber($userID)) {
+				// Allow unsubscribe
+				$lower .= "You have received this email because you are subscribed to this game.  To unsubscribe, click <a href='http://www.sportfast.com/mail/unsubscribe-game/" . $typeModel->gameID . "/" . $userID . "' style='font-size:1em;font-family: Arial, Helvetica, Sans-Serif; color: #8d8d8d;'>here</a>.</p>";
+			} else {
+				$lower .= "You have received this email because you are attending to this game.</p>";
+			}
+			$url = 'http://www.sportfast.com/games/' . $typeModel->gameID;
+			$type = 'game';
+		} else {
+			// Team
+			$lower .= "You have received this email because you are on this team.</p>";
+			$url = 'http://www.sportfast.com/teams/' . $typeModel->teamID;
+			$type = 'team';
+		}
+		
+		$output .= "<tr>
+						<td>
+							<p style='font-family: Arial, Helvetica, Sans-Serif; color: #8d8d8d;font-size:12px;'>
+								" . $this->view->user->firstName . " said...
+							</p>
+							<p style='font-family: Arial, Helvetica, Sans-Serif; color: #333;font-size:14px;background:#e9e9e9;padding:10px;'>" 
+							. nl2br($message) . 
+						"</p></td>
+					</tr>
+					<tr height='30'>
+						<td></td>
+					</tr>
+					<tr>
+						<td align='center'><a href='" . $url . "' style='font-family: Arial, Helvetica, Sans-Serif; color: #8d8d8d;font-size:16px;'>view " . $type . "</a></td>
+					</tr>
+					<tr height='30'>
+						<td></td>
+					</tr>
+					<tr>
+						<td>" . $lower . "</td>
+					</tr>";
+					
+		$text  .= $message;
+		
+		$output .= $this->mailEnd();
+		
+		$returnArray = array('html' => $output,
+							 'text' => $text);
+							 
+		return $returnArray;
+	}
+						
+
+					 
 	
 	/**
 	 * invite users to team game from reserves list
@@ -320,6 +215,7 @@ class MailController extends Zend_Controller_Action
 			
 			$mail->send();
 			
+			
 			/*
 			$subject  = $this->view->user->fullName . " invited you to " . $game->getTeamNamePossession() . " upcoming " . strtolower($game->sport) . " game";
 			$message  = $this->buildInviteTeamGameMessage($this->view->user, $game, $userID);
@@ -360,19 +256,12 @@ class MailController extends Zend_Controller_Action
 		$text .= "\n \t vs. " . $game->opponent . "\n";
 		$text .= "\t " . $game->gameDate->format('l') . " at " . $time . "\n";
 		$text .= "\t "  . $game->locationName . "\n";
+		
+		$inURL = "http://www.sportfast.com/mail/add-user-team-game/" . $game->teamGameID . "/" . $userID . "/1";
+		$outURL = "http://www.sportfast.com/mail/add-user-team-game/" . $game->teamGameID . "/" . $userID . "/0";
+		$maybeURL = "http://www.sportfast.com/mail/add-user-team-game/" . $game->teamGameID . "/" . $userID . "/2";
 					 
-		$output .= "<tr>
-						 <td height='20px'></td>
-					 </tr>
-					 <tr>
-						<td align='right' width='315'>
-							<a href='http://www.sportfast.com/mail/add-user-team-game/" . $game->teamGameID . "/" . $userID . "' class='green-button largest-text bold' style='text-decoration: none; font-family: Arial, Helvetica, Sans-Serif; font-size: 2.2em; font-weight: bold; color: #fff; background-color: #58bf12; padding: .2em 1.5em;'>in</a>
-						</td>
-						<td width='20'></td>
-						<td align='left' width='315'>
-							<a href='http://www.sportfast.com/mail/remove-user-team-game/" . $game->teamGameID . "/" . $userID . "' class='green-button largest-text bold' style='text-decoration: none; font-family: Arial, Helvetica, Sans-Serif; font-size: 2.2em; font-weight: bold; color: #fff; background-color: #58bf12; padding: .2em 1.25em;'>out</a>
-						</td>
-					</tr>";
+		$output .= $this->buildConfirmedButtons($inURL, $outURL, $maybeURL);
 		
 		$text .= "\n IN: http://www.sportfast.com/mail/add-user-team-game/" . $game->teamGameID . "/" . $userID . "	
 				 \n OUT: http://www.sportfast.com/mail/remove-user-team-game/" . $game->teamGameID . "/" . $userID . "
@@ -453,13 +342,16 @@ class MailController extends Zend_Controller_Action
 		}
 		
 		if ($type == 'game') {
-
+			// Is game
 			$typeModel = new Application_Model_Game();
 			$typeModel->getGameByID($typeID);
+			
+			$subjectAdd = ' on ' . $typeModel->gameDate->format('l');
 		} else {
 			// Is team
 			$typeModel = new Application_Model_Team();
 			$typeModel->getTeamByID($typeID);
+			$subjectAdd = '';
 		}
 		
 		require($_SERVER['DOCUMENT_ROOT'] . '/plugins/PHPMailer/class.phpmailer.php');		
@@ -484,6 +376,7 @@ class MailController extends Zend_Controller_Action
 			$notification->save();
 			
 			$mail = new PHPMailer;
+			
 			$mail->isSMTP();                                      
 			$mail->Host = 'box774.bluehost.com';  				 
 			$mail->SMTPAuth = true;                               
@@ -499,7 +392,7 @@ class MailController extends Zend_Controller_Action
 			
 			$mail->isHTML(true);                                  
 			
-			$mail->Subject = $this->view->user->fullName . ' invited you to ' . $this->view->user->getHisOrHer() . ' ' . ucwords($typeModel->sport) . ' ' . ucwords($type);
+			$mail->Subject = $this->view->user->fullName . ' invited you to ' . $this->view->user->getHisOrHer() . ' ' . ucwords($typeModel->sport) . ' ' . ucwords($type) . $subjectAdd;
 			$body 	   	   = $this->buildInviteGameMessage($this->view->user, $typeModel, $note, $userID);
 			
 			$mail->Body    = $body['html'];
@@ -526,12 +419,14 @@ class MailController extends Zend_Controller_Action
 			
 			$mail = new PHPMailer;
 			
+			
 			$mail->isSMTP();                                      // Set mailer to use SMTP
 			$mail->Host = 'box774.bluehost.com';  				  // Specify main and backup server
 			$mail->SMTPAuth = true;                               // Enable SMTP authentication
 			$mail->Username = 'support@sportfast.com';                            // SMTP username
 			$mail->Password = 'sportfast.9';                           // SMTP password
 			//$mail->SMTPSecure = "ssl";
+			
 			
 			
 			$mail->From = 'support@sportfast.com';
@@ -541,8 +436,8 @@ class MailController extends Zend_Controller_Action
 			
 			$mail->isHTML(true);                                  // Set email format to HTML
 			
-			$mail->Subject = $this->view->user->fullName . ' invited you to ' . $this->view->user->getHisOrHer() . ' ' . ucwords($typeModel->sport) . ' ' . ucwords($type);
-			$body 	   	   = $this->buildInviteGameMessage($this->view->user, $typeModel, $note);
+			$mail->Subject = $this->view->user->fullName . ' invited you to ' . $this->view->user->getHisOrHer() . ' ' . ucwords($typeModel->sport) . ' ' . ucwords($type) . $subjectAdd;
+			$body 	   	   = $this->buildInviteGameMessage($this->view->user, $typeModel, $note, false, $email);
 			
 			$mail->Body    = $body['html'];
 			$mail->AltBody = $body['text'];
@@ -580,16 +475,28 @@ class MailController extends Zend_Controller_Action
 	 *			$note => optional personalized note (str),
 	 *			$isUser => if true (aka receivingUserID value), do not include introductory stuff)
 	 */
-	public function buildInviteGameMessage($actingUser, $typeModel, $note = false, $isUser = false)
+	public function buildInviteGameMessage($actingUser, $typeModel, $note = false, $isUser = false, $email = false)
 	{
 		$output = $this->mailStart();
-		$text = '';
+		$text = $main = '';
 		$type = ($typeModel instanceof Application_Model_Game ? 'game' : 'team');
 						
 		if ($type == 'game') {
-
+			
+			if ($isUser) {
+				$output .= "<tr>
+							<td colspan='3'>
+								<p style='font-family: Arial, Helvetica, Sans-Serif; color: #333;font-size:16px;text-align:center'><strong>" . $actingUser->fullName . "</strong> invited you to join " . $actingUser->getHisOrHer() . " " . strtolower($typeModel->sport) . " game.</p>
+							</td>
+					  	 </tr>
+						 <tr>
+							<td height='20px'></td>
+						 </tr>";
+			}
+			
 			$time = ($typeModel->gameDate->format('i') > 0 ? $typeModel->gameDate->format('g:ia') : $typeModel->gameDate->format('ga'));
-			$main = "<tr><td align='center'>
+			
+			$main .= "<tr><td align='center' colspan='3'>
 							 <p class='largest-text bold' style='font-family: Arial, Helvetica, Sans-Serif; font-size: 2.5em; color: #333; font-weight: bold; margin: 0;'>" . $typeModel->getGameTitle(true) . "</p>
 							 <p class='largest-text bold' style='font-family: Arial, Helvetica, Sans-Serif; font-size: 2.5em; color: #333; font-weight: bold; margin: 0;'>" . $typeModel->gameDate->format('l') . " at " . $time . "</p>
 							 <p class='larger-text bold' style='font-family: Arial, Helvetica, Sans-Serif; font-size: 1.75em; color: #333; font-weight: bold; margin: 0;'>" . $typeModel->park->parkName . "</p>
@@ -611,8 +518,8 @@ class MailController extends Zend_Controller_Action
 			$main = $textMain = '';
 			if ($isUser) {
 				$main .= "<tr>
-								<td>
-									<p style='font-family: Arial, Helvetica, Sans-Serif; color: #333;font-size:1.25em;text-align:center'><strong>" . $actingUser->fullName . "</strong> invited you to join " . $actingUser->getHisOrHer() . " " . strtolower($typeModel->sport) . " team.</p>
+								<td colspan='3'>
+									<p style='font-family: Arial, Helvetica, Sans-Serif; color: #333;font-size:16px;text-align:center'><strong>" . $actingUser->fullName . "</strong> invited you to join " . $actingUser->getHisOrHer() . " " . strtolower($typeModel->sport) . " team.</p>
 								</td>
 						  </tr>
 							 
@@ -622,7 +529,7 @@ class MailController extends Zend_Controller_Action
 							 
 				$textMain .= $actingUser->fullName . " invited you to join " . $actingUser->getHisOrHer() . " " . strtolower($typeModel->sport) . " team. \n";
 			}
-			$main .= " <tr><td align='center'>
+			$main .= " <tr><td align='center' colspan='3'>
 							<p class='largest-text bold' style='font-family: Arial, Helvetica, Sans-Serif; font-size: 2.5em; color: #333; font-weight: bold; margin: 0;'>" . $typeModel->teamName . "</p>
 							<p class='larger-text bold' style='font-family: Arial, Helvetica, Sans-Serif; font-size: 1.75em; color: #333; font-weight: bold; margin: 0;'>" . $typeModel->sport . " Team</p>
 						</td></tr>";
@@ -639,11 +546,13 @@ class MailController extends Zend_Controller_Action
 						   "find local pickup games for different sports");
 			
 			$id = $typeModel->teamID;
-		}				
+		}			
 		
 		if ($note) {
 			// Add personalized note
-			$output .= "<tr><td><p style='font-family: Arial, Helvetica, Sans-Serif; font-size: 14px; color: #777; margin: 0;text-align:center;'>\"" . $note . "\"</p></td></tr>
+			$output .= "<tr><td colspan='3'>
+							<p style='font-family: Arial, Helvetica, Sans-Serif; font-size: 12px; color: #8d8d8d; margin: 0;text-align:left;'>" . $actingUser->firstName . " said...</p>
+							<p style='font-family: Arial, Helvetica, Sans-Serif; font-size: 16px; color: #777; margin: 0;text-align:center;background:#e9e9e9;padding:5px;font-weight:bold;'>" . $note . "</p></td></tr>
 						<tr height='20'>
 							<td></td>
 						</tr>";
@@ -653,7 +562,8 @@ class MailController extends Zend_Controller_Action
 		
 		if (!$isUser) {
 			$text .= "\n I've moved our " . $typeModel->sport . " " . $type . " to Sportfast so we can coordinate easier.  With Sportfast, you can:";
-			$output .= "<tr><td><p style='font-family: Arial, Helvetica, Sans-Serif; font-size: 14px; color: #333; margin: 0;'>I've moved our " . $typeModel->sport . " " . $type . " to Sportfast so we can coordinate easier.  With Sportfast, you can:</p>
+			$output .= "<tr><td colspan='3'>
+							<p style='font-family: Arial, Helvetica, Sans-Serif; font-size: 14px; color: #333; margin: 0;'>I've moved our " . $typeModel->sport . " " . $type . " to Sportfast so we can coordinate easier.  With Sportfast, you can:</p>
 							<ul class='bold' style='font-family: Arial, Helvetica, Sans-Serif; font-size: 14px; color: #333; font-weight: bold;'>";
 			//<br><br>" . $intro . "  It's designed specifically to help organize, find, and manage recreational sports.				
 			foreach ($intro as $point) {
@@ -683,43 +593,65 @@ class MailController extends Zend_Controller_Action
 		$text .= "\n \n " . $textMain . "\n";		
 	
 		$output .= "<tr>
-						 <td height='30px'></td>
+						 <td height='20px'></td>
 					 </tr>
 					 ";
 		$output .= 		$main;			 
 		
-		$output .=	"
-					 <tr>
-						 <td height='20px'></td>
-					 </tr>
-					 <tr>
-						<td align='center'>
-							<a href='http://www.sportfast.com/mail/" . $src . "' class='green-button largest-text bold' style='text-decoration: none; font-family: Arial, Helvetica, Sans-Serif; font-size: 2.5em; font-weight: bold; color: #fff; background-color: #58bf12; padding: .2em 1.25em;'>Join</a>
-						</td>
-					 </tr>";
+		if ($type == 'game') {
+			$inUrl    = "http://www.sportfast.com/mail/" . $src . "/1";
+			$outUrl   = "http://www.sportfast.com/mail/" . $src . "/0";
+			$maybeUrl = "http://www.sportfast.com/mail/" . $src . "/2";
+			
+			if (!$isUser) {
+				$inUrl .= "/" . urlencode($email);
+				$outUrl .= "/" . urlencode($email);
+				$maybeUrl .= "/" . urlencode($email);
+			}
+			
+			$buttonSection = $this->buildConfirmedButtons($inUrl, $outUrl, $maybeUrl);
+			
+			$text .= "\n \n \t IN: " . $inUrl;
+			$text .= "\n \t OUT: " . $outUrl;
+			$text .= "\n \t MAYBE: " . $maybeUrl . "\n";
+		} else {
+			$buttonSection = "<tr>
+								 <td height='20px'></td>
+							 </tr>
+							 <tr>
+								<td align='center' colspan='3'>
+									<a href='http://www.sportfast.com/mail/" . $src . "' class='green-button largest-text bold' style='text-decoration: none; font-family: Arial, Helvetica, Sans-Serif; font-size: 2.5em; font-weight: bold; color: #fff; background-color: #58bf12; padding: .2em 1.25em;'>Join</a>
+								</td>
+							 </tr>";
+			
+			$text .= "\n \t JOIN: http://www.sportfast.com/mail/" . $src . " \n";
+		}
+		
+		$output .= $buttonSection;
 					 
-		$text .= "\n \t JOIN: http://www.sportfast.com/mail/" . $src . " \n";
+		
 		if (!$isUser) {
 			$output .=  "<tr>
-						 <td height='10px'></td>
+						 <td height='15px'></td>
 					 </tr>
 					 <tr>
-						 <td>
-						 	<p style='font-family: Arial, Helvetica, Sans-Serif; font-size: 14px; color: #58bf12; font-weight: bold;text-align:center'>You will not receive any future reminders regarding this " . $type . " or be able to view its details unless you join. 
-								</p>
+						 <td colspan='3'>
+						 	<p style='font-family: Arial, Helvetica, Sans-Serif; font-size: 16px; color: #58bf12; font-weight: bold;text-align:center'>
+								You will not receive any future reminders regarding this " . $type . " or be able to view its details unless you " . ($type == 'game' ? 'RSVP now' : 'join') . ". 
+							</p>
 						 </td>
 					 </tr>
 					 " . $this->sportfastExplanation();
 			
 			$text .= $this->sportfastExplanation(true);
 					 
-			$text .= "\n You will not receive any more reminders regarding this " . $type . " or be able to view its details unless you join.";
+			$text .= "\n You will not receive any future reminders regarding this " . $type . " or be able to view its details unless you join.";
 		} else {
 			$output .= "<tr>
 					 	<td height='10px'></td>
 					 </tr>
 					 <tr>
-					 	<td align='center'>
+					 	<td align='center' colspan='3'>
 							<a href='http://www.sportfast.com/" . $type . "s/" . $id . "' class='medium' style='font-family: Arial, Helvetica, Sans-Serif; color: #58bf12;font-size:1.25em;'>view " . $type . "</a>
 						</td>
 					 </tr>";
@@ -843,6 +775,15 @@ class MailController extends Zend_Controller_Action
 	public function inviteUserGameAction()
 	{
 		$gameID = $this->getRequest()->getParam('id');
+		$confirmed  = $this->getRequest()->getParam('param2');
+		$email = urldecode($this->getRequest()->getParam('param3'));
+		
+		$user = new Application_Model_User();
+		$exists = $user->getUserBy('u.username', $email);
+		
+		if ($exists) {
+			return $this->_redirect('/mail/add-user-subscribe-game/' . $gameID . '/' . $user->userID . '/' . $confirmed);
+		}
 		
 		/*
 		$user = new Application_Model_User();
@@ -852,6 +793,8 @@ class MailController extends Zend_Controller_Action
 		$session = new Zend_Session_Namespace('signupInvite');
 		$session->type = 'game';
 		$session->id = $gameID;
+		$session->email = $email;
+		$session->confirmed = $confirmed;
 		
 		$this->_redirect('/signup');
 	}
@@ -927,7 +870,7 @@ class MailController extends Zend_Controller_Action
 			
 			$text .= "There " . ($players == 'players' ? 'are' : 'is') . " only " . $model->totalPlayers . " " . $players . " attending. \n \n";
 			
-			$top = "<p style='font-family: Arial, Helvetica, Sans-Serif; color: #333; margin: 0;'>There " . ($players == 'players' ? 'are' : 'is') . " only " . $model->totalPlayers . " " . $players . " attending.  Show up at your own risk.</p>
+			$top = "<p style='font-family: Arial, Helvetica, Sans-Serif; color: #333; margin: 0;'>There " . ($players == 'players' ? 'are' : 'is') . " only " . $model->totalPlayers . " " . $players . " attending.  Check the game page for more details.</p>
 					 <tr>
 					 	<td height='30'></td>
 					 </tr>";
@@ -1130,10 +1073,7 @@ class MailController extends Zend_Controller_Action
 			$password .= $characters[rand(0, strlen($characters) - 1)];
 		}
 		
-		
-		$user->password = $user->hashPassword($password);
-		
-		
+		$user->password = $user->hashPassword($password);		
 		
 		require($_SERVER['DOCUMENT_ROOT'] . '/plugins/PHPMailer/class.phpmailer.php');	
 		
@@ -1501,28 +1441,9 @@ class MailController extends Zend_Controller_Action
 							 <p class='largest-text bold' style='font-family: Arial, Helvetica, Sans-Serif; font-size: 2.5em; color: #333; font-weight: bold; margin: 0;'>" . $game->gameDate->format('l') . " at " . $time . "</p>
 							 <p class='larger-text bold' style='font-family: Arial, Helvetica, Sans-Serif; font-size: 1.75em; color: #333; font-weight: bold; margin: 0;'>" . $game->park->parkName . "</p>
 						 </td>
-					 </tr>
-					 <tr>
-						 <td height='20px'></td>
-					 </tr>
-					 <tr>
-						<td align='right' width='320'>
-							<a href='" . $inUrl . "' class='green-button largest-text bold' style='text-decoration: none; font-family: Arial, Helvetica, Sans-Serif; font-size: 2.2em; font-weight: bold; color: #fff; background-color: #58bf12; padding: .2em 1.5em;'>in</a>
-						</td>
-						<td width='10'></td>
-						<td align='left' width='320'>
-							<a href='" . $outUrl . "' class='green-button largest-text bold' style='text-decoration: none; font-family: Arial, Helvetica, Sans-Serif; font-size: 2.2em; font-weight: bold; color: #fff; background-color: #58bf12; padding: .2em 1.15em;'>out</a>
-						</td>
-					 </tr>
-					 <tr>
-						 <td height='17px'></td>
-					 </tr>
-					 <tr>
-						 <td align='center' colspan='3'>
-						 	<a href='" . $maybeUrl . "' class='green-button largest-text bold' style='text-decoration: none; font-family: Arial, Helvetica, Sans-Serif; font-size: 1em; font-weight: bold; color: #fff; background-color: #58bf12; padding: .2em 7em;'>maybe</a>
-						 </td>
-					 </tr>
-					 <tr>
+					 </tr>"
+					 . $this->buildConfirmedButtons($inURL, $outURL, $maybeURL) .
+					 "<tr>
 					 	<td height='10px'></td>
 					 </tr>
 					 <tr>
@@ -1561,12 +1482,17 @@ class MailController extends Zend_Controller_Action
 		
 		$message  = $this->mailStart();
 		
+		$inUrl = "http://www.sportfast.com/mail/add-user-team-game/" . $game->teamGameID . "/" . $userID . "/1";
+		$outUrl = "http://www.sportfast.com/mail/add-user-team-game/" . $game->teamGameID . "/" . $userID . "/0";
+		$maybeUrl = "http://www.sportfast.com/mail/add-user-team-game/" . $game->teamGameID . "/" . $userID . "/2";
+		
 		$text  = $team->teamName . " has a game " . $pre . ".  Are you in or out? \n";
 		$text .= "\n \t vs. " . $game->opponent;
 		$text .= "\n \t " . $game->gameDate->format('l') . " at " . $time;
 		$text .= "\n \t vs. " . $game->locationName;
-		$text .= "\n \n IN: http://www.sportfast.com/mail/add-user-team-game/" . $game->teamGameID . "/" . $userID;
-		$text .= "\n OUT: http://www.sportfast.com/mail/remove-user-team-game/" . $game->teamGameID . "/" . $userID;
+		$text .= "\n \n IN: " . $inUrl;
+		$text .= "\n OUT: " . $outUrl;
+		$text .= "\n MAYBE: " . $maybeUrl;
 		$text .= "\n \n view team: http://www.sportfast.com/teams/" . $team->teamID;
 		
 		$message .= "<tr>
@@ -1585,21 +1511,8 @@ class MailController extends Zend_Controller_Action
 							 <p class='larger-text bold' style='font-family: Arial, Helvetica, Sans-Serif; font-size: 1.75em; color: #333; font-weight: bold; margin: 0;'>" . $game->locationName . "</p>
 						 </td>
 					 </tr>
-					 <tr>
-						 <td height='20px'></td>
-					 </tr>
-					 
-					<tr>
-						<td align='right' width='320'>
-							<a href='http://www.sportfast.com/mail/add-user-team-game/" . $game->teamGameID . "/" . $userID . "' class='green-button largest-text bold' style='text-decoration: none; font-family: Arial, Helvetica, Sans-Serif; font-size: 2.2em; font-weight: bold; color: #fff; background-color: #58bf12; padding: .2em 1.5em;'>in</a>
-						</td>
-						<td width='10'></td>
-						<td align='left' width='320'>
-							<a href='http://www.sportfast.com/mail/remove-user-team-game/" . $game->teamGameID . "/" . $userID . "' class='green-button largest-text bold' style='text-decoration: none; font-family: Arial, Helvetica, Sans-Serif; font-size: 2.2em; font-weight: bold; color: #fff; background-color: #58bf12; padding: .2em 1.25em;'>out</a>
-						</td>
-					</tr>
-					 
-					 <tr>
+					 " . $this->buildConfirmedButtons($inUrl, $outUrl, $maybeUrl) . 
+					 "<tr>
 					 	<td height='10px'></td>
 					 </tr>
 					 <tr>
@@ -1646,9 +1559,9 @@ class MailController extends Zend_Controller_Action
 		$confirmed = $this->getRequest()->getParam('param3');
 		
 		$game = new Application_Model_Game();
-
+		$game->gameID = $gameID;
 		
-		$fail = $game->addUserToGame($gameID, $userID, $confirmed);
+		$fail = $game->addUserToGame($userID, $confirmed);
 		
 		
 		if ($fail) {
@@ -1659,18 +1572,10 @@ class MailController extends Zend_Controller_Action
 			}
 			
 		} else {
-		
-			$notification = new Application_Model_Notification();
-			$notification->action = 'join';
-			$notification->type = 'game';
-			$notification->actingUserID = $userID;
-			$notification->gameID = $gameID;
-			
-			$notification->save();
 			
 			if (Zend_Auth::getInstance()->hasIdentity()) {
 				$session = new Zend_Session_Namespace('addToGame');
-				$session->fail = 'added';
+				$session->fail = ($confirmed == '0' ? 'out' : 'added');
 			}
 		}
 		
@@ -1808,11 +1713,18 @@ class MailController extends Zend_Controller_Action
 	{
 		$gameID = $this->getRequest()->getParam('id');
 		$userID = $this->getRequest()->getParam('param2');
+		$confirmed = $this->getRequest()->getParam('param3');
+		
 		
 		$gamesMapper = new Application_Model_GamesMapper();
-		$gamesMapper->saveTeamGameConfirmation($userID, $gameID, '1');
+		//$gamesMapper->saveTeamGameConfirmation($userID, $gameID, '1');
+		
 		
 		$teamID = $gamesMapper->getTeamIDFromTeamGameID($gameID);
+		
+		$game = new Application_Model_Game();
+		$game->teamGameID = $gameID;
+		$game->addUserToGame($userID, $confirmed);
 		
 		$this->view->teamID = $teamID;
 		
@@ -1825,7 +1737,7 @@ class MailController extends Zend_Controller_Action
 	}
 	
 	/**
-	 * add user to team game if not already in it (from email)
+	 * add user to team game if not already in it (from email) INACTIVE
 	 */
 	public function removeUserTeamGameAction()
 	{
@@ -1914,17 +1826,23 @@ class MailController extends Zend_Controller_Action
 		$time = ($game->gameDate->format('i') > 0 ? $game->gameDate->format('g:ia') : $game->gameDate->format('ga'));
 		$message  = $this->mailStart();
 		
+		$inUrl = "http://www.sportfast.com/mail/add-user-subscribe-game/" . $game->gameID . "/" . $userID . "/1";
+		$outUrl = "http://www.sportfast.com/mail/add-user-subscribe-game/" . $game->gameID . "/" . $userID . "/0";
+		$maybeUrl = "http://www.sportfast.com/mail/add-user-subscribe-game/" . $game->gameID . "/" . $userID . "/2";
+		
 		$text  = "Sportfast created a " . strtolower($game->sport) . " game that you might be interested in.  Wanna play? \n";
 		$text .= "\n \t " . $game->getGameTitle(true);
 		$text .= "\n \t " . $game->gameDate->format('l') . " at " . $time;
 		$text .= "\n \t " . $game->park->parkName;
-		$text .= "\n \n IN: http://www.sportfast.com/mail/add-user-subscribe-game/" . $game->gameID . "/" . $userID;
+		$text .= "\n \n IN: " . $inUrl;
+		$text .= "\n OUT: " . $outUrl;
+		$text .= "\n MAYBE: " . $maybeUrl;
 		$text .= "\n \n view game: http://www.sportfast.com/games/" . $game->gameID;
 		$text .= "\n \n To unsubscribe from email notifications when a game is created, visit your account settings and turn off email alerts: http://www.sportfast.com/users/" . $userID . "/settings";
 		
 		$message .= "<tr>
 						<td colspan='3'>
-							<p style='font-family: Arial, Helvetica, Sans-Serif; color: #333;font-size:1em;'>Sportfast created a " . strtolower($game->sport) . " game that you might be interested in.  Wanna play?</p>
+							<p style='font-family: Arial, Helvetica, Sans-Serif; color: #333;font-size:1em;text-align:center;'>Sportfast created a <strong>" . strtolower($game->sport) . " game</strong> that you might be interested in.  Wanna play?</p>
 						</td>
 					</tr>
 					 
@@ -1938,17 +1856,8 @@ class MailController extends Zend_Controller_Action
 							 <p class='larger-text bold' style='font-family: Arial, Helvetica, Sans-Serif; font-size: 1.75em; color: #333; font-weight: bold; margin: 0;'>" . $game->park->parkName . "</p>
 						 </td>
 					 </tr>
-					 <tr>
-						 <td height='20px'></td>
-					 </tr>
-					 
-					<tr>
-						<td align='center'>
-							<a href='http://www.sportfast.com/mail/add-user-subscribe-game/" . $game->gameID . "/" . $userID . "' class='green-button largest-text bold' style='text-decoration: none; font-family: Arial, Helvetica, Sans-Serif; font-size: 2.2em; font-weight: bold; color: #fff; background-color: #58bf12; padding: .2em 1.25em;'>in</a>
-						</td>
-					</tr>
-					 
-					 <tr>
+					 " . $this->buildConfirmedButtons($inUrl, $outUrl, $maybeUrl) . 
+					 "<tr>
 					 	<td height='10px'></td>
 					 </tr>
 					 <tr>
@@ -2163,6 +2072,38 @@ class MailController extends Zend_Controller_Action
 	}
 	
 	/**
+	 * build in, out, and maybe buttons
+	 */
+	public function buildConfirmedButtons($inUrl, $outUrl, $maybeUrl = false)
+	{
+		$output = "<tr>
+						 <td height='20px'></td>
+					 </tr>
+					 <tr>
+						<td align='right' width='320'>
+							<a href='" . $inUrl . "' class='green-button largest-text bold' style='text-decoration: none; font-family: Arial, Helvetica, Sans-Serif; font-size: 2.2em; font-weight: bold; color: #fff; background-color: #58bf12; padding: .2em 1.5em;'>in</a>
+						</td>
+						<td width='10'></td>
+						<td align='left' width='320'>
+							<a href='" . $outUrl . "' class='green-button largest-text bold' style='text-decoration: none; font-family: Arial, Helvetica, Sans-Serif; font-size: 2.2em; font-weight: bold; color: #fff; background-color: #58bf12; padding: .2em 1.15em;'>out</a>
+						</td>
+					 </tr>";
+		
+		if ($maybeUrl) {			
+			$output .=	 "<tr>
+							 <td height='17px'></td>
+						 </tr>
+						 <tr>
+							 <td align='center' colspan='3'>
+								<a href='" . $maybeUrl . "' class='green-button largest-text bold' style='text-decoration: none; font-family: Arial, Helvetica, Sans-Serif; font-size: 1em; font-weight: bold; color: #fff; background-color: #58bf12; padding: .2em 7em;'>maybe</a>
+							 </td>
+						 </tr>";
+		}
+		
+		return $output;
+	}
+	
+	/**
 	 * lower explanation of what sportfast is, how it works, etc
 	 */
 	public function sportfastExplanation($textOnly = false)
@@ -2173,12 +2114,12 @@ class MailController extends Zend_Controller_Action
 							 <td height='40px'></td>
 						 </tr>
 						 <tr>
-							 <td class='dark-back' style='background-color: #333;' bgcolor='#333'>
+							 <td class='dark-back' style='background-color: #333;' bgcolor='#333' colspan='3'>
 								<p class='bold white larger-text' style='font-family: Arial, Helvetica, Sans-Serif; font-size: 1.25em; color: #fff; font-weight: bold; margin: 0;'>What is Sportfast?</p> 	
 							</td>
 						 </tr>
 						 <tr>
-							<td cellpadding='4'>
+							<td cellpadding='4' colspan='3'>
 								<p class='medium smaller-text' style='font-family: Arial, Helvetica, Sans-Serif; font-size: .8em; color: #8d8d8d; margin: 0;'>Sportfast is designed to simplify the way we find, organize, and manage our recreational sports.  
 								It will help you find new pickup games, manage your old ones,
 								and track your progress over time.  Our unique algorithms analyze users' age, skill, availability, and location to create competitive and enjoyable pickup games, as well as league teams, near you.  You'll always
@@ -2189,12 +2130,12 @@ class MailController extends Zend_Controller_Action
 							 <td height='20px'></td>
 						 </tr>
 						<tr>
-							 <td class='dark-back' style='background-color: #333;' bgcolor='#333'>
+							 <td class='dark-back' style='background-color: #333;' bgcolor='#333' colspan='3'>
 								<p class='bold white larger-text' style='font-family: Arial, Helvetica, Sans-Serif; font-size: 1.25em; color: #fff; font-weight: bold; margin: 0;'>How much does it cost?</p> 	
 							</td>
 						 </tr>
 						 <tr>
-							<td cellpadding='4'>
+							<td cellpadding='4' colspan='3'>
 								<p class='medium smaller-text' style='font-family: Arial, Helvetica, Sans-Serif; font-size: .8em; color: #8d8d8d; margin: 0;'>Nothing!  There is no cost.  There aren't even ads!  We're in beta, so help us out by giving us your feedback!</p>
 							</td>
 						</tr>
@@ -2202,17 +2143,17 @@ class MailController extends Zend_Controller_Action
 							 <td height='20px'></td>
 						 </tr>
 						<tr>
-							 <td class='dark-back' style='background-color: #333;' bgcolor='#333'>
+							 <td class='dark-back' style='background-color: #333;' bgcolor='#333' colspan='3'>
 								<p class='bold white larger-text' style='font-family: Arial, Helvetica, Sans-Serif; font-size: 1.25em; color: #fff; font-weight: bold; margin: 0;'>What sports?</p> 	
 							</td>
 						 </tr>
 						 <tr>
-							<td cellpadding='4'>
+							<td cellpadding='4' colspan='3'>
 								<p class='medium smaller-text' style='font-family: Arial, Helvetica, Sans-Serif; font-size: .8em; color: #8d8d8d; margin: 0;'>Currently, we support basketball, soccer, football, volleyball, tennis, and ultimate frisbee.  Again, we're in beta, so we don't quite have everything that we want yet, but keep checking back for more!</p>
 							</td>
 						</tr>
 						 <tr>
-							<td>
+							<td colspan='3'>
 								<p class='medium smaller-text' style='font-family: Arial, Helvetica, Sans-Serif; font-size: .8em; color: #8d8d8d; margin: 0;'>You can read more about us <a href='http://www.sportfast.com/how' class='darkest' style='font-family: Arial, Helvetica, Sans-Serif; color: #444; margin: 0;'>on our website</a>.</p>
 							</td>
 						</tr>";

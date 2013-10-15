@@ -107,13 +107,15 @@ echo $this->placeholder('absolute')->captureStart();
 		echo $this->topalert('upload', $content);
 	}
 	
-	if ($this->invitesSent) {
+	if ($this->invitesSent ||
+		$this->messageSent) {
 		// Invites sent from previous page, show alert
-		echo $this->alert()->start('invites');
-		echo "<p class='largest-text darkest width-100 center heavy'>Invites sent.</p>";
+		echo $this->alert()->start('success');
+		echo "<p class='largest-text darkest width-100 center heavy'>" . ($this->invitesSent ? 'Invites' : 'Message') . " sent.</p>";
 
 		echo $this->alert()->end();
 	}
+	
 	
 	if ($this->userInGame ||
 		$this->captain) {
@@ -132,7 +134,7 @@ echo $this->placeholder('absolute')->captureStart();
 					<p class='heavy darkest width-100 center clear'>Would you like to receive weekly email reminders for this game?</p>";
 			
 			$yes = $no = false;
-			if ($this->isSubscribed) {
+			if ($this->subscribed) {
 				$yes = true;
 			} else {
 				$no = true;
@@ -179,10 +181,12 @@ $this->placeholder('narrowColumn')->captureStart();
 			$maybe = "<p class='white smaller-text clear'>+" . $this->maybeConfirmedPlayers . " maybe</p>";
 		}
 		
-		echo "<div class='green-back white heavy narrow-overlay-container dropshadow'><p class='left inherit'>" . $this->confirmedPlayers . " confirmed" . $gameFull .   "</p>" . $maybe . "</div>";
+		echo "<div class='green-back white heavy narrow-overlay-container dropshadow'><p class='left inherit'>" . $this->confirmedPlayers . " " . ($this->confirmedPlayers == 1 ? 'player' : 'players') . " " . $gameFull .   "</p>" . $maybe . "</div>";
 	} else {
 		echo "<div class='dark-red-back white heavy narrow-overlay-container dropshadow' tooltip='" . ($this->game->minPlayers - $this->totalPlayers) . " more players are needed in order for this game to happen.'>"
-			 . $this->playersNeeded  . " needed"
+			 . $this->confirmedPlayers . " " . ($this->confirmedPlayers == 1 ? 'player' : 'players') . " <br>
+			 <span class='white'>" . $this->playersNeeded  . " needed</span>"
+			 
 			 . ($this->game->canceled ? "<br>CANCELED" : '') .
 			 "</div>";
 	}
@@ -314,6 +318,14 @@ if ($this->userInGame ||
 	
 	}
 	
+	if ($this->captain &&
+		$this->game->isRecurring()) {
+			$options[] = array('text' => 'subscribers',
+								  'img'  => 'subscribers',
+								  'href' => '/games/' . $this->game->gameID . '/subscribers',
+								  'tooltip' => "View list of subscribers");
+		}
+	
 	if ($this->game->isRecurring()) {
 		foreach ($recurringOptions as $option) {
 			$options[] = $option;
@@ -369,23 +381,15 @@ if ($this->userInGame ||
 </header>
 
 
-<div class='right profile-in-out-container'>
-	  <?php 
-          $in = $out = $maybe = '';
-          $selected = 'member-schedule-button-selected inner-shadow';
-          if ($this->game->userConfirmed($this->user->userID)) {
-              $in = $selected;
-          } elseif ($this->game->userNotConfirmed($this->user->userID)) {
-              $out = $selected;
-          } elseif ($this->game->userMaybeConfirmed($this->user->userID)) {
-              $maybe = $selected;
-          }
-          ?>
-      <p class='clear-right button schedule-out larger-text heavy <?php echo $out;?>'>out</p>
-      <p class='right button schedule-in larger-text heavy <?php echo $in;?>'>in</p>
-      <p class='clear-right button smaller-text schedule-maybe <?php echo $maybe;?>'>maybe</p>
-</div>
 <?php
+
+if (!$this->gameFull ||
+	$this->userInGame) {
+	echo $this->partial('partials/global/confirmed.phtml', array('game' => $this->game,
+															   'userID' => $this->user->userID));
+} else {
+	echo "<p class='right medium larger-margin-top'>This game is full.</p>";
+}
             
 if ($this->userInGame) {
 ?>
@@ -534,16 +538,18 @@ if ($this->userInGame) {
         </div>
     </div>-->
 <?php
+/*
 if ($this->showSubscribe) {
 	echo "<div class='green-alert-box ' id='subscribe-container'>
 			<p class='white heavy'>This game happens every week.  <br><span class='white action pointer' id='subscribe'>Click here for weekly email reminders.</span></p>
 			<p class='pointer white' id='subscribe-x'>x</p>
 		  </div>";
 }
+*/
 
 // Create header for players section
 $playersHeader  = "<div class='right profile-section-bold-subheader'>";
-$playersHeader .= 		"<p class='right heavy darkest'>" . $this->confirmedPlayers . " confirmed <span class='medium smaller-text'>" . ($this->maybeConfirmedPlayers > 0 ? '+' . $this->maybeConfirmedPlayers . ' maybe' : '') . "</span></p>";
+$playersHeader .= 		"<p class='right heavy darkest'>" . $this->confirmedPlayers . " players <span class='medium smaller-text'>" . ($this->maybeConfirmedPlayers > 0 ? '+' . $this->maybeConfirmedPlayers . ' maybe' : '') . "</span></p>";
 $playersHeader .= "</div>";
 /*
 if ($this->nextGame) {
