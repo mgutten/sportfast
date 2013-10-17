@@ -198,50 +198,57 @@ abstract class Application_Model_MapperAbstract
 	 */
 	public function getCityIdRange($cityID)
 	{
-		$output = '(';
-		
-		$table = $this->getDbTable();
-		$select = $table->select();
-		$select->setIntegrityCheck(false);
-		
-		// Get cityIDs that are within 15 miles of city
-		$select->from(array('z' => 'zipcodes'),
-					  array('cityID'))
-			   ->where('GLength(LineStringFromWKB(
-								  LineString(
-									(SELECT location FROM zipcodes WHERE cityID = "' . $cityID . '" ORDER BY RAND() LIMIT 1), 
-									z.location
+		$session = new Zend_Session_Namespace('cityIDs');
+		if (!isset($session->cityIDs)) {
+			
+				
+			$output = '(';
+			
+			$table = $this->getDbTable();
+			$select = $table->select();
+			$select->setIntegrityCheck(false);
+			
+			// Get cityIDs that are within 15 miles of city
+			$select->from(array('z' => 'zipcodes'),
+						  array('cityID'))
+				   ->where('GLength(LineStringFromWKB(
+									  LineString(
+										(SELECT location FROM zipcodes WHERE cityID = "' . $cityID . '" ORDER BY RAND() LIMIT 1), 
+										z.location
+										)
 									)
-								)
-							) * (5/8 * 100) < 15') // Multiply by 100 to get km, 5/8 to convert to miles
-			   ->group('z.cityID')
-			   ->order('GLength(LineStringFromWKB(
-								  LineString(
-									(SELECT location FROM zipcodes WHERE cityID = "' . $cityID . '" ORDER BY RAND() LIMIT 1), 
-									z.location
+								) * (5/8 * 100) < 15') // Multiply by 100 to get km, 5/8 to convert to miles
+				   ->group('z.cityID')
+				   ->order('GLength(LineStringFromWKB(
+									  LineString(
+										(SELECT location FROM zipcodes WHERE cityID = "' . $cityID . '" ORDER BY RAND() LIMIT 1), 
+										z.location
+										)
 									)
-								)
-							) ASC')
-			   ->limit(30);
-		
-		$results = $table->fetchAll($select);
-		
-		$idArray = array();
-		foreach ($results as $result) {
-			$idArray[] = $result->cityID;
+								) ASC')
+				   ->limit(30);
+			
+			$results = $table->fetchAll($select);
+			
+			$idArray = array();
+			foreach ($results as $result) {
+				$idArray[] = $result->cityID;
+			}
+			
+			/*
+			for ($i = ($cityID - 6); $i <= ($cityID + 6); $i++) {
+				$idArray[] = $i;
+			}
+			*/
+			
+			$output .= implode(',', $idArray);
+			
+			$output .= ')';
+
+			$session->cityIDs = $output;
 		}
-		
-		/*
-		for ($i = ($cityID - 6); $i <= ($cityID + 6); $i++) {
-			$idArray[] = $i;
-		}
-		*/
-		
-		$output .= implode(',', $idArray);
-		
-		$output .= ')';
-		
-		return $output;
+
+		return $session->cityIDs;
 	}
 	
 	/**

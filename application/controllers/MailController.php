@@ -39,9 +39,15 @@ class MailController extends Zend_Controller_Action
 			$typeModel = new Application_Model_Game();
 			$typeModel->getGameByID($post['gameID']);
 			
-			$subscribers = array_keys($typeModel->subscribers);
+			$subscribers = array();
+			if (is_array($typeModel->subscribers)) {
+				$subscribers = array_keys($typeModel->subscribers);
+			}
 			
-			$confirmed = array_keys($typeModel->confirmedPlayers);
+			$confirmed = array();
+			if (is_array($typeModel->confirmedPlayers)) {
+				$confirmed = array_keys($typeModel->confirmedPlayers);
+			}
 			
 			$userIDs = array_unique(array_merge($subscribers, $confirmed));
 			
@@ -117,7 +123,7 @@ class MailController extends Zend_Controller_Action
 				// Allow unsubscribe
 				$lower .= "You have received this email because you are subscribed to this game.  To unsubscribe, click <a href='http://www.sportfast.com/mail/unsubscribe-game/" . $typeModel->gameID . "/" . $userID . "' style='font-size:1em;font-family: Arial, Helvetica, Sans-Serif; color: #8d8d8d;'>here</a>.</p>";
 			} else {
-				$lower .= "You have received this email because you are attending to this game.</p>";
+				$lower .= "You have received this email because you are attending this game.</p>";
 			}
 			$url = 'http://www.sportfast.com/games/' . $typeModel->gameID;
 			$type = 'game';
@@ -423,10 +429,9 @@ class MailController extends Zend_Controller_Action
 			$mail->isSMTP();                                      // Set mailer to use SMTP
 			$mail->Host = 'box774.bluehost.com';  				  // Specify main and backup server
 			$mail->SMTPAuth = true;                               // Enable SMTP authentication
-			$mail->Username = 'support@sportfast.com';                            // SMTP username
-			$mail->Password = 'sportfast.9';                           // SMTP password
+			$mail->Username = 'support@sportfast.com';            // SMTP username
+			$mail->Password = 'sportfast.9';                      // SMTP password
 			//$mail->SMTPSecure = "ssl";
-			
 			
 			
 			$mail->From = 'support@sportfast.com';
@@ -443,6 +448,7 @@ class MailController extends Zend_Controller_Action
 			$mail->AltBody = $body['text'];
 			
 			$mail->send();
+		
 			/*
 			$subject  = $this->view->user->fullName . ' invited you to ' . $this->view->user->getHisOrHer() . ' ' . ucwords($typeModel->sport) . ' ' . ucwords($type);
 			$message  = $this->buildInviteGameMessage($this->view->user, $typeModel, $note);
@@ -825,6 +831,7 @@ class MailController extends Zend_Controller_Action
 			$model = new Application_Model_Game();
 			$model->gameID = $options['typeID'];
 			$model->date = $post['date'];
+			$model->cancelReason = (isset($post['cancelReason']) ? $post['cancelReason'] : 'No reason given');
 			$action = 'mailCancelGame';
 			//$date  = $post['date'];		
 		} elseif ($options['idType'] == 'teamID') {
@@ -839,7 +846,6 @@ class MailController extends Zend_Controller_Action
 		
 		$users = new Application_Model_Users();
 		$emails = $users->getUserEmails($userIDs);
-		
 		
 		foreach ($emails as $email) {
 			$this->$action($email, $model);		
@@ -875,12 +881,19 @@ class MailController extends Zend_Controller_Action
 					 	<td height='30'></td>
 					 </tr>";
 			$lower = "<p class='largest-text bold' style='font-family: Arial, Helvetica, Sans-Serif; font-size: 2.5em; color: #333; font-weight: bold; margin: 0;'>" . $model->totalPlayers . " " . $players . "</p>";
+		} else {
+			$top = "<p style='font-family: Arial, Helvetica, Sans-Serif; color: #333; margin: 0;'>Your " . $sport . " game has been canceled.</p>
+					<tr>
+					 	<td height='30'></td>
+					 </tr>";
 		}
 		
 		$text .= $model->sport . " Game \n";
 		$text .= $model->gameDate->format('l') . " at " . $time . "\n";
 		
-		$message .= $top . "
+		$message .= "<tr>
+						<td>" . $top . "</td>
+					 </tr>
 					 <tr>
 						<td align='center'>
 							 <p class='largest-text bold' style='font-family: Arial, Helvetica, Sans-Serif; font-size: 2.5em; color: #333; font-weight: bold; margin: 0;'>" . $model->sport . " Game</p>
@@ -924,9 +937,8 @@ class MailController extends Zend_Controller_Action
 				
 		mail($email, $subject, $message, $headers);
 		*/
-		
-		require($_SERVER['DOCUMENT_ROOT'] . '/plugins/PHPMailer/class.phpmailer.php');		
-		
+
+		require_once($_SERVER['DOCUMENT_ROOT'] . '/plugins/PHPMailer/class.phpmailer.php');		
 		
 		$mail = new PHPMailer;
 		$mail->isSMTP();                                      
@@ -935,7 +947,6 @@ class MailController extends Zend_Controller_Action
 		$mail->Username = 'support@sportfast.com';                            
 		$mail->Password = 'sportfast.9';                           
 		//$mail->SMTPSecure = "ssl";
-		
 		
 		$mail->From = 'support@sportfast.com';
 		$mail->FromName = 'Sportfast';
@@ -1442,7 +1453,7 @@ class MailController extends Zend_Controller_Action
 							 <p class='larger-text bold' style='font-family: Arial, Helvetica, Sans-Serif; font-size: 1.75em; color: #333; font-weight: bold; margin: 0;'>" . $game->park->parkName . "</p>
 						 </td>
 					 </tr>"
-					 . $this->buildConfirmedButtons($inURL, $outURL, $maybeURL) .
+					 . $this->buildConfirmedButtons($inUrl, $outUrl, $maybeUrl) .
 					 "<tr>
 					 	<td height='10px'></td>
 					 </tr>
@@ -2058,6 +2069,10 @@ class MailController extends Zend_Controller_Action
 		
 		// Email canceled users
 		foreach ($games['canceled'] as $game) {
+			if ($game->sendConfirmation != '1') {
+				continue;
+			}
+			
 			foreach ($game->players->getAll() as $user) {
 				$this->mailCancelGame($user->username, $game);
 			}
@@ -2065,6 +2080,10 @@ class MailController extends Zend_Controller_Action
 		
 		// Email game on users
 		foreach ($games['on'] as $game) {
+			if ($game->sendConfirmation != '1') {
+				continue;
+			}
+			
 			foreach ($game->players->getAll() as $user) {
 				$this->mailGameOn($user->username, $game);
 			}

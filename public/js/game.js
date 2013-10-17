@@ -23,7 +23,7 @@ $(function() {
 				// is recurring game, show special alert
 				$('#game-cancel-subscribe-container').html(postContent);
 				showAlert($('#manage-cancel-alert-container'));
-			} else {
+		} else {
 				// non recurring, use basic confirm alert
 				confirmAction = function () {
 						var detailsEle = getDetailsEle();

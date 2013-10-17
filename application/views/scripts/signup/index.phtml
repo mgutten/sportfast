@@ -108,6 +108,8 @@ echo $this->form->firstName;
 echo $this->form->lastName;
 echo $this->form->sex;
 ?>
+
+
 <div id='signup-sex-container' class='dropshadow'>
     <div src='/images/signup/sex/male_sprite.png' class='signup-sex-img pointer' id='signup-sex-male' tooltip='Male'></div>
     <div class='signup-sex-img pointer' id='signup-sex-female' tooltip='Female'></div>
@@ -134,7 +136,7 @@ echo $this->form->signupPassword;
 // use same setup as signup password, but change ID bits
 echo $this->form->signupPassword->setLabel('Re-enter Password')->setAttribs(array('id'=>'signupReenterPassword','name'=>'signupReenterPassword'));
 ?>
-<div id='signup-password-reqs' class='medium hidden'>Password must be: <ul><li>8-12 characters long</li></ul></div>
+<div id='signup-password-reqs' class='medium hidden'>Password must be: <ul><li>at least 8 characters long</li></ul></div>
 </div>
 
 <?php

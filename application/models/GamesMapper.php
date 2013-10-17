@@ -51,7 +51,7 @@ class Application_Model_GamesMapper extends Application_Model_TypesMapperAbstrac
 			   		  'pl.parkID = g.parkID',
 					  array('AsText(location) as location'))
 			   ->joinLeft(array('ug' => 'user_games'),
-			   		 'ug.gameID = g.gameID',
+			   		 'ug.gameID = g.gameID AND ug.confirmed = 1',
 					 array(''))
 			   ->joinLeft(array('us' => 'user_sports'),
 			   		 'ug.userID = us.userID AND us.sportID = t.sportID',
@@ -787,6 +787,7 @@ class Application_Model_GamesMapper extends Application_Model_TypesMapperAbstrac
 			   		  'u.userID = oug.userID',
 					  array('u.firstName', 'u.lastName'))
 			   ->where('oug.gameID = ?', $gameID)
+			   ->where('oug.confirmed = ?', 1)
 			   ->group('oug.userID')
 			   ->order('COUNT(oug.userID) DESC')
 			   ->limit(20);
@@ -920,6 +921,7 @@ class Application_Model_GamesMapper extends Application_Model_TypesMapperAbstrac
 	 */
 	public function addUserToPickupGame($gameID, $userID, $confirmed = false)
 	{
+		
 		if (empty($gameID) || empty($userID)) {
 			return false;
 		}
@@ -983,6 +985,7 @@ class Application_Model_GamesMapper extends Application_Model_TypesMapperAbstrac
 			$insert = true;
 			$db->insert('user_games', $data);
 		}
+		
 		
 		if ($recurring == '1') {
 			// Add user to subscribers list as default

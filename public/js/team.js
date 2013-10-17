@@ -56,14 +56,6 @@ $(function()
 		reloadPage();
 	})
 	
-	$('#team-players-container').hover(
-		function() {
-			$('.team-player-going-description-container').stop().animate({opacity: 1}, 300);
-		},
-		function() {
-			$('.team-player-going-description-container').stop().animate({opacity: 0}, 300);
-		}
-	)
 	
 	/* click on edit team's logo */
 	$('#team-manage-team-info-img').click(function()

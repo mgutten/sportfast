@@ -147,6 +147,16 @@ $(function()
 		
 	});
 	
+	/* show legend for color boxes of player section onhover */
+	$('#team-players-container').hover(
+		function() {
+			$('.team-player-going-description-container').stop().animate({opacity: 1}, 300);
+		},
+		function() {
+			$('.team-player-going-description-container').stop().animate({opacity: 0}, 300);
+		}
+	)
+	
 	/* show delete button for message if exists */
 	$('.newsfeed-notification-container').hover(function()
 	{
@@ -767,7 +777,8 @@ function cancelType(idType, typeID, onceOrAlways)
 		url:'/ajax/cancel-type',
 		type: 'POST',
 		data: {options: options},
-		complete: function(data) {
+		success: function(data) {
+
 			reloadPage();
 		}
 	})

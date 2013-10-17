@@ -17,7 +17,7 @@ class Application_View_Helper_PlayersSection
 	{
 		$output = $lowerOutput = '';
 		$counter = 0;
-		$firstNotConfirmed = false;
+		$firstNotConfirmed = $firstMaybeConfirmed = false;
 		$totalPlayers = count($players);
 		
 		if ($this->_view->team) {
@@ -60,7 +60,7 @@ class Application_View_Helper_PlayersSection
 						$background = 'dark-red-back';
 						$success = true;
 					} elseif ($nextGame->userMaybeConfirmed($player->userID)) {
-						$background = 'white-background';
+						$background = 'light-background';
 						$success = true;
 					}
 				}
@@ -83,14 +83,22 @@ class Application_View_Helper_PlayersSection
 						
 						$size = 'small';
 						$success = true;
-						$tooltip = "tooltip = '$player->shortName'";
+						$tooltip = "tooltip = '$player->shortName<br><span class=\"red heavy smaller-text\">out</span>'";
 						if (!$firstNotConfirmed) {
 							$firstNotConfirmed = true;
 							$float = 'clear';
 						}
 					} elseif ($typeModel->userMaybeConfirmed($player->userID)) {
-						$background = 'white-background';
+						$background = 'light-background';
 						$success = true;
+						
+						$size = 'small';
+						$success = true;
+						$tooltip = "tooltip = '$player->shortName<br><span class=\"medium heavy smaller-text\">maybe</span>'";
+						if (!$firstMaybeConfirmed) {
+							$firstMaybeConfirmed = true;
+							$float = 'clear';
+						}
 					}
 				}
 					

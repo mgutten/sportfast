@@ -1550,6 +1550,7 @@ class AjaxController extends Zend_Controller_Action
 			$model  = new Application_Model_Game();
 			$model->getGameByID($options['typeID']);
 			$array['date'] = $model->date;
+			$array['cancelReason'] = (!empty($options['cancelReason']) ? $options['cancelReason'] : 'No reason given');
 			$type = 'game';
 		} elseif ($idType == 'teamID') {
 			$model  = new Application_Model_Team();
@@ -1558,6 +1559,7 @@ class AjaxController extends Zend_Controller_Action
 		}
 		
 		$userIDs = $model->players->getIDs('users');
+		
 		
 		$array['sport'] = $model->sport;
 		$array['userIDs'] = $userIDs;
@@ -1609,6 +1611,34 @@ class AjaxController extends Zend_Controller_Action
 		
 	}
 		
+	/**
+	 * uncancel a game
+	 */
+	public function uncancelGameAction()
+	{
+		$options = $this->getRequest()->getPost('options');
+		$idType  = $options['idType'];
+		
+		if (empty($options['typeID'])) {
+			return false;
+		}
+		
+		if ($idType == 'gameID') {
+			// Is game
+			$game = new Application_Model_Game();
+			$type = 'game';
+			$$type->gameID = $options['typeID'];
+			$$type->uncancel();
+		}
+		
+		$this->_request->setPost($options);
+		
+		$reset = new Zend_Session_Namespace('reset');
+		$reset->reset = true;
+		
+		
+		$this->_forward('uncancel-type','mail', null);
+	}
 		
 		
 	

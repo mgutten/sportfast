@@ -551,6 +551,17 @@ if ($this->showSubscribe) {
 $playersHeader  = "<div class='right profile-section-bold-subheader'>";
 $playersHeader .= 		"<p class='right heavy darkest'>" . $this->confirmedPlayers . " players <span class='medium smaller-text'>" . ($this->maybeConfirmedPlayers > 0 ? '+' . $this->maybeConfirmedPlayers . ' maybe' : '') . "</span></p>";
 $playersHeader .= "</div>";
+
+$playersHeader .= "<div class='left profile-section-bold-subheader team-player-going-description-container'>";
+//$playersHeader .= 		"<img class='left' src='/images/team/confirm/small.png' />";
+$playersHeader .=		"<div class='left green-back profile-confirm'></div>";
+$playersHeader .= 		"<p class='left smaller-text medium team-players-section-header-going'>In</p>";
+//$playersHeader .= 		"<img class='left' src='/images/team/deny/small.png' />";
+$playersHeader .=		"<div class='left dark-red-back profile-confirm'></div>";
+$playersHeader .= 		"<p class='left smaller-text medium team-players-section-header-going'>Out</p>";
+$playersHeader .=		"<div class='left light-background profile-confirm'></div>";
+$playersHeader .= 		"<p class='left smaller-text medium team-players-section-header-going'>Maybe</p>";
+$playersHeader .= "</div>";
 /*
 if ($this->nextGame) {
 	$playersHeader .= "<div class='left profile-section-bold-subheader team-player-going-description-container'>";

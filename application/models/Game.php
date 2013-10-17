@@ -55,7 +55,8 @@ class Application_Model_Game extends Application_Model_ConfirmationsAbstract
 									'teamPage'		=> '', // Used in getTeamByID for Calendar.php to show future games on team page
 									'sportfastCreated' => '',
 									'doNotEmail'    => '',
-									'sendReminder'  => ''
+									'sendReminder'  => '',
+									'sendConfirmation' => ''
 									);
 									
 	protected $_primaryKey = 'gameID';
@@ -110,6 +111,7 @@ class Application_Model_Game extends Application_Model_ConfirmationsAbstract
 	 */
 	public function addUserToGame($userID, $confirmed = false)
 	{
+		
 		if ($this->isTeamGame()) {
 			return $this->getMapper()->addUserToTeamGame($this->teamGameID, $userID, $confirmed);
 		} else {

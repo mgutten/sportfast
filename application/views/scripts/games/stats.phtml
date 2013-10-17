@@ -112,7 +112,7 @@ This game happens every week.  Here are the historical stats for this game.
 <script type='text/javascript'>
 chartData = [['Week', 'Players','No Game'],<?php 
 			foreach ($this->history['games'] as $game) {
-				if ($game->isGameOn()) {
+				if ($game->totalPlayers > $game->minPlayers) {
 					// successful game, first series
 					$first = $game->totalPlayers;
 					$second = 0;

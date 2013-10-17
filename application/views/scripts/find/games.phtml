@@ -170,11 +170,13 @@ $this->placeholder('narrowColumn')->captureEnd();
 ?>
 <?php
 if (!$this->user->hasProfilePic()) {
+	/*
 	echo "<div class='red-alert-box white'>
 			You must have a profile picture to join a game.  
 			<br><a href='/users/" . $this->user->userID . "/upload' class='white center heavy'>Upload now</a>
 			<br><p class='clear-right smaller-text width-100 center white why-profile pointer'>Why do I need a profile picture?</p>
 		  </div>";
+	*/
 }
 ?>
 <p class='left darkest heavy indent'><span class='inherit' id='find-num-results'><?php echo $this->numMatches;?></span> games found</p>
@@ -190,7 +192,7 @@ $content .= 	"<p class='light left pointer selectable-text selectable-text-one'>
 $content .= 	"<p class='light left pointer selectable-text selectable-text-one green-bold'>Match</p>";
 $content .= "</div>";
 echo $this->partial('partials/global/sectionHeaderBold.phtml',array('title'   => 'Results',
-																	  'content' => $content));
+																	'content' => $content));
 
 echo $this->find()->createPagination(false);
 echo "<div class='find-results-outer-container left width-100' id='find-results-outer-container'>";

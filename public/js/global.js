@@ -15,7 +15,7 @@ sliderSkillValues[2]  = {level:'Good',
 sliderSkillValues[3]  = {level:'Better',
 						description: 'I am skilled.  I am better than the average player.'};
 sliderSkillValues[4]  = {level:'Talented',
-						description: 'I am very skilled.  I am typically the best player in the game.'};
+						description: 'I am very skilled.  I am a big step above the average player.'};
 sliderSkillValues[5]  = {level:'Unstoppable',
 						description: 'I played (or should play) on a professional level.'};
 
@@ -622,7 +622,7 @@ $(function()
 		// User is logged in, check for notifications
 		notificationPoll = setInterval(function() {
 				getNewNotifications()
-		}, 30000);
+		}, 45000);
 		
 		pageTitle = getTitle();
 	}
@@ -1013,7 +1013,6 @@ $(function()
 				$(e.target).is('.dropdown-menu-options-container')) && 
 				(typeof $(e.target).attr('change') == 'undefined')) {
 					// Clicked on search bar for dropdown-menu
-					alert();
 					return;
 				}
 			

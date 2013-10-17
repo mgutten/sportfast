@@ -747,7 +747,7 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 	 * @params ($userID 	 => userClass model,
 	 			$savingClass => where to save the information (Notifications object),
 				$onlyNew	 => only select new notifications,
-				$sinceTime   => if true, only select notifications since now - interval of 1 minute)
+				$sinceTime   => set to "YYYY-MM-DD HH:MM:SS")
 	 */
 	public function getUserNotifications($userClass, $savingClass, $onlyNew = false, $sinceTime = false)
 	{		
@@ -1187,6 +1187,8 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 					INNER JOIN `users` AS `u` ON oug.userID = u.userID 
 					INNER JOIN `user_sports` AS `us` ON (us.sportID = '" . $game->sportID . "' AND us.userID = oug.userID)
 					WHERE (oug.oldGameID = '" . $oldGameID . "') 
+						AND (oug.confirmed = 1)
+						AND us.noRatings = 0
 						AND (u.fake != 1) 
 						AND u.userID != '" . $userID . "'
 						AND u.userID NOT IN (SELECT receivingUserID 

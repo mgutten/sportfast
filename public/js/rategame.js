@@ -57,7 +57,7 @@ $(function()
 			
 			$(this).parents('#rateGame-alert-container').find('.alert-body-container:eq(' + index + ')').show();
 			
-			$('.alert-body-container').find('.rating-remember-no-penalize').hide();
+			$(this).parents('.rating-main-container').find('.rating-remember-no-penalize').hide();
 			
 			$(this).siblings('.rating-remember-maybe').removeClass('green-b');
 		})
@@ -74,7 +74,7 @@ $(function()
 			$(this).parents('#rateGame-alert-container').find('.alert-body-container:eq(' + index + ')').show();
 			
 			
-			$('.alert-body-container').find('.rating-remember-no-penalize').show();
+			$(this).parents('.rating-main-container').find('.rating-remember-no-penalize').show();
 			
 			$(this).siblings('.rating-remember-maybe').removeClass('underline');
 			

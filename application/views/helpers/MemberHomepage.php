@@ -326,7 +326,7 @@ class Application_View_Helper_MemberHomepage
 						$output .= "</div>";
 						$output .= "<div class='member-schedule-day-body-players-container darkest heavy'>";
 						$output .= "<p class='member-schedule-day-body-players largest-text center'>" . $game->countConfirmedPlayers() . "</p>";
-						$output .= "<p class='member-schedule-day-body-players-text center clear larger-text'>players</p>";
+						$output .= "<p class='member-schedule-day-body-players-text center clear larger-text'>" . ($game->countConfirmedPlayers() == '1' ? 'player' : 'players') . "</p>";
 						$output .= "<p class='center clear smaller-text member-schedule-day-body-players-confirmed larger-margin-top " . $confirmClass . "'>" . $confirm . "</p>";
 						$output .= "</div>";
 						/*$output .= "<p class='button schedule-in left larger-text member-game-schedule-in " . $confirmed . "'>in</p>";
@@ -352,7 +352,7 @@ class Application_View_Helper_MemberHomepage
 
 						$output .= "<p tooltip='" . $game->countConfirmedPlayers() . " players are going to this game' class='confirmed largest-text heavy left width-100 center member-schedule-day-body-players'>
 										" . $game->countConfirmedPlayers() . "</p> 
-										<p class='clear darkest width-100 larger-text heavy center'>players</p>";
+										<p class='clear darkest width-100 larger-text heavy center'>" . ($game->countConfirmedPlayers() == '1' ? 'player' : 'players') . "</p>";
 						$output .= "</div>";
 						//$type	 = " type='teamGame'";
 						//$typeID	 = " typeID='" . $game->teamGameID . "'";

@@ -460,13 +460,14 @@ class SignupController extends Zend_Controller_Action
 			$notification->save();
 			
 			$session = new Zend_Session_Namespace('signupInvite');
+			
 			if ($session->id) {
 				// User was invited from email invite from fellow user, create notification for them of invite
 				if ($session->type == 'game') {
 					$typeModel = new Application_Model_Game();
 					$typeModel->gameID = $session->id;
 					
-					$game->addUserToGame($user->userID, $confirmed);
+					$typeModel->addUserToGame($user->userID, $session->confirmed);
 				} else {
 					$typeModel = new Application_Model_Team();
 					$typeModel->teamID = $session->id;
@@ -511,6 +512,7 @@ class SignupController extends Zend_Controller_Action
 				Zend_Session::namespaceUnset('signupInvite');
 			}
 			
+			
 			$messages = new Application_Model_Messages();
 			$messageGroupID = $messages->messageGroupExists($user->userID, 0);
 			
@@ -521,7 +523,6 @@ class SignupController extends Zend_Controller_Action
 			$message->message = file_get_contents(PUBLIC_PATH . '/txt/welcome.txt');
 			
 			$message->save();
-			
 			
 			$this->_redirect('/');
 		} else {

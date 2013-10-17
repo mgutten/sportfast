@@ -40,7 +40,7 @@ class Application_Model_CronMapper extends Application_Model_MapperAbstract
 										g.minSkill, g.maxAge, g.minAge, g.recurring, g.date, g.city, g.cityID,
 										g.minPlayers, g.canceled, g.cancelReason, g.remove, g.sportfastCreated, COUNT(ug.userID), (NOW() + INTERVAL " . $this->getTimeOffset() . " HOUR)
 									FROM games g 
-									LEFT JOIN user_games ug ON ug.gameID = g.gameID 
+									LEFT JOIN user_games ug ON (ug.gameID = g.gameID AND ug.confirmed = '1')
 									WHERE g.date < (NOW() + INTERVAL " . $this->getTimeOffset() . " HOUR) 
 									AND g.gameID != (SELECT MAX(gameID) FROM games)
 									AND g.parkID != 0
@@ -291,11 +291,11 @@ class Application_Model_CronMapper extends Application_Model_MapperAbstract
 		// Only run next morning game status at 7:59pm for games UP TO 8:59am
 		$db = Zend_Db_Table::getDefaultAdapter();
 		$statement = "SELECT g.gameID, g.sportID, g.minPlayers, (COUNT(ug.userID) + SUM(ug.plus)) as totalPlayers, 
-							 g.sport, g.parkName, g.date 
+							 g.sport, g.parkName, g.date, g.sendConfirmation
 						FROM games g
 						LEFT JOIN (SELECT u2.userID, ug2.gameID, ug2.plus FROM users u2
 									INNER JOIN user_games ug2 ON u2.userID = ug2.userID 
-									WHERE fake = 0) ug ON g.gameID = ug.gameID
+									WHERE u2.fake = 0 AND ug2.confirmed = 1) ug ON g.gameID = ug.gameID
 						WHERE CASE WHEN (HOUR((NOW() + INTERVAL " . $this->getTimeOffset() . " HOUR)) >= 19 AND MINUTE((NOW() + INTERVAL " . $this->getTimeOffset() . " HOUR)) > 31) THEN HOUR(TIMEDIFF(g.date, (NOW() + INTERVAL " . $this->getTimeOffset() . " HOUR))) <= 13 AND g.date >= (NOW() + INTERVAL " . $this->getTimeOffset() . " HOUR) ELSE (HOUR(TIMEDIFF(g.date, (NOW() + INTERVAL " . $this->getTimeOffset() . " HOUR))) = 1 and MINUTE(TIMEDIFF(g.date, (NOW() + INTERVAL " . $this->getTimeOffset() . " HOUR))) > 29) AND g.date >= (NOW() + INTERVAL " . $this->getTimeOffset() . " HOUR) END
 							AND g.canceled = 0
 						GROUP BY g.gameID";

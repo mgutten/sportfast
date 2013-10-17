@@ -178,7 +178,7 @@ $(function()
 	$('#signupPassword,#signupReenterPassword').keyup(function()
 	{
 		var value   = $.trim($(this).val());
-		var isValid = $(this).isValid({minLength: 8, maxLength: 12});
+		var isValid = $(this).isValid({minLength: 8, maxLength: 30});
 		
 		changeInputBackground($(this),isValid);
 		

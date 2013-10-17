@@ -93,10 +93,11 @@ class IndexController extends Zend_Controller_Action
 												 	'color' => 'light',
 													'outerClass' => 'not-selected'));
 													
-			$lookingDropdownTimeArray = array(array('text'  => 'My Availability',
+			$lookingDropdownTimeArray = array(array('text'  => 'Any Time',
 												 	'color' => 'light'),
-											  array('text'  => 'Any Time',
-												 	'color' => 'light'));
+											  array('text'  => 'My Availability',
+												 	'color' => 'light')
+											  );
 			
 			$this->view->lookingDropdownSport = $dropdown->dropdown('member-looking-sports',$lookingDropdownSportArray, 'Select sports');
 			$this->view->lookingDropdownType  = $dropdown->dropdown('member-looking-types',$lookingDropdownTypeArray, 'Select types');
@@ -119,7 +120,7 @@ class IndexController extends Zend_Controller_Action
 			$options = array('`g`.`sport` IN ' . $sportsParen);
 			
 			
-			$games->findUserGames($this->view->user, $options);
+			$games->findUserGames($this->view->user, $options, false, 'any', 'any');
 			
 			$matches->addMatches($games->games);
 			

@@ -19,7 +19,18 @@ if (!$this->noDefaultHeadTitle) {
 		echo $this->headMeta()->setName('description', 'Find and manage recreational sports.  From pickup games to league teams, Sportfast lets you play everywhere.');
 		//echo $this->headMeta() . PHP_EOL;
  		echo $this->headTitle() . PHP_EOL;
- 		echo $this->headLink()->prependStylesheet($this->baseUrl() . '/css/global.css') . PHP_EOL;
+		
+		$this->headLink()->prependStylesheet($this->baseUrl() . '/css/global.css') . PHP_EOL;
+		
+		$version = '1.07'; // VERSION FOR JS AND CSS
+		
+		foreach ($this->headLink() as $key => $item) {
+			// Add version number to css
+			$item->href .= '?' . $version;
+			
+		}
+		
+		echo $this->headLink() . PHP_EOL;
 		
 		$this->headScript()->prependFile($this->baseUrl() . '/js/global.js');
 		
@@ -29,8 +40,18 @@ if (!$this->noDefaultHeadTitle) {
 			$this->headScript()->prependFile($this->baseUrl() . '/js/rating.js');
 			$this->headScript()->prependFile($this->baseUrl() . '/js/plugins/smartslider.js');
 		}
+		
+		
+		foreach ($this->headScript() as $key => $item) {
+			// Add version number to javascript
+			if (strpos($item->attributes['src'], 'google')) {
+				continue;
+			}
+			$item->attributes['src'] .= '?' . $version;
+		}
+		
 		echo $this->headScript()->prependFile($this->baseUrl() . '/js/jquery-1.9.1.min.js') . PHP_EOL;
-								
+									
  ?>
 </head>
 <body onunload=''>
