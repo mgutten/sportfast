@@ -38,6 +38,7 @@ class Application_Form_Signup extends Zend_Form
 				
 		$this->addElement('hidden', 'sex',  array(
 				'required'		=> true,
+				'class'			=> 'basic',
 				'decorators'    => array('Hidden')
 				));
 		
@@ -48,7 +49,7 @@ class Application_Form_Signup extends Zend_Form
 				'validators'	=> array('digits'),
 				'label'			=> 'mm',
 				'tooltip'		=> 'Date of birth',
-				'class'			=> 'short-input dropshadow',
+				'class'			=> 'short-input dropshadow basic',
 				'maxlength'		=> 2
 				));
 				
@@ -58,17 +59,17 @@ class Application_Form_Signup extends Zend_Form
 				'decorators'	=> array('Overlay'),
 				'validators'	=> array('digits'),
 				'label'			=> 'dd',
-				'class'			=> 'short-input dropshadow',
+				'class'			=> 'short-input dropshadow basic',
 				'maxlength'		=> 2
 				));
 				
 		$this->addElement('text', 'dobYear',  array(
 				'filters'		=> array('StringTrim','StringToLower'),
 				'required'		=> true,
-				'decorators'	=> array('Overlay','QuestionMark'),
+				'decorators'	=> array('Overlay'),
 				'validators'	=> array('digits'),
 				'label'			=> 'yy',
-				'class'			=> 'short-input dropshadow',
+				'class'			=> 'short-input dropshadow basic',
 				'maxlength'		=> 2,
 				'containerTooltip'	=> 'Date of birth:<ul><li>e.g. 07/25/90</li></ul>'
 				));
@@ -121,7 +122,7 @@ class Application_Form_Signup extends Zend_Form
 																				'field' => 'username', 
 																				'messages' => array('recordFound' => 'This email has an account associated with it <a href="/login/forgot" class="underline white">Forgot password?</a>'))),
 										 array('emailAddress',true)),
-				'decorators'	=> array('Overlay','QuestionMark'),
+				'decorators'	=> array('Overlay'),
 				'label'			=> 'Username/Email',
 				'class'			=> 'dropshadow',
 				'containerTooltip'	=> 'Must be a valid email address: <br> <ul><li>e.g. johnsmith@gmail.com</li></ul>',
@@ -141,7 +142,7 @@ class Application_Form_Signup extends Zend_Form
 				'required'			=> false,
 				'decorators'		=> array('Overlay'),
 				'label'				=> 'Street Address <span class="medium smaller-text">number and street name</span>',
-				'class'				=> 'dropshadow',
+				'class'				=> 'dropshadow basic',
 				'containerTooltip'	=> 'Must be a valid street address: <br> <ul><li>e.g. 710 E Blithedale Ave #10</li></ul>',
 				'autocomplete'      => 'off'
 				));
@@ -149,7 +150,7 @@ class Application_Form_Signup extends Zend_Form
 		$this->addElement('text', 'zipcode', array(
 				'filters'			=> array('StringTrim','StringToLower'),
 				'required'			=> true,
-				'decorators'		=> array('Overlay','QuestionMark'),
+				'decorators'		=> array('Overlay'),
 				'validators'		=> array('digits'),
 				'label'				=> 'Zip Code',
 				'class'				=> 'dropshadow',
@@ -167,7 +168,7 @@ class Application_Form_Signup extends Zend_Form
 				'decorators'	=> array('Checkbox'),
 				'checked'		=> false,
 				'text'			=> 'I do not wish to enter my street address. <br><span class="light">(Note: The system will not be able to find your best matches)</span>',
-				'class'			=> 'medium'
+				'class'			=> 'medium basic'
 				));
 				
 		$this->addElement('hidden', 'fileName',  array(

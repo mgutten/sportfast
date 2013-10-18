@@ -296,13 +296,14 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 			   		  'll.leagueLocationID = tg.leagueLocationID')
 			   ->joinLeft(array('utg' => 'user_team_games'),
 			   		  'utg.teamGameID = tg.teamGameID AND utg.userID = ut.userID',
-					  array('(SELECT COUNT(utg2.userID) FROM user_team_games as utg2 WHERE utg2.teamID = tg.teamID AND utg2.confirmed = 1 AND utg2.teamGameID = tg.teamGameID) as confirmedPlayers',
+					  array('(SELECT COUNT(utg2.userID) FROM user_team_games as utg2 WHERE utg2.confirmed = 1 AND utg2.teamGameID = tg.teamGameID) as confirmedPlayers',
 					  		'utg.confirmed as confirmed'))
 			   ->where('ut.userID = ?', $savingClass->userID)
 			   //->where('utg.userID = ?' ,  $savingClass->userID)
 			   ->where('tg.date > (NOW() + INTERVAL ' . $this->getTimeOffset() . ' HOUR)')
 			   ->group('tg.teamGameID');
 		
+	
 		$results = $table->fetchAll($select);
 		
 		
@@ -312,6 +313,7 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 		}
 		
 		
+		// Team reserves
 		$select  = $table->select();
 		
 		$select->setIntegrityCheck(false);

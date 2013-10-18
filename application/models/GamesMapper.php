@@ -260,12 +260,12 @@ class Application_Model_GamesMapper extends Application_Model_TypesMapperAbstrac
 			   		  	  'ug.gameID = g.gameID',
 						  array(''))
 			   ->joinLeft(array('us' => 'user_sports'),
-			   		  	  'us.userID = ug.userID AND us.sportID = g.sportID',
+			   		  	  'us.userID = ug.userID AND us.sportID = g.sportID AND ug.confirmed = 1',
 					 array('avg(us.skillCurrent) as averageSkill',
 					 	   'avg(us.attendance) as averageAttendance',
 						   'avg(us.sportsmanship) as averageSportsmanship',
 						   'avg(us.skillCurrent) - (SELECT skillCurrent FROM user_sports WHERE userID = "' . $userID . '" AND sportID = st.sportID) as skillDifference',
-						   '(COUNT(us.userID) + SUM(ug.plus)) as totalPlayers'
+						   '(COUNT(us.userID) + SUM(ug.plus)) as confirmedPlayers'
 						   ))
 			   ->joinLeft(array('u' => 'users'),
 			   		  'u.userID = us.userID',
@@ -306,7 +306,7 @@ class Application_Model_GamesMapper extends Application_Model_TypesMapperAbstrac
 			$select->having(new Zend_Db_Expr($statements));
 
 		}
-		$select->having('(g.rosterLimit > totalPlayers OR totalPlayers IS NULL)');
+		$select->having('(g.rosterLimit > confirmedPlayers OR confirmedPlayers IS NULL)');
 		
 		$select->group('g.gameID');
 		
@@ -1052,15 +1052,19 @@ class Application_Model_GamesMapper extends Application_Model_TypesMapperAbstrac
 			   ->where('ug.gameID = ?', $gameID);
 		*/
 		
-		$select->from(array('utg' => 'user_team_games'))
-			   ->where('utg.userID = ?', $userID)
-			   ->where('utg.teamGameID = ?', $teamGameID);
+		$select->from(array('tg' => 'team_games'))
+			   ->joinLeft(array('utg' => 'user_team_games'),
+			   			  'utg.teamGameID = tg.teamGameID AND utg.userID = "' . $userID . '"',
+						  array('userTeamGameID'))
+			   ->where('tg.teamGameID = ?', $teamGameID);
 
-			   
+		
 		$result = $table->fetchRow($select);
 		
+		$teamID = $result->teamID;
+		
 		$already = false;
-		if ($result) {
+		if (!is_null($result->userTeamGameID)) {
 			// Already in game
 			$already = true;
 		}
@@ -1068,7 +1072,8 @@ class Application_Model_GamesMapper extends Application_Model_TypesMapperAbstrac
 		
 		$data = array('userID' => $userID,
 					  'teamGameID' => $teamGameID,
-					  'confirmed' => $confirmed);
+					  'confirmed' => $confirmed,
+					  'teamID' => $teamID);
 		$update = $insert = false;
 		$db = Zend_Db_Table::getDefaultAdapter();
 		

@@ -374,8 +374,8 @@ textarea.post-message {
 	border-bottom: none;
 }
 
-.team-confirm-img.light-background,
-.team-confirm-img.dark-red-back {
+.team-player-container-small > .team-confirm-img.light-background,
+.team-player-container-small > .team-confirm-img.dark-red-back {
 	width:10px;
 	height:10px;
 	margin-top: -11px;

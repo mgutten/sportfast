@@ -858,13 +858,8 @@ $(function()
 	/* set behavior for all alert boxes (close them onclick) */
 	$('.alert-black-back,.alert-x').bind('click.default',function()
 	{
-		$('.alert-container').hide();
-		$('.alert').animate({'opacity':0},{duration: 200, complete: function() {
-																		$('.alert').hide()
-																				   .css('opacity',1);
-																		$('.alert-black-back').css('opacity',.85);
-																	}
-		})
+		hideAlerts();
+		
 	})
 	
 	/* show explanation of profile pics onclick of special class */
@@ -1780,13 +1775,29 @@ function animateNotShow(ele, down, fadeIn)
 /**
  * fade in alert box
  */
-function showAlert(alertEle)
+function showAlert(alertEle, opacity)
 {
+	var finalOpacity = (typeof opacity != 'undefined' ? opacity : '.85')
 	displayToBlockHidden(alertEle);
 	displayToBlockHidden($('.alert-black-back'));
 	
 	alertEle.animate({'opacity': 1}, 300);
-	$('.alert-black-back').first().animate({'opacity':.85},300);
+	$('.alert-black-back').first().animate({'opacity':finalOpacity},300);
+}
+
+/**
+ * fade out alert
+ */
+function hideAlerts()
+{
+	$('.alert-container').hide();
+	
+	$('.alert').animate({'opacity':0},{duration: 200, complete: function() {
+																	$('.alert').hide()
+																			   .css('opacity',1);
+																	$('.alert-black-back').css('opacity',.85);
+																}
+	})
 }
 
 function displayToBlockHidden(ele)

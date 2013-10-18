@@ -149,10 +149,10 @@ class Application_View_Helper_Find
 			// Is a limit, show limit
 			$limit = '/' . $match->rosterLimit;
 		}
-		
+	
 		$output  = "<div class='right find-result-right-container'>";
 		$output .=		"<div class='left find-result-players-container'>";
-		$output .=			"<p class='largest-text heavy darkest left width-100 center'>" . $match->totalPlayers . $limit . "</p>";
+		$output .=			"<p class='largest-text heavy darkest left width-100 center'>" . $match->countConfirmedPlayers() . $limit . "</p>";
 		$output .=			"<p class='larger-text clear heavy width-100 darkest center find-players'>players</p>";
 		$output .=		"</div>";
 		$output .=		$button;

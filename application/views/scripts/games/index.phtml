@@ -118,7 +118,8 @@ echo $this->placeholder('absolute')->captureStart();
 	
 	
 	if ($this->userInGame ||
-		$this->captain) {
+		$this->captain ||
+		$this->subscribed) {
 			
 		$this->headScript()->prependFile($this->baseUrl() . '/js/createsuccess.js');
 		//$this->headLink()->prependStylesheet($this->baseUrl() . '/css/create.css');

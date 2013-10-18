@@ -13,11 +13,13 @@ class Application_View_Helper_Alert
 		return $this;
 	}
 	
-	public function start($id, $header = false)
+	public function start($id, $header = false, $x = true)
 	{
 		$output  = "<div class='alert-container alert' id='" . $id . "-alert-container'>";
 		$output .= "<p class='alert-header white heavy'>" . $header . "</p>";
-		$output .= "<p class='white bold arial alert-x pointer'>X</p>";
+		if ($x) {
+			$output .= "<p class='white bold arial alert-x pointer'>X</p>";
+		}
 		$output .= "<div class='alert-body-container'>";
 					
 		return $output;

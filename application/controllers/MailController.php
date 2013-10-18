@@ -1277,7 +1277,7 @@ class MailController extends Zend_Controller_Action
 				
 				$mail->Subject = $game->sport . ' game at ' . $time . ' on ' . $game->gameDate->format('l');
 				
-				$body = $this->buildUpcomingSubcribedGameMessage($game, $user->userID);
+				$body = $this->buildUpcomingSubscribedGameMessage($game, $user->userID);
 				
 				$mail->Body    = $body['html'];
 				$mail->AltBody = $body['text'];
@@ -1418,7 +1418,7 @@ class MailController extends Zend_Controller_Action
 			
 	}
 	
-	public function buildUpcomingSubcribedGameMessage($game, $userID) {
+	public function buildUpcomingSubscribedGameMessage($game, $userID) {
 		
 		$time = ($game->gameDate->format('i') > 0 ? $game->gameDate->format('g:ia') : $game->gameDate->format('ga'));
 		$message  = $this->mailStart();
@@ -1559,6 +1559,98 @@ class MailController extends Zend_Controller_Action
 		
 	}
 	*/
+	
+	/**
+	 * send reminder email to users who signed up yesterday but never verified
+	 */
+	public function remindVerifyAction()
+	{
+		$users = $this->getRequest()->getParam('users');
+		
+		require($_SERVER['DOCUMENT_ROOT'] . '/plugins/PHPMailer/class.phpmailer.php');
+		
+		$usernames = '';
+		
+		foreach ($users as $user) {
+			
+			$mail = new PHPMailer;
+			
+			$mail->isSMTP();                                      
+			$mail->Host = 'box774.bluehost.com';  				 
+			$mail->SMTPAuth = true;                               
+			$mail->Username = 'support@sportfast.com';                            
+			$mail->Password = 'sportfast.9';                           
+			//$mail->SMTPSecure = "ssl";
+			
+			
+			$mail->From = 'support@sportfast.com';
+			$mail->FromName = 'Sportfast';
+			$mail->addAddress($user->username);  
+			$mail->addReplyTo('donotreply@sportfast.com');
+			
+			$mail->isHTML(true);                                  
+			
+			$mail->Subject = "Sportfast Registration Not Complete";
+			
+			$body = $this->buildRemindVerifyMessage($user);
+			
+			$mail->Body    = $body['html'];
+			$mail->AltBody = $body['text'];
+			
+			$mail->send();
+			
+			$usernames .= '\n ' . $user->username;
+		}
+		
+		$headers  = "MIME-Version: 1.0" . "\r\n";
+		$headers .= "Content-type: text/html; charset=iso-8859-1" . "\r\n";
+		$headers .= "From: support@sportfast.com\r\n";	 
+		$headers .= "Reply-To: donotreply@sportfast.com\r\n";	
+		
+		mail('guttenberg.m@gmail.com', 'ADMIN: Remind Verification', $usernames, $headers);
+	}
+	
+	public function buildRemindVerifyMessage($user)
+	{
+		$output = $this->mailStart();
+		$text = '';
+		
+		$output .= "<tr>
+						<td>
+							<p style='font-family: Arial, Helvetica, Sans-Serif; color: #333;font-size:1em;text-align:center;'>
+								Your registration for Sportfast is not complete.  <br><br>To complete registration, please verify this email by <strong>following the link below:</strong>
+							</p>
+						</td>
+					</tr>
+					<tr height='40'>
+						<td></td>
+					</tr>
+					<tr>
+						<td align='center'>
+							<a href='http://www.sportfast.com/signup/verify/" . $user->verifyHash . "' style='text-decoration: none; font-family: Arial, Helvetica, Sans-Serif; font-size: 2.1em; font-weight: bold; color: #fff; background-color: #58bf12; padding: .2em 1.25em;'>CLICK TO VERIFY</a>
+						</td>
+					</tr>
+					<tr>
+						<td height='40'></td>
+					</tr>
+					<tr>
+						<td>
+							<p style='font-family: Arial, Helvetica, Sans-Serif; color: #8d8d8d;font-size:.8em;'>Questions? Check out the <a href='http://www.sportfast.com/about/faq' style='font-family: Arial, Helvetica, Sans-Serif; color: #8d8d8d;text-decoration:underline'>FAQ</a> or contact us any time of day at support@sportfast.com.</p>
+						</td>
+					</tr>";
+		
+		$text .= "Your registration for Sportfast is not complete.  To complete registration, please verify this email by following the link below:";
+		$text .= "\n \n To verify: http://www.sportfast.com/signup/verify/" . $user->verifyHash;
+		
+		$output .= $this->mailEnd();
+		
+		$returnArray = array();
+		$returnArray['html'] = $output;
+		$returnArray['text'] = $text;
+		
+		return $returnArray;
+	}
+	
 	
 	/**
 	 * add user to subscribe game if not already in it (from email)

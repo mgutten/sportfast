@@ -62,10 +62,14 @@ class Application_Model_ConfirmationsAbstract extends Application_Model_ModelAbs
 	
 	public function countConfirmedPlayers()
 	{
+		
 		if (!$this->hasValue('confirmedPlayers')) {
-			return 0;
-		} else {
+			return '0';
+		} elseif (is_array($this->confirmedPlayers)) {
 			return count($this->confirmedPlayers);
+		} else {
+			
+			return $this->confirmedPlayers;
 		}
 	}
 	

@@ -9,6 +9,67 @@ var failedCity;
 
 $(function()
 {
+	if (isSignup()) {
+		// Is signup page
+		showAlert($('#membership-alert-container'), .9);
+		
+		$('.body-column-narrow').css('height', 'auto'); // Undo set height to allow for shorter minimal form vs basic form
+		
+		
+	}
+	
+	
+	$('.signup-membership-container').click(function()
+	{
+		$(this).addClass('selected');
+		
+		var duration = 500;
+		var selected = $(this).find('.signup-membership-button').text().toLowerCase();
+		
+		setTimeout(function() { hideAlerts() }, 10);
+		$('#signup-main-membership-button-' + selected).trigger('click');
+		
+		return;
+		
+		/*
+		$('.signup-membership-container').each(function()
+		{
+			if (!$(this).is('.selected')) {
+				$(this).find('.signup-membership-button').css('background', 'rgb(255, 255, 255)')
+			}
+			
+			$(this).find('.signup-membership-inner-container').animate({'margin-top': '-25em'}, duration);
+			
+		})
+		
+		$('#signup-main-membership-button-' + selected).trigger('click');
+		
+		$(this).find('.signup-membership-button').css('background', 'rgb(230, 230, 230)');
+		$(this).css('background', 'rgb(230, 230, 230)');
+		
+		$('.signup-membership-points-inner-container').animate({'margin-top':'-25em'}, duration);
+		
+		setTimeout(function() { hideAlerts() }, duration + 200);
+		
+		
+		$(this).removeClass('animate-darker');
+		*/
+		
+	})
+	
+	$('.signup-main-membership-button').click(function()
+	{
+		var selected = $(this).text().toLowerCase();
+		
+		$(this).siblings('.signup-main-membership-button').removeClass('selected');
+		$(this).addClass('selected');
+		
+		$('.basic').hide();
+		$('.basic').parent('.input-container').hide();
+		
+		$('.' + selected).show();
+		$('.' + selected).parent('.input-container').show();
+	})
 
 	/* update narrow column name value onkeyup */
 	$('#firstName,#lastName').keyup(function()
@@ -584,7 +645,16 @@ $(function()
 	{
 		var scrollToEle = new Array();
 		// Trigger each inputs keyup to add/remove input-fail class
-		$('input[type=password],input[type=text]').trigger('keyup');
+		$('input[type=password],input[type=text]').each(function()
+		{
+			if ($(this).parents('.basic').css('display') == 'none'
+				|| $(this).css('display') == 'none') {
+				return;
+			}
+			
+			$(this).trigger('keyup');
+		})
+		
 		var fail = false;
 		
 		$('input[type=password],input[type=text]').each(function()
@@ -593,6 +663,8 @@ $(function()
 				// An input already failed
 				return;
 			}
+			
+			
 			if ($(this).is('.input-fail')) {
 				// This input failed, scroll to show
 				if ($(this).is('#streetAddress') && $('#noAddress').prop('checked') == true) {
@@ -603,29 +675,34 @@ $(function()
 				fail = true;
 			}
 		})
-		fail = true;
-		// Test that sex is selected
-		$('.signup-sex-img').each(function()
-		{			
-			if ($(this).is('.signup-sex-selected')) {
-				// One sex is selected, fail is false
-				fail = false;
-			}
-		})
 		
-		if (fail) {
-			$('.signup-sex-img').parent().addClass('input-fail');
-			if (scrollToEle.length < 1) {
-				// Same scroll spot for sex and inputs, only push if not already in array
-				scrollToEle.push($('.signup-sex-img').parents('.signup-section-container'));	
+		if ($('.signup-sex-img').parents('.basic').css('display') != 'none') {
+			fail = true;
+			// Test that sex is selected
+			$('.signup-sex-img').each(function()
+			{			
+				if ($(this).is('.signup-sex-selected')) {
+					// One sex is selected, fail is false
+					fail = false;
+				}
+			})
 			
+			if (fail) {
+				$('.signup-sex-img').parent().addClass('input-fail');
+				if (scrollToEle.length < 1) {
+					// Same scroll spot for sex and inputs, only push if not already in array
+					scrollToEle.push($('.signup-sex-img').parents('.signup-section-container'));	
+				
+				}
 			}
 		}
-	
-		var submitFormSectionEle;
-		// Test all the sports sections for completeness
-		if (submitFormSectionEle = submitFormTestSports()) {
-			scrollToEle.push(submitFormSectionEle)
+		
+		if ($('.basic').css('display') != 'none') {
+			var submitFormSectionEle;
+			// Test all the sports sections for completeness
+			if (submitFormSectionEle = submitFormTestSports()) {
+				scrollToEle.push(submitFormSectionEle)
+			}
 		}
 		
 		

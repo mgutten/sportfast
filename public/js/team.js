@@ -53,7 +53,7 @@ $(function()
 	
 	$('.schedule-in,.schedule-out').click(function()
 	{
-		reloadPage();
+		//reloadPage();
 	})
 	
 	

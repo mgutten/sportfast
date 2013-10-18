@@ -130,6 +130,35 @@ class Application_Model_CronMapper extends Application_Model_MapperAbstract
 	}
 	
 	/**
+	 * send follow up email to users who signed up but did not verify
+	 */
+	public function getUnverifiedUsers()
+	{
+		$table = $this->getDbTable();
+		$select = $table->select();
+		
+		$select->setIntegrityCheck(false);
+		
+		$select->from(array('u' => 'users'))
+			   ->where('DATE(u.joined) = DATE(CURDATE() - INTERVAL 1 DAY)')
+			   ->where('u.active = 0');
+			   	
+		$results = $table->fetchAll($select);
+		
+		$users = array();
+		
+		foreach ($results as $result) {
+			$user = new Application_Model_User($result);
+			
+			$users[] = $user;
+		}
+		
+		return $users;
+		
+	}
+	
+	
+	/**
 	 * update the age of users based on dob in db
 	 */
 	public function updateAge()
@@ -291,7 +320,7 @@ class Application_Model_CronMapper extends Application_Model_MapperAbstract
 		// Only run next morning game status at 7:59pm for games UP TO 8:59am
 		$db = Zend_Db_Table::getDefaultAdapter();
 		$statement = "SELECT g.gameID, g.sportID, g.minPlayers, (COUNT(ug.userID) + SUM(ug.plus)) as totalPlayers, 
-							 g.sport, g.parkName, g.date, g.sendConfirmation
+							 g.sport, g.parkName, g.date
 						FROM games g
 						LEFT JOIN (SELECT u2.userID, ug2.gameID, ug2.plus FROM users u2
 									INNER JOIN user_games ug2 ON u2.userID = ug2.userID 
@@ -411,13 +440,13 @@ class Application_Model_CronMapper extends Application_Model_MapperAbstract
 			   		  'u.userID = gs.userID')
 			   ->joinLeft(array('ug' => 'user_games'),
 			   			  'ug.userID = gs.userID AND g.gameID = ug.gameID',
-						  array(''))
+						  array('ug.confirmed'))
 			   ->where('DATE(DATE_ADD(g.date, INTERVAL -1 DAY)) = CURDATE()')
 			   ->where('g.sendReminder = HOUR(NOW() + INTERVAL ' . $this->getTimeOffset() . ' HOUR)')
 			   ->where('g.recurring = 1')
-			   ->where('ug.userGameID IS NULL OR ug.confirmed = 2')
+			   ->where('ug.userGameID IS NULL')
 			   ->where('gs.doNotEmail = 0');
-		 
+		
 		$results = $table->fetchAll($select);
 		
 		$returnArray = array();
@@ -428,6 +457,10 @@ class Application_Model_CronMapper extends Application_Model_MapperAbstract
 				$game = new Application_Model_Game($result);
 				
 				$returnArray[$result->gameID] = $game;
+			}
+			
+			if ($result->confirmed == '2') {
+				$returnArray[$result->gameID]->addMaybeConfirmedPlayer($result->userID);
 			}
 							
 			$returnArray[$result->gameID]->players->addUser($result);

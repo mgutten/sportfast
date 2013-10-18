@@ -588,7 +588,7 @@ class Application_Model_Game extends Application_Model_ConfirmationsAbstract
 		return $this;
 	}
 	
-	
+	/*
 	public function countConfirmedPlayers()
 	{
 		$count = $this->_attribs['confirmedPlayers'];
@@ -599,6 +599,7 @@ class Application_Model_Game extends Application_Model_ConfirmationsAbstract
 		
 		return $count;
 	}
+	*/
 	
 	/**
 	 * add player to players list

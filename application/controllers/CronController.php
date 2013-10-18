@@ -26,6 +26,19 @@ class CronController extends Zend_Controller_Action
         
     }
 	
+	/**
+	 * send follow up email to inactive users who signed up yesterday but did not verify
+	 */
+	public function remindUnverifiedUsersAction()
+	{
+		$mapper = $this->getMapper();
+		$users = $mapper->getUnverifiedUsers();
+		
+		if ($users) {
+			return $this->_forward('remind-verify', 'mail', null, array('users' => $users));
+		}
+	}
+	
 	
 	/**
 	 * move old games and old teams to "old_" tables, also reset recurring games
@@ -160,6 +173,7 @@ class CronController extends Zend_Controller_Action
 		$mapper = $this->getMapper();
 		
 		$subscribedGames = $mapper->getUserSubscribedGames();
+		
 		
 		$games = array('games' => $subscribedGames,
 					   'teamGames' => array());

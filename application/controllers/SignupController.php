@@ -62,6 +62,13 @@ class SignupController extends Zend_Controller_Action
 		$this->view->copyAvailabilityDropdown = $dropdown->dropdown('copyAvailabilityDropdown',
 																	$sportNames,
 																				 'None'); 
+																				 
+		$this->view->ageDropdown = $dropdown->dropdown('ageDropdown',array('18-29',
+																		   '30-39',
+																		   '40-49',
+																		   '50-59',
+																		   '60-69',
+																		   '70-79'),'Age group'); 
 		
 		/* testing retrieving all of user's information 
 		$user = new Application_Model_User();
@@ -333,9 +340,18 @@ class SignupController extends Zend_Controller_Action
 													<tr>
 														<td height='30'></td>
 													</tr>
+													<tr>
+														<td>
+															<p style='font-family: Arial, Helvetica, Sans-Serif; color: #333;'>Once you verify, you will have full access to Sportfast.  This includes finding pickup games, organizing teams, tracking stats, and more.
+															</p>
+														</td>
+													</tr>
+													<tr>
+														<td height='30'></td>
+													</tr>
                                                   	<tr>
 														<td>
-                                                            <p style='font-family: Arial, Helvetica, Sans-Serif; color: #8d8d8d;font-size:.8em;'>Questions? Check out the <a href='http://www.sportfast.com/about/faq' style='font-family: Arial, Helvetica, Sans-Serif; color: #8d8d8d;text-decoration:underline'>FAQ</a> or contact us anytime of day at support@sportfast.com.</p>
+                                                            <p style='font-family: Arial, Helvetica, Sans-Serif; color: #8d8d8d;font-size:.8em;'>Questions? Check out the <a href='http://www.sportfast.com/about/faq' style='font-family: Arial, Helvetica, Sans-Serif; color: #8d8d8d;text-decoration:underline'>FAQ</a> or contact us any time of day at support@sportfast.com.</p>
 														</td>
 													</tr>
 												</table>
