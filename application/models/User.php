@@ -34,6 +34,7 @@ class Application_Model_User extends Application_Model_ModelAbstract
 									'plus'			=> '',
 									'fake'			=> '',
 									'joined'		=> '',
+									'account'		=> '',
 									'avatar'		=> '',
 									'noEmail'		=> '',  // Do not email when game is created for them
 									'ratingSet'		=> '',   // Used by setUserRating to not update old_user_ratings twice
@@ -102,6 +103,15 @@ class Application_Model_User extends Application_Model_ModelAbstract
 	public function getSubscribedGames()
 	{
 		return $this->getMapper()->getSubscribedGames($this->userID);
+	}
+	
+	/**
+	 * get any recurring past played games for user
+	 */
+	public function getUpcomingPastPlayedGames()
+	{
+		return $this->getMapper()->getUpcomingPastPlayedGames($this);
+		
 	}
 
 	public function getNextWeekScheduledGames()
@@ -365,8 +375,11 @@ class Application_Model_User extends Application_Model_ModelAbstract
 		$sex = $this->_attribs['sex'];
 		if ($sex == 'm') {
 			$sex = 'Male';
-		} else {
+		} elseif ($sex == 'f') {
 			$sex = 'Female';
+		} else {
+			// Not set
+			$sex = 'Gender Unknown';
 		}
 		
 		return $sex;
@@ -653,6 +666,17 @@ class Application_Model_User extends Application_Model_ModelAbstract
 		return $this->getMapper()->removeFriend($friendUserID, $this->userID);
 	}
 	
+	/** 
+	 * test if user is "minimal" account (only put name & email)
+	 */
+	public function isMinimal()
+	{
+		if ($this->account == '1') {
+			return true;
+		} else {
+			return false;
+		}
+	}
 	
 	/**
 	 * get tempAttrib

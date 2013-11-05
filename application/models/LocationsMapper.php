@@ -43,6 +43,35 @@ class Application_Model_LocationsMapper extends Application_Model_MapperAbstract
 					  
 	}
 	
+	/**
+	 * get cityID (zipcode nearest) $location
+	 * @params($location => "POINT(long lat)" str)
+	 */
+	public function getCityIDByLocation($location) 
+	{
+		$table   = $this->getDbTable();
+		$select  = $table->select();
+		$select->setIntegrityCheck(false);
+		
+		$select->from(array('z'  => 'zipcodes'))
+			   ->join(array('c' => 'cities'),
+			   		  'c.cityID = z.cityID')
+			   ->where('z.zipcodeType != ?', 'PO BOX')
+			   ->order("GLength(LineStringFromWKB(
+									  LineString(
+										GeomFromText('" . $location . "'), 
+										z.location
+										)
+									)
+								) ASC)")
+			   ->limit(1);
+				  
+		$results = $table->fetchRow($select);
+		
+		return $results['cityID'];
+					  
+	}
+	
 }
 					  
 

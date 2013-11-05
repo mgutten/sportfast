@@ -26,13 +26,36 @@ class GamesController extends Zend_Controller_Action
 			return;
 		}
 		
+		$session = new Zend_Session_Namespace('signupInvite');
+		
+		if (!$this->view->user) {
+				$this->view->user = new Application_Model_User();
+				$this->view->user->userID = '0';
+				
+				$this->view->signupInvite = true;
+				$this->view->user->username = (isset($session->email) ? $session->email : '');
+				$this->view->signupForm = new Application_Form_Signup();
+				
+				$this->view->parkCityID = $this->view->game->park->location->getCityIDByLocation();
+				
+				$session = new Zend_Session_Namespace('postLoginURL');
+				$session->url = '/games/' . $gameID;
+				
+			}
+		
 		
 		if (!$this->view->user->hasProfilePic()) {
 			// No profile pic, set this page as go to url if upload
-			$session = new Zend_Session_Namespace('goToURL');
-			$session->url = '/games/' . $gameID;
+			$num = mt_rand(1,10);
 			
-			$this->view->topAlert = true;
+			if ($num == 1) {
+			
+				$session = new Zend_Session_Namespace('goToURL');
+				$session->url = '/games/' . $gameID;
+				
+				$this->view->topAlert = true;
+				$this->view->topAlertProfilePicture = true;
+			}
 		} else {
 			$session = Zend_Session::namespaceUnset('goToURL');
 		}
@@ -88,6 +111,8 @@ class GamesController extends Zend_Controller_Action
 		$this->view->maybeConfirmedPlayers = $game->countMaybeConfirmedPlayers();
 		$this->view->rosterLimit   = $game->rosterLimit;
 		$this->view->minPlayers    = $game->minPlayers;
+		$this->view->confirmed = $game->isConfirmed($this->view->user->userID);
+		
 
 		$this->view->gameOn		   = ($this->view->confirmedPlayers >= $game->minPlayers ? true : false);
 		$this->view->playersNeeded = $game->getPlayersNeeded('more');
@@ -100,6 +125,9 @@ class GamesController extends Zend_Controller_Action
 		$this->view->subscribed = $subscribed = $game->isSubscriber($this->view->user->userID);
 		
 		$game->sortPlayersByConfirmed();
+		
+		$this->view->pendingInvites = $game->getPendingInvites($this->view->user->userID);
+
 		
 		/*
 		if ($game->isRecurring() && !$subscribed) {
@@ -304,7 +332,7 @@ class GamesController extends Zend_Controller_Action
 		$this->view->history = $history;
 	}
 	
-	public function subscribersAction()
+	public function membersAction()
 	{
 		//$this->view->narrowColumn = false;
 		

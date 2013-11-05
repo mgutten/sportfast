@@ -42,6 +42,8 @@ class Application_Form_Signup extends Zend_Form
 				'decorators'    => array('Hidden')
 				));
 		
+		
+		/*
 		$this->addElement('text', 'dobMonth',  array(
 				'filters'		=> array('StringTrim','StringToLower'),
 				'required'		=> true,
@@ -73,11 +75,24 @@ class Application_Form_Signup extends Zend_Form
 				'maxlength'		=> 2,
 				'containerTooltip'	=> 'Date of birth:<ul><li>e.g. 07/25/90</li></ul>'
 				));
-				
+				*/
+		
+		$this->addElement('text', 'age',  array(
+				'filters'		=> array('StringTrim','StringToLower'),
+				'required'		=> true,
+				'decorators'	=> array('Overlay'),
+				'validators'	=> array('digits'),
+				'label'			=> 'Age',
+				'tooltip'		=> 'Used to match you with other players your age.',
+				'class'			=> 'short-input dropshadow basic',
+				'maxlength'		=> 2
+				));
+		/*		
 		$this->addElement('hidden', 'age',  array(
 				'validators'	=> array('digits'),
 				'decorators'    => array('Hidden')
 				));
+		*/
 		
 		$this->addElement('text', 'heightFeet',  array(
 				'filters'		=> array('StringTrim','StringToLower'),

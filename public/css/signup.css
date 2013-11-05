@@ -55,7 +55,8 @@
 }
 
 #signup-account-address-warning {
-	margin: 0 0 .5em 1.5em;
+	margin: -2.5em 0 .5em 1.5em;
+	opacity: 0;
 }
 
 /* end signup section overlay */
@@ -83,7 +84,18 @@ input.short-input {
 }
 
 #heightFeet-container {
-	margin-left: 6.8em;
+	margin-left: 8.1em;
+}
+
+#sexDropdown {
+	width:7.7em;
+	font-size:1.06em;
+	margin-left: 1em;
+}
+
+#sexDropdown > .dropdown-menu-selected {
+	padding-top: .35em;
+	padding-bottom: .2em;
 }
 
 .signup-sex-img {
@@ -142,28 +154,28 @@ input.short-input {
 }
 */
 .signup-clear-large {
-	height: 2em;
+	height: 3em;
 	width: 100%;
 }
 
+#age-container {
+	clear:both;
+}
+
+#age-indicator {
+	margin-top: .3em;
+}
+
 #ageDropdown {
-	margin-left: 1em;
-	margin-bottom: .5em;
-	font-size: 1.06em;
+	clear:both;
+	margin-left:1em;
+	font-size:1.06em;
+	width:7em;
 }
 
 #ageDropdown > .dropdown-menu-selected {
-	padding-top: .25em;
-	padding-bottom: .25em;
-	margin-bottom: .65em;
-	color: #777;
-	
+	padding: .3em;
 }
-
-#ageDropdown > .dropdown-menu-container-reverse {
-	color: #fff;
-}
-
 
 .signup-dob-slash {
 	float:left;
@@ -204,7 +216,11 @@ input.input-fail, div.input-fail {
 #signup-password-reqs {
 	float:left;
 	font-size:.9em;
-	margin:0em 0 0 1em;
+	margin:0em 0 0 .5em;
+}
+
+#signup-password-reqs > ul {
+	padding-left:1em;
 }
 
 #zipcode-container {
@@ -440,11 +456,6 @@ div.signup-narrow-column-img-container {
 	margin-top: 1em;
 }
 
-#signup-import-alert-warning {
-	float:left;
-	clear:both;
-	margin: 1em 0 0 1em;
-}
 
 #signup-import-alert-accept {
 	margin: 0em 1.2em 0 0;	
@@ -552,7 +563,7 @@ div.signup-narrow-column-img-container {
 }
 
 #checkbox-container-agree {
-	margin: 2em 0 0 1.5em;
+	margin: 4em 0 0 1.5em;
 }
 
 #checkbox-text-agree {
@@ -571,7 +582,7 @@ div.signup-narrow-column-img-container {
 	clear:both;
 	width: 93%;
 	font-size: 2em;
-	margin-top: 1.5em;
+	margin-top: 1em;
 }
 
 /* verification page */
@@ -582,95 +593,4 @@ div.signup-narrow-column-img-container {
 	width: 40em;
 	left: 50%;
 	margin-left: -20em;
-}
-
-/* membership box */
-.signup-membership-point-container {
-	width: 11em;
-	border: solid 1px #bbb;
-	border-bottom: none;
-	padding-bottom: .4em;
-	min-height: 2.5em;
-}
-
-.signup-membership-point-container:last-child {
-	border-bottom: solid 1px #bbb;
-}
-
-.signup-membership-point {
-	margin-top: 1.65em;
-	width: 12em;
-	text-align:center;
-	padding-left:.5em;
-	padding-right:.5em;
-}
-
-.signup-membership-point:first-child {
-	margin-top: 2em;
-}
-
-.signup-membership-point:nth-child(2) {
-	margin-top:1.2em;
-	margin-bottom: -.3em;
-}
-.signup-membership-container {
-	padding:0 1em .5em 1em;
-	overflow:hidden;
-}
-
-.signup-membership-points-container {
-	overflow:hidden;
-	min-height:.2em;
-	min-width: 12em;
-}
-
-.signup-membership-button {
-	position:relative;
-	z-index: 3;
-	padding-top:.2em;
-}
-
-.signup-membership-container:first-child {
-	margin-left:1.5em;
-}
-
-#signup-membership-outer-container {
-	margin-top: 1em;
-}
-
-#signup-membership-points-holder {
-	width:12em;
-	height:3em;
-	position:relative;
-	z-index:3;
-}
-
-#membership-alert-container {
-	width:44em;
-	margin-left:-22em;
-	margin-top:-18em;
-}
-
-#membership-alert-container > .alert-body-container {
-	padding-bottom: 1em;
-}
-
-.signup-main-membership-button {
-	padding: .2em 0 0;
-	width: 50%;
-
-}
-
-.signup-main-membership-button:hover {
-	background:#e9e9e9;
-}
-
-
-.signup-main-membership-button.selected {
-	background:#58bf12;
-	color:#fff;
-}
-
-#signup-membership-logo {
-	margin-left:13em;
 }

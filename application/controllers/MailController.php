@@ -291,7 +291,241 @@ class MailController extends Zend_Controller_Action
 		return $returnArray;
 	}
 			
+	
+	public function reinviteUsersAction()
+	{
+		$games = $this->getRequest()->getParam('games');
+		$teams = $this->getRequest()->getParam('teams');
 		
+		require($_SERVER['DOCUMENT_ROOT'] . '/plugins/PHPMailer/class.phpmailer.php');
+		
+		foreach ($games as $game) {
+			
+			$firstLetter = strtolower($game->sport[0]);
+			$an = false;
+			
+			if ($firstLetter == 'a' || $firstLetter == 'e' || $firstLetter == 'i' || $firstLetter == 'o' || $firstLetter == 'u') {
+				$an = true;
+			}
+			
+			foreach ($game->players->getAll() as $user) {
+				
+				$email = $user->username;
+				
+				$mail = new PHPMailer;
+			
+				$mail->isSMTP();                                      // Set mailer to use SMTP
+				$mail->Host = 'box774.bluehost.com';  				  // Specify main and backup server
+				$mail->SMTPAuth = true;                               // Enable SMTP authentication
+				$mail->Username = 'support@sportfast.com';            // SMTP username
+				$mail->Password = 'sportfast.9';                      // SMTP password
+				//$mail->SMTPSecure = "ssl";
+				
+				
+				$mail->From = 'support@sportfast.com';
+				$mail->FromName = 'Sportfast';
+				$mail->addAddress($email);  // Add a recipient
+				$mail->addReplyTo('donotreply@sportfast.com');
+				
+				$mail->isHTML(true);                                  // Set email format to HTML
+				
+				
+				$mail->Subject = 'Final Reminder: You have been invited to join a' . ($an ? 'n' : '') . ' ' . ucwords($game->sport) . ' Game';
+				$body 	   	   = $this->buildReinviteGameMessage($game, false, false, $email);
+				
+				$mail->Body    = $body['html'];
+				$mail->AltBody = $body['text'];
+				
+				$mail->send();
+			}
+		}
+		
+		foreach ($teams as $team) {
+			
+			$firstLetter = strtolower($team->sport[0]);
+			$an = false;
+			
+			if ($firstLetter == 'a' || $firstLetter == 'e' || $firstLetter == 'i' || $firstLetter == 'o' || $firstLetter == 'u') {
+				$an = true;
+			}
+			
+			foreach ($team->players->getAll() as $user) {
+				
+				$email = $user->username;
+				
+				$mail = new PHPMailer;
+			
+				$mail->isSMTP();                                      // Set mailer to use SMTP
+				$mail->Host = 'box774.bluehost.com';  				  // Specify main and backup server
+				$mail->SMTPAuth = true;                               // Enable SMTP authentication
+				$mail->Username = 'support@sportfast.com';            // SMTP username
+				$mail->Password = 'sportfast.9';                      // SMTP password
+				//$mail->SMTPSecure = "ssl";
+				
+				
+				$mail->From = 'support@sportfast.com';
+				$mail->FromName = 'Sportfast';
+				$mail->addAddress($email);  // Add a recipient
+				$mail->addReplyTo('donotreply@sportfast.com');
+				
+				$mail->isHTML(true);                                  // Set email format to HTML
+				
+				
+				$mail->Subject = 'Final Reminder: You have been invited to join a' . ($an ? 'n' : '') . ' ' . ucwords($team->sport) . ' Team';
+				$body 	   	   = $this->buildReinviteGameMessage($team, false, false, $email);
+				
+				$mail->Body    = $body['html'];
+				$mail->AltBody = $body['text'];
+				
+				$mail->send();
+			}
+		}
+	}
+	
+	public function buildReinviteGameMessage($typeModel, $note = false, $isUser = false, $email = false)
+	{
+		$output = $this->mailStart();
+		$text = $main = '';
+		$type = ($typeModel instanceof Application_Model_Game ? 'game' : 'team');
+						
+		if ($type == 'game') {
+
+			$output .= "<tr>
+						<td colspan='3'>
+							<p style='font-family: Arial, Helvetica, Sans-Serif; color: #333;font-size:14px;text-align:center'>You have been invited to join a weekly " . strtolower($typeModel->sport) . " game at " . $typeModel->park->parkName . ".  
+							<br><br>If you wish to view this game's details and/or receive communications regarding any game-related updates <strong>you must select an option below</strong>. Otherwise, this will be your last email reminder regarding this game.</p>
+						</td>
+					 </tr>
+					 <tr>
+						<td height='20px'></td>
+					 </tr>";
+			
+			
+			$time = ($typeModel->gameDate->format('i') > 0 ? $typeModel->gameDate->format('g:ia') : $typeModel->gameDate->format('ga'));
+			
+			$main .= "<tr><td align='center' colspan='3'>
+							 <p class='largest-text bold' style='font-family: Arial, Helvetica, Sans-Serif; font-size: 2.5em; color: #333; font-weight: bold; margin: 0;'>" . $typeModel->getGameTitle(true) . "</p>
+							 <p class='largest-text bold' style='font-family: Arial, Helvetica, Sans-Serif; font-size: 2.5em; color: #333; font-weight: bold; margin: 0;'>" . $typeModel->gameDate->format('l') . " at " . $time . "</p>
+							 <p class='larger-text bold' style='font-family: Arial, Helvetica, Sans-Serif; font-size: 1.75em; color: #333; font-weight: bold; margin: 0;'>" . $typeModel->park->parkName . "</p>
+						 </td></tr>";
+						 
+			$textMain  = "\t " . $typeModel->getGameTitle(true);
+			$textMain .= "\n \t " . $typeModel->gameDate->format('l') . " at " . $time;
+			$textMain .= "\n \t " . $typeModel->park->parkName;
+
+			
+			$id = $typeModel->gameID;
+		} else {
+			// Team
+			$main = $textMain = '';
+			
+			$main .= "<tr>
+								<td align='center' colspan='3'>
+									<p style='font-family: Arial, Helvetica, Sans-Serif; color: #333;font-size:16px;text-align:center'>You have been invited to join a " . strtolower($typeModel->sport) . " team, <strong>" . $typeModel->teamName . "</strong>.
+									<br><br>
+									If you wish to receive team messages and updates, then <strong>you must join below</strong>.  This will be your final reminder to join this team and let your teammates know if you are playing.</p>
+								</td>
+						  </tr>
+							 
+							 <tr>
+								 <td height='20px'></td>
+							 </tr>";
+							 
+			$textMain .= "You have been invited to join a " . strtolower($typeModel->sport) . " team, " . $typeModel->teamName . " \n";
+			
+			$main .= " <tr><td align='center' colspan='3'>
+							<p class='largest-text bold' style='font-family: Arial, Helvetica, Sans-Serif; font-size: 2.5em; color: #333; font-weight: bold; margin: 0;'>" . $typeModel->teamName . "</p>
+							<p class='larger-text bold' style='font-family: Arial, Helvetica, Sans-Serif; font-size: 1.75em; color: #333; font-weight: bold; margin: 0;'>" . $typeModel->sport . " Team</p>
+						</td></tr>";
+						
+			$textMain .= "\n \t" . $typeModel->teamName;
+			$textMain .= "\n \t" . $typeModel->sport . " Team";
+			
+			
+			$id = $typeModel->teamID;
+		}			
+		
+
+		$src = "invite-user-" . $type . "/" . $id;
+
+		
+		$text .= "\n \n " . $textMain . "\n";		
+	
+		$output .= "<tr>
+						 <td height='20px'></td>
+					 </tr>
+					 ";
+		$output .= 		$main;			 
+		
+		if ($type == 'game') {
+			$inUrl    = "http://www.sportfast.com/mail/" . $src . "/1";
+			$outUrl   = "http://www.sportfast.com/mail/" . $src . "/0";
+			$maybeUrl = "http://www.sportfast.com/mail/" . $src . "/2";
+			
+			if (!$isUser) {
+				$inUrl .= "/" . urlencode($email);
+				$outUrl .= "/" . urlencode($email);
+				$maybeUrl .= "/" . urlencode($email);
+			}
+			
+			$buttonSection = $this->buildConfirmedButtons($inUrl, $outUrl, $maybeUrl);
+			
+			$text .= "\n \n \t IN: " . $inUrl;
+			$text .= "\n \t OUT: " . $outUrl;
+			$text .= "\n \t MAYBE: " . $maybeUrl . "\n";
+		} else {
+			$buttonSection = "<tr>
+								 <td height='20px'></td>
+							 </tr>
+							 <tr>
+								<td align='center' colspan='3'>
+									<a href='http://www.sportfast.com/mail/" . $src . "' class='green-button largest-text bold' style='text-decoration: none; font-family: Arial, Helvetica, Sans-Serif; font-size: 2.5em; font-weight: bold; color: #fff; background-color: #58bf12; padding: .2em 1.25em;'>Join</a>
+								</td>
+							 </tr>";
+			
+			$text .= "\n \t JOIN: http://www.sportfast.com/mail/" . $src . " \n";
+		}
+		
+		$output .= $buttonSection;
+					 
+		
+		if (!$isUser) {
+			$output .=  $this->sportfastExplanation();
+			
+			$text .= $this->sportfastExplanation(true);
+					 
+		} else {
+			$output .= "<tr>
+					 	<td height='10px'></td>
+					 </tr>
+					 <tr>
+					 	<td align='center' colspan='3'>
+							<a href='http://www.sportfast.com/" . $type . "s/" . $id . "' class='medium' style='font-family: Arial, Helvetica, Sans-Serif; color: #58bf12;font-size:1.25em;'>view " . $type . "</a>
+						</td>
+					 </tr>";
+			/*	 
+			$output .= "<tr>
+					 		<td height='30px'></td>
+					 	</tr>
+						<tr>
+					 	<td align='center'>
+							<p style='font-family: Arial, Helvetica, Sans-Serif; font-size: 11px; color: #8d8d8d; margin: 0;'>To unsubscribe, please access your account settings.
+						</td>
+					 </tr>";
+			*/
+					 
+			$text .= "\n \t view " . $type . ": http://www.sportfast.com/" . $type . "s/" . $id . "\n";
+		}
+		
+						
+		$output .= $this->mailEnd();
+		
+		$returnArray = array();
+		$returnArray['html'] = $output;
+		$returnArray['text'] = $text;
+		
+		return $returnArray;		 
+	}
 	
 	public function inviteTypeAction()
 	{
@@ -558,7 +792,7 @@ class MailController extends Zend_Controller_Action
 			// Add personalized note
 			$output .= "<tr><td colspan='3'>
 							<p style='font-family: Arial, Helvetica, Sans-Serif; font-size: 12px; color: #8d8d8d; margin: 0;text-align:left;'>" . $actingUser->firstName . " said...</p>
-							<p style='font-family: Arial, Helvetica, Sans-Serif; font-size: 16px; color: #777; margin: 0;text-align:center;background:#e9e9e9;padding:5px;font-weight:bold;'>" . $note . "</p></td></tr>
+							<p style='font-family: Arial, Helvetica, Sans-Serif; font-size: 14px; color: #777; margin: 0;text-align:left;background:#e9e9e9;padding:5px;'>" . $note . "</p></td></tr>
 						<tr height='20'>
 							<td></td>
 						</tr>";
@@ -577,11 +811,11 @@ class MailController extends Zend_Controller_Action
 				$text .= "\n \t -" . $point;
 			}
 			$output .= "</ul>
-							<p style='font-family: Arial, Helvetica, Sans-Serif; font-size: 14px; color: #333; margin: 0;'>Signup is required, but it only takes a minute and it's going to make our lives much easier.
+							<p style='font-family: Arial, Helvetica, Sans-Serif; font-size: 14px; color: #333; margin: 0;'>Sportfast was designed for recreational athletes.  It's simple and fast.
 							<br><br>" . $actingUser->shortName . "</p>
 						</td></tr>";
 						
-			$text .= "\n \n Signup is required, but it only takes a minute and it's going to make our lives much easier. \n";
+			$text .= "\n \n Sportfast was designed for recreational athletes.  It's simple and fast. \n";
 			$text .= "\n " . $actingUser->shortName . " ";
 			
 			$src = "invite-user-" . $type . "/" . $id;
@@ -643,7 +877,7 @@ class MailController extends Zend_Controller_Action
 					 <tr>
 						 <td colspan='3'>
 						 	<p style='font-family: Arial, Helvetica, Sans-Serif; font-size: 16px; color: #58bf12; font-weight: bold;text-align:center'>
-								You will not receive any future reminders regarding this " . $type . " or be able to view its details unless you " . ($type == 'game' ? 'RSVP now' : 'join') . ". 
+								You will not receive any future reminders regarding this " . $type . " or be able to view its details unless you " . ($type == 'game' ? 'select an option' : 'join') . ". 
 							</p>
 						 </td>
 					 </tr>
@@ -799,10 +1033,10 @@ class MailController extends Zend_Controller_Action
 		$session = new Zend_Session_Namespace('signupInvite');
 		$session->type = 'game';
 		$session->id = $gameID;
-		$session->email = $email;
+		$session->email = ($email == '1' ? '' : $email); // 1 is default value of param3
 		$session->confirmed = $confirmed;
 		
-		$this->_redirect('/signup');
+		$this->_redirect('/games/' . $gameID);
 	}
 	
 	/**
@@ -995,7 +1229,7 @@ class MailController extends Zend_Controller_Action
 					 	<td align='center'>
 							 <p class='largest-text bold' style='font-family: Arial, Helvetica, Sans-Serif; font-size: 2.5em; color: #333; font-weight: bold; margin: 0;'>" . $day . " at " . $time . "</p>
 							 <p class='larger-text bold' style='font-family: Arial, Helvetica, Sans-Serif; font-size: 1.75em; color: #333; font-weight: bold; margin: 0;'>" . $game->park->parkName . "</p>
-							 <p class='largest-text bold' style='font-family: Arial, Helvetica, Sans-Serif; font-size: 2.5em; color: #333; font-weight: bold; margin: 0;'>" . $game->totalPlayers . " players</p>
+							 <p class='largest-text bold' style='font-family: Arial, Helvetica, Sans-Serif; font-size: 2.5em; color: #333; font-weight: bold; margin: 0;'>" . $game->totalPlayers . " players  <span style='font-family: Arial, Helvetica, Sans-Serif; font-size: .4em; color: #8d8d8d; font-weight: bold; margin: 0;'>" . ($game->countMaybeConfirmedPlayers() > 0 ? '+' . $game->countMaybeConfirmedPlayers() . ' maybe' : '') . "</span></p>
 						 </td>
 					 </tr>
 					 <tr>
@@ -1032,7 +1266,7 @@ class MailController extends Zend_Controller_Action
 		$message .= $this->mailEnd();
 		
 		
-		require($_SERVER['DOCUMENT_ROOT'] . '/plugins/PHPMailer/class.phpmailer.php');		
+		require_once($_SERVER['DOCUMENT_ROOT'] . '/plugins/PHPMailer/class.phpmailer.php');		
 		
 		
 		$mail = new PHPMailer;
@@ -1057,6 +1291,8 @@ class MailController extends Zend_Controller_Action
 		$mail->AltBody = $text;
 		
 		$mail->send();
+		
+		//mail($email, $subject, $message);
 	}
 	 
 	
@@ -1664,12 +1900,21 @@ class MailController extends Zend_Controller_Action
 		$game = new Application_Model_Game();
 		$game->gameID = $gameID;
 		
-		$fail = $game->addUserToGame($userID, $confirmed);
+		$auth = Zend_Auth::getInstance();
 		
+		if (!$auth->hasIdentity()) {
+			// Log user in if not already
+			$user = new Application_Model_User();
+			$user->getUserBy('u.userID', $userID);
+			$user->login();
+			$auth->getStorage()->write($user);
+		}
+		
+		$fail = $game->addUserToGame($userID, $confirmed);
 		
 		if ($fail) {
 			// Failed to add, game is either full or user is already in game
-			if (Zend_Auth::getInstance()->hasIdentity()) {
+			if ($auth->hasIdentity()) {
 				$session = new Zend_Session_Namespace('addToGame');
 				$session->fail = $fail;
 			}
@@ -2161,24 +2406,37 @@ class MailController extends Zend_Controller_Action
 		
 		// Email canceled users
 		foreach ($games['canceled'] as $game) {
-			if ($game->sendConfirmation != '1') {
+			/*if ($game->sendConfirmation != '1') {
 				continue;
-			}
+			}*/
 			
 			foreach ($game->players->getAll() as $user) {
+				if ($game->userNotConfirmed($user->userID)) {
+					// Only email maybes and ins
+					continue;
+				}
+				
 				$this->mailCancelGame($user->username, $game);
 			}
+			mail('guttenberg.m@gmail.com', 'ADMIN: Game Canceled', $game->sport);
 		}
 		
 		// Email game on users
 		foreach ($games['on'] as $game) {
-			if ($game->sendConfirmation != '1') {
+			/*if ($game->sendConfirmation != '1') {
 				continue;
-			}
-			
+			}*/
+			$emailedUsers = array();
 			foreach ($game->players->getAll() as $user) {
+				if ($game->userNotConfirmed($user->userID)) {
+					// Only email maybes and ins
+					continue;
+				}
 				$this->mailGameOn($user->username, $game);
+				
+				$emailedUsers[] = $user->fullName;
 			}
+			mail('guttenberg.m@gmail.com', 'ADMIN: Game on', $game->sport . implode('\n',$emailedUsers));
 		}
 	}
 	
@@ -2191,11 +2449,11 @@ class MailController extends Zend_Controller_Action
 						 <td height='20px'></td>
 					 </tr>
 					 <tr>
-						<td align='right' width='320'>
+						<td align='right' width='325'>
 							<a href='" . $inUrl . "' class='green-button largest-text bold' style='text-decoration: none; font-family: Arial, Helvetica, Sans-Serif; font-size: 2.2em; font-weight: bold; color: #fff; background-color: #58bf12; padding: .2em 1.5em;'>in</a>
 						</td>
 						<td width='10'></td>
-						<td align='left' width='320'>
+						<td align='left' width='322'>
 							<a href='" . $outUrl . "' class='green-button largest-text bold' style='text-decoration: none; font-family: Arial, Helvetica, Sans-Serif; font-size: 2.2em; font-weight: bold; color: #fff; background-color: #58bf12; padding: .2em 1.15em;'>out</a>
 						</td>
 					 </tr>";
@@ -2206,7 +2464,7 @@ class MailController extends Zend_Controller_Action
 						 </tr>
 						 <tr>
 							 <td align='center' colspan='3'>
-								<a href='" . $maybeUrl . "' class='green-button largest-text bold' style='text-decoration: none; font-family: Arial, Helvetica, Sans-Serif; font-size: 1em; font-weight: bold; color: #fff; background-color: #58bf12; padding: .2em 7em;'>maybe</a>
+								<a href='" . $maybeUrl . "' class='green-button largest-text bold' style='text-decoration: none; font-family: Arial, Helvetica, Sans-Serif; font-size: 1em; font-weight: bold; color: #fff; background-color: #58bf12; padding: .2em 7.2em;'>maybe</a>
 							 </td>
 						 </tr>";
 		}
@@ -2242,12 +2500,12 @@ class MailController extends Zend_Controller_Action
 						 </tr>
 						<tr>
 							 <td class='dark-back' style='background-color: #333;' bgcolor='#333' colspan='3'>
-								<p class='bold white larger-text' style='font-family: Arial, Helvetica, Sans-Serif; font-size: 1.25em; color: #fff; font-weight: bold; margin: 0;'>How much does it cost?</p> 	
+								<p class='bold white larger-text' style='font-family: Arial, Helvetica, Sans-Serif; font-size: 1.25em; color: #fff; font-weight: bold; margin: 0;'>Do I need to pay?</p> 	
 							</td>
 						 </tr>
 						 <tr>
 							<td cellpadding='4' colspan='3'>
-								<p class='medium smaller-text' style='font-family: Arial, Helvetica, Sans-Serif; font-size: .8em; color: #8d8d8d; margin: 0;'>Nothing!  There is no cost.  There aren't even ads!  We're in beta, so help us out by giving us your feedback!</p>
+								<p class='medium smaller-text' style='font-family: Arial, Helvetica, Sans-Serif; font-size: .8em; color: #8d8d8d; margin: 0;'>Nope!  There is no cost.  There aren't even ads!  We're in beta, so help us out by giving us your feedback!</p>
 							</td>
 						</tr>
 						<tr>

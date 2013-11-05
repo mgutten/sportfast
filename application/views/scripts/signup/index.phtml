@@ -48,7 +48,7 @@ echo $this->alert()->start('signup-import','Upload and crop your image.');
         <img src='/images/global/img_upload/rotate_left.png' class='clear signup-alert-rotate pointer hidden' id='signup-alert-rotate-left' tooltip='Rotate image left'/>
         <img src='/images/global/img_upload/rotate_right.png' class='right signup-alert-rotate pointer hidden' id='signup-alert-rotate-right' tooltip='Rotate image right'/>
     </div>
-	<p class='medium' id='signup-import-alert-warning'>
+	<p class='medium clear' id='signup-import-alert-warning'>
     	If players cannot recognize you by your picture, you <span class='heavy medium'>will not receive any ratings.</span>
     </p>
     <div class='width-100 clear' id='signup-import-alert-accept-container'>
@@ -91,105 +91,15 @@ if ($this->invited) {
 	echo "<p class='green-alert-box clear white heavy'>To join your " . $this->invited . ", please signup below.</p>";
 	$class = 'larger-margin-top';
 }
-
-$this->placeholder('absolute')->captureStart();
-echo $this->alert()->start('membership', 'Choose an account type');	
 ?>
 
-<!--<p class='larger-text green heavy clear width-100 center <?php echo $class;?>'>Sportfast is free and easy.</p>-->
-
-<!--<p class='width-100 center largest-text green heavy clear' id='signup-membership-choose'>Choose an account type:</p>-->
-<img src='/images/global/logo/large2.png' class='clear' id='signup-membership-logo' />
-<p class='width-100 center medium clear' id='signup-membership-header'>All accounts are free.<br>The basic account will require more information (sports preferences, etc)</p>
-
-<?php
-$membership = array(array('text' => 'Join public games/teams',
-						  'minimal' => true,
-						  'basic' => true),
-					array('text' => 'Join Sportfast-created games/teams',
-						  'minimal' => false,
-						  'basic' => true),
-					array('text' => 'Message other players',
-						  'minimal' => false,
-						  'basic' => true),
-					array('text' => 'Track your stats',
-						  'minimal' => false,
-						  'basic' => true),
-					array('text' => 'Receive ratings',
-						  'minimal' => false,
-						  'basic' => true),
-					array('text' => 'And more',
-						  'minimal' => false,
-						  'basic' => true));
-				  
-echo "<div class='clear width-100' id='signup-membership-outer-container'>";
-
-$minimal = $basic = $points = '';
-$counter = 0;
-$box = "<div class='clear signup-membership-point-container'>";
-$selected = "<p class='width-100 center clear green heavy largest-text'>x</p>";
-
-foreach ($membership as $point) {
-	if ($counter == 0) {
-		$minimal .= "<div class='left signup-membership-container white-background animate-darker pointer'>
-						<p class='left heavy darkest width-100 center largest-text signup-membership-button'>Minimal</p>
-							<div class='clear width-100 signup-membership-inner-container'>
-								<p class='width-100 center clear green heavy'>FREE</p>";
-		$basic   .= "<div class='left signup-membership-container white-background animate-darker pointer'>
-						<p class='left heavy darkest width-100 center largest-text signup-membership-button'>Basic 
-							<div class='clear width-100 signup-membership-inner-container'>
-								<p class='width-100 center clear green heavy'>FREE</p>";
-						
-		$points  .= "<div class='left signup-membership-points-container'>
-						<div class='white-background left' id='signup-membership-points-holder'></div>
-						<div class='clear signup-membership-points-inner-container'>";
-	}
-	
-	
-	$minimal .= $box;
-	$basic .= $box;
-	if ($point['minimal']) {
-		$minimal .= $selected;
-	}
-	
-	if ($point['basic']) {
-		$basic .= $selected;
-	}
-	
-	$minimal .= "</div>";
-	$basic .= "</div>";
-	
-	$points .= "<p class='clear signup-membership-point darkest center'>" . $point['text'] . "</p>";
-	
-	$counter++;
-}
-
-$minimal .= "</div></div>";
-$basic .= "</div></div>";
-$points .= "</div></div>";
-
-
-echo $minimal . $points . $basic;
-
-echo "</div>";
-
-echo $this->alert()->end();
-$this->placeholder('absolute')->captureEnd();
-?>					  
-
-<div class='clear width-100'>
-	<p class='pointer clear medium largest-text heavy signup-main-membership-button center' id='signup-main-membership-button-minimal'>Minimal</p>
-    <p class='pointer left medium largest-text heavy signup-main-membership-button center selected' id='signup-main-membership-button-basic'>Basic</p>
-</div>
-    
-
+<p class='larger-text green heavy clear width-100 center <?php echo $class;?>'>Sportfast is free and easy.</p>
 <?php
 
 $totalSteps = 4;
 $currentStep = 1;
 
 /* SIGNUP SECTION 1: ACCOUNT INFO */
-
 echo $this->partial('partials/signup/stepContainer.phtml',array('title'		  =>'Account Info',
 																'currentStep' =>$currentStep,
 																'totalSteps'  =>$totalSteps));
@@ -197,33 +107,32 @@ $currentStep++;
 echo $this->form->firstName;
 echo $this->form->lastName;
 echo $this->form->sex;
+
+echo $this->sexDropdown;
 ?>
-
-
-<div id='signup-sex-container' class='dropshadow basic'>
+<!--
+<div id='signup-sex-container' class='dropshadow'>
     <div src='/images/signup/sex/male_sprite.png' class='signup-sex-img pointer' id='signup-sex-male' tooltip='Male'></div>
     <div class='signup-sex-img pointer' id='signup-sex-female' tooltip='Female'></div>
 </div>
+-->
 <?php
-echo "<div class='clear'></div>";
 /*
+echo "<div class='clear'></div>";
 echo $this->form->dobMonth;
 echo "<span class='signup-dob-slash'>/</span>";
 echo $this->form->dobDay;
 echo "<span class='signup-dob-slash'>/</span>";
 echo $this->form->dobYear;
 */
-echo $this->ageDropdown;
-
-echo $this->form->age; // hidden
-
-echo "<div class='left basic'>";
+echo $this->form->age;
+echo "<span class='signup-dob-slash signup-dimension-indicator darkest' id='age-indicator'>years old</span>";
+//echo $this->form->age; // hidden
 echo $this->form->heightFeet;
-echo "<span class='signup-dob-slash signup-dimension-indicator' id='heightFeet-indicator'>'</span>";
+echo "<span class='signup-dob-slash signup-dimension-indicator darkest' id='heightFeet-indicator'>'</span>";
 echo $this->form->heightInches;
 echo $this->form->height;
-echo "<span class='signup-dob-slash signup-dimension-indicator' id='heightInches-indicator'>\"</span>";
-echo "</div>";
+echo "<span class='signup-dob-slash signup-dimension-indicator darkest' id='heightInches-indicator'>\"</span>";
 
 
 echo "<div class='clear signup-clear-large'></div>";
@@ -233,23 +142,24 @@ echo $this->form->signupPassword;
 // use same setup as signup password, but change ID bits
 echo $this->form->signupPassword->setLabel('Re-enter Password')->setAttribs(array('id'=>'signupReenterPassword','name'=>'signupReenterPassword'));
 ?>
-<div id='signup-password-reqs' class='medium hidden'>Password must be: <ul><li>at least 8 characters long</li></ul></div>
+<div id='signup-password-reqs' class='medium hidden'>Password must be: <ul><li><span class='close-bullet'>at least 8 characters</span></li></ul></div>
 </div>
 
 <?php
 echo "<div class='clear signup-clear-large'></div>";
 ?>
-
-<p class='medium heavy smaller-text' id='signup-account-address-warning'>
-	This address will be used to find games, players, and teams closest to you.  <br>It will never be displayed and will only be used to help find optimal matches.
+<p class='clear green heavy smaller-text' id='signup-account-address-warning'>
+	This address will be used to find games, players, and teams closest to you.  It will never be displayed and will only be used to help find optimal matches.
 </p>
 
-<p id='signup-account-zipcode-city' class='medium smaller-text basic'></p>
+<div class='clear width-100' id='signup-account-address-container'>
+<p id='signup-account-zipcode-city' class='medium smaller-text'></p>
 <?php
 echo $this->form->streetAddress;
 echo $this->form->zipcode;
 echo $this->form->userLocation;
 ?>
+
 
 <div class='clear'></div>
 
@@ -257,10 +167,9 @@ echo $this->form->userLocation;
 <?php
 echo $this->form->noAddress;
 ?>
-
+</div>
 
 <?php
-echo "<div class='clear width-100 basic'>";
 /* SIGNUP SECTION 2: SPORTS */
 echo $this->partial('partials/signup/stepContainer.phtml',array('title'		  =>'Sports',
 																'currentStep' =>$currentStep,
@@ -290,10 +199,7 @@ foreach ($sports as $sport => $values) {
 
 
 
-
-
 </div>
-
 <?php
 /* STEP 3 IMPORT PHOTO */
 echo $this->partial('partials/signup/stepContainer.phtml',array('title'		  =>'Import Picture',
@@ -304,7 +210,7 @@ $currentStep++;
 
 
 ?>
-<p class='clear medium signup-import-main-current-text'> Current picture:</p>
+<p class='clear medium signup-import-main-current-text'>Other players will see:</p>
 <div class='signup-import-main-img-container'>
     <img src='/images/users/profile/pic/large/default.jpg' class='signup-import-main-img' id='signup-import-main-img'/>
 </div>
@@ -336,18 +242,16 @@ echo $this->form->fileY;
 
 </div>
 
-</div>
-
-<div class='clear width-100 basic'>
 <?php
-
+/*
 echo $this->partial('partials/signup/stepContainer.phtml',array('title'		  =>'Agree',
 																'currentStep' =>$currentStep,
 																'totalSteps'  =>$totalSteps));
 $currentStep++;
-
+*/
 ?>
-<p class='signup-agree-header center'>
+<!--
+<p class='signup-agree-header center darkest'>
 We are not a dating site.  We are not a site for funny videos.  We play sports.  As athletes, we adhere to a general code of conduct.  That conduct is laid out in our Pledge:
 </p>
 <div class='signup-agree-pledges-container'>
@@ -364,18 +268,18 @@ We are not a dating site.  We are not a site for funny videos.  We play sports. 
 	
 	?>
 </div>
-</div>
-
-</div>
+-->
 <?php
 echo $this->form->agree;
 ?>
+<!--</div>-->
 
 <div class='button green-button header' id='signup-finish'>
 	FINISH
 </div>
 
 </form>
+
 
 <?php
 /* NARROW COLUMN */
@@ -397,10 +301,10 @@ echo $this->narrowcolumnsection()->start(array('title' => 'Account Info'));
 </div>
 <div id='account-info-age' class='narrow-column-fade narrow-column-value'>
 </div>
-<div id='account-info-dimensions' class='narrow-column-value'>
-	<span id='account-info-height' class='narrow-column-fade'></span>
-    <!--<span id='account-info-weight' class='narrow-column-fade no-clear'></span>-->
+<div id='account-info-height' class='narrow-column-fade narrow-column-value'>
 </div>
+    <!--<span id='account-info-weight' class='narrow-column-fade no-clear'></span>-->
+
 <div id='account-info-location' class='narrow-column-value'>
 </div>
        
@@ -412,7 +316,7 @@ echo $this->narrowcolumnsection()->start(array('title' => 'Sports'));
 foreach ($sports as $key => $val) {
 	echo "<img src='/images/signup/sports/icons/medium/" . $key . ".png' class='signup-sport-icon-narrow-column' id='signup-narrow-column-sport-" . $key . "'/>";
 }
-									  
+										  
 ?>
 
 <?php

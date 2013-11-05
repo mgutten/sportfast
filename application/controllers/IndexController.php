@@ -19,12 +19,11 @@ class IndexController extends Zend_Controller_Action
 			$this->view->whiteBacking = false;
 		} else {
 			// Member homepage
-			$this->view->narrowColumn = 'right';
 			
-		
-			//$this->view->user->getMapper()->getCityIdRange('984');
-					
+			$this->view->narrowColumn = 'right';
+								
 			$session = new Zend_Session_Namespace('first_visit');
+	
 			if ($session->firstVisit) {
 				// First time logging in
 				Zend_Session::namespaceUnset('first_visit');
@@ -45,7 +44,17 @@ class IndexController extends Zend_Controller_Action
 			
 			$this->view->userSports = $this->view->user->getSportNames();
 			
-			$userSports  = $this->view->user->sports;
+			if (!$this->view->userSports) {
+				$sports = new Application_Model_Sports();
+				
+				$sports->getAllSportsInfo(true);
+				
+				$userSports = $sports->getAll();
+					
+			} else {
+				$userSports  = $this->view->user->sports;
+			}
+			
 			$dropdown    = Zend_Controller_Action_HelperBroker::getStaticHelper('Dropdown');
 			$lookingDropdownSportArray = array();
 			$sportsParen = '('; // For use in options with games model below
@@ -78,6 +87,7 @@ class IndexController extends Zend_Controller_Action
 			$sportsParen .= ')';
 			
 			
+			
 			$lookingTeams = '';
 			if (!$this->view->user->wantsTeams()) {
 				// User does not want any teams, remove from dropdown
@@ -92,12 +102,19 @@ class IndexController extends Zend_Controller_Action
 											  array('text'  => 'Tournaments',
 												 	'color' => 'light',
 													'outerClass' => 'not-selected'));
-													
-			$lookingDropdownTimeArray = array(array('text'  => 'Any Time',
-												 	'color' => 'light'),
-											  array('text'  => 'My Availability',
+			
+			if ($this->view->user->isMinimal()) {
+				$lookingDropdownTimeArray = array(array('text'  => 'Any Time',
 												 	'color' => 'light')
 											  );
+			} else {
+				
+				$lookingDropdownTimeArray = array(array('text'  => 'Any Time',
+														'color' => 'light'),
+												  array('text'  => 'My Availability',
+														'color' => 'light')
+												  );
+			}
 			
 			$this->view->lookingDropdownSport = $dropdown->dropdown('member-looking-sports',$lookingDropdownSportArray, 'Select sports');
 			$this->view->lookingDropdownType  = $dropdown->dropdown('member-looking-types',$lookingDropdownTypeArray, 'Select types');
@@ -109,18 +126,31 @@ class IndexController extends Zend_Controller_Action
 			
 			// Schedule section
 			$this->view->userSchedule = $this->view->user->getNextWeekScheduledGames();
-			
-			$array = array();
-			$array[5] = 'cat';
+
 			
 			// Find section matches
 			$matches = new Application_Model_Matches();
 			
 			$games   = new Application_Model_Games();
 			$options = array('`g`.`sport` IN ' . $sportsParen);
-			
-			
-			$games->findUserGames($this->view->user, $options, false, 'any', 'any');
+	
+			if ($this->view->user->isMinimal()) {
+				// Minimal account, show all matches for any game/teams
+				
+				$options = array();
+				$options['sports'] = array('basketball' => false,
+										   'football'	=> false,
+										   'ultimate'	=> false,
+										   'volleyball'	=> false,
+										   'soccer' 	=> false,
+										   'tennis'		=> array('singles' => array('rally' => true,'match' => true),
+										   						 'doubles' => array('rally' => true,'match' => true))
+											);
+
+				$games->findGames($options, $this->view->user);
+			} else {
+				$games->findUserGames($this->view->user, $options, false, 'any', 'any');
+			}
 			
 			$matches->addMatches($games->games);
 			
@@ -135,6 +165,16 @@ class IndexController extends Zend_Controller_Action
 					
 			
 			$this->view->matches = $matches->sortByMatch();
+			
+			$this->view->pastPlayedGames = $pastPlayedGames = $this->view->user->getUpcomingPastPlayedGames();
+			
+			if ($pastPlayedGames) {
+				$numPastPlayedGames = count($pastPlayedGames->getAll());
+			} else {
+				$numPastPlayedGames = 0;
+			}
+			
+			$this->view->numPastPlayedGames = $numPastPlayedGames;
 						
 		}
     }

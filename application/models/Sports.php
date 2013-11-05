@@ -23,7 +23,7 @@ class Application_Model_Sports extends Application_Model_ModelAbstract
 		}
 	}
 	*/
-	
+
 	
 	public function __construct(array $options = null)
 	{
@@ -53,6 +53,37 @@ class Application_Model_Sports extends Application_Model_ModelAbstract
 			$this->_attribs['sports'][$sport] = new Application_Model_Sport();
 		}
 		return $this->_attribs['sports'][$sport];
+	}
+	
+	/**
+	 * get array of sports types used on Find controller pages where userSports is needed but user is minimal account (no sports)
+	 */
+	public function getSportsTypes()
+	{
+			
+		$returnArray = array();
+		
+		foreach ($this->getAll() as $sport) {
+
+			$sportName = $sport->_attribs['sport'];
+			foreach ($sport->types as $type) {
+				if (strtolower($type->_attribs['typeName']) == 'pickup' && strtolower($type->_attribs['typeSuffix']) == null) {
+					$returnArray[$sportName] = false;
+					continue;
+				}
+				  $innerArray = array();
+				  $typeName = $type->_attribs['typeName'];
+				  
+				  $suffix = $type->_attribs['typeSuffix'];
+				  if ($suffix == 'null') {
+					  $suffix = false;
+				  }
+				  //$innerArray['typeSuffix'] = $suffix;
+				  $returnArray[$sportName][$typeName][$suffix] = true;
+			}
+		}			
+		
+		return $returnArray;
 	}
 		
 

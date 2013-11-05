@@ -52,7 +52,7 @@ class Application_Model_Location extends Application_Model_ModelAbstract
 		$location = explode(' ',$this->_attribs['location']);
 
 		$this->latitude  = ltrim($location[0], 'POINT(');
-		$this->longitude = rtrim($location[1], ')');
+		$this->longitude = rtrim((isset($location[1]) ? $location[1] : ''), ')');
 		
 		return $this;
 	}
@@ -68,6 +68,12 @@ class Application_Model_Location extends Application_Model_ModelAbstract
 		
 		$this->getMapper()->getLocationByCityID($cityID, $this);
 	}
+	
+	public function getCityIDByLocation() {
+		$this->setMapper('Application_Model_LocationsMapper');
 		
+		return $this->getMapper()->getCityIDByLocation($this->location);
+	}
+			
 									
 }

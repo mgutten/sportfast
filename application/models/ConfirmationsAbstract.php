@@ -24,16 +24,23 @@ class Application_Model_ConfirmationsAbstract extends Application_Model_ModelAbs
 			
 			foreach ($players as $player) {
 				
+				if ($player->hasProfilePic()) {
+					$function = 'array_unshift';
+				} else {
+					// Push to end of stack
+					$function = 'array_push';
+				}
+				
 				if ($game->userConfirmed($player->userID)) {
 					// User is confirmed
-
-					array_unshift($playerArray, $player);
+					$function($playerArray, $player);
+					
 				} elseif ($game->userNotConfirmed($player->userID)) {
 					// User is not going
-					array_unshift($notConfirmed, $player);
+					$function($notConfirmed, $player);
 				} elseif ($game->userMaybeConfirmed($player->userID)) {
 					// Is a maybe
-					array_push($maybeConfirmed, $player);
+					$function($maybeConfirmed, $player);
 				} else {
 					array_push($undecided, $player);
 				}
@@ -66,11 +73,18 @@ class Application_Model_ConfirmationsAbstract extends Application_Model_ModelAbs
 		if (!$this->hasValue('confirmedPlayers')) {
 			return '0';
 		} elseif (is_array($this->confirmedPlayers)) {
-			return count($this->confirmedPlayers);
+			$confirmed = count($this->confirmedPlayers);
+
 		} else {
 			
-			return $this->confirmedPlayers;
+			$confirmed = $this->confirmedPlayers;
 		}
+		
+		if ($this->hasValue('plus')) {
+			$confirmed += $this->plus;
+		}
+		
+		return $confirmed;
 	}
 	
 	public function countNotConfirmedPlayers()
@@ -86,9 +100,15 @@ class Application_Model_ConfirmationsAbstract extends Application_Model_ModelAbs
 	{
 		if (!$this->hasValue('maybeConfirmedPlayers')) {
 			return 0;
+		} elseif (is_array($this->maybeConfirmedPlayers)) {
+			$confirmed = count($this->maybeConfirmedPlayers);
+
 		} else {
-			return count($this->maybeConfirmedPlayers);
+			
+			$confirmed = $this->maybeConfirmedPlayers;
 		}
+		
+		return $confirmed;
 	}
 	
 }

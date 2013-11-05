@@ -11,8 +11,10 @@ $this->headLink()->prependStylesheet($this->baseUrl() . '/css/signup.css');
 	<?php
 	
 	if ($this->success) {
+		$email = explode('@', $this->username);
+		
 		echo "<p class='clear largest-text green heavy width-100 center'>Almost done!</p>";
-		echo "<p class='medium clear width-100 center larger-margin-top'>An email verification has been sent to: <br><span class='inherit darkest heavy largest-text'>" . $this->username . "</span></p>
+		echo "<p class='medium clear width-100 center larger-margin-top'>An email verification has been sent to: <br><a href='http://www." . $email[1] . "'  class='inherit underline darkest heavy largest-text' target='_blank'>" . $this->username . "</a></p>
 				<p class='clear darkest width-100 heavy center margin-top'>Please follow the link in this email to complete your signup.</p>
 				<p class='clear medium width-100 center larger-margin-top'>(if you can't find it, check your spam folder)</p>";
 	} else {

@@ -9,67 +9,6 @@ var failedCity;
 
 $(function()
 {
-	if (isSignup()) {
-		// Is signup page
-		showAlert($('#membership-alert-container'), .9);
-		
-		$('.body-column-narrow').css('height', 'auto'); // Undo set height to allow for shorter minimal form vs basic form
-		
-		
-	}
-	
-	
-	$('.signup-membership-container').click(function()
-	{
-		$(this).addClass('selected');
-		
-		var duration = 500;
-		var selected = $(this).find('.signup-membership-button').text().toLowerCase();
-		
-		setTimeout(function() { hideAlerts() }, 10);
-		$('#signup-main-membership-button-' + selected).trigger('click');
-		
-		return;
-		
-		/*
-		$('.signup-membership-container').each(function()
-		{
-			if (!$(this).is('.selected')) {
-				$(this).find('.signup-membership-button').css('background', 'rgb(255, 255, 255)')
-			}
-			
-			$(this).find('.signup-membership-inner-container').animate({'margin-top': '-25em'}, duration);
-			
-		})
-		
-		$('#signup-main-membership-button-' + selected).trigger('click');
-		
-		$(this).find('.signup-membership-button').css('background', 'rgb(230, 230, 230)');
-		$(this).css('background', 'rgb(230, 230, 230)');
-		
-		$('.signup-membership-points-inner-container').animate({'margin-top':'-25em'}, duration);
-		
-		setTimeout(function() { hideAlerts() }, duration + 200);
-		
-		
-		$(this).removeClass('animate-darker');
-		*/
-		
-	})
-	
-	$('.signup-main-membership-button').click(function()
-	{
-		var selected = $(this).text().toLowerCase();
-		
-		$(this).siblings('.signup-main-membership-button').removeClass('selected');
-		$(this).addClass('selected');
-		
-		$('.basic').hide();
-		$('.basic').parent('.input-container').hide();
-		
-		$('.' + selected).show();
-		$('.' + selected).parent('.input-container').show();
-	})
 
 	/* update narrow column name value onkeyup */
 	$('#firstName,#lastName').keyup(function()
@@ -86,6 +25,36 @@ $(function()
 		updateNarrowColumnName($(this).val(), firstOrLast);
 		testDrop($(this));
 	})
+	
+	
+	/* for age dropdown onclick validate 
+	$('#dropdown-menu-ageDropdown').children('.dropdown-menu-option-container').click(function()
+	{
+		$('#ageDropdown').children('.dropdown-menu-selected').addClass('input-success');
+		
+		$('#ageDropdown').children('.dropdown-menu-selected').children('.dropdown-menu-option-text').removeClass('medium').addClass('darkest');
+		
+		var age = $(this).children('p').text();
+		$('#age').val(age);
+		
+		updateNarrowColumnGeneric('age', age + ' years old');
+		
+	});
+	*/
+	
+	/* for sex dropdown onclick validate */
+	$('#dropdown-menu-sexDropdown').children('.dropdown-menu-option-container').click(function()
+	{
+		$('#sexDropdown').children('.dropdown-menu-selected').addClass('input-success').removeClass('input-fail');
+		
+		$('#sexDropdown').children('.dropdown-menu-selected').children('.dropdown-menu-option-text').removeClass('medium').addClass('darkest');
+		
+		var sex = $(this).children('p').text();
+		$('#sex').val(sex);
+		
+		updateNarrowColumnGeneric('sex', sex);
+		
+	});
 	
 	
 	/* update age narrow column */
@@ -182,6 +151,7 @@ $(function()
 			
 			updateNarrowColumnGeneric('height', str)
 		}
+		/*
 		if ($(this).is('#weight')) {
 			// Dealing with weight		
 			var isValid = $(this).isValid({number: true, minLength: 2,maxLength: 3});
@@ -191,9 +161,44 @@ $(function()
 			var str = (value.length < 1 ? 'N/A' : value + ' lb');
 			updateNarrowColumnGeneric('weight',str);
 		}
+		*/
 		
 	
 	})
+	
+	
+	$('#age').keyup(function()
+	{
+		var indicator = $('#' + $(this).attr('id') + '-indicator');
+		var value = $(this).val();
+		
+		// eliminate all non-integer values
+		var newValue = value.replace(/[^\d+]/g,'');
+	
+		if(newValue !== value) {
+			// There was a non-integer value
+			$(this).val(newValue);
+			value = newValue;
+		}
+		
+		
+		if (value.length < 1) {
+			// A value is present
+			indicator.css('opacity',0);
+		} else {
+			// No value present
+			indicator.css('opacity',1);
+		}
+
+		$(this).limitVal(1, 99);
+		var isValid = $(this).isValid({number: true, minLength: 1,maxLength: 2});
+		
+		changeInputBackground($(this),isValid);
+		
+		updateNarrowColumnGeneric('age', value + ' years old')
+	
+	})
+	
 	
 	
 	/* change color of sex icon onclick */
@@ -233,6 +238,18 @@ $(function()
 		endTooltipTimer();
 		$('#tooltip').hide();
 	})
+	
+	/* show tooltip for age */
+	$('#ageText').focus(function()
+	{
+		startTooltipTimer($(this));
+	})
+	.blur(function()
+	{
+		endTooltipTimer();
+		$('#tooltip').hide();
+	})
+	
 	
 	
 	/* validate signup password and reenter password */
@@ -285,6 +302,14 @@ $(function()
 		if (isValid) {
 			testGeocode();
 		}
+	})
+	
+	$('#signup-account-address-container').hover(function()
+	{
+		$('#signup-account-address-warning').stop().animate({opacity: 1}, 400);
+	}, function()
+	{
+		$('#signup-account-address-warning').stop().animate({opacity: 0}, 400);
 	})
 		
 	
@@ -645,16 +670,7 @@ $(function()
 	{
 		var scrollToEle = new Array();
 		// Trigger each inputs keyup to add/remove input-fail class
-		$('input[type=password],input[type=text]').each(function()
-		{
-			if ($(this).parents('.basic').css('display') == 'none'
-				|| $(this).css('display') == 'none') {
-				return;
-			}
-			
-			$(this).trigger('keyup');
-		})
-		
+		$('input[type=password],input[type=text]').trigger('keyup');
 		var fail = false;
 		
 		$('input[type=password],input[type=text]').each(function()
@@ -663,8 +679,6 @@ $(function()
 				// An input already failed
 				return;
 			}
-			
-			
 			if ($(this).is('.input-fail')) {
 				// This input failed, scroll to show
 				if ($(this).is('#streetAddress') && $('#noAddress').prop('checked') == true) {
@@ -675,34 +689,37 @@ $(function()
 				fail = true;
 			}
 		})
+		fail = true;
 		
-		if ($('.signup-sex-img').parents('.basic').css('display') != 'none') {
-			fail = true;
-			// Test that sex is selected
-			$('.signup-sex-img').each(function()
-			{			
-				if ($(this).is('.signup-sex-selected')) {
-					// One sex is selected, fail is false
-					fail = false;
-				}
-			})
+		/*
+		// Test that sex is selected
+		$('.signup-sex-img').each(function()
+		{			
+			if ($(this).is('.signup-sex-selected')) {
+				// One sex is selected, fail is false
+				fail = false;
+			}
+		})
+		*/
+		if ($('#sexDropdown').find('.input-success').length < 1) {
+			$('#sexDropdown').children('.dropdown-menu-selected').addClass('input-fail');
+			scrollToEle.push($('#sexDropdown'));
+		}
+		/*
+		if (fail) {
+			$('.signup-sex-img').parent().addClass('input-fail');
+			if (scrollToEle.length < 1) {
+				// Same scroll spot for sex and inputs, only push if not already in array
+				scrollToEle.push($('.signup-sex-img').parents('.signup-section-container'));	
 			
-			if (fail) {
-				$('.signup-sex-img').parent().addClass('input-fail');
-				if (scrollToEle.length < 1) {
-					// Same scroll spot for sex and inputs, only push if not already in array
-					scrollToEle.push($('.signup-sex-img').parents('.signup-section-container'));	
-				
-				}
 			}
 		}
-		
-		if ($('.basic').css('display') != 'none') {
-			var submitFormSectionEle;
-			// Test all the sports sections for completeness
-			if (submitFormSectionEle = submitFormTestSports()) {
-				scrollToEle.push(submitFormSectionEle)
-			}
+		*/
+	
+		var submitFormSectionEle;
+		// Test all the sports sections for completeness
+		if (submitFormSectionEle = submitFormTestSports()) {
+			scrollToEle.push(submitFormSectionEle)
 		}
 		
 		
@@ -1132,25 +1149,6 @@ function animateNarrowColumnBody(ele)
 						  		 
 }
 
-
-
-/**
- * change input background color based on validity
- * @params(ele => inputEle to change background of,
- 		   isValid => should it be green (ok?) (boolean))
- */
-function changeInputBackground(ele, isValid)
-{
-	if (!isValid) {
-		// Failed validity test
-		ele.removeClass('input-success').addClass('input-fail');
-
-	} else {
-		// Correct input
-		ele.removeClass('input-fail').addClass('input-success');
-	}
-
-}
 
 /**
  * update hidden element for each sport

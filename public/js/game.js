@@ -3,7 +3,112 @@ var postContent = "<p class='dark clear larger-margin-top game-cancel-reason'>Re
 var confirmClicked;
 
 $(function() {
-
+	
+	if ($('#signup1-alert-container').length > 0) {
+		// Is not signed up, show alert
+		showAlert($('#signup1-alert-container'), .9);
+		
+		disableCloseAlerts();
+		
+		
+		/* update narrow column name value onkeyup */
+		$('#firstName,#lastName').keyup(function()
+		{
+			var firstOrLast = true;
+			if ($(this).attr('id') == 'lastName') {
+				firstOrLast = false;
+			}
+			
+			var regexp = /^[a-zA-Z]+-*[a-zA-Z]*$/g;
+			var isValid = $(this).isValid({regex: regexp})
+			
+			changeInputBackground($(this),isValid);
+		})
+		
+		/* check email validation */
+		$('#email').keyup(function()
+		{
+			
+			var value   = $(this).val();
+			var regex	= /^\S+@\S+\.\S+$/;
+			var isValid = $(this).isValid({regex: regex});
+			
+			changeInputBackground($(this), isValid);
+		})
+		.focus(function()
+		{
+			$('#tooltip').children('#tooltip-body').html('<span class="heavy darkest">This email will be used to notify you of upcoming games.</span>');
+			startTooltipTimer($(this));
+		})
+		.blur(function()
+		{
+			endTooltipTimer();
+			$('#tooltip').hide();
+		})
+		
+		/* validate signup password and reenter password */
+		$('#signupPassword').keyup(function()
+		{
+			var value   = $.trim($(this).val());
+			var isValid = $(this).isValid({minLength: 8, maxLength: 30});
+			
+			changeInputBackground($(this),isValid);
+			
+			changeInputBackground($('#signupReenterPassword'), isValid);	
+			
+		})/*
+		.focus(function()
+		{
+			$('#game-password-reqs').show();
+		})
+		.blur (function()
+		{
+			$('#game-password-reqs').hide();
+		})*/
+		
+		$('.games-signup-option-container').click(function()
+		{
+			var inputs = '#firstName,#lastName,#signupPassword';
+			var email = '';
+			if ($('#email').length > 0) {
+				inputs += ',#email';
+				email = $('#email').val();
+			} else {
+				email = $('#user-email').text();
+			}
+			
+			var fail = false;
+			$(inputs).trigger('keyup').each(function()
+			{
+				if ($(this).is('.input-fail')) {
+					fail = true;
+				}
+			})
+			
+			if (fail) {
+				return false;
+			}
+			
+			if ($(this).is('#game-signup-minimal')) {
+				// Minimal signup
+				$('#user-signup').attr('action', '/signup/minimal').submit();
+				//minimalSignup($('#firstName').val(), $('#lastName').val(), email, $('#signupPassword').val());
+			} else {
+				// Want full package
+				$('#user-signup').attr('action', '/signup/basic').submit();
+			}
+			
+			
+			
+		})
+		
+		if ($('#email').val().length > 0) {
+		
+			$('#email').trigger('keyup');
+		}
+		
+	}
+	
 	$('#game-plus').change(function()
 	{
 		var value = $(this).val();

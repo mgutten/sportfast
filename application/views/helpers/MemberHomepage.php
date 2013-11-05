@@ -30,12 +30,24 @@ class Application_View_Helper_MemberHomepage
 						<li>Access your profile</li></ul>";
 			echo "</div>";
 			
+			if (!$user->isMinimal()) {
+				echo "<p class='clear smaller-text member-first-time-sub larger-margin-top darkest'>We will notify you via email when a game is created matching your preferences.</p>";
+				echo "<p class='clear larger-margin-top medium'>Then again, maybe you're here to   
+						<a href='/create' class='darkest underline'> organize your own game or team.</a></p>";
+			}
 			
-			echo "<p class='clear smaller-text member-first-time-sub larger-margin-top darkest'>We will notify you via email when a game is created matching your preferences.</p>";
-			echo "<p class='clear larger-margin-top medium'>Then again, maybe you're here to   
-					<a href='/create' class='darkest underline'> organize your own game or team.</a></p>";
+			echo "<div class='clear width-100 largest-margin-top'>
+					<p class='button clear heavy auto-center member-first-time-button'>Continue to dashboard</p>
+				  </div>";
 			
-			echo "<p class='button clear heavy member-first-time-button'>Continue to dashboard</p>";
+			$session = new Zend_Session_Namespace('postLoginURL');	
+			if ($session->url) {  
+				echo "<p class='clear width-100 center medium margin-top'>or</p>";
+				echo "<div class='clear width-100'>
+						<a href='" . $session->url . "' class='button clear auto-center member-first-time-button'>Go to previous page</a>
+					  </div>";
+			}
+				  
 			
 			echo $this->_view->alert()->end();
 			echo $this->_view->partial('partials/global/alertBack.phtml');
@@ -120,19 +132,51 @@ class Application_View_Helper_MemberHomepage
 		$this->_view->placeholder('narrowColumn')->captureEnd();
 			
 
+		$output = '';
+				
 		$scheduleHeader = $this->buildScheduleHeader();
-		$output 		= $this->_view->partial('partials/global/sectionHeaderBold.phtml',array('title'   => 'schedule',
+		$output 	   .= $this->_view->partial('partials/global/sectionHeaderBold.phtml',array('title'   => 'schedule',
 																								'content' => $scheduleHeader)); 
 		$output 	   .= $this->buildScheduleBody(); // Schedule content here
 		
-		$findHeader  = $this->buildFindHeader();																		
+		$findHeader  = $this->buildFindHeader();	
 		$output     .= $this->_view->partial('partials/global/sectionHeaderBold.phtml',array('title'   => 'find',
 																							 'content' => $findHeader)); 
 		$output 	.= "<div id='gmap'></div>"; // Find content here
-		$output     .= "<img src='/images/global/loading.gif' class='member-find-loading'/>
-						<div id='member-find-body'>"
-					 . $this->buildFindBody()
+		
+		$newClass = $pastClass = $pastBodyClass = $newBodyClass = $past = '';
+		if ($this->_view->pastPlayedGames) {
+			// There are past played games coming up
+			$pastClass = 'selected';
+			$newBodyClass = 'hidden';
+			
+			$past .= $this->buildFindBody($this->_view->pastPlayedGames->getAll(), true);
+		} else {
+			$newClass = 'selected';
+			$pastBodyClass = 'hidden';
+			
+			$past .= $this->buildFindBody(false, true);
+		}
+		
+		$output     .= "<div class='clear width-100' id='member-find-tab-container'>
+							<div class='left light member-find-tab pointer center " . $newClass . "' id='member-find-tab-new' tooltip='These are games that you have never played in.'>
+								<p class='inherit'>New Games</p>
+								<p class='medium member-find-tab-num '>4</p>
+							</div>
+							<div class='left light member-find-tab pointer center " . $pastClass . "' id='member-find-tab-past' tooltip='You have previously played in these weekly games.'>
+								<p class='inherit'>Past Played Games</p>
+								" . ($this->_view->numPastPlayedGames > 0 ? "<p class='medium member-find-tab-num'>" . $this->_view->numPastPlayedGames . "</p>" : '') . "
+							</div>
+						</div>
+						<img src='/images/global/loading.gif' class='member-find-loading'/>
+						<div id='member-find-past' class='clear width-100 member-find-body-container " . $pastBodyClass . "'>
+						" . $past . "
+						</div>
+						<div id='member-find-body' class='clear width-100 member-find-body-container " . $newBodyClass . "'>
+						"
+					 . $this->buildFindBody($this->_view->matches)
 					 . "</div>";
+					 
 		
 		$newsfeedHeader = "<div class='right member-newsfeed-header medium'>" . $this->_view->user->city->city . "</div>";
 		$output     .= $this->_view->partial('partials/global/sectionHeaderPlain.phtml',array('title'   => 'newsfeed',
@@ -290,8 +334,8 @@ class Application_View_Helper_MemberHomepage
 						if ($game->isGameOn()) {
 							// Enough players for game
 							//$confirm = 'GAME ON';
-							$confirm = '';
-							$confirmClass = ' heavy green';
+							$confirm = ($game->countMaybeConfirmedPlayers() ? '+' . $game->countMaybeConfirmedPlayers() . ' maybe' : '');
+							$confirmClass = ' medium';
 						} else {
 							$confirm = $game->getPlayersNeeded('more') . " needed";
 							$confirmClass = ' red';
@@ -413,10 +457,9 @@ class Application_View_Helper_MemberHomepage
 	 * build find body section
 	 * @return $output
 	 */
-	public function buildFindBody()
+	public function buildFindBody($matches, $past = false)
 	{
 		$output = "<div class='member-find-lower-outer-container'><div class='member-find-lower-outer-inner-container'>";
-		$matches  = $this->_view->matches;
 		
 		$counter    = 0;
 		$totalMatches = 1;
@@ -424,10 +467,14 @@ class Application_View_Helper_MemberHomepage
 		$totalGames = 0;
 		$matchesPerPage = 4;
 		$numberOfPages  = 3;
-		if (empty($matches)) {
+		if (empty($matches) && !$past) {
 			// No matches 
 			$output  = "<p class='medium larger-text member-find-none center'>No matches found</p>";
 			$output .= "<a href='/find' class='light center member-find-none-search'><img src='/images/global/body/magnifying_medium.png' style='margin:0 2px -4px 0;'/>Broader search</a>";
+			return $output;
+		} elseif (empty($matches) && $past) {
+			// Is past played section
+			$output  = "<p class='medium larger-text member-find-none center'>There are no upcoming games that you have previously played in.</p>";
 			return $output;
 		}
 			
@@ -447,44 +494,11 @@ class Application_View_Helper_MemberHomepage
 				$totalPages++;
 			}
 			
-			if ($match instanceof Application_Model_Game) {
-				// Match is a game
-				$type     = 'Game';
-				$typeClass= 'bold';
-				$dateTime = DateTime::createFromFormat('Y-m-d H:i:s', $match->date);
-				$newDate  = $dateTime->format('m n');
-				$day      = $match->getDay('D');
-				$hour	  = $match->getHour();
-				$dateDesc = $dateTime->format('M j');
-				$id		  = $match->gameID;
-				$location = $match->getLimitedParkName(22);
-				$gameIndex= $totalGames;
-				$dateHTML = "<div class='member-find-game-date-day'>" . $day . "</div>&nbsp; 
-								<div class='member-find-game-date-hour'>" . $hour . "</div>";
-				$totalGames++;
-			} elseif ($match instanceof Application_Model_Team) {
-				// Match is a team
-				$type	  = 'Team';
-				$dateHTML = $match->getLimitedName('city', 10);
-				$location = $match->getLimitedName('teamName',25);
-				$id		  = $match->teamID;
-				$dateDesc = $match->city;
-				$marker   = '';
-				$gameIndex= '';
-				$typeClass= '';
-			}
-				
-			$output .= "<a class='member-find-game-container member-" . strtolower($type) . "' href='/" . strtolower($type) . "s/" . $id . "' gameIndex='" . $gameIndex . "'>";
-			$output .= "<div class='left member-find-game-number-container'><p class='member-find-game-number green-back white arial bold'>" . $totalMatches . "</p></div>";
-			$output .= "<p class='member-find-game-sport darkest bold'>" . $match->sport . "</p>";
-			$output .= "<p class='member-find-game-type darkest " . $typeClass . "'>" . $type . "</p>";
-			$output .= "<div class='member-find-game-date medium' tooltip='" . $dateDesc . "'>" . $dateHTML . "</div>";
-			$output .= "<p class='member-find-game-players darkest bold'>" . $match->totalPlayers . "<span class='darkest smaller-text'>/" . ($match->rosterLimit > 30 ? "&infin;" : $match->rosterLimit) . "</span></p>";
-			$output .= "<img src='" . $match->getMatchImage() . "' class='member-find-game-match' tooltip='" . $match->getMatchDescription() . "'/>";
-			$output .= "<p class='member-find-game-park medium'>" . $location . "</p>";
-			$output .= "<img src='/images/global/body/single_arrow.png' class='member-find-game-arrow'/>";
+			$output .= $this->buildFindResult($match, $totalMatches, $totalGames);
 			
-			$output .= "</a>";
+			if ($match instanceof Application_Model_Game) {
+				$totalGames++;
+			}
 						
 			$counter++;
 			$totalMatches++;
@@ -512,6 +526,54 @@ class Application_View_Helper_MemberHomepage
 		return $output;
 	}
 	
+	
+	/**
+	 * build html for result of find
+	 */
+	public function buildFindResult($match, $matchNumber = '', $gameNumber = '')
+	{
+		$output = '';
+		if ($match instanceof Application_Model_Game) {
+				// Match is a game
+				$type     = 'Game';
+				$typeClass= 'bold';
+				$dateTime = DateTime::createFromFormat('Y-m-d H:i:s', $match->date);
+				$newDate  = $dateTime->format('m n');
+				$day      = $match->getDay('D');
+				$hour	  = $match->getHour();
+				$dateDesc = $dateTime->format('M j');
+				$id		  = $match->gameID;
+				$location = $match->getLimitedParkName(22);
+				$gameIndex= $matchNumber;
+				$dateHTML = "<div class='member-find-game-date-day'>" . $day . "</div>&nbsp; 
+								<div class='member-find-game-date-hour'>" . $hour . "</div>";
+				
+			} elseif ($match instanceof Application_Model_Team) {
+				// Match is a team
+				$type	  = 'Team';
+				$dateHTML = $match->getLimitedName('city', 10);
+				$location = $match->getLimitedName('teamName',25);
+				$id		  = $match->teamID;
+				$dateDesc = $match->city;
+				$marker   = '';
+				$gameIndex= '';
+				$typeClass= '';
+			}
+			
+			$output .= "<a class='member-find-game-container member-" . strtolower($type) . "' href='/" . strtolower($type) . "s/" . $id . "' gameIndex='" . $gameIndex . "'>";
+			$output .= "<div class='left member-find-game-number-container'><p class='member-find-game-number green-back white arial bold'>" . $matchNumber . "</p></div>";
+			$output .= "<p class='member-find-game-sport darkest bold'>" . $match->sport . "</p>";
+			$output .= "<p class='member-find-game-type darkest " . $typeClass . "'>" . $type . "</p>";
+			$output .= "<div class='member-find-game-date medium' tooltip='" . $dateDesc . "'>" . $dateHTML . "</div>";
+			$output .= "<p class='member-find-game-players darkest bold'>" . $match->countConfirmedPlayers() . "<span class='darkest smaller-text'>/" . ($match->rosterLimit > 30 ? "&infin;" : $match->rosterLimit) . "</span></p>";
+			$output .= "<img src='" . $match->getMatchImage() . "' class='member-find-game-match' tooltip='" . $match->getMatchDescription() . "'/>";
+			$output .= "<p class='member-find-game-park medium'>" . $location . "</p>";
+			$output .= "<img src='/images/global/body/single_arrow.png' class='member-find-game-arrow'/>";
+			
+			$output .= "</a>";
+			
+			return $output;
+	}
 	
 	/**
 	 * build main newsfeed section

@@ -22,10 +22,14 @@ if (!$this->noDefaultHeadTitle) {
 		
 		$this->headLink()->prependStylesheet($this->baseUrl() . '/css/global.css') . PHP_EOL;
 		
-		$version = '1.07'; // VERSION FOR JS AND CSS
+		$version = '1.08'; // VERSION FOR JS AND CSS
 		
 		foreach ($this->headLink() as $key => $item) {
 			// Add version number to css
+			if (strpos($item->href, '?') != false) {
+				// Has Custom version implemented, do not add version
+				continue;
+			}
 			$item->href .= '?' . $version;
 			
 		}

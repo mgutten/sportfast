@@ -140,7 +140,7 @@ class Application_Model_TeamsMapper extends Application_Model_TypesMapperAbstrac
 
 		$select->from(array('t'  => 'teams'),
 					  array(new Zend_Db_Expr('SQL_CALC_FOUND_ROWS t.*')))
-			   ->join(array('uus' => 'user_sports'),
+			   ->joinLeft(array('uus' => 'user_sports'),
 			   		 'uus.sportID = t.sportID AND uus.userID = "' . $userID . '"',
 					 array('skillCurrent as userSkill'))
 			   ->join(array('z' => new Zend_Db_Expr($zipcodeQuery)),
@@ -157,7 +157,7 @@ class Application_Model_TeamsMapper extends Application_Model_TypesMapperAbstrac
 						   'COUNT(us.userID) as totalPlayers'
 						   ))
 			   ->where('t.public = "1"')
-			   ->where('uus.skillCurrent >= t.minSkill AND uus.skillCurrent <= t.maxSkill');
+			   ->where('CASE WHEN uus.skillCurrent IS NOT NULL THEN uus.skillCurrent >= t.minSkill AND uus.skillCurrent <= t.maxSkill ELSE 1 END');
 
 
 		$sportWhere = '';
@@ -217,7 +217,7 @@ class Application_Model_TeamsMapper extends Application_Model_TypesMapperAbstrac
 		$offsetLimit = (isset($limitArray[1]) ? $limitArray[1] : 0);
 		
 		$select->limit($totalLimit,$offsetLimit);
-	
+		
 		$results = $table->fetchAll($select);
 		
 		$db = Zend_Db_Table::getDefaultAdapter();

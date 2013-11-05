@@ -536,7 +536,7 @@ function inviteToTeamGame(teamID, teamGameID, reserves)
 		type: 'POST',
 		data: {options: options},
 		success: function(data) {
-			alert(data);
+
 			showConfirmationAlert('Invites sent');
 		}
 	})

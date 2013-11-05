@@ -15,6 +15,11 @@ class LoginController extends Zend_Controller_Action
 
 		$this->view->whiteBacking = false;
 		
+		if ($already = $this->getRequest()->getParam('already')) {
+			// Tried to signup but username already exists
+			$this->view->already = $already;
+		}
+		
 		$session = new Zend_Session_Namespace('forgot');
 		if ($session->email) {
 			// Forgot password was invoked, show alert
@@ -107,16 +112,21 @@ class LoginController extends Zend_Controller_Action
 			/* ANY FUNCTIONS RUN ON USER HERE SHOULD BE MIMICKED IN BOOTSTRAP InitLayoutSetup*/
 			$user->login();
 			
-			$session = new Zend_Session_Namespace('postLoginURL');
-			if (!empty($session->url)) {
-				// Login was initiated from redirect in Authorization plugin (ie tried to access login-required page without being logged in)
-				// Redirect to stored URL (original attempted url)
-				$url = $session->url;
+			$session = new Zend_Session_Namespace('first_visit');
+			
+			if (!$session->firstVisit) {
 				
-				Zend_Session::namespaceUnset('postLoginURL');
-				return $this->_helper->redirector->goToUrl($url);
+				$session = new Zend_Session_Namespace('postLoginURL');
+				if (!empty($session->url)) {
+					// Login was initiated from redirect in Authorization plugin (ie tried to access login-required page without being logged in)
+					// Redirect to stored URL (original attempted url)
+					$url = $session->url;
+					
+					Zend_Session::namespaceUnset('postLoginURL');
+					return $this->_helper->redirector->goToUrl($url);
+				}
 			}
-		
+			
 			return $this->_helper->redirector->goToUrl('/');
 		}
         

@@ -8,6 +8,12 @@ var selectedMarker;
 
 $(function() {
 	
+	if ($('#member-find-minimal-container').length > 0) {
+		var top = $('#header-section-title-container-find').position().top
+		
+		//$('#member-find-minimal-container').css('top', top);
+	}
+	
 	$(document).on('click','.dropdown-menu-option-container', function(e)
 	{
 		// Option has been clicked
@@ -31,6 +37,24 @@ $(function() {
 		
 		mapMoved();
 		
+	})
+	
+	$('.member-find-tab').click(function()
+	{
+		$('.member-find-tab').removeClass('selected');
+		$(this).addClass('selected');
+		
+		var bodyEle;
+		
+		if ($(this).is('#member-find-tab-new')) {
+			bodyEle = $('#member-find-body');
+		} else {
+			// Is past tab
+			bodyEle = $('#member-find-past');
+		}
+		
+		$('.member-find-body-container').hide();
+		bodyEle.show();
 	})
 	
 	
@@ -190,8 +214,8 @@ $(function() {
  * create gmap markers
  */
 function createMarkers()
-{	
-
+{		
+	
 	// Clear prior markers
 	clearMarkers();
 	

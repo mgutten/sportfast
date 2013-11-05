@@ -145,14 +145,23 @@ class Application_View_Helper_Find
 			$button = '';
 		}
 		$limit = '';
+		/*
 		if ($match->hasValue('rosterLimit') && !($match instanceof Application_Model_Game)) {
 			// Is a limit, show limit
 			$limit = '/' . $match->rosterLimit;
 		}
+		*/
+		
+		if ($match instanceof Application_Model_Game) {
+			$players = $match->countConfirmedPlayers();
+		} else {
+			// Is team
+			$players = $match->totalPlayers;
+		}
 	
 		$output  = "<div class='right find-result-right-container'>";
 		$output .=		"<div class='left find-result-players-container'>";
-		$output .=			"<p class='largest-text heavy darkest left width-100 center'>" . $match->countConfirmedPlayers() . $limit . "</p>";
+		$output .=			"<p class='largest-text heavy darkest left width-100 center'>" . $players . $limit . "</p>";
 		$output .=			"<p class='larger-text clear heavy width-100 darkest center find-players'>players</p>";
 		$output .=		"</div>";
 		$output .=		$button;

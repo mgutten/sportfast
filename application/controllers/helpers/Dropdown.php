@@ -23,7 +23,7 @@ class Application_Controller_Helper_Dropdown extends Zend_Controller_Action_Help
 			}
 		}
 		
-		$class = '';
+		$class = $selectedContainerClass = '';
 		
 		if (is_array($selected)) {
 			
@@ -31,11 +31,15 @@ class Application_Controller_Helper_Dropdown extends Zend_Controller_Action_Help
 				$class = $selected['class'];
 			}
 			
+			if (isset($selected['selectedContainerClass'])) {
+				$selectedContainerClass = $selected['selectedContainerClass'];
+			}
+			
 			$selected = $selected['text'];
 		}
 		
 		$output = "<div id='" . $id . "' class='dropdown-menu-container' dropdown-id='dropdown-menu-hidden-container-" . $id . "'>
-						<div  class='dropdown-menu-selected dropshadow'>
+						<div class='dropdown-menu-selected dropshadow " . $selectedContainerClass . "'>
 						   <p class='dropdown-menu-option-text medium " . $class . "'>" . $selected . "</p>
 						   <img src='/images/global/dropdown/dropdown_arrow.png' class='dropdown-menu-option-img' id='dropdown-menu-arrow'/>
 					   </div>

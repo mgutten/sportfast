@@ -319,23 +319,25 @@ class Application_Model_CronMapper extends Application_Model_MapperAbstract
 	{
 		// Only run next morning game status at 7:59pm for games UP TO 8:59am
 		$db = Zend_Db_Table::getDefaultAdapter();
-		$statement = "SELECT g.gameID, g.sportID, g.minPlayers, (COUNT(ug.userID) + SUM(ug.plus)) as totalPlayers, 
+		$statement = "SELECT g.gameID, g.sportID, g.minPlayers, ug.totalPlayers, 
 							 g.sport, g.parkName, g.date
 						FROM games g
-						LEFT JOIN (SELECT u2.userID, ug2.gameID, ug2.plus FROM users u2
+						LEFT JOIN (SELECT u2.userID, ug2.gameID, (COUNT(ug2.userID) + SUM(ug2.plus)) as totalPlayers FROM users u2
 									INNER JOIN user_games ug2 ON u2.userID = ug2.userID 
-									WHERE u2.fake = 0 AND ug2.confirmed = 1) ug ON g.gameID = ug.gameID
-						WHERE CASE WHEN (HOUR((NOW() + INTERVAL " . $this->getTimeOffset() . " HOUR)) >= 19 AND MINUTE((NOW() + INTERVAL " . $this->getTimeOffset() . " HOUR)) > 31) THEN HOUR(TIMEDIFF(g.date, (NOW() + INTERVAL " . $this->getTimeOffset() . " HOUR))) <= 13 AND g.date >= (NOW() + INTERVAL " . $this->getTimeOffset() . " HOUR) ELSE (HOUR(TIMEDIFF(g.date, (NOW() + INTERVAL " . $this->getTimeOffset() . " HOUR))) = 1 and MINUTE(TIMEDIFF(g.date, (NOW() + INTERVAL " . $this->getTimeOffset() . " HOUR))) > 29) AND g.date >= (NOW() + INTERVAL " . $this->getTimeOffset() . " HOUR) END
+									WHERE u2.fake = 0 AND ug2.confirmed = 1 
+									GROUP BY ug2.gameID) ug ON g.gameID = ug.gameID
+						WHERE CASE WHEN (HOUR((NOW() + INTERVAL " . $this->getTimeOffset() . " HOUR)) >= 19 AND MINUTE((NOW() + INTERVAL " . $this->getTimeOffset() . " HOUR)) > 31) THEN HOUR(TIMEDIFF(g.date, (NOW() + INTERVAL " . $this->getTimeOffset() . " HOUR))) <= 13 AND g.date >= (NOW() + INTERVAL " . $this->getTimeOffset() . " HOUR) ELSE (HOUR(TIMEDIFF(g.date, (NOW() + INTERVAL " . $this->getTimeOffset() . " HOUR))) = 1 and MINUTE(TIMEDIFF(g.date, (NOW() + INTERVAL " . $this->getTimeOffset() . " HOUR))) < 29) AND g.date >= (NOW() + INTERVAL " . $this->getTimeOffset() . " HOUR) END
 							AND g.canceled = 0
 						GROUP BY g.gameID";
+
 		
-						
 		$results = $db->fetchAll($statement);
 		
 		$returnArray = array('canceled' => array(),
 							 'on'		=> array());
 							 
 		foreach ($results as $result) {
+			
 			if ($result['minPlayers'] > $result['totalPlayers']) {
 				// Not enough players for game, cancel
 				$returnArray['canceled'][$result['gameID']] = new Application_Model_Game($result);
@@ -467,6 +469,121 @@ class Application_Model_CronMapper extends Application_Model_MapperAbstract
 		}
 		
 		return $returnArray;
+	}
+	
+	
+	/**
+	 * reinvite users to recurring game who are not part of the site yet
+	 */
+	public function reinviteUserGames()
+	{
+		$table = $this->getDbTable();
+		$select = $table->select();
+		$select->setIntegrityCheck(false);
+		
+		$select->from(array('gi' => 'game_invites'))
+			   ->join(array('g' => 'games'),
+			   		  'gi.gameID = g.gameID')
+			   ->joinLeft(array('u' => 'users'),
+			   			  'gi.email = u.username')
+			   ->where('u.userID IS NULL')
+			   ->where('g.recurring = ?', 1)
+			   ->where('DATE(g.date) = DATE(NOW() + INTERVAL 1 DAY)')
+			   ->where('gi.numInvites = 1');
+			   
+		$results = $table->fetchAll($select);
+		
+		$games = array();
+		$emails = array();
+		
+		foreach ($results as $result) {
+			if (!isset($games[$result->gameID])) {
+				$game = new Application_Model_Game($result);
+				$games[$result->gameID] = $game;
+			}
+			
+			$game = $games[$result->gameID];
+			
+			$game->players->addUser($result);
+			
+			$emails[] = array('email' => $result->email,
+							  'gameID' => $game->gameID);
+			
+		}
+		
+		$this->incrementInvites($emails);
+		
+		return $games;	
+	}
+	
+	/**
+	 * reinvite users to team
+	 */
+	public function reinviteUserTeams()
+	{
+		$table = $this->getDbTable();
+		$select = $table->select();
+		$select->setIntegrityCheck(false);
+		
+		$select->from(array('ti' => 'team_invites'))
+			   ->join(array('t' => 'teams'),
+			   		  't.teamID = ti.teamID')
+			   ->joinLeft(array('u' => 'users'),
+			   			  'ti.email = u.username')
+			   ->where('u.userID IS NULL')
+			   ->where('ti.numInvites = 1');
+			   
+		$results = $table->fetchAll($select);
+		
+		$teams = array();
+		$emails = array();
+		
+		foreach ($results as $result) {
+			if (!isset($teams[$result->teamID])) {
+				$team = new Application_Model_Team($result);
+				$teams[$result->teamID] = $team;
+			}
+			
+			$team = $teams[$result->teamID];
+			
+			$team->players->addUser($result);
+			
+			$emails[] = array('email' => $result->email,
+							  'teamID' => $team->teamID);
+			
+		}
+		
+		$this->incrementInvites($emails);
+		
+		return $teams;
+	}
+	
+	
+	/**
+	 * update game_invites or team_invites to show added invited (increment numInvites)
+	 */
+	public function incrementInvites($emails) {
+		
+		$db = Zend_Db_Table::getDefaultAdapter();
+		
+		foreach ($emails as $inner) {
+			$data = array();
+			$data['numInvites'] = new Zend_Db_Expr('numInvites + 1');
+			
+			$where['email = ?'] = $inner['email'];
+			
+			if (isset($inner['gameID'])) {
+				$type = 'game';
+			} else {
+				// Is teamID
+				$type = 'team';
+			}
+			
+			$where[$type . 'ID = ?'] = $inner[$type . 'ID'];
+			
+			
+			$db->update($type . '_invites', $data, $where);
+		}
 	}
 	
 	

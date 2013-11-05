@@ -1,5 +1,26 @@
 <div class='width-100 profile-options-outer-container'>
 	<div class='profile-options-inner-container white-background left width-100'>
+    	<?php
+			if (isset($this->guests)) {
+				echo "<div class='right margin-top'>";
+				echo "<p class='medium smaller-text left margin-top'>Guests</p>";
+				echo "<select class='smaller-text medium' id='game-plus'>";
+        
+                    for ($i = 0; $i < 3; $i++) {
+						if ($i > ($this->game->rosterLimit - $this->confirmedPlayers)) {
+							continue;
+						}
+                        $selected = '';
+                        if ($this->guests == $i) {
+                            $selected = 'selected';
+                        }
+                        echo "<option " . $selected . ">" . $i . "</option>";
+                    }
+               
+				echo "</select>";
+				echo "</div>";
+			}
+		?>
     	<div class='profile-options-container left width-100'>
     	<?php
 			$class = 'profile-option-container';

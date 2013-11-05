@@ -59,7 +59,8 @@ class Application_Model_GamesMapper extends Application_Model_TypesMapperAbstrac
 					 	   'avg(us.attendance) as averageAttendance',
 						   'avg(us.sportsmanship) as averageSportsmanship',
 						   'avg(us.skillCurrent) - (SELECT skillCurrent FROM user_sports WHERE userID = "' . $userID . '" AND sportID = t.sportID) as skillDifference',
-						   '(COUNT(us.userID) + SUM(ug.plus)) as totalPlayers'
+						   '(COUNT(ug.userID) + SUM(ug.plus)) as confirmedPlayers',
+						   'SUM(ug.plus) as plus'
 						   ))
 			   ->join(array('ust' => 'user_sport_types'),
 			   			  'ust.typeID = g.typeID AND ust.userID = "' . $userID . '"')
@@ -113,9 +114,10 @@ class Application_Model_GamesMapper extends Application_Model_TypesMapperAbstrac
 			}
 		}
 		
-		$select->having('(g.rosterLimit > totalPlayers OR totalPlayers IS NULL)')
+		$select->having('(g.rosterLimit > confirmedPlayers OR confirmedPlayers IS NULL)')
 			   ->group('g.gameID')
 			   ->order('abs(avg(us.skillCurrent) - (SELECT skillCurrent FROM user_sports WHERE userID = "' . $userID . '" AND sportID = t.sportID)) ASC');
+		
 		
 		$results = $table->fetchAll($select);
 
@@ -257,15 +259,15 @@ class Application_Model_GamesMapper extends Application_Model_TypesMapperAbstrac
 			   		  'pl.parkID = g.parkID',
 					  array('AsText(location) as location'))
 			   ->joinLeft(array('ug' => 'user_games'),
-			   		  	  'ug.gameID = g.gameID',
-						  array(''))
+			   		  	  'ug.gameID = g.gameID AND ug.confirmed = 1',
+						  array('(COUNT(ug.userID) + SUM(ug.plus)) as confirmedPlayers'))
 			   ->joinLeft(array('us' => 'user_sports'),
-			   		  	  'us.userID = ug.userID AND us.sportID = g.sportID AND ug.confirmed = 1',
+			   		  	  'us.userID = ug.userID AND us.sportID = g.sportID',
 					 array('avg(us.skillCurrent) as averageSkill',
 					 	   'avg(us.attendance) as averageAttendance',
 						   'avg(us.sportsmanship) as averageSportsmanship',
 						   'avg(us.skillCurrent) - (SELECT skillCurrent FROM user_sports WHERE userID = "' . $userID . '" AND sportID = st.sportID) as skillDifference',
-						   '(COUNT(us.userID) + SUM(ug.plus)) as confirmedPlayers'
+						   
 						   ))
 			   ->joinLeft(array('u' => 'users'),
 			   		  'u.userID = us.userID',
@@ -494,12 +496,14 @@ class Application_Model_GamesMapper extends Application_Model_TypesMapperAbstrac
 						
 			if ($player->confirmed == '1') {
 				$savingClass->addConfirmedPlayer($player->userID);
+				$savingClass->plus += $player->plus;
 			} elseif ($player->confirmed == '0') {
 				$savingClass->addNotConfirmedPlayer($player->userID);
 			} elseif ($player->confirmed == '2') {
 				// Maybe
 				$savingClass->addMaybeConfirmedPlayer($player->userID);
 			}
+			
 			
 			/*
 			if ($player->subscribed !== null) {
@@ -513,6 +517,7 @@ class Application_Model_GamesMapper extends Application_Model_TypesMapperAbstrac
 			}
 			*/	
 		}
+		
 		
 		$select = $table->select();
 		$select->setIntegrityCheck(false);
@@ -547,6 +552,47 @@ class Application_Model_GamesMapper extends Application_Model_TypesMapperAbstrac
 		return $table->update(array('doNotEmail' => '1'), $where);
 		
 	}
+	
+	/**
+	 * get pending invites sent from $userID user
+	 * @params ($userID => actingUserID,
+	 *			$game => Application_Model_Game)
+	 * @returns array of emails and numInvites
+	 */
+	public function getPendingInvites($userID, $game)
+	{
+		$table = $this->getDbTable();
+		$select = $table->select();
+		$select->setIntegrityCheck(false);
+		
+		$select->from(array('gi' => 'game_invites'))
+			   ->joinLeft(array('u' => 'users'),
+			   			  'u.username = gi.email')
+			   ->where('gi.gameID = ?', $game->gameID)
+			   ->where('gi.actingUserID = ?', $userID)
+			   ->group('gi.email')
+			   ->order('gi.firstSent DESC');
+		 
+		$results = $table->fetchAll($select);
+		
+		$returnArray = array('joined' => array(),
+							 'notJoined' => array());
+		foreach ($results as $result) {
+			$array = array('email' 		=> $result->email,
+						   'numInvites' => $result->numInvites,
+						   'firstSent'  => $result->firstSent);
+						   
+			if ($result->userID != NULL) {
+				$array['userID'] = $result->userID;
+				$returnArray['joined'][] = $array;
+			} else {
+				$returnArray['notJoined'][] = $array;
+			}
+		}
+		
+		return $returnArray;
+	}
+			
 	
 	/**
 	 * save user confirmation (confirmed or not) to db for pickup game
@@ -812,7 +858,8 @@ class Application_Model_GamesMapper extends Application_Model_TypesMapperAbstrac
 			$select->from(array('oug' => 'old_user_games'),
 						  array('COUNT(oug.oldGameID) as count'))
 				   ->where('oug.userID = ?', $userID)
-				   ->where('oug.gameID = ?', $gameID);
+				   ->where('oug.gameID = ?', $gameID)
+				   ->where('oug.confirmed = ?', 1);
 				   
 			$result = $table->fetchRow($select);
 			
@@ -1133,7 +1180,7 @@ class Application_Model_GamesMapper extends Application_Model_TypesMapperAbstrac
 	
 	
 	/**
-	 * get game subscribers (used on games/subscribers page)
+	 * get game subscribers (used on games/members page)
 	 */
 	public function getGameSubscribers($gameID)
 	{
@@ -1154,8 +1201,8 @@ class Application_Model_GamesMapper extends Application_Model_TypesMapperAbstrac
 			   ->joinLeft(array('oug' => new Zend_Db_Expr('(' . $oldUserGames . ')')),
 			   		  'oug.userID = u.userID',
 					  array('totalGames', 'date'))
-			   ->where('gs.gameID = ?', $gameID);
-
+			   ->where('gs.gameID = ?', $gameID)
+			   ->order('oug.totalGames DESC');
 		
 		$results = $table->fetchAll($select);
 		

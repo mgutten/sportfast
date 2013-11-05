@@ -281,8 +281,7 @@ $this->placeholder('narrowColumn')->captureEnd();
 				continue;
 			}
 
-			if ($games[$i]->isTeamGame() &&
-			    $games[$i]->confirmed != 1) {
+			if ($games[$i]->confirmed != 1) {
 					// Not attending upcoming game, do not show
 					continue;
 				}

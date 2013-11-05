@@ -20,12 +20,24 @@ class FindController extends Zend_Controller_Action
 		$this->view->lookingFor = $dropdown->dropdown('looking-for', array('Games','Teams','Players','Parks'), 'Games');
 		
 		//$this->view->sports = $sports = $this->view->user->getSportNames();
-		$this->view->types = $types  = $this->view->user->getSportTypes();
+		if (!$this->view->user->hasValue('sports')) {
+			
+			$sports = new Application_Model_Sports();
+			
+			$sports->getAllSportsInfo(true);
+			
+			$types = $sports->getSportsTypes();
+			
+		} else {
+			$types = $this->view->user->getSportTypes();
+		}
+		
+		$this->view->types = $types;
 		$this->view->skill = $skill = array('lower' => 64,
 								   		    'upper' => 100);
 		$this->view->age   = $age   = array('lower' => 17,
 								   			'upper' => 70);
-		$this->view->time  = $time  = 'user';
+		$this->view->time  = $time  = '';
 		
 		$options = array();
 		$options['sports'] = $types;
@@ -64,8 +76,20 @@ class FindController extends Zend_Controller_Action
 		$dropdown = Zend_Controller_Action_HelperBroker::getStaticHelper('Dropdown');
 		$this->view->lookingFor = $dropdown->dropdown('looking-for', array('Games','Teams','Players','Parks'), 'Teams');
 		
+		if (!$this->view->user->hasValue('sports')) {
+			
+			$sports = new Application_Model_Sports();
+			
+			$sports->getAllSportsInfo(true);
+			
+			$types = $sports->getSportsTypes();
+			
+		} else {
+			$types = $this->view->user->getSportTypes();
+		}
+		
 		//$this->view->sports = $sports = $this->view->user->getSportNames();
-		$this->view->types = $types  = $this->view->user->getSportTypes();
+		$this->view->types = $types;
 		$this->view->skill = $skill = array('lower' => 64,
 								   		    'upper' => 100);
 		$this->view->age   = $age   = array('lower' => 17,

@@ -55,7 +55,7 @@ $(function()
 			index += 2;
 			
 			
-			$(this).parents('#rateGame-alert-container').find('.alert-body-container:eq(' + index + ')').show();
+			$(this).parents('#rateGame-alert-container').find('.alert-submit-container').show();
 			
 			$(this).parents('.rating-main-container').find('.rating-remember-no-penalize').hide();
 			
@@ -71,7 +71,7 @@ $(function()
 			
 			parentEle.siblings('.rating-section-container').hide();
 			
-			$(this).parents('#rateGame-alert-container').find('.alert-body-container:eq(' + index + ')').show();
+			$(this).parents('#rateGame-alert-container').find('.alert-submit-container').show();
 			
 			
 			$(this).parents('.rating-main-container').find('.rating-remember-no-penalize').show();
@@ -89,7 +89,7 @@ $(function()
 			
 			parentEle.siblings('.rating-section-container').hide();
 			
-			$(this).parents('#rateGame-alert-container').find('.alert-body-container:eq(' + index + ')').show();
+			$(this).parents('#rateGame-alert-container').find('.alert-submit-container').show();
 			
 			$('.alert-body-container').find('.rating-remember-no-penalize').hide();
 			
@@ -139,8 +139,11 @@ $(function()
 		/* submit */
 		$('.rating-submit').bind('click.submit', function()
 		{
+			/*
 			var index = $(this).parents('.alert-body-container').index('.alert-body-container');
 			index -= 2;
+			*/
+			var index = 0;
 			
 			parentEle = $('.alert-body-container:eq(' + index + ')');
 						

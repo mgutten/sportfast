@@ -42,6 +42,28 @@ class AjaxController extends Zend_Controller_Action
 	}
 	
 	/**
+	 * minimal signup from game/team page of non-member
+	 */
+	public function minimalSignupAction()
+	{
+		$options = $this->getRequest()->getPost('options');
+		
+		$user = new Application_Model_User();
+		$user->firstName = $options['firstName'];
+		$user->lastName = $options['lastName'];
+		$user->username = $options['email'];
+		$user->password = $user->hashPassword($options['password']);
+		$user->account = '1';
+		
+		
+		$user->save(false);
+		
+		$user->login();
+		
+		
+	}
+	
+	/**
 	 * admin handle the removal or reinstatement of rating
 	 */
 	public function updateFlaggedRatingAction()

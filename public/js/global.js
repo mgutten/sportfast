@@ -856,11 +856,7 @@ $(function()
 	
 	
 	/* set behavior for all alert boxes (close them onclick) */
-	$('.alert-black-back,.alert-x').bind('click.default',function()
-	{
-		hideAlerts();
-		
-	})
+	enableCloseAlerts();
 	
 	/* show explanation of profile pics onclick of special class */
 	$('.why-profile').click(function()
@@ -1777,6 +1773,9 @@ function animateNotShow(ele, down, fadeIn)
  */
 function showAlert(alertEle, opacity)
 {
+	if ($('.alert-black-back').css('display') != 'none') {
+		return;
+	}
 	var finalOpacity = (typeof opacity != 'undefined' ? opacity : '.85')
 	displayToBlockHidden(alertEle);
 	displayToBlockHidden($('.alert-black-back'));
@@ -1797,6 +1796,24 @@ function hideAlerts()
 																			   .css('opacity',1);
 																	$('.alert-black-back').css('opacity',.85);
 																}
+	})
+}
+
+/**
+ * disable close alert onclick
+ */
+function disableCloseAlerts()
+{
+	$('.alert-black-back,.alert-x').unbind('click.default');
+	
+}
+
+function enableCloseAlerts()
+{
+	$('.alert-black-back,.alert-x').bind('click.default',function()
+	{
+		hideAlerts();
+		
 	})
 }
 
@@ -2155,6 +2172,24 @@ function initializeMap(lat, lon, zoom, callback)
 		var latLon = new google.maps.LatLng(lat, lon);
 		gmap.setCenter(latLon);
 		
+		// Remove "Report a map error" from bottom right of google map
+		var styleOptions = {
+			name: "Dummy Style"
+		};
+	
+		 var MAP_STYLE = [
+			{
+				featureType: "road",
+				elementType: "all",
+				stylers: [
+					{ visibility: "on" }
+				]
+			}
+		];
+		var mapType = new google.maps.StyledMapType(MAP_STYLE, styleOptions);
+		gmap.mapTypes.set("Dummy Style", mapType);
+		gmap.setMapTypeId("Dummy Style");
+		
 		callback();
 		
 }
@@ -2242,7 +2277,25 @@ function showConfirmationAlert(str)
 					  															 }
 					   })
 }
-						   														
+	
+	
+/**
+ * change input background color based on validity
+ * @params(ele => inputEle to change background of,
+ 		   isValid => should it be green (ok?) (boolean))
+ */
+function changeInputBackground(ele, isValid)
+{
+	if (!isValid) {
+		// Failed validity test
+		ele.removeClass('input-success').addClass('input-fail');
+
+	} else {
+		// Correct input
+		ele.removeClass('input-fail').addClass('input-success');
+	}
+
+}					   														
 							 
 	
 /**

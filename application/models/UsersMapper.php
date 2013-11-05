@@ -269,17 +269,18 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 					  array('(COUNT(ug2.userID) + SUM(ug2.plus)) as totalPlayers',
 					  		'(SELECT COUNT(userID) FROM user_games WHERE gameID = ug.gameID AND confirmed = "1") AS confirmedPlayers'))*/
 			   ->where('ug.userID = ?', $savingClass->userID)
+			   ->where('ug.confirmed = 1 OR ug.confirmed = 2')
 			   ->where('g.date > (NOW() + INTERVAL ' . $this->getTimeOffset() . ' HOUR)')
 			   ->group('ug.gameID');
 
 
 		$results = $table->fetchAll($select);
 		
-		
 		foreach ($results as $result) {
 			//$savingClass->games->addGame($result, $byDay); true = by day
 			$game = $savingClass->games->addGame($result);
 			
+			$game->plus = 0; // Unset plus since getGamePlayers does it
 			$game->getGamePlayers();
 		}
 		
@@ -343,6 +344,43 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 		
 		return $savingClass;
 		
+	}
+	
+	/**
+	 * get any recurring past played games for user
+	 * @params ($userModel => Application_Model_User)
+	 * @returns Application_Model_Games
+	 */
+	public function getUpcomingPastPlayedGames($userModel)
+	{
+		$table = $this->getDbTable();
+		$select = $table->select();
+		$select->setIntegrityCheck(false);
+		
+		$select->from(array('g' => 'games'))
+			   ->join(array('gs' => 'game_subscribers'),
+			   		  'gs.gameID = g.gameID')
+			   ->joinLeft(array('ug' => 'user_games'),
+			   			  'ug.gameID = g.gameID AND ug.confirmed = 1',
+						  array('(COUNT(ug.userID) + SUM(ug.plus)) as totalPlayers'))
+			   ->where('gs.userID = ?', $userModel->userID)
+			   ->where('g.date > NOW() + INTERVAL ' . $this->getTimeOffset() . ' HOUR')
+			   ->group('g.gameID')
+			   ->order('g.date ASC');
+		
+		$results = $table->fetchAll($select);
+		
+		if (count($results) < 1) {
+			return false;
+		}
+		
+		$games = new Application_Model_Games();
+		
+		foreach ($results as $game) {
+			$games->addGame($game);
+		}
+		
+		return $games;
 	}
 	
 	
@@ -874,10 +912,10 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 		
 		if ($onlyNew) {
 			// Select only notifications since last read
-			$select .= " AND nl.dateHappened > '" . $lastRead . "' ";
+			$select .= " AND nl.dateHappened >= '" . $lastRead . "' ";
 		} else {
 			// Select old notifications
-			$select .= " AND nl.dateHappened <= '" . $lastRead . "' ";
+			$select .= " AND nl.dateHappened < '" . $lastRead . "' ";
 		}
 		
 		if ($sinceTime) {
@@ -945,10 +983,10 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 		
 		if ($onlyNew) {
 			// Select only notifications since last read
-			$select .= " AND nl.dateHappened > '" . $lastRead . "' ";
+			$select .= " AND nl.dateHappened >= '" . $lastRead . "' ";
 		} else {
 			// Select old notifications
-			$select .= " AND nl.dateHappened <= '" . $lastRead . "' ";
+			$select .= " AND nl.dateHappened < '" . $lastRead . "' ";
 		}
 		
 		if ($sinceTime) {
@@ -1153,6 +1191,7 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 		$gameID = $game->gameID;
 		
 		$oldGameID = $result['oldGameID'];
+		$parkID = $result['parkID'];
 
 		// Test if user has already rated for this game
 		$select = $table->select();
@@ -1195,9 +1234,16 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 						AND u.userID != '" . $userID . "'
 						AND u.userID NOT IN (SELECT receivingUserID 
 												FROM user_ratings 
-												WHERE givingUserID = '" . $userID . "' 
-													AND dateHappened > (NOW() - INTERVAL 45 DAY)
-													AND sportID = '" . $game->sportID . "'
+												WHERE (givingUserID = '" . $userID . "' 
+														AND dateHappened > (NOW() - INTERVAL 45 DAY)
+														AND sportID = '" . $game->sportID . "')
+													OR receivingUserID IN (SELECT receivingUserID 
+																			FROM user_ratings
+																			WHERE DATE(dateHappened) > DATE(NOW() - INTERVAL 6 DAY)
+																				AND sportID = '" . $game->sportID . "'
+																				AND gameID = '" . $gameID . "'
+																			GROUP BY receivingUserID
+																			HAVING (COUNT(receivingUserID) > 1))
 											)";
 		
 		
@@ -1208,10 +1254,28 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 			$user = new Application_Model_User();
 			$user->userID = $result['userID'];
 			
+			
 			if ($user->hasProfilePic()) {
 				// User must have profile pic to be rated
 				$game->addPlayer($result);
 			}
+		}
+		
+		// Only retrieve park if have not rated it recently
+		$table = $this->getDbTable();
+		$select = $table->select();
+		$select->setIntegrityCheck(false);
+		
+		$select->from(array('pr' => 'park_ratings'))
+			   ->where('pr.parkID = ?', $parkID)
+			   ->where('pr.userID = ?', $userID)
+			   ->where('pr.dateHappened > (NOW() - INTERVAL 4 MONTH)');
+		
+		$result = $table->fetchRow($select);
+		
+		if ($result) {
+			
+			$game->park = '';
 		}
 		
 		return $game;

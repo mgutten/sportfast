@@ -59,6 +59,10 @@ abstract class Application_Model_MapperAbstract
 				// This attrib is a location 
 				$data[$column] = new Zend_Db_Expr("GeomFromText('" . $value . "')");
 				continue;
+			} elseif ((strpos(strtolower($value), 'now()') !== false)) {
+				// Set to now() 
+				$data[$column] = new Zend_Db_Expr("NOW()");
+				continue;
 			} elseif (empty($value) && $value !== '0' && $value !== NULL) {
 				// Skip empty columns
 				continue;

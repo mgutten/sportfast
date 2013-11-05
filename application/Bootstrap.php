@@ -11,7 +11,17 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 		$front->registerPlugin(new My_Plugin_Authorization());
 		
 	}
-			
+	
+	protected function _initSession()
+	{
+		// Allows use of sessions/cookies between subdomains (www and non www)
+		Zend_Session::setOptions(array(
+			'cookie_domain' => '.sportfast.com',
+			'name'          => 'SportfastSession'
+		));
+		Zend_Session::start();
+	}
+		
 	
     protected function _initMyActionHelpers()
     {
@@ -92,8 +102,11 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 				$user->getUserInfo();
 			}
 			
+			
 			$session = new Zend_Session_Namespace('rating');
+			
 			if (!isset($session->rating)) {
+				
 				// Only show ratings popups once per session
 				$game = $user->getLastGame();
 				if ($game) {

@@ -89,10 +89,13 @@ class Application_Model_Matches extends Application_Model_ModelAbstract
 					$timeUntilB = $diff;
 				}
 			}
-			*/		
+			*/
+			
+			$aPlayers = ($a instanceof Application_Model_Game ? $a->countConfirmedPlayers() : $a->totalPlayers);
+			$bPlayers = ($b instanceof Application_Model_Game ? $b->countConfirmedPlayers() : $b->totalPlayers);
 				
-			$a = $a->totalPlayers - (abs($a->skillDifference) * .7);
-			$b = $b->totalPlayers - (abs($b->skillDifference) * .7);
+			$a = ($aPlayers == 0 ? -1 : $aPlayers) - (abs($a->skillDifference) * .5);
+			$b = ($bPlayers == 0 ? -1 : $bPlayers) - (abs($b->skillDifference) * .5);
 			
 		}
 		

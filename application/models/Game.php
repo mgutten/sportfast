@@ -56,7 +56,8 @@ class Application_Model_Game extends Application_Model_ConfirmationsAbstract
 									'sportfastCreated' => '',
 									'doNotEmail'    => '',
 									'sendReminder'  => '',
-									'sendConfirmation' => ''
+									'sendConfirmation' => '',
+									'plus'			=> ''
 									);
 									
 	protected $_primaryKey = 'gameID';
@@ -103,6 +104,15 @@ class Application_Model_Game extends Application_Model_ConfirmationsAbstract
 	public function getGameSubscribers()
 	{
 		return $this->getMapper()->getGameSubscribers($this->gameID);
+	}
+	
+	/**
+	 * get pending invites sent from $userID user
+	 * @returns array of emails and numInvites
+	 */
+	public function getPendingInvites($userID)
+	{
+		return $this->getMapper()->getPendingInvites($userID, $this);
 	}
 	
 	/**
@@ -162,6 +172,19 @@ class Application_Model_Game extends Application_Model_ConfirmationsAbstract
 		}
 		
 		return parent::getProfilePic($size, $id, $type);
+	}
+	
+	/**
+	 * get game time
+	 * @returns str (e.g. 2pm or 2:30pm)
+	 */
+	public function getGameTime()
+	{
+		if ($this->gameDate->format('i') > 0) {
+			return $this->gameDate->format('g:ia');
+		} else {
+			return $this->gameDate->format('ga');
+		}
 	}
 	
 	public function getAverage($rating)

@@ -14,15 +14,15 @@ $this->placeholder('narrowColumn')->captureStart();
 
 echo "<img src='" . $this->game->getProfilePic('large', 'parks') . "' class='rounded-corners narrow-column-picture dropshadow'/>";
 
-echo "<div class='clear larger-margin-top larger-text'>";
-echo	"<p class='clear heavy'>" . $this->game->getGameTitle() . "</p>";
-echo	"<p class='clear'>" . $this->game->gameDate->format('l') . "s at " . $this->game->gameDate->format('ga') . "</p>";
-echo	"<a href='/parks/" . $this->game->park->parkID . "' class='clear light'>" . $this->game->park->parkName . "</a>";
+echo "<div class='clear larger-margin-top larger-text width-100'>";
+echo	"<p class='clear heavy width-100 center'>" . $this->game->getGameTitle() . "</p>";
+echo	"<p class='clear smaller-text width-100 center'>" . $this->game->gameDate->format('l') . "s at " . $this->game->getGameTime() . "</p>";
+echo	"<a href='/parks/" . $this->game->park->parkID . "' class='clear light smaller-text width-100 center'>" . $this->game->park->parkName . "</a>";
 echo "</div>";
 
 echo "<div class='clear larger-text width-100 light-back' id='history-current-players-container'>";
 echo	"<p class='clear medium width-100 center smaller-text'>This Week:</p>";
-echo	"<a href='/games/" . $this->game->gameID . "' class='largest-text medium heavy clear width-100 center'>" . $this->game->players->countUsers() . " <span class='smaller-text medium'>players</span></a>";
+echo	"<a href='/games/" . $this->game->gameID . "' class='largest-text medium clear width-100 center'>" . $this->game->countConfirmedPlayers() . " <span class='smaller-text medium'>players</span></a>";
 echo "</div>";
 $this->placeholder('narrowColumn')->captureEnd();
 ?>

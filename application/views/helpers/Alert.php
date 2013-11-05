@@ -61,27 +61,31 @@ class Application_View_Helper_Alert
 	
 	/**
 	 * invite players to game/team alert
+	 * @params ($pendingInvites => associated array of 'joined' and 'notJoined' arrays, to be used to see if there are any pending invites for current user)
 	 */
-	public function inviteAlert()
+	public function inviteAlert($pendingInvites = false)
 	{
 		$href = '';
 		if ($this->_view->game) {
 			// Is game page
-			$href = '/games/' . $this->_view->game->gameID . '/invite';
+			$href = '/games/' . $this->_view->game->gameID;
 		} elseif ($this->_view->team) {
-			$href = '/teams/' . $this->_view->team->teamID . '/invite';
+			$href = '/teams/' . $this->_view->team->teamID;
 		}
+		
+		
 		
 		$form = new Application_Form_General();
 		
 		$output  = $this->start('invite','Invite players');
+		//$output .=  "<a href='" . $href . "/pending' class='right smaller-text medium'>" . count($pendingInvites['notJoined']) . " pending invites</a>";
 		$output .= 	"<div class='clear width-100'>"
 						. $form->text->setAttrib('id', 'inviteSearchAlert')
 							   		 ->setLabel("Start typing a player's name...")
 					. "</div>";
 		$output .= "<div class='clear width-100' id='invite-alert-results'>";
 		$output .= "</div>";
-		$output .= "<a href='" . $href . "' class='clear width-100 center medium smaller-text larger-margin-top'>or by email</a>";
+		$output .= "<a href='" . $href . "/invite' class='clear width-100 center medium smaller-text larger-margin-top'>or by email</a>";
 		$output .= $this->end();
 		
 		return $output;
@@ -136,12 +140,22 @@ class Application_View_Helper_Alert
 	public function ratingAlert($game)
 	{
 		$ratings = $this->getRandomRatings($game);
-		$details = "You recently played " . $game->sport . " on " . $game->gameDate->format('l') . ".  <br><span class='white'>Please rate some of the other players.</span>";
+		if (!$ratings[0]->hasValue('userID')) {
+			$please = 'the location.';
+		} else {
+			// Is user 
+			$please = 'some of the other players.';
+		}
+		$details = "You recently played " . $game->sport . " on " . $game->gameDate->format('l') . ".  <br><span class='white'>Please rate " . $please . "</span>";
 		$output  = $this->start('rateGame', $details);
 		
 		$form = $this->_view->rateGameForm;
 		
 		$output .= "<span id='rateGame-details' gameID='" . $game->gameID . "'></span>";
+		
+		if (empty($ratings)) {
+			return false;
+		}
 		
 		$counter = 0;
 		foreach ($ratings as $rating) {
@@ -263,11 +277,12 @@ class Application_View_Helper_Alert
 			$counter++;
 		}
 		
-		$output .= "<div class='alert-body-container margin-top clear hidden'>";
+		/*$output .= "<div class='alert-body-container margin-top clear hidden'>";
 		$output .=		"<p class='button rating-submit larger-text'>Submit</p>";
 		$output .= "</div>";
+		*/
 		
-		$output .= "<div class='alert-body-container margin-top hidden right'>";
+		$output .= "<div class='alert-body-container margin-top hidden clear alert-submit-container'>";
 		$output .=		"<p class='button rating-submit larger-text'>Submit</p>";
 		$output .= "</div>";
 		
@@ -282,10 +297,10 @@ class Application_View_Helper_Alert
 	
 		$ratings = array();
 		$chosen = array($this->_view->user->userID);
-		$park = false;
+		$park = ($game->hasValue('park') ? false : true);
 		$b = 0;
 		
-		for ($i = 0; $b < 2; $i++) {
+		for ($i = 0; $b < 1; $i++) {
 			$random = mt_rand(1,10);
 			
 			if ($random > 9 && !$park) {

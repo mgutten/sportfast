@@ -16,6 +16,29 @@ rosterLimits.ultimate 	= {upper: 22};
 
 $(function()
 {
+	
+	/* hide buttons container if exists */
+	if ($('.profile-options-inner-container').length > 0) {
+		var ua = window.navigator.userAgent
+		var msie = ua.indexOf ( "MSIE " )
+		if (msie) {
+			// Force non-cache of last img for IE
+			var src = $('.profile-options-img').last().attr('src');
+			var d = new Date();
+			var n = d.getTime();
+			
+			$('.profile-options-img').last().attr('src', src + '?' + n); 
+		}
+		
+		$('.profile-options-img').last().load(function() {
+			
+			var height = parseInt($('.profile-options-inner-container').height(),10) - parseInt($('.profile-options-button').outerHeight(),10);
+			
+			$('.profile-options-inner-container').css('margin-top', -height + 'px')
+		})
+	}
+	
+	
 	/* fade in user description on mouseover */
 	$(document).on('mouseenter.overlay','.profile-player-overlay-container',function() 
 	{
@@ -647,6 +670,27 @@ $(function()
 })
 
 
+/** 
+ * minimal signup on game/team page
+ */
+function minimalSignup(firstName, lastName, email, password)
+{
+	var options = {firstName: firstName,
+				   lastName: lastName,
+				   email: email,
+				   password: password};
+				   
+	$.ajax({
+		url: '/ajax/minimal-signup',
+		type: 'POST',
+		data: {options: options},
+		success: function(data) {
+			reloadPage();
+		}
+	})
+}
+
+
 /**
  * update game_subscribers doNotEmail for game
  * @params (onOrOff => 1 = no emails, 0 = emails)
@@ -1034,22 +1078,24 @@ function animateProfileButtons()
 {
 	//$('.profile-options-outer-container').animate({'height': '6em'}, 300);
 	var downMargin = -5;
-	var upMargin = '-5em';
+	
 	var marginTop = parseInt($('.profile-options-inner-container').css('margin-top'),10) - downMargin;
 	
 	if (marginTop < 0) {
-		// Is down, move up
-		$('.profile-options-outer-container').animate({'height': '7em'}, 300);
+		// Is up, move down
+		$('.profile-options-outer-container').animate({'height': parseInt($('.profile-options-inner-container').height(),10) + 'px'}, 300);
 		
 		$('.profile-options-button').text('hide options')
 		
 		$('.profile-options-inner-container').animate({marginTop: downMargin + 'px'}, 300);
 	} else {
-		$('.profile-options-outer-container').animate({'height': '1.5em'}, 300);
+		$('.profile-options-outer-container').animate({'height': '24px'}, 300);
 		
-		$('.profile-options-button').text('show options')
+		$('.profile-options-button').text('show options');
 		
-		$('.profile-options-inner-container').animate({marginTop: upMargin}, 300);
+		var upMargin = parseInt($('.profile-options-inner-container').height(),10) - parseInt($('.profile-options-button').outerHeight(),10);
+		
+		$('.profile-options-inner-container').animate({marginTop: -upMargin + 'px'}, 300);
 	}
 	/*
 	var width = parseInt($('.profile-buttons-innermost-container').innerWidth(),10) + parseInt($('.profile-animate-buttons').innerWidth(), 10);

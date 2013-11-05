@@ -18,6 +18,7 @@ class SignupController extends Zend_Controller_Action
 		}
 		
 		$signupSession = new Zend_Session_Namespace('signup');
+		$sex = false;
 		
 		// Create general signup form
 		$form = new Application_Form_Signup();
@@ -25,6 +26,10 @@ class SignupController extends Zend_Controller_Action
 			// Session not empty, populate form
 			foreach($signupSession as $key => $val) {
 				$form->populate(array($key => $val));
+			}
+			
+			if (!empty($signupSession->sex)) {
+				$sex = ucwords($signupSession->sex);
 			}
 		}
 		
@@ -68,7 +73,18 @@ class SignupController extends Zend_Controller_Action
 																		   '40-49',
 																		   '50-59',
 																		   '60-69',
-																		   '70-79'),'Age group'); 
+																		   '70+'),'Age group'); 
+		
+		$selected = 'Sex';
+		if ($sex) {
+			$selected = array('text' => $sex,
+							  'selectedContainerClass' => 'input-success');
+							  
+			$this->view->form->sex->setValue($sex);
+		}
+																		   
+		$this->view->sexDropdown = $dropdown->dropdown('sexDropdown',array('male',
+																		   'female'),$selected); 																   
 		
 		/* testing retrieving all of user's information 
 		$user = new Application_Model_User();
@@ -105,6 +121,7 @@ class SignupController extends Zend_Controller_Action
 	
 	public function validateAction()
 	{
+		
 		
 		$fail = false;
 		$form = new Application_Form_Signup();
@@ -157,6 +174,8 @@ class SignupController extends Zend_Controller_Action
 									 
 				$user->city = $user->city->city;
 				
+				$user->account = '2';
+				
 				// Set verifyHash for user
 				$user->verifyHash = md5($_POST['email']);
 				
@@ -165,10 +184,14 @@ class SignupController extends Zend_Controller_Action
 				
 				// Set joined
 				$user->setCurrent('joined');
+				$user->setCurrent('lastActive');
 				
 				// Convert dob inputs to db format
-				$post['dobYear'] = ($post['dobYear'] < date('y') ? '20' : '19') . $post['dobYear'];
-				$post['dob'] = $post['dobYear'] . '-' . $post['dobMonth'] . '-' . $post['dobDay'];
+				//$post['dobYear'] = ($post['dobYear'] < date('y') ? '20' : '19') . $post['dobYear'];
+				//$post['dob'] = $post['dobYear'] . '-' . $post['dobMonth'] . '-' . $post['dobDay'];
+				
+				//$post['age'] = (int) $post['age'];
+				$post['sex'] = $post['sex'][0];
 				
 				foreach ($post as $key => $val) {
 					// Update all of User's attribs with appropriate post data
@@ -714,6 +737,104 @@ class SignupController extends Zend_Controller_Action
 		
 		$user->save(true);
 		}
+	}
+	
+	/**
+	 * minimal signup from game/team page
+	 */
+	public function minimalAction()
+	{
+		$post = $this->getRequest()->getPost();
+		
+		$user = new Application_Model_User();
+		
+		if ($user->getUserBy('u.username', $post['email'])) {
+			return $this->_forward('index', 'login', null, array('already' => $post['email']));
+		}
+		
+		
+		
+		$user->firstName = $post['firstName'];
+		$user->lastName = $post['lastName'];
+		$user->username = $post['email'];
+		$user->password = $user->hashPassword($post['signupPassword']);
+		$user->account = '1';
+		$user->active = '1';
+		$user->setLastReadCurrent();
+		$user->setCurrent('lastActive');
+		$user->setCurrent('joined');
+		
+		$location = new Application_Model_Location();
+		$location->location = $post['location'];
+		$user->userLocation = $location;
+		
+		$user->cityID = $post['cityID'];
+		
+		$user->save();
+		
+		$session = new Zend_Session_Namespace('signupInvite');
+		
+		if ($session->type == 'game') {
+			$game = new Application_Model_Game();
+			$game->gameID = $session->id;
+			
+			$game->addUserToGame($user->userID, $session->confirmed);
+		}
+		
+		$session = Zend_Session::namespaceUnset('signupInvite');
+		
+		$session = new Zend_Session_Namespace('first_visit');
+		$session->firstVisit = true;
+		
+		$notification = new Application_Model_Notification();
+		$notification->receivingUserID = $user->userID;
+		$notification->action = 'message';
+		$notification->details = 'sportfast';
+		$notification->cityID = $user->cityID;
+		$notification->save();
+		
+		$notification = new Application_Model_Notification();
+		$notification->actingUserID = $user->userID;
+		$notification->action = 'join';
+		$notification->details = 'sportfast';
+		$notification->cityID = $user->cityID;
+		$notification->save();
+		
+		$messages = new Application_Model_Messages();
+		$messageGroupID = $messages->messageGroupExists($user->userID, 0);
+		
+		$message = new Application_Model_Message();
+		$message->messageGroupID = $messageGroupID;
+		$message->sendingUserID = 0;
+		$message->receivingUserID = $user->userID;
+		$message->message = file_get_contents(PUBLIC_PATH . '/txt/welcome.txt');
+		
+		$message->save();
+		
+		$array = array('username' => $post['email'],
+					   'password' => $post['signupPassword'],
+					   'rememberMe' => '1');
+		
+		$this->_request->setPost($array);
+		
+		$this->_forward('auth','login', null);
+		
+	}
+	
+	/**
+	 * minimal signup from game/team page
+	 */
+	public function basicAction()
+	{
+		$post = $this->getRequest()->getPost();
+		
+		$signupSession = new Zend_Session_Namespace('signup');
+		
+		$signupSession->email = $post['email'];
+		$signupSession->firstName = $post['firstName'];
+		$signupSession->lastName = $post['lastName'];
+		
+		$this->_redirect('/signup');
 	}
 	
 	/**

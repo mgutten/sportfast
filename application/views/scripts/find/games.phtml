@@ -121,10 +121,10 @@ $this->placeholder('narrowColumn')->captureStart();
 	echo $this->narrowcolumnsection()->start(array('title' => 'Time'));
 	echo $this->checkbox->setName('timeUser')
 						->setAttribs(array('text' =>'My Availability',
-										   'checked' => 'checked'));
+										   'checked' => false));
 	echo $this->checkbox->setName('timeAny')
 						->setAttribs(array('text' =>'Any Time',
-										   'checked' => false));
+										   'checked' => 'checked'));
 	echo $this->narrowcolumnsection()->end();
 	
 	echo $this->narrowcolumnsection()->start(array('title' => 'Skill'));

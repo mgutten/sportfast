@@ -69,19 +69,15 @@ $this->placeholder('absolute')->captureEnd();
             </div>
             <div class='clear width-100'>
                 <?php 
-                echo "<div class='left settings-small'>" . $this->signupForm->dobMonth->setValue($this->user->getDobDate()->format('m')) . "</div>";
-                echo "<p class='settings-separator left'>/</p>";
-                echo "<div class='left settings-small'>" . $this->signupForm->dobDay->setValue($this->user->getDobDate()->format('d')) . "</div>";
-                echo "<p class='settings-separator left'>/</p>";
-                echo "<div class='left settings-small'>" . $this->signupForm->dobYear->setValue($this->user->getDobDate()->format('y')) . "</div>";
+                echo "<div class='left settings-small'>" . $this->signupForm->age->setValue(($this->user->age ? $this->user->age : '')) . "</div>";
                 ?>
                 
                 <div class='left' id='settings-height-container'>
                 <?php 
 				$height = $this->user->getHeightFeet();
-                echo "<div class='left settings-small'>" . $this->signupForm->heightFeet->setValue($height['feet']) . "</div>";
+                echo "<div class='left settings-small'>" . $this->signupForm->heightFeet->setValue(($height['feet'] ? $height['feet'] : '')) . "</div>";
                 echo "<p class='settings-separator left'>'</p>";
-                echo "<div class='left settings-small'>" . $this->signupForm->heightInches->setValue($height['inches']) . "</div>";
+                echo "<div class='left settings-small'>" . $this->signupForm->heightInches->setValue(($height['inches'] ? $height['inches'] : '')) . "</div>";
                 echo "<p class='settings-separator left'>\"</p>";
                 ?>
                 </div>

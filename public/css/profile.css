@@ -29,13 +29,13 @@
 	float:left;
 	clear:both;
 	overflow:hidden;
-	height: 1.5em;
+	height: 24px;
 	margin-top:-1.2em;
 }
 
 .profile-options-inner-container {
-	padding-top: 1em;
-	margin-top: -5em;
+	/*padding-top: 1em;*/
+	/*margin-top: -5em;*/
 }
 
 .profile-options-button {
@@ -55,7 +55,7 @@
 }
 
 .profile-options-container {
-	margin-bottom: .3em;
+	margin-bottom: 5px;
 }
 
 .profile-in-out-container {
@@ -292,7 +292,15 @@
 }
 
 .team-player-container-small {
-	margin-top: 30px;
+	margin-top: 16px;
+}
+
+.profile-players-num-maybeNot {
+	padding:11px 0; 
+	width:48px;
+	margin-top:1px; 
+	margin-right:2px; 
+	letter-spacing: -2px;
 }
 
 .team-player-container-small > .team-confirm-img {
@@ -376,9 +384,9 @@ textarea.post-message {
 
 .team-player-container-small > .team-confirm-img.light-background,
 .team-player-container-small > .team-confirm-img.dark-red-back {
-	width:10px;
-	height:10px;
-	margin-top: -11px;
+	width:8px;
+	height:8px;
+	margin-top: -9px;
 }
 
 .profile-confirm {

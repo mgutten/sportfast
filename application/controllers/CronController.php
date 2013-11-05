@@ -27,6 +27,25 @@ class CronController extends Zend_Controller_Action
     }
 	
 	/**
+	 * reinvite outside users to join any game/team that they were invited to
+	 */
+	public function reinviteUsersAction()
+	{
+		$mapper = $this->getMapper();
+		
+		$games = $mapper->reinviteUserGames();
+		
+		$teams = $mapper->reinviteUserTeams();
+		
+		
+		if ($teams || $games) {
+			return $this->_forward('reinvite-users', 'mail', null, array('games' => $games,
+																		 'teams' => $teams));
+		}
+	
+	}
+	
+	/**
 	 * send follow up email to inactive users who signed up yesterday but did not verify
 	 */
 	public function remindUnverifiedUsersAction()
@@ -134,6 +153,7 @@ class CronController extends Zend_Controller_Action
 		$mapper = $this->getMapper();
 		
 		$date = new DateTime('now');
+		
 		
 		if ((($date->format('G') >= 6 && $date->format('i') > 31) || $date->format('G') >= 7) && ($date->format('G') < 20)) {
 			// Only update games between 7AM and 8PM
