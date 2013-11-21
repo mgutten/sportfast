@@ -36,18 +36,20 @@ $(function()
 						var action = 'delete';
 						var type   = idType.replace(/ID/, '');
 						var details;		
-						
+
 						//createNotification(idType, typeID, actingUserID, receivingUserID, action, type, details);
-						
+
 						cancelType(idType, typeID);
-						changedAlert = true;
+						$('*').css('cursor', 'progress');
+						
+						//changedAlert = true;
 						//reloadPage();
 				}
 				
 		var detailsEle = getDetailsEle();
 		var text = 'delete ' + detailsEle.attr('teamName');
 		var postContent = "<p class='clear margin-top light width-100 center'>This action cannot be undone.</p>";
-		
+
 		populateConfirmActionAlert(text, postContent);
 	})
 	
@@ -475,7 +477,8 @@ $(function()
 						//createNotification(idType, typeID, actingUserID, receivingUserID, action, type, details);
 						
 						cancelType(idType, typeID);
-						changedAlert = true;
+						
+						//changedAlert = true;
 						//reloadPage();
 				}
 				
@@ -489,6 +492,8 @@ $(function()
 		
 
 	});
+	
+	
 	
 	$('.calendar-captain').click(function()
 	{

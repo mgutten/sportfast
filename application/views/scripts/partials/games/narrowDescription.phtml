@@ -1,0 +1,7 @@
+<img src='<?php echo $this->game->park->getProfilePic('large');?>' class='clear narrow-column-picture' />
+
+<div class='clear larger-margin-top larger-text width-100'>
+    <p class='clear heavy darkest width-100 center'><?php echo $this->game->getGameTitle();?></p>
+    <p class='clear darkest width-100 center smaller-text'><?php echo $this->game->gameDate->format('l') . "s at " . $this->game->gameDate->format('g') . ($this->game->gameDate->format('i') != 0 ? ':' . $this->game->gameDate->format('i') : '') . $this->game->gameDate->format('a');?></p>
+    <p class='clear medium width-100 center smaller-text'><?php echo $this->game->park->parkName;?></p>
+</div>

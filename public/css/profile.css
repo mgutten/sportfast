@@ -68,6 +68,11 @@
 
 /* common alerts */
 
+.profile-invite-result > img {
+	width:55px;
+	height:45px;
+}
+
 #inviteSearchAlert-container {
 	width: 20em;
 	margin: 1em auto;
@@ -148,14 +153,11 @@
 	float:right;
 }
 
-#user-buttons-container,#profile-buttons-container {
-	position:absolute;
-	right: 0;
-	width: 1em;
+#user-buttons-container,
+#profile-buttons-container {
+	padding-left: .5em;
 	float:right;
 	overflow-x:hidden;
-	height: 30em;
-	padding-right: .3em;
 	overflow-y:hidden;
 	/*margin-top: .2em;*/
 	
@@ -649,5 +651,126 @@ input[type=text].profile-manage-team-info-roster-limit {
 	width: 20em;
 	margin-left: -10em;
 	margin-top: -7em;
+}
+
+/* signup alerts */
+#signup1-alert-container {
+	width: 30em;
+	margin-left:-15em;
+	margin-top: -20em;
+}
+
+#firstName,
+#lastName {
+	width: 9em;
+}
+
+#lastName-container {
+	margin-left:.5em;
+	font-size:1.06em;
+}
+
+#firstName-container {
+	margin-left:4em;
+	font-size:1.06em;
+}
+
+#email-container,
+#signupPassword-container {
+	float:none;
+	width: 15em;
+	display:block;
+	margin: .5em auto;
+	font-size:1.06em;
+}
+
+#email,
+#signupPassword {
+	width: 14em;
+}
+
+.games-signup-option-container {
+	padding: 4%;
+	width: 88%;
+	margin-left:2%;
+	/*border: 1px solid #ddd;*/
+	
+}
+
+#game-signup-minimal {
+	border-top: none;
+}
+
+#game-signup-login {
+	width: 6.1em;
+}
+
+#game-signup-logo {
+	margin-left: 8.2em;
+	width: 160px;
+}
+
+#game-signup-how-container {
+	position:absolute;
+	top: 340px;
+	left:-20%;
+	width: 140%;
+	height: 120px;
+	background: #333;
+}
+
+#game-signup-options-container {
+	margin-top: 1em;
+}
+
+/* pending invites */
+.profile-pending-name {
+	width: 14em;
+	min-height: 1px;
+}
+
+.profile-pending-username {
+	width: 18em;
+	min-height: 1px;
+}
+
+.profile-pending-numInvites {
+	margin-top: .7em;
+}
+
+.game-subscribers-container {
+	height: 1.7em;
+}
+
+.profile-pending-actions-container { 
+	opacity: 0;
+}
+
+.game-subscribers-container.selectable:hover {
+	background:#e9e9e9;
+}
+
+.game-subscribers-container.selected {
+	background: #ddd;
+}
+
+.game-subscribers-container.selected:hover {
+	background: #ccc;
+}
+
+.profile-pending-actions-container {
+	margin-top: 1.2em;
+}
+
+.profile-pending-actions-container > p {
+	margin-left: 3em;
+}
+
+.profile-pending-actions-container > p:first-child {
+	margin-left: 1em;
+}
+
+#profile-pending-subheader-bold {
+	margin-top: .8em;
 }
 	

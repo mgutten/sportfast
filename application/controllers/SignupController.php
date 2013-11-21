@@ -190,7 +190,7 @@ class SignupController extends Zend_Controller_Action
 				//$post['dobYear'] = ($post['dobYear'] < date('y') ? '20' : '19') . $post['dobYear'];
 				//$post['dob'] = $post['dobYear'] . '-' . $post['dobMonth'] . '-' . $post['dobDay'];
 				
-				//$post['age'] = (int) $post['age'];
+				$post['age'] = (int) $post['age'];
 				$post['sex'] = $post['sex'][0];
 				
 				foreach ($post as $key => $val) {
@@ -468,11 +468,46 @@ class SignupController extends Zend_Controller_Action
 		
 		if ($verified) {
 			// Success
+			
+			$userID = $verified['userID'];
+			
+			$session = new Zend_Session_Namespace('signupInvite');
+			if ($session->id) {
+				// User was invited from email invite from fellow user, create notification for them of invite
+				if ($session->type == 'game') {
+					$game = new Application_Model_Game();
+					$game->gameID = $session->id;
+					
+					$game->addUserToGame($userID, $session->confirmed);
+					
+					$confirmed = $session->confirmed;
+			
+					$session = new Zend_Session_Namespace('signupAdded');
+					$session->type = 'game';
+					$session->id = $game->gameID;
+					$session->confirmed = $confirmed;
+				} else {
+					// Is team
+					$team = new Application_Model_Team();
+					$team->teamID = $session->id;
+					
+					$team->addUserToTeam($userID);
+					
+					$session = new Zend_Session_Namespace('signupAdded');
+					$session->type = 'team';
+					$session->id = $team->teamID;
+				}
+				
+				
+				Zend_Session::namespaceUnset('signupInvite');
+			}
+			
 			$auth = Zend_Auth::getInstance();
 			
 			// if success, $verified stores userID
-			$user->getUserBy('u.userID',$verified['userID']);
+			$user->getUserBy('u.userID',$userID);
 			$user->login();
+			
 			
 			$auth->getStorage()->write($user);
 			
@@ -497,59 +532,6 @@ class SignupController extends Zend_Controller_Action
 			$notification->details = 'sportfast';
 			$notification->cityID = $user->city->cityID;
 			$notification->save();
-			
-			$session = new Zend_Session_Namespace('signupInvite');
-			
-			if ($session->id) {
-				// User was invited from email invite from fellow user, create notification for them of invite
-				if ($session->type == 'game') {
-					$typeModel = new Application_Model_Game();
-					$typeModel->gameID = $session->id;
-					
-					$typeModel->addUserToGame($user->userID, $session->confirmed);
-				} else {
-					$typeModel = new Application_Model_Team();
-					$typeModel->teamID = $session->id;
-					$captains = $typeModel->getTeamCaptains();
-					$actingUserID = $captains[0];
-					
-					$typeID = $session->type . 'ID';
-					$notification = new Application_Model_Notification();
-					$notification->receivingUserID = $user->userID;
-					$notification->actingUserID = $actingUserID;
-					$notification->action = 'invite';
-					$notification->type = $session->type;
-					$notification->$typeID = $session->id;
-					$notification->cityID = $user->city->cityID;
-					$notification->save();
-				}
-				
-				
-				/*if ($session->type == 'game') {
-					$typeModel = new Application_Model_Game();
-					$typeModel->gameID = $session->id;
-					$captains = $typeModel->getGameCaptains();
-					$actingUserID = $captains[0];
-				} else {
-					$typeModel = new Application_Model_Team();
-					$typeModel->teamID = $session->id;
-					$captains = $typeModel->getTeamCaptains();
-					$actingUserID = $captains[0];
-				}
-				
-				$typeID = $session->type . 'ID';
-				$notification = new Application_Model_Notification();
-				$notification->receivingUserID = $user->userID;
-				$notification->actingUserID = $actingUserID;
-				$notification->action = 'invite';
-				$notification->type = $session->type;
-				$notification->$typeID = $session->id;
-				$notification->cityID = $user->city->cityID;
-				$notification->save();
-				*/
-				
-				Zend_Session::namespaceUnset('signupInvite');
-			}
 			
 			
 			$messages = new Application_Model_Messages();
@@ -779,6 +761,23 @@ class SignupController extends Zend_Controller_Action
 			$game->gameID = $session->id;
 			
 			$game->addUserToGame($user->userID, $session->confirmed);
+			
+			$confirmed = $session->confirmed;
+			
+			$session = new Zend_Session_Namespace('signupAdded');
+			$session->type = 'game';
+			$session->id = $game->gameID;
+			$session->confirmed = $confirmed;
+		} elseif ($session->type == 'team') {
+			// Is team
+			$team = new Application_Model_Team();
+			$team->teamID = $session->id;
+			
+			$team->addUserToTeam($user->userID);
+			
+			$session = new Zend_Session_Namespace('signupAdded');
+			$session->type = 'team';
+			$session->id = $team->teamID;
 		}
 		
 		$session = Zend_Session::namespaceUnset('signupInvite');

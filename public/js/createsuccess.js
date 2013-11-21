@@ -1,4 +1,4 @@
-// success page for create game or team
+// Success page for create game or team
 
 var selectedUsers = new Array();
 

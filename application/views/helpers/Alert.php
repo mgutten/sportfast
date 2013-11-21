@@ -73,12 +73,12 @@ class Application_View_Helper_Alert
 			$href = '/teams/' . $this->_view->team->teamID;
 		}
 		
-		
+		$count = (count($pendingInvites['notJoined']) + count($pendingInvites['joined']['notMembers']));
 		
 		$form = new Application_Form_General();
 		
 		$output  = $this->start('invite','Invite players');
-		//$output .=  "<a href='" . $href . "/pending' class='right smaller-text medium'>" . count($pendingInvites['notJoined']) . " pending invites</a>";
+		$output .=  "<a href='" . $href . "/pending' class='right smaller-text medium' tooltip='You have " . $count . " pending invites for this game'>" . $count . " pending invites</a>";
 		$output .= 	"<div class='clear width-100'>"
 						. $form->text->setAttrib('id', 'inviteSearchAlert')
 							   		 ->setLabel("Start typing a player's name...")
@@ -86,6 +86,83 @@ class Application_View_Helper_Alert
 		$output .= "<div class='clear width-100' id='invite-alert-results'>";
 		$output .= "</div>";
 		$output .= "<a href='" . $href . "/invite' class='clear width-100 center medium smaller-text larger-margin-top'>or by email</a>";
+		$output .= $this->end();
+		
+		return $output;
+	}
+	
+	/**
+	 * minimal signup alert
+	 * @params ($user => Application_Model_User,
+	 *			$cityID => cityID to input for user
+	 *			$location => str 'POINT(lat lon)')
+	 */
+	public function minimalSignup($user, $cityID, $location) {
+		
+		$signupForm = new Application_Form_Signup();
+		
+		$output = $this->start('signup1', '', false);
+			
+			/*echo "<div class='clear width-100'>
+					<p class='right medium smaller-text width-100 center'>Have an account?</p>
+					<div class='clear width-100'><a href='/login' class='auto-center button smaller-text' id='game-signup-login'>Login</a></div>
+				  </div>";*/
+			
+		$output .= "<img src='/images/global/logo/large2.png' class='left' id='game-signup-logo'/>";
+		
+		$output .= "<div class='right'>
+				<p class='right medium smaller-text'>Have an account?</p>
+				<a href='/login' class='clear-right button smaller-text' id='game-signup-login'>Login</a>
+			  </div>";
+		
+		
+		
+		$output .= "<form action='/signup/basic' method='post' id='user-signup'>";
+		
+		$output .= "<p class='clear light width-100 center largest-margin-top'>Please enter your name so other players can recognize you.</p>";
+		
+		$output .= $signupForm->firstName;
+		$output .= $signupForm->lastName;
+		
+		$email = '';
+		if ($user->hasValue('username')) {
+			$email = $user->username;
+		}
+		$output .= "<p class='clear largest-margin-top light width-100 center'>Your email will be your login for Sportfast. </p>";
+		$output .= "<div class='clear width-100'>" . $signupForm->email->setValue($email) . "</div>";
+		$output .= "<div class='clear width-100'>" . $signupForm->signupPassword . "</div>";
+		//$output .= "<p class='clear smaller-text medium width-100 center hidden' id='game-password-reqs'>Must be at least 8 characters</p>";
+		
+		/*
+		$output .= "<div id='game-signup-how-container' class='dropshadow'>
+				<p class='white clear width-100 smaller-text center'>How Sportfast Works</p>
+				</div>";
+		*/
+		$output .= "<div class='clear width-100 largest-margin-top' id='game-signup-options-container'>";
+		$output .= "<p class='clear light width-100 center'>Sportfast analyzes players' skill, age, and availability to create competitive games <a href='/how' target='_blank' class='medium underline'>learn more</a>:</p>";
+		$output .= "<div class='white-background animate-darker clear games-signup-option-container pointer' tooltip='More information includes:<ul class=\"heavy medium\"><li>Age</li><li>Zipcode</li><li>Sports Preferences</li></ul>'>
+				<div class='clear width-100'>
+					<img src='/images/games/account/all.png' class='auto-center'/>
+				</div>
+				<p class='width-100 center medium heavy clear'>I want to use this site to its full potential.</p>
+				<p class='clear width-100 center medium smaller-text'>More information required</p>
+			  </div>";
+		
+		$output .= "<div class='white-background animate-darker clear games-signup-option-container pointer' id='game-signup-minimal' tooltip='By choosing this, you cannot:<ul class=\"heavy medium\"><li>Join Sportfast-created games</li><li>Be matched to nearby games</li><li>Receive ratings</li>'>
+				<div class='clear width-100'>
+					<img src='/images/games/account/limited.png' class='auto-center'/>
+				</div>
+				<p class='width-100 center medium heavy clear '>I just want the bare minimum.</p>
+				<p class='clear width-100 center medium smaller-text'>You're done, but site function will be limited</p>
+			  </div>";
+		$output .= "</div>";
+		$output .= "<p class='clear medium smaller-text margin-top width-100 center'>By selecting an option you agree to Sportfast's <a href='/about/terms' class='inherit underline' target='_blank'>Terms and Conditions</a>.</p>";
+		
+		$output .= "<input type='hidden' name='location' value='" . $location . "'/>";
+		$output .= "<input type='hidden' name='cityID' value='" . $cityID . "'/>";
+		
+		$output .= "</form>";
+			
 		$output .= $this->end();
 		
 		return $output;

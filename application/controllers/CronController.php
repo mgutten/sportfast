@@ -87,8 +87,6 @@ class CronController extends Zend_Controller_Action
 			if (is_file($dir . $file)) {
 				unlink($dir . $file);
 			}
-						
-			
 
 		}
 		// CLOSE THE DIRECTORY
@@ -103,7 +101,7 @@ class CronController extends Zend_Controller_Action
 	public function updateAgeAction()
 	{
 		$mapper = $this->getMapper();
-		
+		return;
 		$mapper->updateAge();
 	}
 	
@@ -125,6 +123,7 @@ class CronController extends Zend_Controller_Action
 	public function removeInactiveTypesAction()
 	{
 		$mapper = $this->getMapper();
+		return;
 		
 		$mapper->removeInactiveUsers();
 		$mapper->removeInactiveTeams();
@@ -138,6 +137,7 @@ class CronController extends Zend_Controller_Action
 	{
 		$mapper = $this->getMapper();
 		
+		return;
 		$inactive = $mapper->getInactiveUsers();
 		
 		return $this->_forward('warn-inactive', 'mail', null, array('inactive' => $inactive));
@@ -154,7 +154,6 @@ class CronController extends Zend_Controller_Action
 		
 		$date = new DateTime('now');
 		
-		
 		if ((($date->format('G') >= 6 && $date->format('i') > 31) || $date->format('G') >= 7) && ($date->format('G') < 20)) {
 			// Only update games between 7AM and 8PM
 			$games = $mapper->updateGameStatus();
@@ -165,7 +164,7 @@ class CronController extends Zend_Controller_Action
 	
 	
 	/**
-	 * inform users that they have a game tomorrow
+	 * inform users that they have a game tomorrow (teams)
 	 * OFTEN: PER DAY
 	 */
 	public function informUsersGameAction()
@@ -185,7 +184,7 @@ class CronController extends Zend_Controller_Action
 	}
 	
 	/**
-	 * inform users that they have a game tomorrow
+	 * inform users that they have a game tomorrow (pickup)
 	 * OFTEN: PER HOUR
 	 */
 	public function informUsersSubscribedGameAction()
@@ -193,7 +192,6 @@ class CronController extends Zend_Controller_Action
 		$mapper = $this->getMapper();
 		
 		$subscribedGames = $mapper->getUserSubscribedGames();
-		
 		
 		$games = array('games' => $subscribedGames,
 					   'teamGames' => array());

@@ -24,69 +24,8 @@ echo $this->placeholder('absolute')->captureStart();
 	echo $this->alert()->confirmAlert();
 	
 	if ($this->signupInvite) {
-		echo $this->alert()->start('signup1', '', false);
-			
-			/*echo "<div class='clear width-100'>
-					<p class='right medium smaller-text width-100 center'>Have an account?</p>
-					<div class='clear width-100'><a href='/login' class='auto-center button smaller-text' id='game-signup-login'>Login</a></div>
-				  </div>";*/
-			
-			echo "<img src='/images/global/logo/large2.png' class='left' id='game-signup-logo'/>";
-			
-			echo "<div class='right'>
-					<p class='right medium smaller-text'>Have an account?</p>
-					<a href='/login' class='clear-right button smaller-text' id='game-signup-login'>Login</a>
-				  </div>";
-			
-			
-			
-			echo "<form action='/signup/basic' method='post' id='user-signup'>";
-			
-			echo "<p class='clear light width-100 center largest-margin-top'>Please enter your name so other players can recognize you.</p>";
-			
-			echo $this->signupForm->firstName;
-			echo $this->signupForm->lastName;
-			
-			$email = '';
-			if ($this->user->hasValue('username')) {
-				$email = $this->user->username;
-			}
-			echo "<p class='clear largest-margin-top light width-100 center'>Your email will be your login for Sportfast. </p>";
-			echo "<div class='clear width-100'>" . $this->signupForm->email->setValue($email) . "</div>";
-			echo "<div class='clear width-100'>" . $this->signupForm->signupPassword . "</div>";
-			//echo "<p class='clear smaller-text medium width-100 center hidden' id='game-password-reqs'>Must be at least 8 characters</p>";
-			
-			/*
-			echo "<div id='game-signup-how-container' class='dropshadow'>
-					<p class='white clear width-100 smaller-text center'>How Sportfast Works</p>
-					</div>";
-			*/
-			echo "<div class='clear width-100 largest-margin-top' id='game-signup-options-container'>";
-			echo "<p class='clear light width-100 center'>Sportfast analyzes players' skill, age, and availability to create competitive games <a href='/how' target='_blank' class='medium underline'>learn more</a>:</p>";
-			echo "<div class='white-background animate-darker clear games-signup-option-container pointer' tooltip='More information includes:<ul class=\"heavy medium\"><li>Age</li><li>Zipcode</li><li>Sports Preferences</li></ul>'>
-					<div class='clear width-100'>
-						<img src='/images/games/account/all.png' class='auto-center'/>
-					</div>
-					<p class='width-100 center medium heavy clear'>I want to use this site to its full potential.</p>
-					<p class='clear width-100 center medium smaller-text'>More information required</p>
-				  </div>";
-			
-			echo "<div class='white-background animate-darker clear games-signup-option-container pointer' id='game-signup-minimal' tooltip='By choosing this, you cannot:<ul class=\"heavy medium\"><li>Join Sportfast-created games</li><li>Be matched to nearby games</li><li>Receive ratings</li>'>
-					<div class='clear width-100'>
-						<img src='/images/games/account/limited.png' class='auto-center'/>
-					</div>
-					<p class='width-100 center medium heavy clear '>I just want the bare minimum.</p>
-					<p class='clear width-100 center medium smaller-text'>You're done, but site function will be limited</p>
-				  </div>";
-			echo "</div>";
-			echo "<p class='clear medium smaller-text margin-top width-100 center'>By selecting an option you agree to Sportfast's <a href='/about/terms' class='inherit underline' target='_blank'>Terms and Conditions</a>.</p>";
-			
-			echo "<input type='hidden' name='location' value='" . $this->game->park->location->location . "'/>";
-			echo "<input type='hidden' name='cityID' value='" . $this->parkCityID . "'/>";
-			
-			echo "</form>";
-			
-		echo $this->alert()->end();
+		echo $this->alert()->minimalSignup($this->user, $this->parkCityID, $this->game->park->location->location);
+		
 	}
 	
 	if (!$this->userInGame) {

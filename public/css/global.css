@@ -75,6 +75,7 @@ ul {
 .inherit {
 	color: inherit;
 	font: inherit;
+	text-decoration: inherit;
 }
 
 .futura {
@@ -364,6 +365,10 @@ p.default,div.default {
 	float:right !important;
 }
 
+.selectable {
+	cursor: pointer;
+}
+
 div.no-clear,span.no-clear,p.no-clear,img.no-clear {
 	clear:none;
 }
@@ -442,6 +447,14 @@ div.selected-green,img.selected-green,p.selected-green {
 
 .larger-indent {
 	margin-left: .6em;
+}
+
+.margin-right {
+	margin-right: .3em;
+}
+
+.larger-margin-right {
+	margin-right: .6em;
 }
 
 
@@ -1860,8 +1873,8 @@ div.dropdown-menu-container-reverse:hover {
 }
 
 #confirm-alert {
-	width: 12em;
-	margin-left: -8em;
+	max-width: 20em;
+	margin-left: -10em;
 	margin-top: -8em;
 	font-size: 1em;
 	display:none;
@@ -2022,6 +2035,21 @@ div.dropdown-menu-container-reverse:hover {
 }
 
 /* pagination */
+.pagination-outer-container {
+	float:left;
+	width:100%;
+}
+
+.pagination-inner-container {
+	float:left;
+	width: 100%;
+	display:none;
+}
+
+.pagination-inner-container:first-child {
+	display: block;
+}
+
 .pagination-pages-outer-container {
 	text-align:center;
 }
@@ -2287,6 +2315,12 @@ input.city-change-input {
 	padding: 2em 0;
 }
 
+
+.img-holder-tiny {
+	width: 35px;
+	height: 29px;
+}
+
 /* img containers (make into box shape) */
 .box-img-container-tiny {
 	width:29px;
@@ -2526,6 +2560,10 @@ input[type=text].selectable-input {
 .find-results-joined {
 	margin-top: .9em;
 	margin-left: .4em;
+}
+
+.find-players {
+	margin-top: -.25em;
 }
 
 /* bottom alert 

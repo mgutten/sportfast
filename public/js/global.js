@@ -338,6 +338,13 @@ $(function()
 	});
 	
 	
+	/* any "selectable" classes toggle selected class onclick */
+	$('.selectable').click(function()
+	{
+		$(this).toggleClass('selected');
+	})
+	
+	
 	/* Search bar ajax call */
 	$('#headerSearchBar').keyup(function(e)
 	{
@@ -1046,6 +1053,24 @@ $(function()
 
 
 /**
+ * Ajax call to edit user's details
+ * @params (attribs => obj with attrib => val)
+ */
+function editUser(attribs, callback)
+{
+	$.ajax({
+		url: '/ajax/edit-user',
+		type: 'POST',
+		data: {attribs: attribs},
+		success: function(data) {
+			if (typeof callback != 'undefined') {
+				callback();
+			}
+		}
+	})
+}
+
+/**
  * Ajax call to get new notifications for user
  */
 function getNewNotifications()
@@ -1262,6 +1287,7 @@ function notificationConfirmDeny(notificationLogID, confirmOrDeny, type, action,
 	options.action = action;
 	options.confirmOrDeny = confirmOrDeny;
 	options.optionalID = optionalID;
+	
 
 	$.ajax({
 		url: '/ajax/notification-action',
@@ -1286,6 +1312,7 @@ function notificationJoin(notificationLogID, type, url)
 	var options = new Object();
 	options.notificationLogID = notificationLogID;
 	options.type = type;
+
 
 	$.ajax({
 		url: '/ajax/notification-action',
@@ -2148,10 +2175,11 @@ function showTooltip(ele)
  * initialize googleMap w/ lon, lat, and zoom
  * @params (lon  => longitude,
  *			lat  => latitude,
- *			zoom => zoom (higher is more zoomed))
+ *			zoom => zoom (higher is more zoomed)),
+ *			option => object of options to add to the map
  *			callback => callback function
  */
-function initializeMap(lat, lon, zoom, callback) 
+function initializeMap(lat, lon, zoom, option, callback) 
 {	
         var mapOptions = {
           //center: new google.maps.LatLng(lat, lon),
@@ -2162,7 +2190,10 @@ function initializeMap(lat, lon, zoom, callback)
         };
         gmap = new google.maps.Map(document.getElementById("gmap"), mapOptions);
 			
-			
+		if (typeof option != 'undefined') {
+			gmap.setOptions(option);
+		}
+		
 		if (userLocation.length > 0) {
 			// User location is set, center on it initially
 			lat = userLocation[0];
@@ -2193,7 +2224,7 @@ function initializeMap(lat, lon, zoom, callback)
 		callback();
 		
 }
-
+/*
 function setZoom()
 {
 		// Zoom constraint
@@ -2213,6 +2244,7 @@ function setZoom()
 	
 	gmap.initialZoom = true;
 }
+*/
 
 
 
@@ -2251,7 +2283,7 @@ function getCoordinatesFromAddress(address, callbackSuccess, callbackFailure)
 function populateConfirmActionAlert(str, postContent)
 {
 	$('#confirm-action-text').text(str);
-	
+
 	if (typeof postContent != 'undefined') {
 		// add post content
 		$('#confirm-action-postContent').html(postContent);
@@ -2266,7 +2298,7 @@ function populateConfirmActionAlert(str, postContent)
  */
 function showConfirmationAlert(str) 
 {
-	$('#confirm-alert').text(str)
+	$('#confirm-alert').html(str)
 					   .css({display: 'block',
 							 opacity: 0})
 					   .stop().animate({opacity: 1}, {duration: 300, complete: function() {

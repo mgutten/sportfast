@@ -25,12 +25,30 @@ class TeamsController extends Zend_Controller_Action
 			return;
 		}
 		
+		$session = new Zend_Session_Namespace('signupInvite');
+		
+		if (!$this->view->user) {
+				$this->view->user = new Application_Model_User();
+				$this->view->user->userID = '0';
+				
+				$this->view->signupInvite = true;
+				$this->view->user->username = (isset($session->email) ? $session->email : '');
+				
+				$location = new Application_Model_Location();
+				$this->view->cityLocation = $location->getLocationByCityID($team->cityID);
+				
+				$session = new Zend_Session_Namespace('postLoginURL');
+				$session->url = '/teams/' . $teamID;
+				
+			}
+		/*
 		$session = new Zend_Session_Namespace('firstTeam');
 		if ($session->first) {
 			// Is first team/game, show profile buttons
 			$this->view->firstTeam = true;
 			Zend_Session::namespaceUnset('firstTeam');
 		}
+		*/
 		
 		$session = new Zend_Session_Namespace('invites');
 		if ($session->sent) {
@@ -169,7 +187,7 @@ class TeamsController extends Zend_Controller_Action
 								   
 			$this->view->reserveUserName = $userName;
 		}
-		
+	
 		$this->view->userOnTeam   = $userOnTeam = $team->players->userExists($this->view->user->userID);
 		
 		if ($userOnTeam) {
@@ -229,6 +247,17 @@ class TeamsController extends Zend_Controller_Action
 
 		$this->view->note = $note;
 		
+	}
+	
+	public function pendingAction()
+	{
+		$teamID = $this->getRequest()->getParam('id');
+        $team = new Application_Model_Team();
+		$team->getTeamByID($teamID);
+		
+		$this->view->team = $team;
+		
+		$this->view->pendingInvites = $team->getPendingInvites($this->view->user->userID);
 	}
 
 

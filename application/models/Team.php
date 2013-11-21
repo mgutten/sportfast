@@ -282,6 +282,11 @@ class Application_Model_Team extends Application_Model_ConfirmationsAbstract
 	{
 		return ucwords($this->_attribs['city']);
 	}
+	
+	public function getPendingInvites($userID)
+	{
+		return $this->getMapper()->getPendingInvites($userID, $this);
+	}
 			
 		
 	private static function sortByConfirmed ($a, $b)

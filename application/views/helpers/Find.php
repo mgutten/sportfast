@@ -173,9 +173,10 @@ class Application_View_Helper_Find
 	/**
 	 * create game container for a match (controller => find, action => games)
 	 * @params ($match => game model,
-	 *			$number => # of match in list)
+	 *			$number => # of match in list
+	 *			$showMatch => boolean should show whether you are already on this team?)
 	 */
-	public function createGame($match, $number = false)
+	public function createGame($match, $number = false, $showMatch = true)
 	{
 		
 		$userInGame = false;
@@ -187,14 +188,15 @@ class Application_View_Helper_Find
 			$matchImg = '<img class="left" src="/images/global/canceled.png" tooltip="This game has been canceled. Reason: ' . $match->getCancelReason(true) . '"/>';
 		} else {
 			$matchImg = "<div class='left'>";
-			if (!$match->isTeamGame()) {
+			if (!$match->isTeamGame() &&
+				$showMatch) {
 				// Only show match img for pickup games
 				$matchImg .= "<img src='" . $match->getMatchImage() . "' tooltip='" . $match->getMatchDescription() . "' class='left find-result-match-img'/>" ;
 				$class = 'find-results-joined';
 			} else {
 				$class = '';
 			}
-			$matchImg .= ($userInGame ? "<p class='left " . $class . " smaller-text green'> You're playing!</p>" : '');
+			$matchImg .= (($userInGame && $showMatch) ? "<p class='left " . $class . " smaller-text green'> You're playing!</p>" : '');
 					  
 			if (!$match->isPublic()) {
 				// Private game
@@ -252,6 +254,14 @@ class Application_View_Helper_Find
 			$userInGame = true;
 		}
 		
+		$matchImg = "";
+		if ($showMatch) {
+			// Only show match img for pickup games
+			$matchImg .= "<img src='" . $match->getMatchImage() . "' tooltip='" . $match->getMatchDescription() . "' class='left find-result-match-img'/>" ;
+
+			$matchImg .= ($userInGame ? "<p class='left " . $class . " smaller-text green find-results-joined'> You're on this team!</p>" : '');
+		}
+		
 		if ($number) {
 			$number = "<p class='find-result-number white green-back heavy'>" . $number . "</p>";
 		}
@@ -265,8 +275,7 @@ class Application_View_Helper_Find
 		$output .=			"<p class='clear darkest larger-text'>" . $match->sport . " Team</p>";	
 		$output .=			"<p class='clear light'>" . $match->city . "</p>";		
 		$output .= 		"</div>";
-		$output .=		"<img src='" . $match->getMatchImage() . "' tooltip='" . $match->getMatchDescription() . "' class='left find-result-match-img'/>";	
-		$output .=		($userInGame ? "<p class='left find-results-joined smaller-text green'> You're on this team!</p>" : '');
+		$output .=		$matchImg;
 		$output .=		$this->createRight($match, $userInGame);
 		$output .= "</a>";
 		

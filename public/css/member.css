@@ -192,12 +192,56 @@
 	color: #fff;
 }
 
+#member-move-map {
+	padding: 3px 0;
+	width:60%;
+}
+
+#member-move-map-inner-container {
+	position: absolute;
+	z-index: 2;
+	top: 0;
+	left:0;
+	width:100%;
+}
+
+#member-move-map-container {
+	position: absolute;
+	top: -1px;
+	margin-top: 0;
+	left:0;
+	width: 100%;
+	z-index: 9;
+}
+
+#member-move-map-back {
+	position:absolute;
+	top: 0;
+	left:0;
+	width:100%;
+	height: 24px;
+}
+
+.member-move-space-holder {
+	width: 20%;
+	min-height: 1px;
+}
+
 #gmap {
 	width: 99.8%;
-	height: 20em;
+	height: 22em;
 	float:left;
 	border:1px solid #222;
+	border-top: none;
 	margin-top: -1px;
+}
+
+#member-find-outer-container {
+	margin-top: 1px;
+}
+
+#member-find-tab-past {
+	border-left: 1px solid #ccc;
 }
 
 .member-find-tab {
@@ -225,6 +269,7 @@
 	position:relative;
 	margin-top:-24px;
 	height:24px;
+	width: 59%;
 }
 
 .member-find-tab-num {
@@ -435,9 +480,13 @@ div.member-find-game-date-hour {
 
 /* alerts */
 #first-time-alert-container {
-	width: 36em;
+	width: 42em;
 	margin-top: -10em;
-	margin-left: -18em;
+	margin-left: -21em;
+}
+
+.find-result-players-container {
+	margin-right: .5em;
 }
 
 .member-first-time-overview {

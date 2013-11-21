@@ -1,0 +1,31 @@
+<?php
+if (!$this->user) {
+	echo "<div class='clear width-100 game-subscribers-container'></div>";
+	return;
+}
+?>
+<a href='/users/<?php echo $this->user->userID; ?>' class='clear width-100 game-subscribers-container animate-darker'>
+			<img src='<?php echo $this->user->getProfilePic('tiny');?>' class='left'/>
+			<p class='left larger-indent heavy darkest game-subscribers-name' tooltip='<?php echo $this->user->fullName;?>'><?php echo $this->user->shortName; ?></p>
+	
+
+	<p class='left game-subscribers-total-subheader medium smaller-text'>total games:</p>
+		  <p class='left game-subscribers-total medium  indent heavy'><?php echo $this->user->getTempAttrib('totalGames');?></p>
+	
+	<div class='left game-subscribers-lastPlayed-container'>
+	
+    <?php
+	if ($lastPlayed = $this->user->getTempAttrib('lastPlayed')) {
+		// Has played before
+	?>
+		<p class='left game-subscribers-total-subheader medium smaller-text'>last played</p>
+				  <p class='left game-subscribers-lastPlayed medium indent smaller-text'><?php echo $this->user->getTimeFromNow($lastPlayed, 30);?></p>
+    <?php
+	} 
+	echo "</div>";
+	
+	if ($this->user->getTempAttrib('doNotEmail') == '0') {
+		echo "<img src='/images/games/members/reminders.png' class='right margin-top game-subscribers-reminders' tooltip='Receives weekly reminders'/>";
+	}
+	
+	echo "</a>";

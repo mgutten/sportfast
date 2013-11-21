@@ -36,6 +36,7 @@ class Application_Model_User extends Application_Model_ModelAbstract
 									'joined'		=> '',
 									'account'		=> '',
 									'avatar'		=> '',
+									'homeMapTip'	=> '',
 									'noEmail'		=> '',  // Do not email when game is created for them
 									'ratingSet'		=> '',   // Used by setUserRating to not update old_user_ratings twice
 									'tempAttribs'	=> array()  // Used to store temporary attribs in
@@ -49,7 +50,6 @@ class Application_Model_User extends Application_Model_ModelAbstract
 		$this->getMapper()->save($this, $loopSave);
 		return $this;
 	}
-
 	
 	/** 
 	 * actions to take to log user in and store all necessary info

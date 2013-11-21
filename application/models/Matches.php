@@ -36,7 +36,7 @@ class Application_Model_Matches extends Application_Model_ModelAbstract
 			} else {
 				$matches = $this->_attribs['matches'];
 			}*/
-			$matches = $this->attribs['matches'];
+			$matches = $this->_attribs['matches'];
 			usort($matches, array('Application_Model_Matches','matchSort'));
 			
 			$returnMatches = array();
@@ -53,8 +53,10 @@ class Application_Model_Matches extends Application_Model_ModelAbstract
 			} else {
 				$returnMatches = $matches;
 			}
+			
+			$this->_attribs['matches'] = $returnMatches;
 		
-			return $returnMatches;
+			return $this->getAll();
 		} else {
 			return false;
 		}
@@ -93,9 +95,17 @@ class Application_Model_Matches extends Application_Model_ModelAbstract
 			
 			$aPlayers = ($a instanceof Application_Model_Game ? $a->countConfirmedPlayers() : $a->totalPlayers);
 			$bPlayers = ($b instanceof Application_Model_Game ? $b->countConfirmedPlayers() : $b->totalPlayers);
+			
+			$aDateDifference = $bDateDifference = 2.5;
+			if ($a instanceof Application_Model_Game) {
+				$aDateDifference = (7 * 24)/(($a->gameDate->format('U') - time())/(60*60)); // # of hours between now and gametime adjusted for 7 day week (7 * 24 hours)
+			}
+			if ($b instanceof Application_Model_Game) {
+				$bDateDifference = (7 * 24)/(($b->gameDate->format('U') - time())/(60*60));
+			}
 				
-			$a = ($aPlayers == 0 ? -1 : $aPlayers) - (abs($a->skillDifference) * .5);
-			$b = ($bPlayers == 0 ? -1 : $bPlayers) - (abs($b->skillDifference) * .5);
+			$a = ($aPlayers == 0 ? -1 : $aPlayers) - (abs($a->skillDifference) * .5) + $aDateDifference ;
+			$b = ($bPlayers == 0 ? -1 : $bPlayers) - (abs($b->skillDifference) * .5) + $bDateDifference ;
 			
 		}
 		

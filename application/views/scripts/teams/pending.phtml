@@ -1,0 +1,98 @@
+<?php
+/**
+ * controller => teams
+ * action => pending
+ */
+
+$this->headTitle('Pending Invites');
+$this->headLink()->prependStylesheet($this->baseUrl() . '/css/profile.css');
+$this->headLink()->prependStylesheet($this->baseUrl() . '/css/game.css');
+$this->headScript()->prependFile($this->baseUrl() . '/js/profile.js');
+?>
+
+<?php
+$this->placeholder('absolute')->captureStart();
+	echo $this->partial('partials/global/alertBack.phtml');
+	echo $this->alert()->confirmAlert();
+$this->placeholder('absolute')->captureEnd();
+
+$this->placeholder('narrowColumn')->captureStart();
+	echo $this->partial('partials/teams/narrowDescription.phtml', array('team' => $this->team));
+$this->placeholder('narrowColumn')->captureEnd();
+
+?>
+
+<?php
+// Store universal team details in hidden container
+echo "<span id='team-details' 
+			teamID='" . $this->team->teamID . "' 
+			idType='teamID' 
+			actingUserID='" . $this->user->userID . "' 
+			city='" . $this->team->city . "'
+			rosterLimit='" . $this->team->rosterLimit . "'
+			sport='" . $this->team->sport . "'
+			public='" . ($this->isPublic ? 'public' : 'private') . "'
+	 </span>";
+
+
+$notJoined = count($this->pendingInvites['notJoined']) + count($this->pendingInvites['joined']['notMembers']);
+
+echo $this->partial('partials/global/backTo.phtml', array('type' => 'team',
+														  'id'	 => $this->team->teamID));
+														  
+if ($notJoined > 0) {
+	
+	$subheader = "<p class='right medium' id='profile-pending-subheader-bold'>" . $notJoined . " users have not responded</p>";
+	echo $this->partial('partials/global/sectionHeaderBold.phtml', array('title' => 'pending invites',
+																		  'content' => $subheader));
+	
+	echo "<div class='clear width-100 profile-pending-container'>";
+	$counter = 0;
+	$pageCounter = 1;
+	$combinedArray = array_merge($this->pendingInvites['joined']['notMembers'], $this->pendingInvites['notJoined']);
+	
+	echo $this->pagination()->start($combinedArray, array('partial' => 'partials/games/pendingInvite.phtml', 
+														  'attrib' =>  'user'));
+	/*
+		foreach ($this->pendingInvites['joined']['notMembers'] as $user) {
+			echo  $this->partial('partials/games/pendingInvite.phtml', array('user' => $user));
+			
+			$counter++;
+		}
+		
+		foreach ($this->pendingInvites['notJoined'] as $user) {
+			echo  $this->partial('partials/games/pendingInvite.phtml', array('user' => $user));
+			$counter++;
+		}
+	*/
+		
+		echo "<div class='clear width-100 margin-top profile-pending-actions-container'>
+				<p class='left medium action pointer profile-pending-all-select' id=''>select all</p>
+				<p class='left medium action pointer larger-indent profile-pending-all-deselect' id=''>deselect all</p>
+				<p class='right red action pointer larger-indent profile-pending-remove' id='' tooltip='Remove selected users from list'>remove selected</p>
+				<p class='right medium action pointer larger-indent profile-pending-invite' id='' tooltip='Send invites to selected emails'><img src='/images/games/members/reminders.png' class='left'>&nbsp;<span class='right inherit'>resend invites</span></p>
+				
+			  </div>";
+	echo "</div>";
+}
+
+$joined = count($this->pendingInvites['joined']['members']);
+if ($joined > 0) {
+	
+	$subheader = "<p class='right larger-margin-top medium'>" . $joined . " users have joined</p>";
+	echo $this->partial('partials/global/sectionHeaderPlain.phtml', array('title' => 'successful invites',
+																		  'content' => $subheader));
+	
+	echo "<div class='clear width-100 profile-pending-container'>";																	  
+	echo $this->pagination()->start($this->pendingInvites['joined']['members'], array('partial' => 'partials/games/pendingInvite.phtml', 
+														  							  'attrib' =>  'user'));
+																				
+	echo "<div class='clear width-100 margin-top profile-pending-actions-container'>
+				<p class='left medium action pointer profile-pending-all-select' id=''>select all</p>
+				<p class='left medium action pointer larger-indent profile-pending-all-deselect' id=''>deselect all</p>
+				<p class='right red action pointer larger-indent profile-pending-remove' id='' tooltip='Remove selected users from list'>remove selected</p>
+			  </div>";
+	
+	echo "</div>";
+}
+

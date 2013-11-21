@@ -64,35 +64,39 @@ class Application_Model_CronMapper extends Application_Model_MapperAbstract
 			$db->query($insertUserGames);
 			
 			// Delete from games table (non-recurring games)
+			$getGameIDs = "SELECT gameID 
+							  FROM old_games 
+							  WHERE movedDate BETWEEN (SELECT movedDate - INTERVAL 1 MINUTE FROM old_games WHERE oldGameID = '" . $oldGameID . "')
+												  AND (SELECT movedDate + INTERVAL 1 MINUTE FROM old_games WHERE oldGameID = '" . $oldGameID . "')";
+			$stmt = $db->query($getGameIDs);
+			
+			$results = $stmt->fetchAll();
+			
+			$counter = 0;
+			$gameIDs = '';
+			foreach ($results as $result) {
+				if ($counter != 0) {
+					$gameIDs .= ',';
+				}
+				$gameIDs .= $result['gameID'];
+				$counter++;
+			}
+											  
+			
 			$deleteGames = "DELETE FROM games 
-								WHERE games.gameID IN (SELECT gameID 
-														FROM old_games 
-														WHERE movedDate = (SELECT movedDate 
-																			FROM old_games 
-																			WHERE oldGameID = '" . $oldGameID . "')
-															AND (recurring = 0)
-													   )";
+								WHERE games.gameID IN (" . $gameIDs . ")
+										AND (games.recurring = 0)";
 			$db->query($deleteGames);
 			
 			// Delete from game_messages
 			$deleteMessages = "DELETE FROM game_messages 
-								WHERE gameID IN (SELECT gameID 
-														FROM old_games 
-														WHERE movedDate = (SELECT movedDate 
-																			FROM old_games 
-																			WHERE oldGameID = '" . $oldGameID . "')
-													   )";
+								WHERE gameID IN (" . $gameIDs . ")";
 			
 			$db->query($deleteMessages);
 			
 			// Delete game notifications
 			$deleteNotifications = "DELETE FROM notification_log 
-								WHERE gameID IN (SELECT gameID 
-														FROM old_games 
-														WHERE movedDate = (SELECT movedDate 
-																			FROM old_games 
-																			WHERE oldGameID = '" . $oldGameID . "')
-													   )";
+								WHERE gameID IN (" . $gameIDs . ")";
 			
 			$db->query($deleteNotifications);
 		}
@@ -117,12 +121,7 @@ class Application_Model_CronMapper extends Application_Model_MapperAbstract
 		
 		// Delete user_games
 		$deleteUserGames = "DELETE FROM user_games 
-							WHERE user_games.gameID IN (SELECT gameID 
-													FROM old_games 
-													WHERE movedDate = (SELECT movedDate 
-																		FROM old_games 
-																		WHERE oldGameID = '" . $oldGameID . "')
-												   )";
+							WHERE user_games.gameID IN (" . $gameIDs . ")";
 												   
 		$db->query($deleteUserGames);
 									
@@ -436,6 +435,8 @@ class Application_Model_CronMapper extends Application_Model_MapperAbstract
 		$select->setIntegrityCheck(false);
 		
 		$select->from(array('g' => 'games'))
+			   ->join(array('st' => 'sport_types'),
+			   				'st.typeID = g.typeID')
 			   ->join(array('gs' => 'game_subscribers'),
 			   		  'g.gameID = gs.gameID')
 			   ->join(array('u' => 'users'),
@@ -447,7 +448,8 @@ class Application_Model_CronMapper extends Application_Model_MapperAbstract
 			   ->where('g.sendReminder = HOUR(NOW() + INTERVAL ' . $this->getTimeOffset() . ' HOUR)')
 			   ->where('g.recurring = 1')
 			   ->where('ug.userGameID IS NULL')
-			   ->where('gs.doNotEmail = 0');
+			   ->where('gs.doNotEmail = 0')
+			   ->order('u.userID DESC');
 		
 		$results = $table->fetchAll($select);
 		
@@ -484,13 +486,17 @@ class Application_Model_CronMapper extends Application_Model_MapperAbstract
 		$select->from(array('gi' => 'game_invites'))
 			   ->join(array('g' => 'games'),
 			   		  'gi.gameID = g.gameID')
+			   ->join(array('st' => 'sport_types'),
+			   		  'st.typeID = g.typeID')
 			   ->joinLeft(array('u' => 'users'),
 			   			  'gi.email = u.username')
 			   ->where('u.userID IS NULL')
 			   ->where('g.recurring = ?', 1)
 			   ->where('DATE(g.date) = DATE(NOW() + INTERVAL 1 DAY)')
-			   ->where('gi.numInvites = 1');
-			   
+			   ->where('gi.numInvites = 1')
+			   ->where('gi.email != ""')
+			   ->group(new Zend_Db_Expr('gi.email, gi.gameID'));
+
 		$results = $table->fetchAll($select);
 		
 		$games = array();
@@ -504,7 +510,7 @@ class Application_Model_CronMapper extends Application_Model_MapperAbstract
 			
 			$game = $games[$result->gameID];
 			
-			$game->players->addUser($result);
+			$game->players->addUser($result)->username = $result->email; // game_invites->email does not set Application_Model_User->username
 			
 			$emails[] = array('email' => $result->email,
 							  'gameID' => $game->gameID);
@@ -531,7 +537,9 @@ class Application_Model_CronMapper extends Application_Model_MapperAbstract
 			   ->joinLeft(array('u' => 'users'),
 			   			  'ti.email = u.username')
 			   ->where('u.userID IS NULL')
-			   ->where('ti.numInvites = 1');
+			   ->where('ti.numInvites = 1')
+			   ->where('ti.email != ""')
+			   ->where('DATE(now() - INTERVAL 6 DAY) = DATE(ti.firstSent)');
 			   
 		$results = $table->fetchAll($select);
 		

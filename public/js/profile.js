@@ -38,6 +38,114 @@ $(function()
 		})
 	}
 	
+	/* show minimal signup if exists */
+	if ($('#signup1-alert-container').length > 0) {
+		// Is not signed up, show alert
+		showAlert($('#signup1-alert-container'), .9);
+		
+		disableCloseAlerts();
+		
+		
+		
+		/* update narrow column name value onkeyup */
+		$('#firstName,#lastName').keyup(function()
+		{
+			var firstOrLast = true;
+			if ($(this).attr('id') == 'lastName') {
+				firstOrLast = false;
+			}
+			
+			var regexp = /^[a-zA-Z]+-*[a-zA-Z]*$/g;
+			var isValid = $(this).isValid({regex: regexp})
+			
+			changeInputBackground($(this),isValid);
+		})
+		
+		/* check email validation */
+		$('#email').keyup(function()
+		{
+			
+			var value   = $(this).val();
+			var regex	= /^\S+@\S+\.\S+$/;
+			var isValid = $(this).isValid({regex: regex});
+			
+			changeInputBackground($(this), isValid);
+		})
+		.focus(function()
+		{
+			$('#tooltip').children('#tooltip-body').html('<span class="heavy darkest">This email will be used to notify you of upcoming games.</span>');
+			startTooltipTimer($(this));
+		})
+		.blur(function()
+		{
+			endTooltipTimer();
+			$('#tooltip').hide();
+		})
+		
+		/* validate signup password and reenter password */
+		$('#signupPassword').keyup(function()
+		{
+			var value   = $.trim($(this).val());
+			var isValid = $(this).isValid({minLength: 8, maxLength: 30});
+			
+			changeInputBackground($(this),isValid);
+			
+			changeInputBackground($('#signupReenterPassword'), isValid);	
+			
+		})/*
+		.focus(function()
+		{
+			$('#game-password-reqs').show();
+		})
+		.blur (function()
+		{
+			$('#game-password-reqs').hide();
+		})*/
+		
+		$('.games-signup-option-container').click(function()
+		{
+			var inputs = '#firstName,#lastName,#signupPassword';
+			var email = '';
+			if ($('#email').length > 0) {
+				inputs += ',#email';
+				email = $('#email').val();
+			} else {
+				email = $('#user-email').text();
+			}
+			
+			var fail = false;
+			$(inputs).trigger('keyup').each(function()
+			{
+				if ($(this).is('.input-fail')) {
+					fail = true;
+				}
+			})
+			
+			if (fail) {
+				return false;
+			}
+			
+			if ($(this).is('#game-signup-minimal')) {
+				// Minimal signup
+				$('#user-signup').attr('action', '/signup/minimal').submit();
+				//minimalSignup($('#firstName').val(), $('#lastName').val(), email, $('#signupPassword').val());
+			} else {
+				// Want full package
+				$('#user-signup').attr('action', '/signup/basic').submit();
+			}
+			
+			
+			
+		})
+		
+		if ($('#email').val().length > 0) {
+		
+			$('#email').trigger('keyup');
+		}
+		
+	}
+
+	
 	
 	/* fade in user description on mouseover */
 	$(document).on('mouseenter.overlay','.profile-player-overlay-container',function() 
@@ -563,10 +671,13 @@ $(function()
 		$('#join-button').trigger('click');
 	})
 	
-	$('#confirm-action').click(function()
+	$('#confirm-action-alert-container').on('click.confirm', '#confirm-action', function()
 	{
-		
+
 		confirmAction();
+		
+		// Prevent double fire of confirmAction
+		$('#confirm-action-alert-container').off('click.confirm', '#confirm-action');
 	})
 	
 	$('#deny-action').click(function()
@@ -580,11 +691,11 @@ $(function()
 	}
 	
 	/* invite user from invite button */
-	$(document).on('click','.invite-search-result,.profile-invite-result',function()
+	$(document).on('click.invite','.invite-search-result,.profile-invite-result',function()
 	{
 		var classy;
 		var searchBar;
-		
+
 		if ($(this).is('.invite-search-result')) {
 			classy = $('.invite-search-result');
 			searchBar = $('#inviteSearchBar');
@@ -635,7 +746,7 @@ $(function()
 		}
 	})
 	
-	/* show animatable options container for first time team/game */
+	/* show animatable options container for first time team/game 
 	var detailsEle = getDetailsEle();
 	if (detailsEle) {
 		// Bug fix with failed js on ratings page
@@ -643,6 +754,103 @@ $(function()
 			animateProfileButtons();
 		}
 	}
+	*/
+	
+	/* select all pending invites in section */
+	$('.profile-pending-all-select').click(function()
+	{
+		$(this).parents('.profile-pending-container').find('.game-subscribers-container.selectable').addClass('selected');
+
+	})
+	
+	/* deselect all pending invites in section */
+	$('.profile-pending-all-deselect').click(function()
+	{
+		$(this).parents('.profile-pending-container').find('.game-subscribers-container').removeClass('selected');
+	})
+
+	$('.profile-pending-invite').click(function()
+	{
+	
+		var numInvites = 0;
+		if ((numInvites = $(this).parents('.profile-pending-container').find('.game-subscribers-container.selected').length) == 0) {
+				showConfirmationAlert('Please select players to send invites');
+				return;
+			}
+		
+		var curEle = $(this);
+		
+		confirmAction = function() {
+			
+			var emails = '';
+			var counter = 0;
+			
+			
+			curEle.parents('.profile-pending-container').find('.game-subscribers-container.selected').each(function() {
+				if (counter != 0) {
+					emails += ',';
+				}
+				emails += $(this).attr('email');
+				
+				counter++;
+			});	
+			
+			var detailsEle = getDetailsEle();
+			var idType	   = detailsEle.attr('idType');
+			var typeID	   = detailsEle.attr(idType);
+
+			inviteUserToType(idType, typeID, '', emails, reloadPage);
+
+		}
+		
+		populateConfirmActionAlert('send invites to ' + numInvites + ' players');
+	})
+	
+	$('.profile-pending-remove').click(function()
+	{
+	
+		var numSelected = 0;
+		if ((numSelected = $(this).parents('.profile-pending-container').find('.game-subscribers-container.selected').length) == 0) {
+				showConfirmationAlert('Please select players to remove');
+				return;
+			}
+		
+		var curEle = $(this);
+		
+		confirmAction = function() {
+		
+			var emails = '';
+			var counter = 0;
+			
+			curEle.parents('.profile-pending-container').find('.game-subscribers-container.selected').each(function() {
+				if (counter != 0) {
+					emails += ',';
+				}
+				emails += $(this).attr('email');
+				
+				counter++;
+			});	
+			
+			
+			var detailsEle = getDetailsEle();
+			var idType	   = detailsEle.attr('idType');
+			var typeID	   = detailsEle.attr(idType);
+
+			deleteInvites(idType, typeID, emails, reloadPage);
+
+		}
+		
+		populateConfirmActionAlert('remove ' + numSelected + ' players from the list');
+	})
+	
+	/* show action buttons onhover */
+	$('.profile-pending-container').hover(function()
+	{
+		$(this).find('.profile-pending-actions-container').stop().animate({opacity: 1}, 300);
+	}, function()
+	{
+		$(this).find('.profile-pending-actions-container').stop().animate({opacity: 0}, 300);
+	})
 	
 	
 	$(document).click(function(e)
@@ -668,6 +876,28 @@ $(function()
 	
 	
 })
+
+
+/** 
+ * delete game/team invites
+ */
+function deleteInvites(idType, typeID, emails, callback)
+{
+	var options = {idType: idType,
+				   typeID: typeID,
+				   emails: emails};
+				   
+	$.ajax({
+		url: '/ajax/delete-invites',
+		type: 'POST',
+		data: {options: options},
+		success: function(data) {
+			if (typeof callback != 'undefined') {
+				callback();
+			}
+		}
+	})
+}
 
 
 /** 
@@ -768,9 +998,10 @@ function getType()
  * invite user to type (game or team)
  * @params (idType => 'gameID' or 'teamID',
  *			typeID => gameID or typeID,
- *			receivingUserID => user who is being invited
+ *			receivingUserID => user who is being invited,
+ *			emails => str of comma separated emails
  */
-function inviteUserToType(idType, typeID, receivingUserID)
+function inviteUserToType(idType, typeID, receivingUserID, emails, callback)
 {
 	if (idType == 'gameID') {
 		var options = {gameID : typeID,
@@ -779,13 +1010,19 @@ function inviteUserToType(idType, typeID, receivingUserID)
 		var options = {teamID : typeID,
 					   userIDs: receivingUserID};
 	}
+	
+	if (typeof emails != 'undefined') {
+		options.emails = emails;
+	}
 		   
 	$.ajax({
 		url:'/mail/invite-type',
 		type: 'POST',
 		data: options,
 		success: function(data) {
-
+			if (typeof callback != 'undefined') {
+				callback();
+			}
 		}
 	})
 }
@@ -816,13 +1053,14 @@ function cancelType(idType, typeID, onceOrAlways)
 				   typeID: typeID,
 				   onceOrAlways: onceOrAlways,
 				   cancelReason: reason};
-		   
+
+	$('*').css('cursor', 'progress');
+	   
 	$.ajax({
 		url:'/ajax/cancel-type',
 		type: 'POST',
 		data: {options: options},
 		success: function(data) {
-
 			reloadPage();
 		}
 	})

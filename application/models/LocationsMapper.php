@@ -34,7 +34,7 @@ class Application_Model_LocationsMapper extends Application_Model_MapperAbstract
 			   ->where('z.zipcodeType = "STANDARD"')
 			   ->order('z.main DESC')
 			   ->limit(1);
-					  
+	
 		$results = $table->fetchRow($select);
 		
 		$savingClass->setAttribs($results);

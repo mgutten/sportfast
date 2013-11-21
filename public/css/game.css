@@ -168,8 +168,8 @@
 
 /* subscribers page */
 .game-subscribers-container {
-	
-	padding: .4em .3em .4em .3em;
+	width:98%;
+	padding: .4em .5em .4em .5em;
 	background:#fff;
 }
 
@@ -192,7 +192,7 @@
 }
 
 .game-subscribers-lastPlayed {
-	width: 6em;
+	width: 8em;
 	margin-top: .8em;
 }
 
@@ -214,72 +214,4 @@
 	font-size: .7em;
 }
 
-/* signup alerts */
-#signup1-alert-container {
-	width: 30em;
-	margin-left:-15em;
-	margin-top: -20em;
-}
 
-#firstName,
-#lastName {
-	width: 9em;
-}
-
-#lastName-container {
-	margin-left:.5em;
-	font-size:1.06em;
-}
-
-#firstName-container {
-	margin-left:4em;
-	font-size:1.06em;
-}
-
-#email-container,
-#signupPassword-container {
-	float:none;
-	width: 15em;
-	display:block;
-	margin: .5em auto;
-	font-size:1.06em;
-}
-
-#email,
-#signupPassword {
-	width: 14em;
-}
-
-.games-signup-option-container {
-	padding: 4%;
-	width: 88%;
-	margin-left:2%;
-	/*border: 1px solid #ddd;*/
-	
-}
-
-#game-signup-minimal {
-	border-top: none;
-}
-
-#game-signup-login {
-	width: 6.1em;
-}
-
-#game-signup-logo {
-	margin-left: 8.2em;
-	width: 160px;
-}
-
-#game-signup-how-container {
-	position:absolute;
-	top: 340px;
-	left:-20%;
-	width: 140%;
-	height: 120px;
-	background: #333;
-}
-
-#game-signup-options-container {
-	margin-top: 1em;
-}

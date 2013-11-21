@@ -36,8 +36,14 @@ if ($this->fail) {
 			
 			echo "<p class='medium width-100 center'>It will be removed within a few days.</p>";
 
-			echo "<a href='/' class='clear larger-text larger-margin-top heavy green-button white' id='game-canceled-back'>Back to home</a>";
+			echo "<a href='/' class='clear larger-text larger-margin-top heavy green-button white' id='team-canceled-back'>Back to home</a>";
 		echo $this->alert()->end();
+	}
+	
+	if ($this->signupInvite) {
+		
+		echo $this->alert()->minimalSignup($this->user, $this->team->cityID, $this->cityLocation->location);
+		
 	}
 
 	
@@ -391,7 +397,7 @@ echo "<span id='team-details'
 			public='" . ($this->isPublic ? 'public' : 'private') . "'
 			teamName='" . $this->team->teamName . "'
 			nextGameID='" . ($this->nextGame ? $this->nextGame->teamGameID : '') . "'
-			" . ($this->firstTeam ? "firstType = 'true'" : '') . "
+			" . ($this->firstTeam ? "firstType = 'true'" : '') . ">
 	 </span>";
 ?>
 
@@ -498,6 +504,7 @@ if ($this->userOnTeam) {
 			$text = 'Join';
 			$id    = 'join-button';
 			$tooltip = 'Join Team';
+			
 			if (!$this->team->isSystemCreated() && 
 				$this->hasCaptain &&
 				!$this->invited) {
@@ -506,13 +513,13 @@ if ($this->userOnTeam) {
 				$id   = 'request-join-button';
 				$tooltip = 'Request to join team.';
 			}
-			if ($this->team->minSkill > $this->user->getSport($this->team->sport)->skill &&
+			/*if ($this->team->minSkill > $this->user->getSport($this->team->sport)->skill &&
 				!$this->invited) {
 				// User is not good enough for this team
 				$class = 'transparent default';
 				$id = '';
 				$lower = '<p class="light clear-right smaller-text margin-top">You must have a minimum skill of ' . $this->team->minSkill . ' to join.';
-			}
+			}*/
 			?>
             <div id='profile-buttons-container'>
     		<p class='green-button right larger-text join-button heavy <?php echo $class;?>' id='<?php echo $id;?>' tooltip='<?php echo $tooltip;?>'>

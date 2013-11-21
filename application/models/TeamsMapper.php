@@ -383,13 +383,12 @@ class Application_Model_TeamsMapper extends Application_Model_TypesMapperAbstrac
 		$select->from(array('t'  => 'teams'))
 			   ->joinLeft(array('ut' => 'user_teams'),
 			   		 'ut.teamID = t.teamID',
-					 array(''))
+					 array('COUNT(ut.userID) as totalPlayers'))
 			   ->joinLeft(array('us' => 'user_sports'),
 			   		 'ut.userID = us.userID AND us.sportID = t.sportID',
 					 array('avg(us.skillCurrent) as averageSkill',
 					 	   'avg(us.attendance) as averageAttendance',
-						   'avg(us.sportsmanship) as averageSportsmanship',
-						   'COUNT(us.userID) as totalPlayers'
+						   'avg(us.sportsmanship) as averageSportsmanship'
 						   ))
 				->where('t.teamID = ?', $teamID)
 				->limit(1);
@@ -434,14 +433,20 @@ class Application_Model_TeamsMapper extends Application_Model_TypesMapperAbstrac
 						  		'creator'))
 			   ->join(array('u' => 'users'),
 			   		  'ut.userID = u.userID')
-			   ->join(array('us' => 'user_sports'),
-			   		  'ut.userID = us.userID AND us.sportID = "' . $sportID . '"')
+			   ->joinLeft(array('us' => 'user_sports'),
+			   		  'ut.userID = us.userID AND us.sportID = "' . $sportID . '"',
+					  array('us.skillInitial',
+					  		'us.often',
+							'us.skillCurrent',
+							'us.attendance',
+							'us.sportsmanship',
+							'us.noRatings'))
 			   ->join(array('s' => 'sports'),
 			   		  's.sportID = ' . $sportID)
 			   ->where('ut.teamID = ?', $teamID)
-			   ->group('us.userID');
+			   ->group('ut.userID');
 		
-			   
+			
 		$players = $table->fetchAll($select);
 
 		foreach ($players as $player) {
@@ -629,6 +634,40 @@ class Application_Model_TeamsMapper extends Application_Model_TypesMapperAbstrac
 					  
 		$this->getDbTable()->insert($data);
 		
+
+		// Row was inserted, not updated, create notifications
+		$teamID = $savingClass->teamID;
+		$notifications = new Application_Model_Notifications();
+		
+		$notifications->deleteAll(array('nl.actingUserID' => $userID,
+										'nl.teamID'		  => $teamID,
+										'n.action'		  => 'leave',
+										'n.type'		  => 'team'));
+										
+		$notifications->deleteAll(array('nl.actingUserID' => $userID,
+										'nl.teamID'		  => $teamID,
+										'n.action'		  => 'join',
+										'n.type'		  => 'team'));
+		
+
+		// Is "in" or "maybe"
+		$notification = new Application_Model_Notification();
+		
+		$notification->actingUserID = $userID;
+		$notification->teamID = $teamID;
+		$notification->action = 'join';
+		$notification->type = 'team';
+		
+		$auth = Zend_Auth::getInstance();
+		
+		if ($auth->hasIdentity()) {
+			// User logged in, get their cityID
+			$notification->cityID = $auth->getIdentity()->cityID;
+		}
+		
+		$notification->save();
+
+		
 		return false;
 	}
 		
@@ -658,6 +697,66 @@ class Application_Model_TeamsMapper extends Application_Model_TypesMapperAbstrac
 	}
 	
 	/**
+	 * get pending invites sent from $userID user
+	 * @params ($userID => actingUserID,
+	 *			$team => Application_Model_Team)
+	 * @returns array of emails and numInvites
+	 */
+	public function getPendingInvites($userID, $team)
+	{
+		$table = $this->getDbTable();
+		$select = $table->select();
+		$select->setIntegrityCheck(false);
+		
+		$select->from(array('ti' => 'team_invites'))
+			   ->joinLeft(array('u' => 'users'),
+			   			  'u.username = ti.email')
+			   ->joinLeft(array('ut' => 'user_teams'),
+			   		  	  'ut.userID = u.userID AND ut.teamID = "' . $team->teamID . '"',
+						  array('userTeamID'))
+			   ->where('ti.teamID = ?', $team->teamID)
+			   ->where('ti.actingUserID = ?', $userID)
+			   ->group('ti.email')
+			   ->order('ti.firstSent DESC');
+		 
+		$results = $table->fetchAll($select);
+		
+		$returnArray = array('joined' => array('members' => array(),
+											   'notMembers' => array()),
+							 'notJoined' => array());
+		foreach ($results as $result) {
+			$user = new Application_Model_User();
+			
+			$user->username = $result->email;
+			$user->setTempAttrib('numInvites', $result->numInvites);
+			$user->setTempAttrib('firstSent', $result->firstSent);
+			
+			/*
+			$array = array('email' 		=> $result->email,
+						   'numInvites' => $result->numInvites,
+						   'firstSent'  => $result->firstSent);
+			*/
+			 
+			if ($result->userID != NULL) {
+				$user->userID = $result->userID;
+				$user->firstName = $result->firstName;
+				$user->lastName = $result->lastName;
+				
+				if ($result->userTeamID != NULL) {
+					// Is member
+					$returnArray['joined']['members'][] = $user;
+				} else {
+					$returnArray['joined']['notMembers'][] = $user;
+				}
+			} else {
+				$returnArray['notJoined'][] = $user;
+			}
+		}
+		
+		return $returnArray;
+	}
+	
+	/**
 	 * save sent invites to db
 	 */
 	public function saveInvites($emails, $actingUserID, $teamID)
@@ -676,6 +775,8 @@ class Application_Model_TeamsMapper extends Application_Model_TypesMapperAbstrac
 			$sql .= "('', '" . $email . "', " . $actingUserID . ", " . $teamID . ", CURDATE())";
 			$counter++;
 		}
+		
+		$sql .= " ON DUPLICATE KEY UPDATE numInvites = numInvites + 1";
 		
 		$db->query($sql);
 	}

@@ -85,6 +85,14 @@ class Application_Model_Game extends Application_Model_ConfirmationsAbstract
 	}
 	
 	/**
+	 * get similar games to this game (game has overlapping players)
+	 */
+	public function getSimilarGames($userID = '')
+	{
+		return $this->getMapper()->getSimilarGames($userID, $this);
+	}
+	
+	/**
 	 * get captains from db
 	 */
 	public function getGameCaptains()
@@ -660,6 +668,16 @@ class Application_Model_Game extends Application_Model_ConfirmationsAbstract
 	public function unsubscribe($userID) 
 	{
 		return $this->getMapper()->unsubscribe($userID, $this->gameID);
+	}
+	
+	/**
+	 * add member to game (in db)
+	 */
+	public function addMemberToGame($userID)
+	{
+		$this->addSubscriber($userID);
+		
+		return $this->getMapper()->addMemberToGame($userID, $this->gameID);
 	}
 
 	/**

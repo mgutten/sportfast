@@ -1,0 +1,22 @@
+<div class='clear game-subscribers-container <?php echo ($this->user ? 'selectable' : '');?>' email='<?php echo ($this->user ? $this->user->username : '');?>'>
+  <?php
+  		if ($this->user) {
+			$isUser = false;
+			if ($this->user->hasValue('firstName')) {
+				$isUser = true;
+			}
+			
+			if ($isUser) {
+				echo "<img class='left' src='" . $this->user->getProfilePic('tiny') . "'/>";
+			} else {
+				echo "<div class='left img-holder-tiny'></div>";
+			}
+		?>
+	  <p class='left darkest heavy larger-indent margin-top profile-pending-name'><?php echo ($isUser ? $this->user->fullName : 'N/A');?></p>
+	  <p class='left darkest indent margin-top profile-pending-username'><?php echo ($this->user->hasValue('username') ? $this->user->username : '');?></p>
+	  <?php if ($numInvites = $this->user->getTempAttrib('numInvites')) {
+		  echo "<p class='left medium indent margin-top smaller-text profile-pending-numInvites' tooltip='Number of invites this email has received'># of invites: " . $numInvites . "</p>";
+	  }
+	}
+	  ?>
+</div>

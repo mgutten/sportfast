@@ -27,7 +27,7 @@ abstract class Application_Model_ModelAbstract
 		}
 		$attrib = $this->_attribs[$attrib];
 		
-		if (is_object($attrib) || $attrib) {
+		if (is_object($attrib) || $attrib || $attrib == '0') {
 			// Attrib is an object or has a value
 			return true;
 		} else {

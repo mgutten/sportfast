@@ -19,7 +19,6 @@ class IndexController extends Zend_Controller_Action
 			$this->view->whiteBacking = false;
 		} else {
 			// Member homepage
-			
 			$this->view->narrowColumn = 'right';
 								
 			$session = new Zend_Session_Namespace('first_visit');
@@ -28,6 +27,24 @@ class IndexController extends Zend_Controller_Action
 				// First time logging in
 				Zend_Session::namespaceUnset('first_visit');
 				$this->view->firstVisit = true;
+				
+				$session = new Zend_Session_Namespace('signupAdded');
+				if ($session->type) {
+					// User was added to either team or game on signup
+					if ($session->type == 'game') {
+						// Is game
+						$typeModel = new Application_Model_Game();
+						$typeModel->getGameByID($session->id);
+						
+					} elseif ($session->type == 'team') {
+						// Is team
+						$typeModel = new Application_Model_Team();
+						$typeModel->getTeamByID($session->id);
+					}
+					$this->view->signupAdded = $typeModel;
+				}
+						
+						
 				//$session->firstVisit = false;
 			} elseif ($this->view->lastActive) {
 				// Not first visit on site

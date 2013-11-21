@@ -66,7 +66,7 @@ class Application_Model_Location extends Application_Model_ModelAbstract
 	public function getLocationByCityID($cityID) {
 		$this->setMapper('Application_Model_LocationsMapper');
 		
-		$this->getMapper()->getLocationByCityID($cityID, $this);
+		return $this->getMapper()->getLocationByCityID($cityID, $this);
 	}
 	
 	public function getCityIDByLocation() {

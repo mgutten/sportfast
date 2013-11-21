@@ -358,15 +358,22 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 		$select->setIntegrityCheck(false);
 		
 		$select->from(array('g' => 'games'))
+			   ->join(array('pl' => 'park_locations'),
+			   		  'pl.parkID = g.parkID',
+					  array('AsText(pl.location) as location'))
 			   ->join(array('gs' => 'game_subscribers'),
 			   		  'gs.gameID = g.gameID')
 			   ->joinLeft(array('ug' => 'user_games'),
 			   			  'ug.gameID = g.gameID AND ug.confirmed = 1',
-						  array('(COUNT(ug.userID) + SUM(ug.plus)) as totalPlayers'))
+						  array('(COUNT(ug.userID) + SUM(ug.plus)) as confirmedPlayers'))
+			   ->joinLeft(array('ug2' => 'user_games'),
+			   			  'ug2.gameID = g.gameID AND ug2.userID = "' . $userModel->userID . '"',
+						  array('ug2.confirmed'))
 			   ->where('gs.userID = ?', $userModel->userID)
 			   ->where('g.date > NOW() + INTERVAL ' . $this->getTimeOffset() . ' HOUR')
 			   ->group('g.gameID')
 			   ->order('g.date ASC');
+			   
 		
 		$results = $table->fetchAll($select);
 		
@@ -1235,7 +1242,7 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 						AND u.userID NOT IN (SELECT receivingUserID 
 												FROM user_ratings 
 												WHERE (givingUserID = '" . $userID . "' 
-														AND dateHappened > (NOW() - INTERVAL 45 DAY)
+														AND dateHappened > (NOW() - INTERVAL 60 DAY)
 														AND sportID = '" . $game->sportID . "')
 													OR receivingUserID IN (SELECT receivingUserID 
 																			FROM user_ratings

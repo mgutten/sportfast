@@ -121,6 +121,8 @@ class Application_Model_NotificationsMapper extends Application_Model_MapperAbst
 	 {
 		 $db = Zend_Db_Table::getDefaultAdapter();
 		 
+		 $query = $query2 = '';
+		 
 		 if ($type == 'friend') {
 			 
 			 $query = "INSERT INTO friends (userID1, userID2, userName1, userName2)
@@ -233,7 +235,7 @@ class Application_Model_NotificationsMapper extends Application_Model_MapperAbst
 
 							
 		 } elseif ($type == 'game') {
-			 $query = "INSERT INTO user_games (gameID, userID, confirmed)
+			 /*$query = "INSERT INTO user_games (gameID, userID, confirmed)
 			 			(SELECT nl.gameID,
 								CASE WHEN n.action = 'invite' THEN nl.receivingUserID ELSE nl.actingUserID END,
 								'1'
@@ -250,6 +252,23 @@ class Application_Model_NotificationsMapper extends Application_Model_MapperAbst
 						 	FROM notification_log as `nl`
 							INNER JOIN notifications n ON n.notificationID = nl.notificationID
 							WHERE nl.notificationLogID = '" . $notificationLogID . "')";
+			*/
+			
+			 $select = "SELECT * FROM notification_log nl 
+			 				INNER JOIN notifications n ON n.notificationID = nl.notificationID
+			 				WHERE nl.notificationLogID = '" . $notificationLogID . "'";		
+							
+			 $result = $db->fetchRow($select);
+			 
+			 if ($result['action'] == 'invite') {
+				 $userID = $result['receivingUserID'];
+			 } else {
+				 $userID = $result['actingUserID'];
+			 }
+			 
+			 $game = new Application_Model_Game();
+			 $game->gameID = $result['gameID'];
+			 $game->addUserToGame($userID, '1');
 			
 			/*
 			 $select = "SELECT CASE WHEN n.action = 'invite' THEN nl.receivingUserID ELSE nl.actingUserID END as userID,
@@ -299,8 +318,9 @@ class Application_Model_NotificationsMapper extends Application_Model_MapperAbst
 			 }
 		 }
 		 
-
-		 $db->query($query);
+		 if ($query) {
+			 $db->query($query);
+		 }
 		 
 		 if ($query2) {
 			 $db->query($query2);

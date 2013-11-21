@@ -29,6 +29,21 @@ class AjaxController extends Zend_Controller_Action
     }
 	
 	/**
+	 * edit user's details
+	 */
+	public function editUserAction()
+	{
+
+		$post = $this->getRequest()->getPost('attribs');
+		foreach ($post as $attrib => $val) {
+
+			$this->view->user->$attrib = $val;
+		}
+		
+		$this->view->user->save(false);
+	}
+	
+	/**
 	 * set userRatingID to "incorrect" and to be reviewed as inaccurate rating
 	 */
 	public function flagRemovalAction()
@@ -40,6 +55,26 @@ class AjaxController extends Zend_Controller_Action
 		$ratingsMapper->setUserRatingIncorrect($userRatingID);
 		
 	}
+	
+	/**
+	 * delete game/team invites
+	 */
+	public function deleteInvitesAction()
+	{
+		$options = $this->getRequest()->getPost('options');
+		$emails = explode(',', $options['emails']);
+		
+		foreach ($emails as $email) {
+			$invite = new Application_Model_Invite();
+			$invite->email = $email;
+			$invite->$options['idType'] = $options['typeID'];
+			$invite->actingUserID = $this->view->user->userID;
+			
+			$invite->delete();
+		}
+		
+	}
+		
 	
 	/**
 	 * minimal signup from game/team page of non-member
@@ -209,58 +244,61 @@ class AjaxController extends Zend_Controller_Action
 	{
 		$timestamp = $this->getRequest()->getParam('timestamp');
 		
-		$this->view->user->resetNewNotifications()
-				 		 ->getNewUserNotifications($timestamp);
-					 
-		$numNew = count($this->view->user->notifications->unread);
+		if ($this->view->user) {
 		
-		$output = '';
-		
-		foreach ($this->view->user->notifications->unread as $notification) {
-			$buttons = '';
-			$remove = '';
-			$class = 'light-back';
-			if (!is_object($notification)) {
-				continue;
-			}
-			if ($notification->hasValue('actionRequired')) {	
-				$buttons = "<div class='notification-button-container clear-right' notificationLogID='" . $notification->notificationLogID . "' type='" . $notification->type . "' action='" . $notification->action . "'>";
-				$buttons .= "<p class='button notification-action-button'>Confirm</p>";
-				$buttons .= "<p class='button notification-action-button notification-action-button-second'>Decline</p>";
-				$buttons .= "</div>";
-				$remove = "<p class='light larger-text right notification-remove' tooltip='Delete'>x</p>";
-			} elseif ($notification->hasValue('joinOption')) {
-				$buttons = "<div class='notification-button-container clear-right' notificationLogID='" . $notification->notificationLogID . "' type='" . $notification->type . "' action='" . $notification->action . "'>";
-				$buttons .= "<p class='button notification-join'>Join</p>";
-				$buttons .= "</div>";
-				$remove = "<p class='light larger-text right notification-remove' tooltip='Delete'>x</p>";
+			$this->view->user->resetNewNotifications()
+							 ->getNewUserNotifications($timestamp);
+						 
+			$numNew = count($this->view->user->notifications->unread);
+			
+			$output = '';
+			
+			foreach ($this->view->user->notifications->unread as $notification) {
+				$buttons = '';
+				$remove = '';
+				$class = 'light-back';
+				if (!is_object($notification)) {
+					continue;
+				}
+				if ($notification->hasValue('actionRequired')) {	
+					$buttons = "<div class='notification-button-container clear-right' notificationLogID='" . $notification->notificationLogID . "' type='" . $notification->type . "' action='" . $notification->action . "'>";
+					$buttons .= "<p class='button notification-action-button'>Confirm</p>";
+					$buttons .= "<p class='button notification-action-button notification-action-button-second'>Decline</p>";
+					$buttons .= "</div>";
+					$remove = "<p class='light larger-text right notification-remove' tooltip='Delete'>x</p>";
+				} elseif ($notification->hasValue('joinOption')) {
+					$buttons = "<div class='notification-button-container clear-right' notificationLogID='" . $notification->notificationLogID . "' type='" . $notification->type . "' action='" . $notification->action . "'>";
+					$buttons .= "<p class='button notification-join'>Join</p>";
+					$buttons .= "</div>";
+					$remove = "<p class='light larger-text right notification-remove' tooltip='Delete'>x</p>";
+				}
+				
+				
+				if ($notification->isSports()) {
+					// Special case for smaller sports pictures
+					$pictureClass = 'notification-picture-sports';
+				} else {
+					$pictureClass = 'notification-picture';
+				}
+				
+				$output .=  "<a href='" . $notification->getFormattedUrl() . "' class='notification-container " . $class . " pointer' notificationLogID = '" . $notification->notificationLogID . "'>" 
+							 . "<div class='notification-text-picture-container'>"
+								 . "<img src='" . $notification->getPicture() . "' class='" . $pictureClass . "' />"
+								 . "<span class='notification-text'>" . $notification->getFormattedText() . "</span>"
+								 . $remove
+								 . $buttons
+							 . "</div>"
+							 . "<span class='notification-time-subscript light'>" . $notification->getTimeFromNow() . "</span>"
+							 . "</a>";
+			
 			}
 			
+			$return = array();
+			$return[0] = $numNew;
+			$return[1] = $output;
 			
-			if ($notification->isSports()) {
-				// Special case for smaller sports pictures
-				$pictureClass = 'notification-picture-sports';
-			} else {
-				$pictureClass = 'notification-picture';
-			}
-			
-			$output .=  "<a href='" . $notification->getFormattedUrl() . "' class='notification-container " . $class . " pointer' notificationLogID = '" . $notification->notificationLogID . "'>" 
-						 . "<div class='notification-text-picture-container'>"
-							 . "<img src='" . $notification->getPicture() . "' class='" . $pictureClass . "' />"
-							 . "<span class='notification-text'>" . $notification->getFormattedText() . "</span>"
-							 . $remove
-							 . $buttons
-						 . "</div>"
-						 . "<span class='notification-time-subscript light'>" . $notification->getTimeFromNow() . "</span>"
-						 . "</a>";
-		
+			echo json_encode($return);
 		}
-		
-		$return = array();
-		$return[0] = $numNew;
-		$return[1] = $output;
-		
-		echo json_encode($return);
 		
 	}
 	
@@ -428,6 +466,39 @@ class AjaxController extends Zend_Controller_Action
 		 $where[] = $table->getAdapter()->quoteInto('gameID = ?', $options['gameID']);
 
 		 $table->update(array('plus' => $options['plus']), $where);
+	 }
+	 
+	 /**
+	  * add member to game
+	  */
+	 public function addMemberToGameAction()
+	 {
+		 
+		  $options = $this->getRequest()->getPost('options');
+		  
+		  if (empty($options['userID']) || empty($options['gameID'])) {
+			 return false;
+		  }
+		  
+		  
+		  $game = new Application_Model_Game();
+		  $game->gameID = $options['gameID'];
+		  $fail = $game->addMemberToGame($options['userID']); // echo result so js can handle case where user is not added (already a member)
+		  
+		  if (!$fail) {
+			  $notification = new Application_Model_Notification();
+			  $notification->actingUserID = $this->view->user->userID;
+			  $notification->receivingUserID = $options['userID'];
+			  $notification->gameID = $options['gameID'];
+			  $notification->action = 'become';
+			  $notification->type = 'game';
+			  $notification->details = 'member';
+			  
+			  $notification->save();
+		  }
+		  
+		  echo $fail;
+		 
 	 }
 	 
 	 /**
@@ -914,7 +985,7 @@ class AjaxController extends Zend_Controller_Action
 	
 	
 	/**
-	 * get and return matches based on user's request/info
+	 * get and return matches based on user's request/info (homepage)
 	 */
 	public function getMatchesAction()
 	{
@@ -939,9 +1010,32 @@ class AjaxController extends Zend_Controller_Action
 			}
 			
 			$points = ($post['points'] != 'false' ? $post['points'] : false);
+			
 			$games = new Application_Model_Games();
-			$games->findUserGames($this->view->user, $options, $points, $day, $hour);
-		
+			
+			if ($this->view->user->isMinimal()) {
+				// Minimal account, show all matches for any game/teams
+				
+				$options = array();
+				$options['sports'] = array('basketball' => false,
+										   'football'	=> false,
+										   'ultimate'	=> false,
+										   'volleyball'	=> false,
+										   'soccer' 	=> false,
+										   'tennis'		=> array('singles' => array('rally' => true,'match' => true),
+										   						 'doubles' => array('rally' => true,'match' => true))
+											);
+											
+				if ($points) {
+					$options['points'] = $points;
+				}
+
+				$games->findGames($options, $this->view->user);
+			} else {
+				$games->findUserGames($this->view->user, $options, $points, $day, $hour);
+			}
+			
+					
 			$matches->addMatches($games->games);
 		}
 		if (in_array('teams',$post['types'])) {
@@ -956,31 +1050,31 @@ class AjaxController extends Zend_Controller_Action
 			$teams->findUserTeams($this->view->user, $options);
 			$matches->addMatches($teams->teams);
 		}
-
+		
 		$matches->sortByMatch();
-		$this->view->matches = $matches->matches;
 		
 		$output = array();
 		$memberHomepage = $this->view->getHelper('memberhomepage');
-		$output[0] = $memberHomepage->buildFindBody();
+		$output[0] = $memberHomepage->buildFindBody($matches->getAll());
 		
 		if (isset($matches->matches[0])) {
 			// Matches exist
-			foreach ($matches->matches as $match) {
+			foreach ($matches->getAll() as $match) {
 				if (get_class($match) == 'Application_Model_Game') {
 					// Get latitude and longitude
 					$location = $match->getPark()->getLocation();
-					$output[1][] = array($location->getLatitude(), $location->getLongitude());
+					$output[1][] = array($location->getLatitude(), $location->getLongitude(), $match->parkName);
 				}
 				
 			}
 		} else {
 			$output[1][] = '';
 		}
-		
+
 		echo json_encode($output);
 		
 		return;
+		/*
 		$jsonArray = array();
 		
 		foreach ($matches->matches as $match) {
@@ -992,6 +1086,7 @@ class AjaxController extends Zend_Controller_Action
 		}
 		
 		echo json_encode($jsonArray);
+		*/
 		
 	}
 	

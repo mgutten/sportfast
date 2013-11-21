@@ -106,6 +106,7 @@ class Application_Model_Notification extends Application_Model_ModelAbstract
 		$possession = 'your';
 		$class = 'dark heavy text-width';
 		$is = 'is';
+		$a = 'a';
 		
 		if ($this->newsfeed) {
 			// This notification is meant for newsfeed, give different class
@@ -125,6 +126,17 @@ class Application_Model_Notification extends Application_Model_ModelAbstract
 					}
 				}
 			}
+		}
+		
+		if (($pos = strpos($this->text, '&a %sport')) > -1) {
+			  // Sport is in notification, check to conjugate "a" to "an"
+			  $vowels = array('a','e','i', 'o', 'u');
+			  if (in_array(strtolower($this->_attribs['sport'][0]), $vowels)) {
+				  // Is vowel, possession should be an
+				  $a = 'an';
+			  } else {
+				  $a = 'a';
+			  }
 		}
 		
 		if (strpos($this->text,'&possession') == 0) {
@@ -207,10 +219,13 @@ class Application_Model_Notification extends Application_Model_ModelAbstract
 				// Format date (Wednesday, Dec 31 at 4pm)
 				$replaceVal = date('l', $time) . ' <span class="light">' . date('M j', $time) . '</span> at ' . date('ga', $time);
 				
-			} elseif ($match == 'day') {
+			} elseif ($match == 'day' || $match == 'days') {
 				// Display day (wednesday, thursday)
 				$time = strtotime($this->_attribs['date']);
 				$replaceVal = date('l', $time);
+				if ($match == 'days') {
+					$replaceVal .= 's';
+				}
 				$pre  = "<span class='" . $class . "'>";
 				$post = "</span>";
 				
@@ -244,7 +259,7 @@ class Application_Model_Notification extends Application_Model_ModelAbstract
 		
 		// Replace possession holder with possession var (ie a game, your game)
 		
-		return str_replace(array('&possession', '&is'), array($possession, $is), $str);
+		return str_replace(array('&possession', '&is', '&a'), array($possession, $is, $a), $str);
 		
 	}
 	

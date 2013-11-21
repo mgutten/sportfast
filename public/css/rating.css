@@ -79,10 +79,15 @@
 
 /* rating chart */
 .rating-chart-option {
-	margin-left: .5em;
+	margin-left: 1.5em;
 }
 
-.rating-chart-option:first-child {
+.rating-chart-option.green-bold {
+	margin-left: 1em;
+}
+
+.rating-chart-option:first-child,
+.rating-chart-option.green-bold:first-child {
 	margin-left: 0;
 }
 

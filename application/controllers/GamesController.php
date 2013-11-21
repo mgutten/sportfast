@@ -34,7 +34,6 @@ class GamesController extends Zend_Controller_Action
 				
 				$this->view->signupInvite = true;
 				$this->view->user->username = (isset($session->email) ? $session->email : '');
-				$this->view->signupForm = new Application_Form_Signup();
 				
 				$this->view->parkCityID = $this->view->game->park->location->getCityIDByLocation();
 				
@@ -184,6 +183,13 @@ class GamesController extends Zend_Controller_Action
 			$sendReminder = $game->getSendReminder(true);
 			$this->view->reminderHourDropdown = $dropdown->dropdown('reminder-hour', range(1,12), $sendReminder['hour'], false, true);
 			$this->view->reminderAmpmDropdown = $dropdown->dropdown('reminder-ampm', array('am', 'pm'), $sendReminder['ampm'], false, true);					
+		}
+		
+		if ($game->isRecurring()) {
+			// Test to see if there are similar games that members play in
+			$similarGames = $game->getSimilarGames($this->view->user->userID);
+			
+			var_dump($similarGames->getAll());
 		}
 			
 		$this->view->userHasSport = $this->view->user->hasSport($game->sport);
@@ -346,6 +352,10 @@ class GamesController extends Zend_Controller_Action
 		
 		$this->view->game = $game;
 		
+		$this->view->form = new Application_Form_General();
+		
+		$this->view->captain = $game->isCaptain($this->view->user->userID);
+		
 	}
 	
 	public function inviteAction()
@@ -363,6 +373,17 @@ class GamesController extends Zend_Controller_Action
 
 		$this->view->note = $note;
 		
+	}
+	
+	public function pendingAction()
+	{
+		$gameID = $this->getRequest()->getParam('id');
+        $game = new Application_Model_Game();
+		$game->getGameByID($gameID);
+		
+		$this->view->game = $game;
+		
+		$this->view->pendingInvites = $game->getPendingInvites($this->view->user->userID);
 	}
 
 	

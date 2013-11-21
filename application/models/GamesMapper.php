@@ -53,6 +53,9 @@ class Application_Model_GamesMapper extends Application_Model_TypesMapperAbstrac
 			   ->joinLeft(array('ug' => 'user_games'),
 			   		 'ug.gameID = g.gameID AND ug.confirmed = 1',
 					 array(''))
+			   ->joinLeft(array('ug2' => 'user_games'),
+			   		 'ug2.gameID = g.gameID AND ug2.userID = "' . $userID . '"',
+					 array('ug2.confirmed as confirmed'))
 			   ->joinLeft(array('us' => 'user_sports'),
 			   		 'ug.userID = us.userID AND us.sportID = t.sportID',
 					 array('avg(us.skillCurrent) as averageSkill',
@@ -77,7 +80,7 @@ class Application_Model_GamesMapper extends Application_Model_TypesMapperAbstrac
 			   
 		if ($gameIDs) {
 			// User is in games, do not show those
-			$select->where('g.gameID NOT IN ' . $gameIDs);
+			//$select->where('g.gameID NOT IN ' . $gameIDs);
 		}
 			   
 		if (($day === false || is_array($day)) ||
@@ -118,11 +121,12 @@ class Application_Model_GamesMapper extends Application_Model_TypesMapperAbstrac
 			   ->group('g.gameID')
 			   ->order('abs(avg(us.skillCurrent) - (SELECT skillCurrent FROM user_sports WHERE userID = "' . $userID . '" AND sportID = t.sportID)) ASC');
 		
-		
 		$results = $table->fetchAll($select);
 
 		foreach ($results as $result) {
-			$savingClass->addGame($result);
+			
+			$game = $savingClass->addGame($result);
+			
 		}
 		
 		return $savingClass;
@@ -273,13 +277,15 @@ class Application_Model_GamesMapper extends Application_Model_TypesMapperAbstrac
 			   		  'u.userID = us.userID',
 					  array('avg(u.age) as averageAge'));
 					  
-		if ($options['time'] == 'user') {
-			// Use user availability
-			$select->join(array('usa' => 'user_sport_availabilities'),
-						  'st.sportID = usa.sportID');
-			$where[] = "usa.userID = '" . $userID . "'";
-			$where[] = "HOUR(g.date) = usa.hour";
-			$where[] = 'DATE_FORMAT(g.date,"%w") = usa.day';
+		if (isset($options['time'])) {
+			if ($options['time'] == 'user') {
+				// Use user availability
+				$select->join(array('usa' => 'user_sport_availabilities'),
+							  'st.sportID = usa.sportID');
+				$where[] = "usa.userID = '" . $userID . "'";
+				$where[] = "HOUR(g.date) = usa.hour";
+				$where[] = 'DATE_FORMAT(g.date,"%w") = usa.day';
+			}
 		}
 			
 		
@@ -568,6 +574,9 @@ class Application_Model_GamesMapper extends Application_Model_TypesMapperAbstrac
 		$select->from(array('gi' => 'game_invites'))
 			   ->joinLeft(array('u' => 'users'),
 			   			  'u.username = gi.email')
+			   ->joinLeft(array('gs' => 'game_subscribers'),
+			   		  	  'gs.userID = u.userID AND gs.gameID = "' . $game->gameID . '"',
+						  array('gameSubscriberID'))
 			   ->where('gi.gameID = ?', $game->gameID)
 			   ->where('gi.actingUserID = ?', $userID)
 			   ->group('gi.email')
@@ -575,18 +584,35 @@ class Application_Model_GamesMapper extends Application_Model_TypesMapperAbstrac
 		 
 		$results = $table->fetchAll($select);
 		
-		$returnArray = array('joined' => array(),
+		$returnArray = array('joined' => array('members' => array(),
+											   'notMembers' => array()),
 							 'notJoined' => array());
 		foreach ($results as $result) {
+			$user = new Application_Model_User();
+			
+			$user->username = $result->email;
+			$user->setTempAttrib('numInvites', $result->numInvites);
+			$user->setTempAttrib('firstSent', $result->firstSent);
+			
+			/*
 			$array = array('email' 		=> $result->email,
 						   'numInvites' => $result->numInvites,
 						   'firstSent'  => $result->firstSent);
-						   
+			*/
+			 
 			if ($result->userID != NULL) {
-				$array['userID'] = $result->userID;
-				$returnArray['joined'][] = $array;
+				$user->userID = $result->userID;
+				$user->firstName = $result->firstName;
+				$user->lastName = $result->lastName;
+				
+				if ($result->gameSubscriberID != NULL) {
+					// Is member
+					$returnArray['joined']['members'][] = $user;
+				} else {
+					$returnArray['joined']['notMembers'][] = $user;
+				}
 			} else {
-				$returnArray['notJoined'][] = $array;
+				$returnArray['notJoined'][] = $user;
 			}
 		}
 		
@@ -760,6 +786,44 @@ class Application_Model_GamesMapper extends Application_Model_TypesMapperAbstrac
 			   ->where('utg.userID = ?', $userID)
 			   ->where('utg.teamGameID = ?', $teamGameID);
 			   
+	}
+	
+	/**
+	 * get games with overlapping members
+	 */
+	public function getSimilarGames($userID, $game)
+	{
+		$table = $this->getDbTable();
+		$select = $table->select();
+		$select->setIntegrityCheck(false);
+		
+		$gameSubscribers = "SELECT gameID FROM game_subscribers gs
+								WHERE gs.userID = '" . $userID . "'";
+		
+		$select->from(array('gs' => 'game_subscribers'),
+					  array('COUNT(gs2.userID) as sharedPlayers'))
+			   ->join(array('gs2' =>'game_subscribers'),
+			   		  	  'gs2.userID = gs.userID AND gs2.gameID != gs.gameID')
+			   ->join(array('g' => 'games'),
+			   		  'g.gameID = gs2.gameID')
+			   ->joinLeft(array('gs3' => new Zend_Db_Expr('(' . $gameSubscribers . ')')),
+			   			  'gs3.gameID = gs2.gameID',
+						  array(''))
+			   ->where('gs3.gameID IS NULL')
+			   ->where('gs.gameID = ?', $game->gameID)
+			   ->group('gs2.gameID')
+			   ->having('sharedPlayers > 5');
+		
+		echo $select;   
+		$results = $table->fetchAll($select);
+		
+		$games = new Application_Model_Games();
+		
+		foreach ($results as $result) {
+			$game->addGame($result);
+		}
+		
+		return $games;
 	}
 	
 	/**
@@ -964,6 +1028,38 @@ class Application_Model_GamesMapper extends Application_Model_TypesMapperAbstrac
 	}
 	
 	/**
+	 * add member to game
+	 */
+	public function addMemberToGame($userID, $gameID)
+	{
+		$table = $this->getDbTable();
+		$select = $table->select();
+		$select->setIntegrityCheck(false);
+		
+		$select->from(array('gs' => 'game_subscribers'))
+			   ->where('gs.userID = ?', $userID)
+			   ->where('gs.gameID = ?', $gameID);
+			   
+		$result = $table->fetchRow($select);
+		
+		if ($result) {
+			// Already a member
+			return 'already';
+		}
+		
+		$data = array('userID' => $userID,
+					  'gameID' => $gameID,
+					  'joinDate' => new Zend_Db_Expr('NOW()'));
+		
+		$db = Zend_Db_Table::getDefaultAdapter();
+		
+		$db->insert('game_subscribers', $data);
+		
+		return false;
+	}
+		
+	
+	/**
 	 * add user to game
 	 */
 	public function addUserToPickupGame($gameID, $userID, $confirmed = false)
@@ -1036,7 +1132,7 @@ class Application_Model_GamesMapper extends Application_Model_TypesMapperAbstrac
 		
 		if ($recurring == '1') {
 			// Add user to subscribers list as default
-			$sql = "INSERT INTO game_subscribers (gameID, userID, doNotEmail) VALUES (" . $gameID . ", " . $userID . ", '0')
+			$sql = "INSERT INTO game_subscribers (gameID, userID, doNotEmail, joinDate) VALUES (" . $gameID . ", " . $userID . ", '0', CURDATE())
 		  		ON DUPLICATE KEY UPDATE gameID = " . $gameID;
 				
 			$db->query($sql);
@@ -1271,6 +1367,8 @@ class Application_Model_GamesMapper extends Application_Model_TypesMapperAbstrac
 			$sql .= "('', '" . $email . "', " . $actingUserID . ", " . $gameID . ", CURDATE())";
 			$counter++;
 		}
+		
+		$sql .= " ON DUPLICATE KEY UPDATE numInvites = numInvites + 1";
 		
 		$db->query($sql);
 	}

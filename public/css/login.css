@@ -75,9 +75,14 @@ input.dropdown-login-submit {
 	margin-top: .5em;
 }
 
-#forgot-alert-container {
+#forgot-alert-container,
+#already-alert-container {
 	margin-top: -10em;
 	margin-left: -17em;
 	width: 34em;
+}
+
+#already-alert-container {
+	margin-top: -5em;
 }
 	

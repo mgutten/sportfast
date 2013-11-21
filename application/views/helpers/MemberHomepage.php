@@ -41,15 +41,35 @@ class Application_View_Helper_MemberHomepage
 				  </div>";
 			
 			$session = new Zend_Session_Namespace('postLoginURL');	
-			if ($session->url) {  
+			if ($session->url &&
+				!$this->_view->signupAdded) {  
 				echo "<p class='clear width-100 center medium margin-top'>or</p>";
+				$type = (strpos($session->url, 'game') != false ? 'game' : 'team');
 				echo "<div class='clear width-100'>
-						<a href='" . $session->url . "' class='button clear auto-center member-first-time-button'>Go to previous page</a>
+						<a href='" . $session->url . "' class='button clear auto-center member-first-time-button'>Back to " . $type . " page</a>
 					  </div>";
 			}
-				  
 			
-			echo $this->_view->alert()->end();
+			if ($this->_view->signupAdded) {
+				// User was added to team or game on signup
+				$typeModel = $this->_view->signupAdded;
+				if ($typeModel instanceof Application_Model_Game) {
+					// Is game
+					$type = 'game';
+				} else {
+					$type = 'team';
+				}
+				$function = 'create' . ucwords($type);
+				echo "</div>"; // Close to alert-body-container
+				echo "<div class='alert-body-container larger-margin-top'>";
+				echo	"<p class='width-100 darkest center left'>You have been added to the following " . $type . ":</p>";
+				echo	$this->_view->find()->$function($typeModel, false, false);
+				echo "</div>";
+				echo "</div>";
+			} else {
+				echo $this->_view->alert()->end();
+			}
+			
 			echo $this->_view->partial('partials/global/alertBack.phtml');
 			
 			$this->_view->placeholder('absolute')->captureEnd();
@@ -130,7 +150,6 @@ class Application_View_Helper_MemberHomepage
 			
 
 		$this->_view->placeholder('narrowColumn')->captureEnd();
-			
 
 		$output = '';
 				
@@ -142,7 +161,22 @@ class Application_View_Helper_MemberHomepage
 		$findHeader  = $this->buildFindHeader();	
 		$output     .= $this->_view->partial('partials/global/sectionHeaderBold.phtml',array('title'   => 'find',
 																							 'content' => $findHeader)); 
-		$output 	.= "<div id='gmap'></div>"; // Find content here
+		$output 	.= "<div class='clear width-100' id='member-find-outer-container'>
+							<div class='clear width-100 relative' id='gmap-container'>
+								<div id='gmap'></div>
+								";
+		if ($this->_view->user->homeMapTip) {
+			// User has not clicked "dont show again" for map tip
+			$output .= "<div id='member-move-map-container'>
+									<div class='transparent-black' id='member-move-map-back'></div>
+									<div id='member-move-map-inner-container'>
+										<div class='left member-move-space-holder'></div>
+										<p class='left white heavy center' id='member-move-map'>Drag the map to find games near you</p>
+										<div class='left member-move-space-holder' id='member-move-map-hide'><p class='smaller-text right white pointer action larger-margin-right larger-margin-top'>don't show again</p></div>
+									</div>
+								</div>";
+		}
+		$output .= 	"</div>"; // Find content here
 		
 		$newClass = $pastClass = $pastBodyClass = $newBodyClass = $past = '';
 		if ($this->_view->pastPlayedGames) {
@@ -160,11 +194,11 @@ class Application_View_Helper_MemberHomepage
 		
 		$output     .= "<div class='clear width-100' id='member-find-tab-container'>
 							<div class='left light member-find-tab pointer center " . $newClass . "' id='member-find-tab-new' tooltip='These are games that you have never played in.'>
-								<p class='inherit'>New Games</p>
-								<p class='medium member-find-tab-num '>4</p>
+								<p class='inherit'>Find New Games</p>
+								
 							</div>
-							<div class='left light member-find-tab pointer center " . $pastClass . "' id='member-find-tab-past' tooltip='You have previously played in these weekly games.'>
-								<p class='inherit'>Past Played Games</p>
+							<div class='left light member-find-tab pointer center " . $pastClass . "' id='member-find-tab-past' tooltip='You are currently a member of these weekly games.'>
+								<p class='inherit'>Your Games</p>
 								" . ($this->_view->numPastPlayedGames > 0 ? "<p class='medium member-find-tab-num'>" . $this->_view->numPastPlayedGames . "</p>" : '') . "
 							</div>
 						</div>
@@ -177,6 +211,8 @@ class Application_View_Helper_MemberHomepage
 					 . $this->buildFindBody($this->_view->matches)
 					 . "</div>";
 					 
+		$output .= "</div>";
+		
 		
 		$newsfeedHeader = "<div class='right member-newsfeed-header medium'>" . $this->_view->user->city->city . "</div>";
 		$output     .= $this->_view->partial('partials/global/sectionHeaderPlain.phtml',array('title'   => 'newsfeed',
@@ -460,7 +496,7 @@ class Application_View_Helper_MemberHomepage
 	public function buildFindBody($matches, $past = false)
 	{
 		$output = "<div class='member-find-lower-outer-container'><div class='member-find-lower-outer-inner-container'>";
-		
+	
 		$counter    = 0;
 		$totalMatches = 1;
 		$totalPages = 1;
@@ -474,7 +510,7 @@ class Application_View_Helper_MemberHomepage
 			return $output;
 		} elseif (empty($matches) && $past) {
 			// Is past played section
-			$output  = "<p class='medium larger-text member-find-none center'>There are no upcoming games that you have previously played in.</p>";
+			$output  = "<p class='medium larger-text member-find-none center'>There are no upcoming games that you are a member of.</p>";
 			return $output;
 		}
 			
@@ -533,6 +569,7 @@ class Application_View_Helper_MemberHomepage
 	public function buildFindResult($match, $matchNumber = '', $gameNumber = '')
 	{
 		$output = '';
+		$numTooltip = '';
 		if ($match instanceof Application_Model_Game) {
 				// Match is a game
 				$type     = 'Game';
@@ -545,8 +582,26 @@ class Application_View_Helper_MemberHomepage
 				$id		  = $match->gameID;
 				$location = $match->getLimitedParkName(22);
 				$gameIndex= $matchNumber;
+				$numClass = 'dark-back';
 				$dateHTML = "<div class='member-find-game-date-day'>" . $day . "</div>&nbsp; 
 								<div class='member-find-game-date-hour'>" . $hour . "</div>";
+				
+				$numTooltip = 'You are not in this game.';
+				
+				if ($match->hasValue('confirmed')) {
+					$numClass = 'green-back';
+					if ($match->confirmed == '1') {
+						$confirmed = 'in';
+						$confirmedClass = 'green';
+					} elseif ($match->confirmed == '0') {
+						$confirmed = 'out';
+						$confirmedClass = 'red';
+					} else {
+						$confirmed = 'maybe';
+						$confirmedClass = '';
+					}
+					$numTooltip = 'You are <span class="heavy inherit ' . $confirmedClass . '">' . $confirmed . '</span> for this game.';
+				}
 				
 			} elseif ($match instanceof Application_Model_Team) {
 				// Match is a team
@@ -558,10 +613,11 @@ class Application_View_Helper_MemberHomepage
 				$marker   = '';
 				$gameIndex= '';
 				$typeClass= '';
+				$numClass = 'green-back';
 			}
 			
 			$output .= "<a class='member-find-game-container member-" . strtolower($type) . "' href='/" . strtolower($type) . "s/" . $id . "' gameIndex='" . $gameIndex . "'>";
-			$output .= "<div class='left member-find-game-number-container'><p class='member-find-game-number green-back white arial bold'>" . $matchNumber . "</p></div>";
+			$output .= "<div class='left member-find-game-number-container' tooltip='" . $numTooltip . "'><p class='member-find-game-number " . $numClass . " white arial bold'>" . $matchNumber . "</p></div>";
 			$output .= "<p class='member-find-game-sport darkest bold'>" . $match->sport . "</p>";
 			$output .= "<p class='member-find-game-type darkest " . $typeClass . "'>" . $type . "</p>";
 			$output .= "<div class='member-find-game-date medium' tooltip='" . $dateDesc . "'>" . $dateHTML . "</div>";

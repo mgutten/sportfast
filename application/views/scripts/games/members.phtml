@@ -6,7 +6,10 @@
 $this->headTitle('Game Members');
 $this->headLink()->prependStylesheet($this->baseUrl() . '/css/profile.css');
 $this->headLink()->prependStylesheet($this->baseUrl() . '/css/game.css');
+$this->headScript()->prependFile($this->baseUrl() . '/js/gamemembers.js');
 $this->headScript()->prependFile($this->baseUrl() . '/js/profile.js');
+$this->headScript()->prependFile($this->baseUrl() . '/js/createsuccess.js');
+
 
 ?>
 
@@ -24,6 +27,21 @@ echo "<div class='clear larger-margin-top larger-text width-100'>
 
 $this->placeholder('narrowColumn')->captureEnd();
 
+// Store universal game details in hidden container
+echo "<span id='game-details' 
+			gameID='" . $this->game->gameID . "' 
+			idType='gameID' 
+			actingUserID='" . $this->user->userID . "' 
+			city='" . $this->game->city . "'
+			rosterLimit='" . $this->game->rosterLimit . "'
+			sport='" . $this->game->sport . "'
+			public='" . ($this->isPublic ? 'public' : 'private') . "'
+			recurring = '" . ($this->game->isRecurring() ? 'true' : '') . "' 
+			picture='" /*. (!$this->user->hasProfilePic() ? 'true' : '')*/ . "'>
+	 </span>";
+
+
+
 echo $this->partial('partials/global/backTo.phtml', array('type' => 'game',
 														  'id' => $this->game->gameID));
 
@@ -38,30 +56,38 @@ echo "</div>";
 ?>
 
 <?php
+$members = $this->subscribers->getAll();
 
-foreach ($this->subscribers->getAll() as $user)
-{
-	echo "<a href='/users/" . $user->userID . "' class='clear width-100 game-subscribers-container animate-darker'>
-			<img src='" . $user->getProfilePic('tiny') . "' class='left'/>
-			<p class='left larger-indent heavy darkest game-subscribers-name'>" . $user->shortName . "</p>";
-	
+echo $this->pagination()->start($members, array('partial' => 'partials/games/members.phtml', 
+												'attrib' =>  'user'));
+/*
+echo $this->pagination()->start($members, array('partial' => 'partials/games/members.phtml',
+												'attrib' => 'user'));*/
+												
+?>
 
-	echo "<p class='left game-subscribers-total-subheader medium smaller-text'>total games:</p>
-		  <p class='left game-subscribers-total medium  indent heavy'>" . $user->getTempAttrib('totalGames') . "</p>";
+<?php
+if ($this->captain) {
 	
-	echo "<div class='left game-subscribers-lastPlayed-container'>";
-	
-	if ($lastPlayed = $user->getTempAttrib('lastPlayed')) {
-		// Has played before
-		echo "<p class='left game-subscribers-total-subheader medium smaller-text'>last played</p>
-				  <p class='left game-subscribers-lastPlayed medium indent smaller-text'>" . $user->getTimeFromNow($lastPlayed, 30) . "</p> ";
-	} 
+	echo "<div class='clear width-100 larger-margin-top'>";
+	echo	"<p class='darkest heavy clear width-100 center larger-margin-top'>Add Member</p>";
+
+	echo $this->form->text->setAttrib('id', 'inviteSearchAlert')
+						  ->setLabel("Start typing a player's name...");
+
+						  
+	echo "<div class='clear width-100' id='invite-alert-results'></div>";
 	echo "</div>";
-	
-	if ($user->getTempAttrib('doNotEmail') == '0') {
-		echo "<img src='/images/games/members/reminders.png' class='right margin-top game-subscribers-reminders' tooltip='Receives weekly reminders'/>";
+
+?>
+																 
+<script>
+<?php
+	foreach ($members as $member) {
+		echo "membersArray.push('" . $member->userID . "');";
 	}
-	
-	echo "</a>";
-}
-																	 
+?>
+</script>
+
+<?php } ?>
+

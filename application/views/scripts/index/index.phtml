@@ -34,7 +34,22 @@ if (!$this->loggedIn) {
 									 }
 								 }?>
 					  ]
-	<?php } ?>
+	<?php } 
+	
+	if (!empty($this->pastPlayedGames)) {
+		?>
+		pastPlayedGmapMarkers = [	<?php
+								 foreach ($this->pastPlayedGames->getAll() as $match) {
+									 if ($match instanceof Application_Model_Game) {
+										 // Is game, create marker on map
+										 $location = $match->getPark()->getLocation();
+										 echo '[' . $location->latitude . ',' . $location->longitude . '],';
+									 }
+								 }?>
+					  ]
+	<?php
+	}
+	?>
 					
 		userLocation = [<?php echo '"' . $this->user->getLocation()->latitude . '","' . $this->user->getLocation()->longitude . '"';?>];
 	</script> 
