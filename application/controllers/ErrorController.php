@@ -20,6 +20,7 @@ class ErrorController extends Zend_Controller_Action
                 $this->getResponse()->setHttpResponseCode(404);
                 $priority = Zend_Log::NOTICE;
                 $this->view->message = 'Page not found';
+				$this->_forward('error404', 'error', null);
                 break;
             default:
                 // application error
@@ -54,6 +55,11 @@ class ErrorController extends Zend_Controller_Action
     }
 	
 	public function permissionAction()
+	{
+		$this->view->narrowColumn = false;
+	}
+	
+	public function error404Action()
 	{
 		$this->view->narrowColumn = false;
 	}

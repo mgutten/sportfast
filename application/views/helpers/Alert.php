@@ -118,19 +118,28 @@ class Application_View_Helper_Alert
 		
 		
 		$output .= "<form action='/signup/basic' method='post' id='user-signup'>";
-		
-		$output .= "<p class='clear light width-100 center largest-margin-top'>Please enter your name so other players can recognize you.</p>";
+		if ($user->hasValue('username')) {			
+			$output .= "<p class='clear width-100 center heavy red margin-top'>Please signup to complete action</p>";
+		} else {
+			$output .= "<p class='clear width-100 center heavy red margin-top'>Signup required</p>";
+		}
+		$output .= "<div class='game-signup-hover width-100 clear'>";
+		$output .= "<p class='game-signup-hover-target clear light width-100 center largest-margin-top'>Enter your name so other players can recognize you.</p>";
 		
 		$output .= $signupForm->firstName;
 		$output .= $signupForm->lastName;
+		$output .= "</div>";
 		
+		$output .= "<div class='game-signup-hover width-100 clear'>";
 		$email = '';
 		if ($user->hasValue('username')) {
 			$email = $user->username;
 		}
-		$output .= "<p class='clear largest-margin-top light width-100 center'>Your email will be your login for Sportfast. </p>";
+		$output .= "<p class='clear largest-margin-top light width-100 center game-signup-hover-target'>Your email will be your login for Sportfast. </p>";
 		$output .= "<div class='clear width-100'>" . $signupForm->email->setValue($email) . "</div>";
-		$output .= "<div class='clear width-100'>" . $signupForm->signupPassword . "</div>";
+		$output .= "<div class='clear width-100'>" . $signupForm->signupPassword . "</div>
+					<p class='clear light smaller-text width-100 center game-signup-hover-target'>Must be at least 8 characters.</p>";
+		$output .= "</div>";
 		//$output .= "<p class='clear smaller-text medium width-100 center hidden' id='game-password-reqs'>Must be at least 8 characters</p>";
 		
 		/*

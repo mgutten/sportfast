@@ -28,6 +28,20 @@ $this->placeholder('absolute')->captureStart();
 
 <?php
 echo $this->partial('partials/global/alertBack.phtml');
+
+/* confirm signup despite not all sports are filled out */
+echo $this->alert()->start('signup-incomplete','');
+
+echo "<p class='clear width-100 center medium'>The following sport(s) have not been filled out completely:</p>
+		<p class='clear width-100 center heavy red margin-top larger-text' id='signup-incomplete-sports'></p>
+		<p class='clear larger-margin-top width-100 center medium'>Proceed anyway?</p>
+		<p class='clear larger-margin-top button yes'>Yes</p>
+		<p class='left larger-margin-top button no'>No</p>";
+		
+echo $this->alert()->end();		
+
+
+/* upload image alert */
 echo $this->alert()->start('signup-import','Upload and crop your image.');
 ?>
 <img class='signup-import-alert-img' id='signup-import-alert-img' src='/images/global/profile/xl/default.jpg' />
@@ -94,21 +108,26 @@ if ($this->invited) {
 ?>
 
 <p class='larger-text green heavy clear width-100 center <?php echo $class;?>'>Sportfast is free and easy.</p>
+<p class='green clear width-100 center'>The more information you provide, the better the system will work for you.</p>
 <?php
 
 $totalSteps = 4;
 $currentStep = 1;
 
 /* SIGNUP SECTION 1: ACCOUNT INFO */
-echo $this->partial('partials/signup/stepContainer.phtml',array('title'		  =>'Account Info',
+$content = "<p class='right red' id='signup-required'>* Required</p>";
+echo $this->partial('partials/signup/stepContainer.phtml',array('title'		  =>'Account',
 																'currentStep' =>$currentStep,
-																'totalSteps'  =>$totalSteps));
+																'totalSteps'  =>$totalSteps,
+																'content'	  =>$content));
 $currentStep++;
 echo $this->form->firstName;
 echo $this->form->lastName;
+//echo $this->form->nickname;
 echo $this->form->sex;
+echo $this->form->age;
 
-echo $this->sexDropdown;
+//echo $this->sexDropdown;
 ?>
 <!--
 <div id='signup-sex-container' class='dropshadow'>
@@ -125,14 +144,14 @@ echo $this->form->dobDay;
 echo "<span class='signup-dob-slash'>/</span>";
 echo $this->form->dobYear;
 */
-echo $this->form->age;
-echo "<span class='signup-dob-slash signup-dimension-indicator darkest' id='age-indicator'>years old</span>";
+//echo $this->form->age;
+//echo "<span class='signup-dob-slash signup-dimension-indicator darkest' id='age-indicator'>years old</span>";
 //echo $this->form->age; // hidden
-echo $this->form->heightFeet;
-echo "<span class='signup-dob-slash signup-dimension-indicator darkest' id='heightFeet-indicator'>'</span>";
-echo $this->form->heightInches;
-echo $this->form->height;
-echo "<span class='signup-dob-slash signup-dimension-indicator darkest' id='heightInches-indicator'>\"</span>";
+//echo $this->form->heightFeet;
+//echo "<span class='signup-dob-slash signup-dimension-indicator darkest' id='heightFeet-indicator'>'</span>";
+//echo $this->form->heightInches;
+//echo $this->form->height;
+//echo "<span class='signup-dob-slash signup-dimension-indicator darkest' id='heightInches-indicator'>\"</span>";
 
 
 echo "<div class='clear signup-clear-large'></div>";
@@ -145,11 +164,12 @@ echo $this->form->signupPassword->setLabel('Re-enter Password')->setAttribs(arra
 <div id='signup-password-reqs' class='medium hidden'>Password must be: <ul><li><span class='close-bullet'>at least 8 characters</span></li></ul></div>
 </div>
 
+
 <?php
 echo "<div class='clear signup-clear-large'></div>";
 ?>
 <p class='clear green heavy smaller-text' id='signup-account-address-warning'>
-	This address will be used to find games, players, and teams closest to you.  It will never be displayed and will only be used to help find optimal matches.
+	This address will be used to find games, players, and teams closest to you.  <br />It will never be displayed and will only be used to help find optimal matches.
 </p>
 
 <div class='clear width-100' id='signup-account-address-container'>
@@ -163,11 +183,15 @@ echo $this->form->userLocation;
 
 <div class='clear'></div>
 
+<!--
 
 <?php
 echo $this->form->noAddress;
 ?>
+-->
+
 </div>
+
 
 <?php
 /* SIGNUP SECTION 2: SPORTS */
@@ -201,8 +225,8 @@ foreach ($sports as $sport => $values) {
 
 </div>
 <?php
-/* STEP 3 IMPORT PHOTO */
-echo $this->partial('partials/signup/stepContainer.phtml',array('title'		  =>'Import Picture',
+/* STEP 3 Profile */
+echo $this->partial('partials/signup/stepContainer.phtml',array('title'		  =>'Profile',
 																'currentStep' =>$currentStep,
 																'totalSteps'  =>$totalSteps));
 															
@@ -210,27 +234,30 @@ $currentStep++;
 
 
 ?>
-<p class='clear medium signup-import-main-current-text'>Other players will see:</p>
-<div class='signup-import-main-img-container'>
+<p class='left pointer margin-top larger-indent dark why-profile smaller-text'>
+   	Why should I have a profile picture?
+</p>
+<div class='signup-import-main-img-container pointer animate-opacity'>
     <img src='/images/users/profile/pic/large/default.jpg' class='signup-import-main-img' id='signup-import-main-img'/>
+    <p class='width-100 center white transparent-black heavy' id='signup-import-upload-overlay'>upload picture</p>
 </div>
+<!--
 <div class='signup-import-main-text-container'>
-	<p class='center green larger-text'>
-    	You may signup without a picture, but players without one <span class='green-bold'>won't receive ratings.</span>
-    </p>
+	
     <div id='signup-import-main-upload-button-container'>
-        <div class='button larger-text' id='signup-import-main-upload-button'>
+        <div class='button' id='signup-import-main-upload-button'>
             Upload Picture
         </div>
     </div>
-    <p class='pointer width-100 center dark clear why-profile'>
-    	Why do I need a profile picture?
-    </p>
+    
+    <!--
     <p class='center width-100 smaller-text light clear larger-margin-top'>
     	You can add/edit your profile picture under Account Settings later.
     </p>
     
+    
 </div>
+-->
 <?php
 // Hidden inputs for picture info
 echo $this->form->fileName;
@@ -238,7 +265,31 @@ echo $this->form->fileWidth;
 echo $this->form->fileHeight;
 echo $this->form->fileX;
 echo $this->form->fileY;
-?>    	
+
+echo "<div class='left'>";
+echo $this->sexDropdown;
+
+echo "<p class='clear smaller-text medium signup-profile-desc'>DOB - to match with players your age</p>";
+echo $this->form->dobMonth;
+echo "<span class='signup-dob-slash'>/</span>";
+echo $this->form->dobDay;
+echo "<span class='signup-dob-slash'>/</span>";
+echo $this->form->dobYear;
+
+//echo $this->form->age;
+//echo "<span class='signup-dob-slash signup-dimension-indicator darkest' id='age-indicator'>years old</span>";
+//echo $this->form->age; // hidden
+echo "<p class='clear smaller-text medium signup-profile-desc'>Height</p>";
+echo $this->form->heightFeet;
+echo "<span class='signup-dob-slash signup-dimension-indicator darkest' id='heightFeet-indicator'>'</span>";
+echo $this->form->heightInches;
+echo $this->form->height;
+echo "<span class='signup-dob-slash signup-dimension-indicator darkest' id='heightInches-indicator'>\"</span>";
+echo "</div>";
+
+
+?>
+ 	
 
 </div>
 
@@ -291,17 +342,17 @@ $this->placeholder('narrowColumn')->captureStart();
 
 <?php
 // Account Info
-echo $this->narrowcolumnsection()->start(array('title' => 'Account Info'));
+echo $this->narrowcolumnsection()->start(array('title' => 'Account'));
 											   ?>
 <div id='account-info-name' class='capitalize narrow-column-value'>
-    <span id='account-info-first-name' class='narrow-column-value bold'></span>
-    <span id='account-info-last-name' class='narrow-column-value bold no-clear'></span>
+    <span id='account-first-name' class='narrow-column-value bold'></span>
+    <span id='account-last-name' class='narrow-column-value bold no-clear'></span>
 </div>
-<div id='account-info-sex' class='narrow-column-fade narrow-column-value'>
+<div id='account-sex' class='narrow-column-fade narrow-column-value'>
 </div>
-<div id='account-info-age' class='narrow-column-fade narrow-column-value'>
+<div id='account-age' class='narrow-column-fade narrow-column-value'>
 </div>
-<div id='account-info-height' class='narrow-column-fade narrow-column-value'>
+<div id='account-height' class='narrow-column-fade narrow-column-value'>
 </div>
     <!--<span id='account-info-weight' class='narrow-column-fade no-clear'></span>-->
 
@@ -310,7 +361,8 @@ echo $this->narrowcolumnsection()->start(array('title' => 'Account Info'));
        
 <?php 
 // Sports section
-echo $this->narrowcolumnsection()->end(); 
+echo $this->narrowcolumnsection()->end();
+/*
 echo $this->narrowcolumnsection()->start(array('title' => 'Sports'));
 
 foreach ($sports as $key => $val) {
@@ -321,4 +373,20 @@ foreach ($sports as $key => $val) {
 
 <?php
 echo $this->narrowcolumnsection()->end(); 
+*/
+
+echo "<div class='width-100 clear largest-margin-top'>
+		<p class='width-100 darkest smaller-text heavy'>With your current info you can:</p>
+		<ul class='light' id='signup-checklist'>
+			<li class='minimal' tooltip='Fill out all of step one'>Join pickup games</li>
+			<li class='minimal' tooltip='Fill out all of step one'>Join teams</li>
+			<li class='basic' tooltip='Fill out at least one sport'>Create games</li>
+			<li class='basic' tooltip='Fill out at least one sport'>Create teams</li>
+			<li class='picture' tooltip='Upload a profile picture'>Receive ratings</li>
+			<li class='full' tooltip='Input sex, date of birth, and at least one sport'>Join Sportfast games</li>
+			<li class='full' tooltip='Input sex, date of birth, and at least one sport'>Have games created for you</li>
+			
+		</ul>
+	</div>";
+
 $this->placeholder('narrowColumn')->captureEnd();

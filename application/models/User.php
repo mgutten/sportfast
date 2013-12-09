@@ -83,6 +83,7 @@ class Application_Model_User extends Application_Model_ModelAbstract
 	 */
 	public function getLastGame()
 	{
+		return false;
 		return $this->getMapper()->getLastGame($this->userID);
 	}
 	

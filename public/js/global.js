@@ -17,7 +17,7 @@ sliderSkillValues[3]  = {level:'Better',
 sliderSkillValues[4]  = {level:'Talented',
 						description: 'I am very skilled.  I am a big step above the average player.'};
 sliderSkillValues[5]  = {level:'Unstoppable',
-						description: 'I played (or should play) on a professional level.'};
+						description: 'I played (or should play) on a higher level.'};
 
 var sliderSportsmanshipValues = [];
 sliderSportsmanshipValues[0] = {level:'Bad',
@@ -795,6 +795,7 @@ $(function()
 			}
 			$(this).siblings('.green-bold').removeClass('green-bold')
 		}
+		
 		$(this).toggleClass('green-bold');
 	})
 	
@@ -1037,7 +1038,8 @@ $(function()
 				$(this).is('.calendar-day') ||
 				$(this).is('.header-dropdown-option,.header-dropdown-option-cog') ||
 				$(this).is('.cog-dropdown-account-text') ||
-				$(this).is('.header-dropdown-option-cog')) {
+				$(this).is('.header-dropdown-option-cog') ||
+				$(this).is('.member-find-game-container')) {
 				// Do not give padding to notification indicator
 				return;
 			}
@@ -1921,7 +1923,7 @@ function fadeOutInputOverlay(inputEle, focusIn)
 	} else {
 		overlayEle.show();
 		if (focusIn || inputEle.is(':focus')) {
-			overlayEle.animate({'opacity':'.4'},200);
+			overlayEle.animate({'opacity':'.5'},200);
 		} else {
 			overlayEle.animate({'opacity':'1'},200);
 		}
@@ -2318,7 +2320,10 @@ function showConfirmationAlert(str)
  */
 function changeInputBackground(ele, isValid)
 {
-	if (!isValid) {
+	if (!(ele.val().length > 0)) {
+		return false;
+	}
+	if (!isValid && (typeof ele.attr('required') != 'undefined')) {
 		// Failed validity test
 		ele.removeClass('input-success').addClass('input-fail');
 

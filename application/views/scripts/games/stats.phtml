@@ -69,7 +69,7 @@ This game happens every week.  Here are the historical stats for this game.
                 <p class='clear jumbo-text dark heavy width-100 center'><?php echo $this->history['maxPlayers'];?></p>
             </div>
             <div class='left margin-top history-stat-container'>
-                <p class='clear dark history-stat-header' tooltip='Number of current subscribers'>Subscribers</p>
+                <p class='clear dark history-stat-header' tooltip='Number of current subscribers'>Members</p>
                 <p class='clear jumbo-text dark heavy width-100 center'><?php echo $this->history['totalSubscribers'];?></p>
             </div>
             <div class='clear larger-margin-top width-100' >
@@ -112,7 +112,7 @@ This game happens every week.  Here are the historical stats for this game.
 <script type='text/javascript'>
 chartData = [['Week', 'Players','No Game'],<?php 
 			foreach ($this->history['games'] as $game) {
-				if ($game->totalPlayers > $game->minPlayers) {
+				if ($game->totalPlayers >= $game->minPlayers) {
 					// successful game, first series
 					$first = $game->totalPlayers;
 					$second = 0;

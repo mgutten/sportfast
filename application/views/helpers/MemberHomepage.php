@@ -193,7 +193,7 @@ class Application_View_Helper_MemberHomepage
 		}
 		
 		$output     .= "<div class='clear width-100' id='member-find-tab-container'>
-							<div class='left light member-find-tab pointer center " . $newClass . "' id='member-find-tab-new' tooltip='These are games that you have never played in.'>
+							<div class='left light member-find-tab pointer center " . $newClass . "' id='member-find-tab-new' tooltip='These are games that you are not a member of.'>
 								<p class='inherit'>Find New Games</p>
 								
 							</div>
@@ -548,7 +548,7 @@ class Application_View_Helper_MemberHomepage
 		// Num pages
 		$output .= "<div class='pagination-pages-outer-container'><div class='pagination-pages-inner-container'>";
 		for ($i = 1; $i <= $totalPages; $i++) {
-			$class = 'pagination-page pointer medium member-find-pagination';
+			$class = 'pagination-page smaller-text pointer medium member-find-pagination';
 			if ($i == 1) {
 				$class .= ' light-back';
 			}
@@ -557,7 +557,9 @@ class Application_View_Helper_MemberHomepage
 		
 		$output .= "</div></div>";
 		
-		$output .= "<a href='/find' class='member-find-view-more medium'>view more</a>";
+		if (!$past) {
+			$output .= "<a href='/find' class='member-find-view-more medium'>view more</a>";
+		}
 		
 		return $output;
 	}

@@ -98,7 +98,8 @@ class GamesController extends Zend_Controller_Action
 		
 		$this->view->userPlus = ($userInGame ? $userInGame->plus : false);
 		
-		$this->view->pastGame  = ($game->gameDate->format('U') < time() ? true : false);
+		$this->view->pastGame  = (($game->gameDate->format('U') + (60*90)) < time() ? true : false);
+		$this->view->currentGame  = ($game->gameDate->format('U') < time() ? true : false);
 		$this->view->todayGame = ($game->gameDate->format('mdy') == date('mdy') ? true : false);
 		$this->view->gameTitle = $game->getGameTitle();
 		
@@ -187,9 +188,8 @@ class GamesController extends Zend_Controller_Action
 		
 		if ($game->isRecurring()) {
 			// Test to see if there are similar games that members play in
-			$similarGames = $game->getSimilarGames($this->view->user->userID);
+			$this->view->similarGames = $similarGames = $game->getSimilarGames($this->view->user->userID);
 			
-			var_dump($similarGames->getAll());
 		}
 			
 		$this->view->userHasSport = $this->view->user->hasSport($game->sport);

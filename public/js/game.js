@@ -54,6 +54,18 @@ $(function() {
 			}
 	})
 	
+	/* become member of similar game */
+	$('#game-become-member').click(function(e) 
+	{
+		e.preventDefault();
+		var detailsEle = getDetailsEle();
+		var userID = detailsEle.attr('actingUserID');
+		var gameID = $(this).parents('.find-result-container').attr('gameID');
+
+		addMemberToGame(gameID, userID, memberAdded);
+	});
+		
+	
 	/* change reminder time */
 	$('#dropdown-menu-hidden-container-reminder-hour, #dropdown-menu-hidden-container-reminder-ampm').find('.dropdown-menu-option-container').click(function()
 	{
@@ -282,6 +294,16 @@ function updateSendReminder(gameID, hour)
 		success: function(data) {
 		}
 	})
+}
+
+/**
+ * callback from addMemberToGame for similarGame
+ */
+function memberAdded()
+{
+	showConfirmationAlert('Added as member');
+	
+	reloadPage();
 }
 
 /**

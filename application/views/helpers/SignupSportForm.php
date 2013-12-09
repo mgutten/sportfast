@@ -46,20 +46,51 @@ class Application_View_Helper_SignupSportForm
 			} else {
 				$class = '';
 			}
+			$sportModel = new Application_Model_Sport();
+			$sportModel->sport = $sport['sport'];
+			
 			$output .= "<div id='signup-sports-hidden-" . $sport['sport'] . "' class='animate-hidden-container signup-sports-hidden " . $class . "'>
 						<div class='signup-sports-form' id='signup-sports-form-" . $sport['sport'] . "' sport='" . $sport['sport'] . "'>
-						<p class='center header signup-sports-title darkest'>" . ucwords($sport['sport']) . "</p>
+						<div class='clear width-100'>
+							<p class='center auto-center signup-sports-title medium heavy light-back rounded-corners'>
+								<img src='" . $sportModel->getIcon('small', 'solid', 'medium') ."' style='display:inline-block; margin-bottom:-5px;'/> 
+								<span class='inherit sport-title'>" . ucwords($sport['sport']) . "</span>
+							</p>
+							" . (!$userSports ? "<p class='right red heavy larger-margin-top signup-sports-complete'>Not Complete</p>" : '') . "
+						</div>
 						" . $remove;
 						
-			
+			$output .= "<div class='clear width-100 light-back rounded-corners'>";
 			if (($userSports && !$userSport) || (!$userSports)) {
 				// Using userSports and sport is part of user already OR no userSports at all
-				$output .= "<div class='signup-sports-skill signup-sports-form-section' section='skill' id='signup-sports-skill-" . $sport['sport'] . "'>
+				/*$output .= "<div class='signup-sports-skill signup-sports-form-section' section='skill' id='signup-sports-skill-" . $sport['sport'] . "'>
 							<p class='signup-sports-form-section-title'>Skill Level</p>";
 				$output .= $this->_view->slider()->create(array('id'    		=> $sport['sport'] . '-rating',
 																'desc'			=> true,
 																'valuePosition' => 'below',
 																'valueClass'	=> 'green-bold'));	
+				
+				$output .= "</div>";
+				*/
+				
+				$output .= "<div class='signup-sports-skill signup-sports-form-section' section='skill' id='signup-sports-skill-" . $sport['sport'] . "'>
+							<p class='signup-sports-form-section-title'>Skill Level<span class='signup-sports-form-section-title-description medium indent smaller-text'> - How skilled are you?</span></p>
+							";
+				$output .= $this->_view->slider()->create(array('id'    		=> $sport['sport'] . '-rating',
+																'desc'			=> true,
+																'valuePosition' => 'below',
+																'valueClass'	=> 'green larger-text heavy signup-slider-value'));	
+																
+				$what    = array('beginner' => array('value' => 30),
+							 'decent' => array('value' => 7),
+							 'good' => array('value' => 2),
+							 'better' => array('value' => 0),
+							 'talented' => array(),
+							 'unstoppable' => array()
+							 );
+							 
+				//$output .= $this->selectableText($what, true);
+				
 				
 				$output .= "</div>";
 			}
@@ -69,7 +100,7 @@ class Application_View_Helper_SignupSportForm
 			if (!empty($sport['type'])) {
 				// Type section to be shown
 				$output .= "<div class='signup-sports-type signup-sports-form-section' section='type' id='signup-sports-type-" . $sport['sport'] . "'>
-							<p class='signup-sports-form-section-title'>Type <span class='light'>what types of games you want to play</p>";
+							<p class='signup-sports-form-section-title'>Type<span class='signup-sports-form-section-title-description medium indent smaller-text'> - What type do you play?</span></p>";
 				
 				
 				$userTypes = array();
@@ -142,10 +173,9 @@ class Application_View_Helper_SignupSportForm
 			
 			// What do you want to play?
 			$output .= "<div class='signup-sports-what signup-sports-form-section' section='what' id='signup-sports-what-" . $sport['sport'] . "'>
-						<p class='signup-sports-form-section-title'>What do you want to play? <span class='light'>select any</p>";
-			$what    = array('Pickup' 				=> array('tooltip' => 'Pickup games can be found at most parks and rec centers.  They are non-competitive and inspire exercise.'),
-							 'League' 				=> array('subtext' => 'w/ refs',
-							 				   				 'tooltip' => 'League teams play against one another in competitive, scheduled games with referees.'),
+						<p class='signup-sports-form-section-title'>Format<span class='signup-sports-form-section-title-description medium indent smaller-text'> - What format do you want to play?</span></p>";
+			$what    = array('Pickup' 				=> array('tooltip' => 'Pickup games can be found at most parks and rec centers.  They are non-competitive and encourage exercise.'),
+							 'League' 				=> array('tooltip' => 'League teams play against one another in competitive, scheduled games with referees.'),
 							 'Weekend Tournament'   => array('tooltip' => 'Weekend tournaments give you a taste of league play without the long-term commitment.  It is a reffed tournament that happens on a Saturday and Sunday.')
 							 );
 			
@@ -202,7 +232,7 @@ class Application_View_Helper_SignupSportForm
 			
 			// How often?
 			$output .= "<div class='signup-sports-often signup-sports-form-section' section='often' id='signup-sports-often-" . $sport['sport'] . "'>
-						<p class='signup-sports-form-section-title'>How often do you want to play?</p>";
+						<p class='signup-sports-form-section-title'>Often<span class='signup-sports-form-section-title-description medium indent smaller-text'> - How often do you want to play?</span></p>";
 			$what    = array('Once/month' => array('value' => 30),
 							 'Once/week' => array('value' => 7),
 							 '2-3 times/week' => array('value' => 2),
@@ -222,7 +252,7 @@ class Application_View_Helper_SignupSportForm
 			
 			// Availability
 			$output .= "<div class='signup-sports-availability signup-sports-form-section' section='availability'>
-						<p class='signup-sports-form-section-title'>When would you want to play?</p>
+						<p class='signup-sports-form-section-title'>Availability<span class='signup-sports-form-section-title-description medium indent smaller-text'> - When would you want to play?</span></p>
 						<div class='signup-sports-availability-copy-container'>
 							<p class='medium'>Copy availability from:</p>
 							<div class='signup-sports-availability-copy-option-container'>
@@ -261,12 +291,13 @@ class Application_View_Helper_SignupSportForm
 			}
 			$output .= "</div></div>";
 			
-			
+			$output .= "</div>";
 			
 			$counterOuter++;
 			
 		}
 		$output .= "</div>";
+		
 						
 		return $output;
 	}

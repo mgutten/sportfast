@@ -486,15 +486,18 @@ class AjaxController extends Zend_Controller_Action
 		  $fail = $game->addMemberToGame($options['userID']); // echo result so js can handle case where user is not added (already a member)
 		  
 		  if (!$fail) {
-			  $notification = new Application_Model_Notification();
-			  $notification->actingUserID = $this->view->user->userID;
-			  $notification->receivingUserID = $options['userID'];
-			  $notification->gameID = $options['gameID'];
-			  $notification->action = 'become';
-			  $notification->type = 'game';
-			  $notification->details = 'member';
-			  
-			  $notification->save();
+			  if ($options['userID'] != $this->view->user->userID) {
+				  // Is not current user adding themself
+				  $notification = new Application_Model_Notification();
+				  $notification->actingUserID = $this->view->user->userID;
+				  $notification->receivingUserID = $options['userID'];
+				  $notification->gameID = $options['gameID'];
+				  $notification->action = 'become';
+				  $notification->type = 'game';
+				  $notification->details = 'member';
+				  
+				  $notification->save();
+			  }
 		  }
 		  
 		  echo $fail;

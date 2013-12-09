@@ -201,7 +201,7 @@ class Application_View_Helper_PlayersSection
 					$output .= "<div class='green-back clear team-confirm-img'></div>";
 					$output .= 	"<div class='hover-dark profile-player-overlay-container'>";
 					$output .=		"<div class='profile-player-overlay'>";
-					$output .=			"<p class='light width-100 center left margin-top default'>Guest of <span class='white'>" . $name . "</span></p>";
+					$output .=			"<p class='light width-100 center left margin-top default'>Guest of <br><span class='white'>" . $name . "</span></p>";
 					//$output .=			"<p class='light width-100 center left smaller-text'>not a member</p>";
 					$output .=		"</div>";
 					$output .=	"</div>";

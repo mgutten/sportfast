@@ -213,6 +213,10 @@ class Application_Model_Game extends Application_Model_ConfirmationsAbstract
 			$totalCount++;
 		}
 		
+		if ($totalCount == 0) {
+			return 0;
+		}
+		
 		return floor($finalRating/$totalCount);
 	}
 
@@ -303,6 +307,16 @@ class Application_Model_Game extends Application_Model_ConfirmationsAbstract
 		}
 		return $this->_attribs['park'];
 	}
+	
+	/**
+	 * get str of days and time that game happens
+	 * @returns str e.g. Thursdays at 4:30pm
+	 */
+	public function getGameDays()
+	{
+		return $this->gameDate->format('l') . 's at ' . ($this->gameDate->format('i') > 0 ? $this->gameDate->format('g:ia') : $this->gameDate->format('ga'));
+	}
+		
 
 	/**
 	 * get sendReminder 

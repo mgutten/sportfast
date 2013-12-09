@@ -222,6 +222,7 @@ abstract class Application_Model_MapperAbstract
 										)
 									)
 								) * (5/8 * 100) < 15') // Multiply by 100 to get km, 5/8 to convert to miles
+				   ->where('z.zipcodeType != "PO BOX"')
 				   ->group('z.cityID')
 				   ->order('GLength(LineStringFromWKB(
 									  LineString(

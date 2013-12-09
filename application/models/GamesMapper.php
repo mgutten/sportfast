@@ -65,9 +65,13 @@ class Application_Model_GamesMapper extends Application_Model_TypesMapperAbstrac
 						   '(COUNT(ug.userID) + SUM(ug.plus)) as confirmedPlayers',
 						   'SUM(ug.plus) as plus'
 						   ))
+			   ->joinLeft(array('gs' => 'game_subscribers'),
+			   			   'gs.gameID = g.gameID AND gs.userID = "' . $userID . '" AND gs.member = "1"',
+						   array('gameSubscriberID'))
 			   ->join(array('ust' => 'user_sport_types'),
 			   			  'ust.typeID = g.typeID AND ust.userID = "' . $userID . '"')
 			   //->where('g.cityID = ?', $cityID)
+			   ->where('gs.gameSubscriberID IS NULL')
 			   ->where('g.public = "1"')
 			   ->where('g.canceled = ?', '0')
 			   ->where('MBRContains(
@@ -271,7 +275,6 @@ class Application_Model_GamesMapper extends Application_Model_TypesMapperAbstrac
 					 	   'avg(us.attendance) as averageAttendance',
 						   'avg(us.sportsmanship) as averageSportsmanship',
 						   'avg(us.skillCurrent) - (SELECT skillCurrent FROM user_sports WHERE userID = "' . $userID . '" AND sportID = st.sportID) as skillDifference',
-						   
 						   ))
 			   ->joinLeft(array('u' => 'users'),
 			   		  'u.userID = us.userID',
@@ -317,6 +320,7 @@ class Application_Model_GamesMapper extends Application_Model_TypesMapperAbstrac
 		$select->having('(g.rosterLimit > confirmedPlayers OR confirmedPlayers IS NULL)');
 		
 		$select->group('g.gameID');
+		
 		
 		if (isset($options['order'])) {
 			// Order by
@@ -806,21 +810,27 @@ class Application_Model_GamesMapper extends Application_Model_TypesMapperAbstrac
 			   		  	  'gs2.userID = gs.userID AND gs2.gameID != gs.gameID')
 			   ->join(array('g' => 'games'),
 			   		  'g.gameID = gs2.gameID')
+			   ->join(array('st' => 'sport_types'),
+			   		  'st.typeID = g.typeID')
 			   ->joinLeft(array('gs3' => new Zend_Db_Expr('(' . $gameSubscribers . ')')),
 			   			  'gs3.gameID = gs2.gameID',
 						  array(''))
 			   ->where('gs3.gameID IS NULL')
 			   ->where('gs.gameID = ?', $game->gameID)
 			   ->group('gs2.gameID')
-			   ->having('sharedPlayers > 5');
+			   ->having('sharedPlayers > 6');
 		
-		echo $select;   
+		
 		$results = $table->fetchAll($select);
+
+		if (count($results) < 1) {
+			return false;
+		}
 		
 		$games = new Application_Model_Games();
 		
 		foreach ($results as $result) {
-			$game->addGame($result);
+			$games->addGame($result);
 		}
 		
 		return $games;
@@ -1039,7 +1049,7 @@ class Application_Model_GamesMapper extends Application_Model_TypesMapperAbstrac
 		$select->from(array('gs' => 'game_subscribers'))
 			   ->where('gs.userID = ?', $userID)
 			   ->where('gs.gameID = ?', $gameID);
-			   
+		
 		$result = $table->fetchRow($select);
 		
 		if ($result) {

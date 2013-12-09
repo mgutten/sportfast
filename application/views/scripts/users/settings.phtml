@@ -69,7 +69,13 @@ $this->placeholder('absolute')->captureEnd();
             </div>
             <div class='clear width-100'>
                 <?php 
-                echo "<div class='left settings-small'>" . $this->signupForm->age->setValue(($this->user->age ? $this->user->age : '')) . "</div>";
+				$dob = ($this->user->dob ? $this->user->getDobDate() : false);
+                echo "<div class='left settings-small'>" . $this->signupForm->dobMonth->setValue(($dob ? $dob->format('m') : '')) . 
+					"<span class='signup-dob-slash'>/</span>"
+ 					. $this->signupForm->dobDay->setValue(($dob ? $dob->format('d') : '')) . 
+			 		"<span class='signup-dob-slash'>/</span>"
+					. $this->signupForm->dobYear->setValue(($dob ? $dob->format('y') : '')) . 
+					"</div>";
                 ?>
                 
                 <div class='left' id='settings-height-container'>

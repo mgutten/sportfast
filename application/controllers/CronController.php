@@ -95,6 +95,16 @@ class CronController extends Zend_Controller_Action
 	}
 	
 	/**
+	 * delete teams marked for deletion
+	 * OFTEN: PER DAY
+	 */
+	public function deleteTeamsAction()
+	{
+		$mapper = $this->getMapper();
+		$mapper->deleteTeams();
+	}
+	
+	/**
 	 * update users age based on birthday
 	 * OFTEN: PER DAY
 	 */
@@ -123,6 +133,8 @@ class CronController extends Zend_Controller_Action
 	public function removeInactiveTypesAction()
 	{
 		$mapper = $this->getMapper();
+		
+		
 		return;
 		
 		$mapper->removeInactiveUsers();

@@ -10,6 +10,8 @@ var homeMapTipHovered = false;
 
 $(function() {
 	
+
+	
 	if ($('#member-find-minimal-container').length > 0) {
 		var top = $('#header-section-title-container-find').position().top
 		

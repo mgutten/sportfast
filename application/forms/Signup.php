@@ -20,9 +20,10 @@ class Application_Form_Signup extends Zend_Form
 				'required'		=> true,
 				'decorators'	=> array('Overlay'),
 				'validators'	=> array('alnum'),
-				'label'			=> 'First Name',
+				'label'			=> 'First Name<span class="inherit smaller-text"> what you go by</span>',
 				'class'			=> 'dropshadow',
-				'autocomplete'  => 'off'
+				'autocomplete'  => 'off',
+				'asterisk'		=> true
 				));
 			
 				
@@ -33,85 +34,105 @@ class Application_Form_Signup extends Zend_Form
 				'validators'	=> array(array('Regex', false, array('pattern' => '/^[a-zA-Z]+-*[a-zA-Z]*$/'))),
 				'label'			=> 'Last Name',
 				'class'			=> 'dropshadow',
-				'autocomplete'  => 'off'
+				'autocomplete'  => 'off',
+				'asterisk'		=> true,
+				'asterisk'		=> true
+				));
+				
+		$this->addElement('text', 'nickname', array(
+				'filters'		=> array('StringTrim'),
+				'required'		=> false,
+				'decorators'	=> array('Overlay'),
+				'validators'	=> array('alnum'),
+				'label'			=> 'Nickname<span class="inherit smaller-text"> what you go by</span>',
+				'class'			=> 'dropshadow',
+				'autocomplete'  => 'off',
+				'asterisk'		=> true
 				));
 				
 		$this->addElement('hidden', 'sex',  array(
-				'required'		=> true,
+				'required'		=> false,
 				'class'			=> 'basic',
-				'decorators'    => array('Hidden')
+				'decorators'    => array('Hidden'),
+				'asterisk'		=> true
 				));
 		
 		
-		/*
+		
 		$this->addElement('text', 'dobMonth',  array(
 				'filters'		=> array('StringTrim','StringToLower'),
-				'required'		=> true,
+				'required'		=> false,
 				'decorators'	=> array('Overlay'),
 				'validators'	=> array('digits'),
 				'label'			=> 'mm',
 				'tooltip'		=> 'Date of birth',
 				'class'			=> 'short-input dropshadow basic',
-				'maxlength'		=> 2
+				'maxlength'		=> 2,
+				'asterisk'		=> true
 				));
 				
 		$this->addElement('text', 'dobDay',  array(
 				'filters'		=> array('StringTrim','StringToLower'),
-				'required'		=> true,
+				'required'		=> false,
 				'decorators'	=> array('Overlay'),
 				'validators'	=> array('digits'),
 				'label'			=> 'dd',
 				'class'			=> 'short-input dropshadow basic',
-				'maxlength'		=> 2
+				'maxlength'		=> 2,
+				'asterisk'		=> true
 				));
 				
 		$this->addElement('text', 'dobYear',  array(
 				'filters'		=> array('StringTrim','StringToLower'),
-				'required'		=> true,
+				'required'		=> false,
 				'decorators'	=> array('Overlay'),
 				'validators'	=> array('digits'),
 				'label'			=> 'yy',
 				'class'			=> 'short-input dropshadow basic',
 				'maxlength'		=> 2,
-				'containerTooltip'	=> 'Date of birth:<ul><li>e.g. 07/25/90</li></ul>'
+				'containerTooltip'	=> 'Date of birth:<ul><li>e.g. 07/25/90</li></ul>',
+				'asterisk'		=> true
 				));
-				*/
-		
+				
+		/*		
 		$this->addElement('text', 'age',  array(
 				'filters'		=> array('StringTrim','StringToLower'),
-				'required'		=> true,
+				'required'		=> false,
 				'decorators'	=> array('Overlay'),
 				'validators'	=> array('digits'),
 				'label'			=> 'Age',
 				'tooltip'		=> 'Used to match you with other players your age.',
 				'class'			=> 'short-input dropshadow basic',
-				'maxlength'		=> 2
+				'maxlength'		=> 2,
+				'asterisk'		=> true
 				));
-		/*		
+		*/
 		$this->addElement('hidden', 'age',  array(
 				'validators'	=> array('digits'),
 				'decorators'    => array('Hidden')
 				));
-		*/
+		
 		
 		$this->addElement('text', 'heightFeet',  array(
 				'filters'		=> array('StringTrim','StringToLower'),
-				'required'		=> true,
+				'required'		=> false,
 				'decorators'	=> array('Overlay'),
 				'validators'	=> array('digits'),
 				'label'			=> 'ft',
 				'class'			=> 'short-input dropshadow',
-				'maxlength'		=> 1
+				'maxlength'		=> 1,
+				'asterisk'		=> true
 				));
 				
 		$this->addElement('text', 'heightInches',  array(
 				'filters'		=> array('StringTrim','StringToLower'),
-				'required'		=> true,
+				'required'		=> false,
 				'decorators'	=> array('Overlay'),
 				'validators'	=> array('digits'),
 				'label'			=> 'in',
 				'class'			=> 'short-input dropshadow',
-				'maxlength'		=> 2
+				'maxlength'		=> 2,
+				'asterisk'		=> true
 				));
 				
 		$this->addElement('hidden', 'height',  array(
@@ -141,7 +162,8 @@ class Application_Form_Signup extends Zend_Form
 				'label'			=> 'Username/Email',
 				'class'			=> 'dropshadow',
 				'containerTooltip'	=> 'Must be a valid email address: <br> <ul><li>e.g. johnsmith@gmail.com</li></ul>',
-				'autocomplete'  => 'off'
+				'autocomplete'  => 'off',
+				'asterisk'		=> true
 				));
 				
 		$this->addElement('password', 'signupPassword', array(
@@ -149,17 +171,19 @@ class Application_Form_Signup extends Zend_Form
 				'required'			=> true,
 				'decorators'		=> array('Overlay'),
 				'label'				=> 'Password',
-				'class'				=> 'dropshadow'
+				'class'				=> 'dropshadow',
+				'asterisk'		=> true
 				));
 				
 		$this->addElement('text', 'streetAddress', array(
 				'filters'			=> array('StringTrim','StringToLower'),
 				'required'			=> false,
 				'decorators'		=> array('Overlay'),
-				'label'				=> 'Street Address <span class="medium smaller-text">number and street name</span>',
+				'label'				=> 'Street Address <span class="inherit smaller-text">number and street name</span>',
 				'class'				=> 'dropshadow basic',
 				'containerTooltip'	=> 'Must be a valid street address: <br> <ul><li>e.g. 710 E Blithedale Ave #10</li></ul>',
-				'autocomplete'      => 'off'
+				'autocomplete'      => 'off',
+				'asterisk'		=> true
 				));
 				
 		$this->addElement('text', 'zipcode', array(
@@ -170,7 +194,8 @@ class Application_Form_Signup extends Zend_Form
 				'label'				=> 'Zip Code',
 				'class'				=> 'dropshadow',
 				'maxlength'			=> 5,
-				'containerTooltip'	=> 'Must be a valid street address: <br> <ul><li>e.g. 35 Silvertree Dr #10, 95131</li></ul>'
+				'containerTooltip'	=> 'Must be a valid street address: <br> <ul><li>e.g. 35 Silvertree Dr #10, 95131</li></ul>',
+				'asterisk'		=> true
 				));
 				
 		$this->addElement('hidden', 'userLocation',  array(

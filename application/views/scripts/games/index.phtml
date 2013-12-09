@@ -276,6 +276,9 @@ if ($this->topAlert && $this->userInGame) {
 } elseif ($this->pastGame) {
 	// This game already happened
 	echo "<div class='red-alert-box white heavy'>This game already happened!</div>";
+} elseif ($this->currentGame) {
+	// This game already happened
+	echo "<div class='green-alert-box white heavy'>This game is currently happening!</div>";
 }
 ?>
 
@@ -614,6 +617,29 @@ echo "<div id='team-players-container' class='clear width-100'>";
 echo $this->playerssection($this->game->players->users);
 
 echo "</div>";
+
+if ($this->similarGames) {
+	$similarGames = $this->similarGames->getAll();
+	$similarGame = $similarGames[0];
+	echo "<div class='clear game-similar-container width-100'>
+			<p class='clear medium'>Members of this game also play...</p>
+			<a href='/games/" . $similarGame->gameID . "' class='clear find-result-container animate-darker' gameID='" . $similarGame->gameID . "'>
+				<img src='" . $similarGame->getProfilePic('medium') . "' class='left img-medium-small'/>
+			
+				<div class='left find-result-left-container'>
+					<p class='clear larger-text darkest heavy'>" . $similarGame->getGameTitle() . "</p>
+					<p class='clear darkest'>" . $similarGame->getGameDays() . "</p>
+					<p class='clear medium'>" . $similarGame->parkName . "</p>
+				</div>
+				
+				<div class='left find-result-right-container'>
+					<p class='clear-right smaller-text medium'>You are not a member of this game</p>
+					<p class='clear-right button' id='game-become-member'>Become member</p>
+
+				</div>
+			</a>
+		</div>";
+}
 
 // Recent Activity section
 echo $this->partial('partials/global/sectionHeaderPlain.phtml',array('title' => 'Recent Activity'));

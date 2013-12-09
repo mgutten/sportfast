@@ -13,9 +13,21 @@
 	margin-top: 2em;
 }
 
+#signup-section-container1 > .input-container > input {
+	width: 11.5em;
+}
+
+#signup-section-container1 > .input-container > input#email {
+	width: 24.7em;
+}
+
 .header-section-title-container {
 	height: 49px;
 	margin-bottom: 1em;
+}
+
+#signup-required {
+	margin-top: .75em;
 }
 
 .signup-step-revise {
@@ -84,13 +96,27 @@ input.short-input {
 }
 
 #heightFeet-container {
-	margin-left: 8.1em;
+	clear: both;
+}
+
+#heightInches-container {
+	margin-left: .55em;
+}
+
+#dobMonth-container {
+	clear:both;
+}
+
+.signup-profile-desc {
+	margin-left: 1.4em;
 }
 
 #sexDropdown {
-	width:7.7em;
+	width:5.7em;
 	font-size:1.06em;
 	margin-left: 1em;
+	margin-bottom: .7em;
+	margin-top: .8em;
 }
 
 #sexDropdown > .dropdown-menu-selected {
@@ -224,11 +250,11 @@ input.input-fail, div.input-fail {
 }
 
 #zipcode-container {
-	width: 20%;
+	width: 11em;
 }
 
 #streetAddress-container {
-	width: 70%;
+	width: 63.5%;
 }
 
 #streetAddress {
@@ -242,7 +268,7 @@ input.input-fail, div.input-fail {
 #signup-account-zipcode-city {
 	float:left;
 	clear:both;
-	margin: -.5em 0em 0 76%;
+	margin: -1.2em 0em 0 76%;
 }
 
 ul.green {
@@ -262,6 +288,16 @@ ul.green {
 	height: auto;
 }
 
+#signup-checklist {
+	padding-left:.1em;
+}
+
+#signup-checklist > li {
+	margin-top: 7px;
+	line-height: 1em;
+	list-style-type: none;
+}
+
 div.signup-narrow-column-img-container {
 	margin: 0;
 }
@@ -275,7 +311,7 @@ div.signup-narrow-column-img-container {
 	display:none;
 }
 
-#account-info-first-name {
+#account-first-name {
 	margin-right: .25em;
 }
 
@@ -288,6 +324,11 @@ div.signup-narrow-column-img-container {
 #signup-sports-container {
 	overflow: hidden;
 	position:relative;
+}
+
+.signup-sports-complete {
+	margin-right: .5em;
+	margin-top: -1em;
 }
 
 #signup-sports-what {
@@ -329,7 +370,7 @@ div.signup-narrow-column-img-container {
 	clear:both;
 	/*border: 1px solid #E0E0E0;*/
 	display:none;
-	padding: .5em .5em;
+	padding: 1.5em .5em;
 	
 }
 
@@ -349,6 +390,11 @@ div.signup-narrow-column-img-container {
 
 .signup-sports-form-section-title {
 	float:left;
+	margin-bottom: .4em;
+}
+
+.signup-sports-form-section-title-description {
+	opacity: 0;
 }
 
 .signup-skill-slider {
@@ -358,14 +404,36 @@ div.signup-narrow-column-img-container {
 	margin: .3em 0 0em 0;
 }
 
+.signup-slider-value {
+	width:7.5em;
+}
+
 .signup-sports-selectable {
-	font-size: 1.3em;
+	/*font-size: 1.3em;*/
 	float:left;
-	margin: .25em 2em 0 0;
+	margin: 0em 1.2em 0 0;
+	padding: .2em .4em;
+}
+
+.signup-sports-selectable:hover {
+	background:#e3e3e3;
+}
+
+.signup-sports-selectable.green-bold {
+	font-family: 'Futura-Book';
+	color: #fff;
+	background: #58bf12;
+}
+
+.signup-sports-skill > .selectable-text {
+	margin-right: 1em;
 }
 
 .signup-sports-title {
-	font-size: 1.7em;
+	font-size: 1.8em;
+	width: 10em;
+	padding: .2em 0 .3em 0;
+	margin-bottom:-10px;
 }
 
 .signup-sports-remove {
@@ -432,6 +500,7 @@ div.signup-narrow-column-img-container {
 	margin: 4em 0 0 3em;
 	width: 7em;
 	padding-bottom: 0;
+	padding-top: .1em;
 }
 
 #signup-import-alert-guidelines {
@@ -492,20 +561,46 @@ div.signup-narrow-column-img-container {
 
 /* import section */
 
-.signup-import-main-img-container {
+#signup-why-profile {
+	margin-left: 1em;
+	margin-bottom: .4em;
+}
+
+.signup-import-main-img-container,
+.signup-import-main-img-container-medium {
 	float:left;
 	clear:both;
 	overflow:hidden;
 	width: 199px;
 	height: 160px;
 	border: 1px solid #444;
-	margin-left: 1.5em;
+	margin-left: 10em;
+	position:relative;
+}
+
+.why-profile {
+	margin-left: 13.7em;
+	margin-bottom: .3em;
+}
+
+.signup-import-main-img-container-medium {
+	width: 119px;
+	height: 96px;
+	margin-left: 1.1em;
 }
 
 .signup-import-main-img {
 	float:left;
 	clear:both;
 	margin: 0 0 0 0;
+}
+
+#signup-import-upload-overlay {
+	position:absolute;
+	top: 50%;
+	left: 0;
+	padding: .2em 0;
+	margin-top: -.7em;
 }
 
 .signup-import-main-current-text {
@@ -517,19 +612,19 @@ div.signup-narrow-column-img-container {
 .signup-import-main-text-container {
 	float:left;
 	margin: 0 0 0 2em;
-	width: 60%;
+	width: 72%;
 }
 
 #signup-import-main-upload-button-container {
 	float:left;
 	clear:both;
 	width: 100%;
-	height: 5em;
+	height: 2.7em;
 }
 
 #signup-import-main-upload-button {
 	float: none;
-	margin: 1.5em auto;
+	margin: .75em auto;
 	width: 8em;
 }
 
@@ -593,4 +688,20 @@ div.signup-narrow-column-img-container {
 	width: 40em;
 	left: 50%;
 	margin-left: -20em;
+}
+
+/* incomplete alert */
+#signup-incomplete-alert-container {
+	width:32em;
+	margin-left: -16em;
+	margin-top: -5em;
+	position:fixed;
+}
+
+#signup-incomplete-alert-container > .alert-body-container > .clear.button {
+	margin-left: 11.2em;
+}
+
+#signup-incomplete-alert-container > .alert-body-container > .left.button {
+	margin-left: 2em;
 }

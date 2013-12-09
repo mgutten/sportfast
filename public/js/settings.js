@@ -206,6 +206,22 @@ $(function()
 		changed = 'info';
 	})
 	
+	$('input').change(function()
+	{
+		var button;
+		if (changed == 'sports') {
+			button = $('#sports-save-changes-container');
+		} else if (changed == 'info') {
+			button = $('#info-save-changes-container')
+		}
+		
+		if (button.css('display') != 'block') {
+			button.css({'opacity': 0,
+						'display': 'block'})
+				  .stop().animate({opacity: 1}, 800);
+		}
+	})
+	
 	$(document).bind('mouseup.changed',function() {
 		
 		var button;
@@ -302,7 +318,7 @@ function updateSkillHiddenInput(sliderEle, value)
 function getSportName(ele) 
 {
 	var sportFormEle = $(ele).parents('.signup-sports-form');
-	var sportTitle   = sportFormEle.find('.signup-sports-title');
+	var sportTitle   = sportFormEle.find('.sport-title');
 	var sport        = sportTitle.text().toLowerCase();
 	
 	return sport;
@@ -310,6 +326,7 @@ function getSportName(ele)
 
 function buildSliders()
 {
+	
 	/* sliders */
 	var width = $('.signup-skill-slider').width();
 	// strackbar requires element to not be hidden (offset().left)
@@ -327,5 +344,6 @@ function buildSliders()
 										 trackerHeight: 20, 
 										 trackerWidth: 19 })
 	// Hide element again
+	
 	$('.signup-sports-hidden,#sports-container').hide();
 }

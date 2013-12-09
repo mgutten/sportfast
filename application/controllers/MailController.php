@@ -19,7 +19,8 @@ class MailController extends Zend_Controller_Action
 						'add-user-subscribe-game',
 						'add-user-team-game',
 						'add-user-team',
-						'unsubscribe-game');
+						'unsubscribe-game',
+						'invite-user-member');
 		if (!in_array($this->getRequest()->getActionName(), $render)) {
 			$this->_helper->layout()->disableLayout();
 			$this->_helper->viewRenderer->setNoRender(true);
@@ -418,7 +419,7 @@ class MailController extends Zend_Controller_Action
 			$output .= "<tr>
 						<td colspan='3'>
 							<p style='font-family: Arial, Helvetica, Sans-Serif; color: #333;font-size:14px;text-align:center'>You have been invited to join a weekly " . strtolower($typeModel->sport) . " game at " . $typeModel->park->parkName . ".  
-							<br><br>If you wish to view this game's details and/or receive communications regarding any game-related updates <strong>you should select an option below</strong> to join. If you have already joined using a different email address than this one, then you can disregard this message.  
+							<br><br>If you wish to view this game's details and/or receive future communications regarding any game-related updates <strong>you should select an option below</strong> to join. If you have already joined using a different email address than this one, then you can disregard this message.  
 							Otherwise, this will be your last email reminder regarding this game.</p>
 						</td>
 					 </tr>
@@ -574,11 +575,12 @@ class MailController extends Zend_Controller_Action
 			$userIDs = array();
 		}
 		
+		
+		
 		if (!empty($post['emails'])) {
 			// Emails have been posted
 			$emails = explode(',', $post['emails']);
 			
-
 			$pattern = '/([a-z0-9])(([-a-z0-9._])*([a-z0-9]))*\@([a-z0-9])' .
 						'(([a-z0-9-])*([a-z0-9]))+' . '(\.([a-z0-9])([-a-z0-9_-])?([a-z0-9])+)/i';
 			
@@ -586,6 +588,7 @@ class MailController extends Zend_Controller_Action
 				preg_match ($pattern, $emails[$i], $matches);
 				$emails[$i] = $matches[0];
 			}
+			
 			
 			$users = new Application_Model_Users();
 			$emailsExist = $users->emailsExist($emails);
@@ -601,12 +604,13 @@ class MailController extends Zend_Controller_Action
 			}
 		}
 		
+		
 		$note = '';
 		if (!empty($post['note'])) {
 			// Personalized note was sent
 			$note = $post['note'];
 		}
-		
+
 		if ($type == 'game') {
 			// Is game
 			$typeModel = new Application_Model_Game();
@@ -663,6 +667,8 @@ class MailController extends Zend_Controller_Action
 			
 			$mail->Body    = $body['html'];
 			$mail->AltBody = $body['text'];
+			
+			
 			
 			$mail->send();
 			//mail($userEmails[$userID], $mail->Subject, $body['html']);
@@ -884,6 +890,10 @@ class MailController extends Zend_Controller_Action
 			
 			$buttonSection = $this->buildConfirmedButtons($inUrl, $outUrl, $maybeUrl);
 			
+			if ($typeModel->isRecurring()) {
+				$buttonSection .= $this->buildMemberButtons($id, $isUser, $email);
+			}
+			
 			$text .= "\n \n \t IN: " . $inUrl;
 			$text .= "\n \t OUT: " . $outUrl;
 			$text .= "\n \t MAYBE: " . $maybeUrl . "\n";
@@ -908,17 +918,19 @@ class MailController extends Zend_Controller_Action
 					 
 		
 		if (!$isUser) {
-			$output .=  "<tr>
-						 <td height='15px'></td>
-					 </tr>
-					 <tr>
-						 <td colspan='3'>
-						 	<p style='font-family: Arial, Helvetica, Sans-Serif; font-size: 16px; color: #58bf12; font-weight: bold;text-align:center'>
-								You will not receive any future reminders regarding this " . $type . " or be able to view its details unless you " . ($type == 'game' ? 'select an option' : 'join') . ". 
-							</p>
-						 </td>
-					 </tr>
-					 " . $this->sportfastExplanation();
+			if ($type != 'game') {
+				$output .=  "<tr>
+							 <td height='15px'></td>
+						 </tr>
+						 <tr>
+							 <td colspan='3'>
+								<p style='font-family: Arial, Helvetica, Sans-Serif; font-size: 16px; color: #58bf12; font-weight: bold;text-align:center'>
+									You will not receive any future reminders regarding this " . $type . " or be able to view its details unless you " . ($type == 'game' ? 'select an option' : 'join') . ". 
+								</p>
+							 </td>
+						 </tr>";
+			}
+			$output .= $this->sportfastExplanation();
 			
 			$text .= $this->sportfastExplanation(true);
 					 
@@ -1425,7 +1437,7 @@ class MailController extends Zend_Controller_Action
 		$mail->AltBody = $text;
 		
 		$mail->send();
-		
+		//mail($email, $subject, $message);
 		/*
 		$headers  = "MIME-Version: 1.0" . "\r\n";
 		$headers .= "Content-type: text/html; charset=iso-8859-1" . "\r\n";
@@ -2444,6 +2456,60 @@ class MailController extends Zend_Controller_Action
 	}
 	
 	/**
+	 * add user as member of game 
+	 */
+	public function addUserMemberAction()
+	{
+		$gameID = $this->getRequest()->getParam('id');
+		$userID = $this->getRequest()->getParam('param2');
+		
+		$game = new Application_Model_Game();
+		$game->gameID = $gameID;
+		
+		$game->addMemberToGame($userID);
+		
+		$auth = Zend_Auth::getInstance();
+		
+		if (!$auth->hasIdentity()) {
+			// Log user in if not already
+			$user = new Application_Model_User();
+			$user->getUserBy('u.userID', $userID);
+			$user->login();
+			$auth->getStorage()->write($user);
+		}
+		
+		return $this->_redirect('/games/' . $gameID);
+	}
+	
+	/**
+	 * set session for user wanting to be member of game 
+	 */
+	public function inviteUserMemberAction()
+	{		
+		$gameID = $this->getRequest()->getParam('id');
+		$param2 = $this->getRequest()->getParam('param2');
+		$email = urldecode($this->getRequest()->getParam('param3'));
+		
+		$user = new Application_Model_User();
+		$exists = $user->getUserBy('u.username', $email);
+		
+		if ($exists) {
+			echo $email;
+			return;
+			return $this->_redirect('/mail/add-user-member/' . $gameID . '/' . $user->userID);
+		}
+				
+		$session = new Zend_Session_Namespace('signupInvite');
+		$session->type = 'game';
+		$session->id = $gameID;
+		$session->email = ($email == '1' ? '' : $email); // 1 is default value of param3
+		$session->confirmed = '3'; // Special confirmed value to show that they do not want to respond, but want to be added as member
+		
+		$this->_redirect('/games/' . $gameID);
+	}
+		
+
+	/**
 	 * inform users that a game was created for them
 	 */
 	public function gameCreatedAction()
@@ -2804,6 +2870,42 @@ class MailController extends Zend_Controller_Action
 						 </tr>";
 		}
 		
+		return $output;
+	}
+	
+	public function buildMemberButtons($gameID, $userID = false, $email = false)
+	{
+		if ($userID) {
+			$addSrc = "http://www.sportfast.com/mail/add-user-member/" . $gameID . "/" . $userID;
+			
+		} elseif ($email) {
+			$addSrc = "http://www.sportfast.com/mail/invite-user-member/" . $gameID . "/0/" . urlencode($email);
+		}
+		
+		$output = "<tr>
+						<td height='17px'></td>
+					</tr>
+                          <tr>
+                            <td align='center' colspan='3'><p style='font-family: Arial, Helvetica, Sans-Serif; font-size: 14px; color: #333; margin: 0;'><strong>OR</strong></p></td>
+						 </tr>
+                          <tr>
+							 <td height='17px'></td>
+						 </tr>
+						 <tr>
+							 <td align='center' colspan='3'>
+								<a href='" . $addSrc . "' class='green-button largest-text bold' style='text-decoration: none; font-family: Arial, Helvetica, Sans-Serif; font-size: 1em; font-weight: bold; color: #fff; background-color: #58bf12; padding: .2em 1em;'>Don't respond, but I'm interested in receiving emails for this game</a>
+							 </td>
+						 </tr><tr>
+						 <td height='15px'></td>
+					 </tr>
+					 <tr>
+						 <td colspan='3'>
+						 	<p style='font-family: Arial, Helvetica, Sans-Serif; font-size: 14px; color: #333; font-weight: bold;text-align:center'>
+								You will be added as a member of this game and can opt-in for reminder emails each week.  <br>Any of the above options will add you as a member.  
+							</p>
+						 </td>
+					 ";
+					 
 		return $output;
 	}
 	

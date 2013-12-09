@@ -1,3 +1,4 @@
+// JavaScript Document
 // signup.js
 var date = new Date();
 // array to store usable, copyable availability-calendars from other sports
@@ -6,13 +7,15 @@ var jcropAPI;
 var days = new Array('Su','M','T','W','Th','F','Sa');
 var oftenConversion = new Array('30','7','2','0');
 var failedCity;
+var sportFormTimeout;
+var confirmAction;
 
 $(function()
 {
-
 	/* update narrow column name value onkeyup */
 	$('#firstName,#lastName').keyup(function()
 	{
+		
 		var firstOrLast = true;
 		if ($(this).attr('id') == 'lastName') {
 			firstOrLast = false;
@@ -22,8 +25,12 @@ $(function()
 		var isValid = $(this).isValid({regex: regexp})
 		
 		changeInputBackground($(this),isValid);
+		
 		updateNarrowColumnName($(this).val(), firstOrLast);
+		
 		testDrop($(this));
+		
+		toggleAll();
 	})
 	
 	
@@ -42,6 +49,27 @@ $(function()
 	});
 	*/
 	
+	
+	/* yes or no clicked from incomplete sports alert */
+	$('#signup-incomplete-alert-container').find('.button').click(function()
+	{
+		if ($(this).is('.no')) {
+			hideAlerts();
+		} else {
+			// Proceed anyway
+			confirmAction();
+		}
+	})
+	
+	/* test for sport completeness */
+	$('.signup-sports-form').mouseup(function()
+	{
+		clearTimeout(sportFormTimeout);
+		sportFormTimeout = setTimeout(function() {
+			toggleAll();
+		}, 50);
+	})
+	
 	/* for sex dropdown onclick validate */
 	$('#dropdown-menu-sexDropdown').children('.dropdown-menu-option-container').click(function()
 	{
@@ -53,6 +81,7 @@ $(function()
 		$('#sex').val(sex);
 		
 		updateNarrowColumnGeneric('sex', sex);
+		toggleAll();
 		
 	});
 	
@@ -78,11 +107,22 @@ $(function()
 			$(this).limitVal(1,32);
 		}
 			
-		var isValid = $(this).isValid({minLength: 2, maxLength: 2, number:true});
+		var isValid = $(this).isValid({minLength: 1, maxLength: 2, number:true});
 		
 		changeInputBackground($(this), isValid);
 		
+		var dayValid = $('#dobDay').isValid({minLength: 1, maxLength: 2, number:true})
+		var monthValid = $('#dobMonth').isValid({minLength: 1, maxLength: 2, number:true})
+		var yearValid = $('#dobYear').isValid({minLength: 2, maxLength: 2, number:true})
+		
+		/*
 		if(($('#dobDay').val().length + $('#dobMonth').val().length + $('#dobYear').val().length) < 6) {
+			return;
+		}
+		*/
+		if(!dayValid ||
+		   !monthValid ||
+		   !yearValid) {
 			return;
 		}
 		
@@ -96,6 +136,7 @@ $(function()
 		$('#age').val(age);
 		
 		updateNarrowColumnGeneric('age',str);
+		toggleAll();
 	})
 	
 	
@@ -225,6 +266,8 @@ $(function()
 		var isValid = $(this).isValid({regex: regex});
 		
 		changeInputBackground($(this), isValid);
+		
+		toggleAll();
 	});
 	
 	/* show important tooltip for email */
@@ -250,8 +293,7 @@ $(function()
 		$('#tooltip').hide();
 	})
 	
-	
-	
+
 	/* validate signup password and reenter password */
 	$('#signupPassword,#signupReenterPassword').keyup(function()
 	{
@@ -270,6 +312,8 @@ $(function()
 		}
 		
 		changeInputBackground($('#signupReenterPassword'), isValid);	
+		
+		toggleAll();
 		
 	})
 	.focus(function()
@@ -334,6 +378,8 @@ $(function()
 		
 		changeInputBackground($(this), isValid);
 		
+		toggleAll();
+		
 		if (isValid) {
 			// Get city and state
 			getCity($(this).val(), populateCity);
@@ -361,10 +407,18 @@ $(function()
 		}
 	});
 	
+	/* show description of sport section on hover */
+	$('.signup-sports-form-section').hover(function()
+	{
+		$(this).find('.signup-sports-form-section-title-description').stop().animate({'opacity': 1}, 300);
+	}, function() {
+		$(this).find('.signup-sports-form-section-title-description').stop().animate({'opacity': 0}, 300);
+	})
 	
 	/* select sport, change color of sport icon onclick */
 	$('.sport-icon-large').click(function() 
 	{
+		
 		var sport = $(this).attr('tooltip').toLowerCase();
 		if ($(this).is('.selected-green')) {
 			// Already selected, return
@@ -388,7 +442,7 @@ $(function()
 		testDrop($(this));
 		
 		// Change hidden input for this sport to active
-		$('#' + sport + 'Active').val(true);
+		//$('#' + sport + 'Active').val(true);
 
 		// Hide any old dropdowns
 		// Uncomment to only allow one form at a time (remove else from above)
@@ -399,6 +453,8 @@ $(function()
 		
 		$('#signup-sports-container').prepend(hiddenEle)
 		animateNotShow(hiddenEle, down);
+		
+		toggleAll();
 		
 	})
 	
@@ -432,6 +488,8 @@ $(function()
 		toggleNarrowColumnSport(sport);
 		// Change hidden input for this sport to active
 		$('#' + sport + 'Active').val(false);
+		
+		toggleAll();
 		
 	})
 	
@@ -488,12 +546,22 @@ $(function()
 	
 	$('.signup-sports-what').find('.selectable-text').click(function()
 	{
-		if ($(this).text().toLowerCase() == 'league w/ refs' && $(this).is('.green-bold')) {
+		if ($(this).text().toLowerCase() == 'league' && $(this).is('.green-bold')) {
 			// Show positions
 			$(this).parents('.signup-sports-form').find('.signup-sports-position').show();
-		} else if ($(this).text().toLowerCase() == 'league w/ refs' && !$(this).is('.green-bold')) {
+		} else if ($(this).text().toLowerCase() == 'league' && !$(this).is('.green-bold')) {
 			// Hide positions
 			$(this).parents('.signup-sports-form').find('.signup-sports-position').hide();
+		}
+	})
+	
+	/* change background of agree prop on click */
+	$('#agree').change(function()
+	{
+		
+		if ($(this).prop('checked')) {
+			$('#agree').siblings('.checkbox-text').removeClass('dark-red-back white');
+			$('#agree').siblings('.checkbox-text').find('a').removeClass('dark-red-back white');
 		}
 	})
 	
@@ -546,7 +614,7 @@ $(function()
 	
 	
 	/* signup alert for import picture */
-	$('#signup-import-main-upload-button').click(function()
+	$('#signup-import-main-upload-button,.signup-import-main-img-container').click(function()
 	{
 		$('.alert-black-back,#signup-import-alert-container').show();
 	})
@@ -556,8 +624,14 @@ $(function()
 		$('.alert').hide();
 	});
 	
+	/* cancel current picture */
 	$('#signup-import-alert-cancel').click(function()
 	{
+		$('.signup-import-main-img-container').addClass('animate-opacity');
+		$('#signup-import-upload-overlay').show();
+		
+		toggleAll();
+		
 		$('#signup-import-main-img,.narrow-column-picture').css({width: 'auto',
 																 height: 'auto',
 																 marginTop: 0,
@@ -624,6 +698,15 @@ $(function()
 																								jcropAPI = this;
 																								})
 														
+														/* remove styling from main-img */
+														$('.signup-import-main-img-container').removeClass('animate-opacity')
+																							  .css('opacity', 1)
+																							  .attr('opacity', '');
+														
+														toggleAll();
+														
+														$('#signup-import-upload-overlay').hide();
+														
 														$('.signup-alert-rotate').show();				
 														$('#signup-import-alert-accept').show();
 														$('#signup-import-alert-cancel').show();
@@ -670,15 +753,24 @@ $(function()
 	{
 		var scrollToEle = new Array();
 		// Trigger each inputs keyup to add/remove input-fail class
-		$('input[type=password],input[type=text]').trigger('keyup');
+		$('.body-column-wide').find('input[type=password],input[type=text]').trigger('keyup');
 		var fail = false;
 		
-		$('input[type=password],input[type=text]').each(function()
+		$('.body-column-wide').find('input[type=password],input[type=text]').each(function()
 		{
+
+			if (typeof $(this).attr('required') != 'undefined') {
+				// Is required
+				
+				if ($(this).val().length < 1) {
+					$(this).addClass('input-fail');
+				}
+			}
+			
 			if (fail) {
-				// An input already failed
 				return;
 			}
+			
 			if ($(this).is('.input-fail')) {
 				// This input failed, scroll to show
 				if ($(this).is('#streetAddress') && $('#noAddress').prop('checked') == true) {
@@ -689,6 +781,7 @@ $(function()
 				fail = true;
 			}
 		})
+		
 		fail = true;
 		
 		/*
@@ -700,11 +793,12 @@ $(function()
 				fail = false;
 			}
 		})
-		*/
+		
 		if ($('#sexDropdown').find('.input-success').length < 1) {
 			$('#sexDropdown').children('.dropdown-menu-selected').addClass('input-fail');
 			scrollToEle.push($('#sexDropdown'));
 		}
+		*/
 		/*
 		if (fail) {
 			$('.signup-sex-img').parent().addClass('input-fail');
@@ -714,26 +808,55 @@ $(function()
 			
 			}
 		}
-		*/
+		
 	
 		var submitFormSectionEle;
 		// Test all the sports sections for completeness
 		if (submitFormSectionEle = submitFormTestSports()) {
 			scrollToEle.push(submitFormSectionEle)
 		}
-		
+		*/
 		
 		if ($('#agree').prop('checked') == false) {
 			// Have not checked the agree box
-			$('#agree').siblings('.checkbox-text').addClass('red');
+			$('#agree').siblings('.checkbox-text').addClass('dark-red-back white');
+			$('#agree').siblings('.checkbox-text').find('a').addClass('white');
 			scrollToEle.push($('#agree'))
 		}
-
+		
+		 
 		if (scrollToEle.length > 0) {
 			// Something failed along the way, scroll to the first failed element
 			$('html, body').animate({scrollTop: scrollToEle[0].offset().top - 20}, 1000);
 		} else {
 			// All inputs are clear and ready, submit the form!
+			
+			fail = false;
+			var sports = ''
+			$('.signup-sport-icon').each(function()
+			{
+				if ($(this).is('.selected-green')) {
+					// Sport is selected
+					var sport = $(this).attr('tooltip');
+					if ($('#signup-sports-form-' + sport.toLowerCase()).find('.signup-sports-complete').text().toLowerCase() != 'complete') {
+						// Is not fully filled out
+						fail = true;
+						sports += (sports == '' ? sport : '<br>' + sport);
+					}
+				}
+			})
+						
+			if (fail) {	
+				$('#signup-incomplete-sports').html(sports);	
+				showAlert($('#signup-incomplete-alert-container'));
+				
+				confirmAction = function() {
+						$('#signupForm').submit();
+				}
+				
+				return;
+			}
+			
 			$('#signupForm').submit();
 		}
 		
@@ -762,6 +885,113 @@ function rotateImage(src, leftOrRight, callback)
 		}
 	})
 }
+
+function toggleMinimal()
+{
+	if (testMinimal()) {
+		$('#signup-checklist').children('.minimal').addClass('green heavy');
+	} else {
+		$('#signup-checklist').children('.minimal').removeClass('green heavy');
+	}
+}
+
+function togglePicture()
+{
+	if (testPicture() && testMinimal()) {
+		$('#signup-checklist').children('.picture').addClass('green heavy');
+	} else {
+		$('#signup-checklist').children('.picture').removeClass('green heavy');
+	}
+}
+
+function toggleBasic()
+{
+	if (testBasic() && testMinimal()) {
+		$('#signup-checklist').children('.basic').addClass('green heavy');
+	} else {
+		$('#signup-checklist').children('.basic').removeClass('green heavy');
+	}
+}
+
+/**
+ * sex, age, and height
+ */
+function toggleFull()
+{
+	if (testFull() && testMinimal()) {
+		$('#signup-checklist').children('.full').addClass('green heavy');
+	} else {
+		$('#signup-checklist').children('.full').removeClass('green heavy');
+	}
+}
+	
+function toggleAll()
+{
+	toggleMinimal();
+	toggleBasic();
+	togglePicture();
+	toggleFull();
+}
+
+
+/**
+ * test to see what actions user has with current info (for minimal)
+ */
+function testMinimal()
+{
+	if ($('#firstName').is('.input-success') &&
+		$('#lastName').is('.input-success') &&
+		$('#email').is('.input-success') &&
+		$('#signupPassword').is('.input-success') &&
+		$('#signupReenterPassword').is('.input-success') &&
+		$('#zipcode').is('.input-success')) {
+			// All basic inputs are valid
+			return true;
+		} else {
+			return false;
+		}
+}
+
+/**
+ * test to see what actions user has with current info (for full account)
+ */
+function testFull()
+{
+	if ($('#age').val() != '' &&
+		$('#sex').val() != '') {
+			// All basic inputs are valid
+			return true;
+		} else {
+			return false;
+		}
+}
+
+/**
+ * test to see what actions user has with current info (for picture)
+ */
+function testPicture()
+{
+	if ($('.narrow-column-picture').attr('src') != '/images/users/profile/pic/large/default.jpg') {
+		// Not default picture
+		return true;
+	} else {
+		return false;
+	}
+}	
+
+/**
+ * test to see what actions user has with current info (for minimal)
+ */
+function testBasic()
+{
+	if (!submitFormTestSports(false)) {
+		// All basic inputs are valid
+		return true;
+	} else {
+		return false;
+	}
+}
+			
 
 function populateUploadedImg(data)
 {		
@@ -856,31 +1086,43 @@ function fadeOutInputOverlay(inputEle, focusIn)
 
 /**
  * form is being submitted, test all selected sports for completeness
- * @params(coords => coordinates of jcrop)
+ * @params(changeColor => bool if false, do not change color of header on fail)
  */
-function submitFormTestSports()
+function submitFormTestSports(changeColor)
 {
+
+	if (typeof changeColor == 'undefined') {
+		// Default to true
+		changeColor = true;
+	}
+	
+	
 	var scrollToEle = false;
 	var signupSportsSelected = $('.signup-sports-form.animate-hidden-selected');
 	
 	if (signupSportsSelected.length < 1) {
 		// No sports are selected
-		$('#signup-sports-what').addClass('red');
-		return scrollToEle = $('#signup-section-container2');
+		if (changeColor) {
+			$('#signup-sports-what').addClass('red');
+		}
+		scrollToEle = $('#signup-section-container2');
+		return scrollToEle;
 	}
+	
 	
 	signupSportsSelected.each(function()
 	{
 		var sport = getSportName($(this).children());
 		var section;
 
-		if (!loopSportsSections($(this))) {
+		if (!loopSportsSections($(this), changeColor)) {
 			
 			scrollToEle = $(this)
-			return false;
+			//return false;
 		}
 		
 	})
+	
 	
 	return scrollToEle;
 	
@@ -892,29 +1134,36 @@ function submitFormTestSports()
  * @params(formEle => .signup-sports-form)
  */
 
-function loopSportsSections(formEle) {
+function loopSportsSections(formEle, changeColor) {
 	
 	var sport    = getSportName(formEle.children());
 	var sections = new Array('position','type','what','often','availability');
 	var section;
 	var scrollToEle;
-		
+	
 	
 	for (i = 0; i < sections.length; i++) {
 		
 		if ((section = formEle.find('.signup-sports-' + sections[i])).length > 0) {
 			// Category is present, test for selected values
-			if (!testIfValues(section, sport)) {
+			if (!testIfValues(section, sport, changeColor)) {
 				
 				scrollToEle = formEle;
 			}
 		}
 	}
 	
-	
 	if (scrollToEle) {
+		formEle.find('.signup-sports-complete').text('Not Complete').addClass('red').removeClass('green');
+		
+		// Change hidden input for this sport to active
+		$('#' + sport + 'Active').val(false);
+		
 		return false;
 	}
+	
+	$('#' + sport + 'Active').val(true);
+	formEle.find('.signup-sports-complete').text('Complete').addClass('green').removeClass('red');
 	
 	return true;
 }
@@ -922,16 +1171,17 @@ function loopSportsSections(formEle) {
 /**
  * test sports form section for values
  * @params(section => section element,
- *	   	   sport   => what sport form we are in (str))
+ *	   	   sport   => what sport form we are in (str),
+ *		   changeColor => bool if true, change color to red on fail)
  */
-function testIfValues(section, sport)
+function testIfValues(section, sport, changeColor)
 {
 	var sectionTitle = capitalize($.trim(section.attr('section')));
 	var id           = sport + sectionTitle //e.g. basketballRating
 	var hiddenInput  = $('#' + id);
 	var titleEle     = section.children('.signup-sports-form-section-title');
 	var fail		 = false;
-
+	
 	
 	if (sectionTitle == 'Availability') {
 		// Special case for availability section
@@ -945,7 +1195,9 @@ function testIfValues(section, sport)
 		}
 		
 		if (fail) {
-			titleEle.addClass('red');
+			if (changeColor) {
+				titleEle.addClass('red');
+			}
 			return false;
 		} else {
 			titleEle.removeClass('red');
@@ -978,7 +1230,9 @@ function testIfValues(section, sport)
 	
 	// Rest of sections test if input has any values
 	if (hiddenInput.val().length < 1) {
-		titleEle.addClass('red');
+		if (changeColor) {
+			titleEle.addClass('red');
+		}
 		return false;
 	} else {
 		titleEle.removeClass('red');
@@ -1001,14 +1255,28 @@ function updateProfilePic(coords)
 	var ry = 160 / coords.h; 
 	var height = $('#signup-import-alert-img').height(); // height of original image
 	var width  = $('#signup-import-alert-img').width() //width of original image
+	
+	var rxMed = rx * 116/199;
+	var ryMed = ry * 96/160;
 
 	
-	$('#signup-import-main-img,.narrow-column-picture').css({
+	$('.narrow-column-picture,#signup-import-main-img').css({
 		width: Math.round(rx * width) + 'px',
 		height: Math.round(ry * height) + 'px',
 		marginLeft: '-' + Math.round(rx * coords.x) + 'px',
 		marginTop: '-' + Math.round(ry * coords.y) + 'px'
 	});
+	
+	/* smaller main pic 
+	$('#signup-import-main-img').css({
+		width: Math.round(rxMed * width) + 'px',
+		height: Math.round(ryMed * height) + 'px',
+		marginLeft: '-' + Math.round(rxMed * coords.x) + 'px',
+		marginTop: '-' + Math.round(ryMed * coords.y) + 'px'
+	});
+	*/
+	
+	
 	
 	$('#fileWidth').val(coords.w);
 	$('#fileHeight').val(coords.h);
@@ -1026,16 +1294,14 @@ function testDrop(ele)
 		var id = $.trim(ele.parents('.signup-section-container').find('.header-section-title').text().toLowerCase()).replace(/ /g,'-');
 		var narrowColumnEle = $('#narrow-column-' + id);
 		var hiddenEle	    = narrowColumnEle.find('.narrow-column-body');
-		
-		
+	
 		if (hiddenEle.is('.animate-hidden-selected')) {
 			return;
 		}
-	
+		
 		if (hiddenEle.innerHeight() > 5) {
 			// Body of narrow column has values in it
 			narrowColumnEle.find('.narrow-column-header').trigger('click');
-
 		}
 }
 
@@ -1050,10 +1316,10 @@ function updateNarrowColumnName (value, firstOrLast)
 	var ele;
 	if (firstOrLast) {
 		// First name being changed
-		ele = $('#account-info-first-name');
+		ele = $('#account-first-name');
 	} else {
 		// Last name being changed
-		ele = $('#account-info-last-name');
+		ele = $('#account-last-name');
 		// Only show first letter of last name
 		value = (value[0] ? value[0] : '');
 	}
@@ -1098,7 +1364,7 @@ function findAge(month, day, year)
  */
 function updateNarrowColumnGeneric(section, str)
 {
-	var ele 	    = $('#account-info-' + section);
+	var ele 	    = $('#account-' + section);
 	var priorLength = $.trim(ele.text()).length;
 	
 	ele.text(str)
@@ -1278,7 +1544,7 @@ function updateAvailabilityHiddenInput(dayEle)
 function getSportName(ele) 
 {
 	var sportFormEle = $(ele).parents('.signup-sports-form');
-	var sportTitle   = sportFormEle.find('.signup-sports-title');
+	var sportTitle   = sportFormEle.find('.signup-sports-title').children('.sport-title');
 	var sport        = sportTitle.text().toLowerCase();
 	
 	return sport;
@@ -1390,4 +1656,3 @@ function isSignup()
 		return false;
 	}
 }
-

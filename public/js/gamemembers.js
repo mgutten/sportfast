@@ -30,7 +30,7 @@ $(function()
 		var type   = idType.replace(/ID/, '');
 		var details;	
 		
-		addMemberToGame(typeID, receivingUserID);	
+		addMemberToGame(typeID, receivingUserID, memberAdded);	
 		
 		
 		return false; // prevent bug that closes animated div after selecting a name from the results
@@ -59,28 +59,12 @@ $(function()
 	
 })
 
-/**
- * invite user to type (game or team)
- * @params (gameID => gameID,
- *			userID => userID of member being added
- */
-function addMemberToGame(gameID, userID)
+function memberAdded(data) 
 {
-	
-	var options = {gameID: gameID,
-				   userID: userID};
-	   
-	$.ajax({
-		url:'/ajax/add-member-to-game',
-		type: 'POST',
-		data: {options: options},
-		success: function(data) {
-			var str = 'Member added <br><span class="white">(reload to view changes)</span>';
-			if (data != '') {
-				// Is already a member
-				str = 'This user is already a member';
-			}
-			showConfirmationAlert(str);
-		}
-	})
+	var str = 'Member added <br><span class="white">(reload to view changes)</span>';
+	if (data != '') {
+		// Is already a member
+		str = 'This user is already a member';
+	}
+	showConfirmationAlert(str);
 }

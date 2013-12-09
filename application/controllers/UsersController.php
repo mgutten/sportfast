@@ -233,7 +233,7 @@ class UsersController extends Zend_Controller_Action
 		$user->lastName = $post['lastName'];
 		$user->dob = $post['dob'];
 		$user->age = $post['age'];
-		//$user->setAgeFromDob();
+		$user->setAgeFromDob();
 		//$user->weight = $post['weight'];
 		$user->setHeightFromFeetAndInches($post['heightFeet'], $post['heightInches']);
 		$user->noEmail = ($post['noEmail'] == 'on' ? 0 : 1);

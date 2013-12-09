@@ -150,11 +150,13 @@ class SignupController extends Zend_Controller_Action
 				return;
 			} else {
 				// Form is valid
+				$agePosted = $sportPosted = $sexPosted;
+				
 				$user 	  = new Application_Model_User();
 				$userInfo = $user->getAttribs();
 				
 				// Get user location
-				if ($post['noAddress']) {
+				if (empty($post['streetAddress'])) {
 					// No address provided
 					$location = new Application_Model_Location();
 					$location->getLocationByZipcode($post['zipcode']);
@@ -174,7 +176,7 @@ class SignupController extends Zend_Controller_Action
 									 
 				$user->city = $user->city->city;
 				
-				$user->account = '2';
+				//$user->account = '2';
 				
 				// Set verifyHash for user
 				$user->verifyHash = md5($_POST['email']);
@@ -190,8 +192,14 @@ class SignupController extends Zend_Controller_Action
 				//$post['dobYear'] = ($post['dobYear'] < date('y') ? '20' : '19') . $post['dobYear'];
 				//$post['dob'] = $post['dobYear'] . '-' . $post['dobMonth'] . '-' . $post['dobDay'];
 				
-				$post['age'] = (int) $post['age'];
-				$post['sex'] = $post['sex'][0];
+				if (!empty($post['age'])) {
+					$post['age'] = (int) $post['age'];
+					$agePosted = true;
+				}
+				if (!empty($post['sex'])) {
+					$post['sex'] = $post['sex'][0];
+					$sexPosted = true;
+				}
 				
 				foreach ($post as $key => $val) {
 					// Update all of User's attribs with appropriate post data
@@ -226,6 +234,8 @@ class SignupController extends Zend_Controller_Action
 						// Sport was not selected
 						continue;
 					}
+					
+					$sportPosted = true;
 					
 					$sportModel = $user->getSport($sport);
 					
@@ -330,6 +340,12 @@ class SignupController extends Zend_Controller_Action
 					}
 					
 				}
+
+				if ($agePosted && $sportPosted && $sexPosted) {
+					$user->account = '2';
+				} else {
+					$user->account = '1';
+				}
 				
 				
 				$user->save(true);
@@ -420,7 +436,7 @@ class SignupController extends Zend_Controller_Action
 				$mail->Body    = $message;
 				$mail->AltBody = $text;
 				
-				
+				/* send confirmation email
 				$this->view->whiteBacking = false;
 				$this->view->username = $user->username;
 				if($mail->send()) {
@@ -431,6 +447,9 @@ class SignupController extends Zend_Controller_Action
 					mail('support@sportfast.com', 'Signup Mail Failure', 'Mail could not be sent to: ' . $user->username, $headers);
 					//echo 'An error occured.  Email could not be sent to ' . $user->username . '.';
 				}
+				*/
+				
+				
 				
 			} 
 		} 
@@ -455,6 +474,8 @@ class SignupController extends Zend_Controller_Action
 			$images->createimages($fileInfo, $userID);
 		}
 		
+		$this->_redirect('/signup/verify/' . $user->verifyHash);
+		
 	}
 	
 	public function verifyAction()
@@ -478,14 +499,20 @@ class SignupController extends Zend_Controller_Action
 					$game = new Application_Model_Game();
 					$game->gameID = $session->id;
 					
-					$game->addUserToGame($userID, $session->confirmed);
+					if ($session->confirmed == '3') {
+						// Special case where add user as member, but not to game
+						$game->addMemberToGame($userID);
+					} else {
 					
-					$confirmed = $session->confirmed;
-			
-					$session = new Zend_Session_Namespace('signupAdded');
-					$session->type = 'game';
-					$session->id = $game->gameID;
-					$session->confirmed = $confirmed;
+						$game->addUserToGame($userID, $session->confirmed);
+						
+						$confirmed = $session->confirmed;
+				
+						$session = new Zend_Session_Namespace('signupAdded');
+						$session->type = 'game';
+						$session->id = $game->gameID;
+						$session->confirmed = $confirmed;
+					}
 				} else {
 					// Is team
 					$team = new Application_Model_Team();
@@ -760,14 +787,20 @@ class SignupController extends Zend_Controller_Action
 			$game = new Application_Model_Game();
 			$game->gameID = $session->id;
 			
-			$game->addUserToGame($user->userID, $session->confirmed);
+			if ($session->confirmed == '3') {
+				// Special case where user wants to be added as member but not to game currently
+				$game->addMemberToGame($user->userID);
+			} else {
 			
-			$confirmed = $session->confirmed;
-			
-			$session = new Zend_Session_Namespace('signupAdded');
-			$session->type = 'game';
-			$session->id = $game->gameID;
-			$session->confirmed = $confirmed;
+				$game->addUserToGame($user->userID, $session->confirmed);
+				
+				$confirmed = $session->confirmed;
+				
+				$session = new Zend_Session_Namespace('signupAdded');
+				$session->type = 'game';
+				$session->id = $game->gameID;
+				$session->confirmed = $confirmed;
+			}
 		} elseif ($session->type == 'team') {
 			// Is team
 			$team = new Application_Model_Team();

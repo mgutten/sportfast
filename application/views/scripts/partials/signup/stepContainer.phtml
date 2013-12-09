@@ -3,6 +3,12 @@
     		<p class='darkest signup-step-revise arial bold'>STEP <?php echo $this->currentStep;?></p>
             <p class='header-section-title header white'><?php echo strtoupper($this->title);?></p>
             <img src='/images/global/section_header_finish.png' class='header-section-finish' />
+            <?php
+				if ($this->content) {
+					echo $this->content;
+				}
+			?>	
+			
             <!--<p class='signup-section-steps header darkest'><span class='signup-step'>step </span><?php echo '<span class="signup-step-bold header">' . $this->currentStep . '</span>
 					<span class="signup-step"> of ' . $this->totalSteps . '</span>';?></p>-->
     </div>

@@ -102,6 +102,30 @@ $(function()
 			$('#game-password-reqs').hide();
 		})*/
 		
+		/* show description for minimal signup on hover */
+		$('.game-signup-hover').hover(function()
+		{
+			if ($(this).find('input').is(':focus')) {
+				return;
+			}
+			$(this).children('.game-signup-hover-target').stop().animate({opacity: 1}, 300);
+		}, function()
+		{
+			if ($(this).find('input').is(':focus')) {
+				return;
+			}
+			$(this).children('.game-signup-hover-target').stop().animate({opacity: 0}, 300);
+		})
+		
+		$('.game-signup-hover').find('input').focus(function()
+		{
+			$(this).parents('.game-signup-hover').children('.game-signup-hover-target').stop().animate({opacity: 1}, 300);
+		})
+		.blur(function()
+		{
+			$(this).children('.game-signup-hover-target').stop().animate({opacity: 0}, 300);
+		})
+		
 		$('.games-signup-option-container').click(function()
 		{
 			var inputs = '#firstName,#lastName,#signupPassword';
@@ -1202,6 +1226,29 @@ function changeTypeAttribs(options)
 		type: 'POST',
 		data: {options: options},
 		success: function(data) {
+		}
+	})
+}
+
+/**
+ * add user as member (game or team)
+ * @params (gameID => gameID,
+ *			userID => userID of member being added
+ */
+function addMemberToGame(gameID, userID, callback)
+{
+
+	var options = {gameID: gameID,
+				   userID: userID};
+	   
+	$.ajax({
+		url:'/ajax/add-member-to-game',
+		type: 'POST',
+		data: {options: options},
+		success: function(data) {
+			if (typeof callback != 'undefined') {
+				callback(data);
+			}
 		}
 	})
 }

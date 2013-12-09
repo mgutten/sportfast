@@ -3,6 +3,10 @@
 	padding-top: 2em;
 }
 
+.find-result-container {
+	border-bottom: none;
+}
+
 /* top section */
 .user-name,.profile-name {
 	font-size: 3em;
@@ -697,6 +701,10 @@ input[type=text].profile-manage-team-info-roster-limit {
 	
 }
 
+.game-signup-hover-target {
+	opacity:0;
+}
+
 #game-signup-minimal {
 	border-top: none;
 }
@@ -706,7 +714,7 @@ input[type=text].profile-manage-team-info-roster-limit {
 }
 
 #game-signup-logo {
-	margin-left: 8.2em;
+	margin-left: 8.9em;
 	width: 160px;
 }
 

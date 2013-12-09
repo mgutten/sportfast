@@ -24,7 +24,6 @@ class Application_Model_CronMapper extends Application_Model_MapperAbstract
 			$moveGame = "UPDATE games SET gameID = ((
 														SELECT gameID
 														FROM (SELECT MAX(gameID) as gameID FROM games) AS g2
-														
 													) + 1) 
 							WHERE parkID = 0 AND sportID = 0 AND public = 0";
 			$db->query($moveGame);
@@ -41,7 +40,7 @@ class Application_Model_CronMapper extends Application_Model_MapperAbstract
 										g.minPlayers, g.canceled, g.cancelReason, g.remove, g.sportfastCreated, COUNT(ug.userID), (NOW() + INTERVAL " . $this->getTimeOffset() . " HOUR)
 									FROM games g 
 									LEFT JOIN user_games ug ON (ug.gameID = g.gameID AND ug.confirmed = '1')
-									WHERE g.date < (NOW() + INTERVAL " . $this->getTimeOffset() . " HOUR) 
+									WHERE g.date < (NOW() + INTERVAL " . $this->getTimeOffset() . " HOUR - INTERVAL 90 MINUTE) 
 									AND g.gameID != (SELECT MAX(gameID) FROM games)
 									AND g.parkID != 0
 									AND g.sportID != 0
@@ -112,20 +111,44 @@ class Application_Model_CronMapper extends Application_Model_MapperAbstract
 		$updateGames = "UPDATE games SET date = DATE_ADD(date,INTERVAL 1 WEEK),
 										 canceled = 0,
 										 cancelReason = '' 
-							WHERE date < (NOW() + INTERVAL " . $this->getTimeOffset() . " HOUR)
+							WHERE date < (NOW() + INTERVAL " . $this->getTimeOffset() . " HOUR - INTERVAL 90 MINUTE)
 								AND recurring = 1
 								AND (remove IS NULL OR
 									 remove = '0000-00-00')";
 							
 		$db->query($updateGames);
 		
-		// Delete user_games
-		$deleteUserGames = "DELETE FROM user_games 
-							WHERE user_games.gameID IN (" . $gameIDs . ")";
-												   
-		$db->query($deleteUserGames);
+		if ($gameIDs) {
+			// Delete user_games
+			$deleteUserGames = "DELETE FROM user_games 
+								WHERE user_games.gameID IN (" . $gameIDs . ")";
+													   
+			$db->query($deleteUserGames);
+		}
 									
 		
+	}
+	
+	/**
+	 * delete teams who are marked for deletion with remove column
+	 */
+	public function deleteTeams()
+	{
+		$db = Zend_Db_Table::getDefaultAdapter();
+		
+		$insert = "INSERT INTO old_teams (teamID, sportID, sport, rosterLimit, teamName, public, 
+										  city, cityID, captain, systemCreated, minSkill, maxSkill,
+										  minAge, maxAge, picture, remove, lastActive, movedDate)
+								 (SELECT teamID, sportID, sport, rosterLimit, teamName, public,
+										  city, cityID, captain, sportfastCreated, minSkill, maxSkill,
+										  minAge, maxAge, picture, remove, lastActive, NOW() 
+										FROM teams 
+										WHERE remove = CURDATE())";
+										
+		$db->query($insert);
+		
+		$delete = "DELETE FROM teams WHERE remove = CURDATE()";
+		$db->query($delete);
 	}
 	
 	/**
@@ -325,7 +348,7 @@ class Application_Model_CronMapper extends Application_Model_MapperAbstract
 									INNER JOIN user_games ug2 ON u2.userID = ug2.userID 
 									WHERE u2.fake = 0 AND ug2.confirmed = 1 
 									GROUP BY ug2.gameID) ug ON g.gameID = ug.gameID
-						WHERE CASE WHEN (HOUR((NOW() + INTERVAL " . $this->getTimeOffset() . " HOUR)) >= 19 AND MINUTE((NOW() + INTERVAL " . $this->getTimeOffset() . " HOUR)) > 31) THEN HOUR(TIMEDIFF(g.date, (NOW() + INTERVAL " . $this->getTimeOffset() . " HOUR))) <= 13 AND g.date >= (NOW() + INTERVAL " . $this->getTimeOffset() . " HOUR) ELSE (HOUR(TIMEDIFF(g.date, (NOW() + INTERVAL " . $this->getTimeOffset() . " HOUR))) = 1 and MINUTE(TIMEDIFF(g.date, (NOW() + INTERVAL " . $this->getTimeOffset() . " HOUR))) < 29) AND g.date >= (NOW() + INTERVAL " . $this->getTimeOffset() . " HOUR) END
+						WHERE CASE WHEN (HOUR((NOW() + INTERVAL " . $this->getTimeOffset() . " HOUR)) >= 19 AND MINUTE((NOW() + INTERVAL " . $this->getTimeOffset() . " HOUR)) > 31) THEN HOUR(TIMEDIFF(g.date, (NOW() + INTERVAL " . $this->getTimeOffset() . " HOUR))) <= 11 AND g.date >= (NOW() + INTERVAL " . $this->getTimeOffset() . " HOUR) ELSE (HOUR(TIMEDIFF(g.date, (NOW() + INTERVAL " . $this->getTimeOffset() . " HOUR))) = 1 and MINUTE(TIMEDIFF(g.date, (NOW() + INTERVAL " . $this->getTimeOffset() . " HOUR))) < 29) AND g.date >= (NOW() + INTERVAL " . $this->getTimeOffset() . " HOUR) END
 							AND g.canceled = 0
 						GROUP BY g.gameID";
 
