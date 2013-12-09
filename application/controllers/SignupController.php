@@ -167,6 +167,8 @@ class SignupController extends Zend_Controller_Action
 					$location->location = $post['userLocation'];
 					$user->userLocation = $location;
 				}
+				
+				$user->zipcode = $post['zipcode'];
 
 				
 				// Set city obj for user
@@ -189,8 +191,8 @@ class SignupController extends Zend_Controller_Action
 				$user->setCurrent('lastActive');
 				
 				// Convert dob inputs to db format
-				//$post['dobYear'] = ($post['dobYear'] < date('y') ? '20' : '19') . $post['dobYear'];
-				//$post['dob'] = $post['dobYear'] . '-' . $post['dobMonth'] . '-' . $post['dobDay'];
+				$post['dobYear'] = ($post['dobYear'] < date('y') ? '20' : '19') . $post['dobYear'];
+				$post['dob'] = $post['dobYear'] . '-' . $post['dobMonth'] . '-' . $post['dobDay'];
 				
 				if (!empty($post['age'])) {
 					$post['age'] = (int) $post['age'];

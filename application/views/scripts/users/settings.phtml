@@ -92,7 +92,7 @@ $this->placeholder('absolute')->captureEnd();
             <div id='signup-account-zipcode-city' class='left'></div>
             <div class='clear width-100' id='street-container'>
 				<?php echo $this->signupForm->streetAddress->setValue($this->user->streetAddress);?>
-                <?php echo "<div class='left settings-separate'>" . $this->signupForm->zipcode . "</div>";?>
+                <?php echo "<div class='left settings-separate'>" . $this->signupForm->zipcode->setValue(($this->user->zipcode ? $this->user->zipcode : '')) . "</div>";?>
             </div>
         </div>
         <a href='/users/<?php echo $this->user->userID;?>/upload' class='right' id='settings-profile-pic-container' tooltip='Upload new profile picture'>

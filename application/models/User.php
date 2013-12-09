@@ -21,6 +21,7 @@ class Application_Model_User extends Application_Model_ModelAbstract
 									'verifyHash' 	=> '',
 									'dob'			=> '',
 									'city'			=> '',
+									'zipcode'		=> '',
 									'sports'		=> array(),
 									'picture'		=> '',
 									'notifications' => '',
@@ -447,6 +448,9 @@ class Application_Model_User extends Application_Model_ModelAbstract
 	
 	public function getDobDate()
 	{
+		if ($this->_attribs['dob'] == '0000-00-00') {
+			return false;
+		}
 		return DateTime::createFromFormat('Y-m-d', $this->dob);
 	}
 	

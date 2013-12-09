@@ -42,7 +42,9 @@ class Application_View_Helper_MemberHomepage
 			
 			$session = new Zend_Session_Namespace('postLoginURL');	
 			if ($session->url &&
-				!$this->_view->signupAdded) {  
+				!$this->_view->signupAdded &&
+				strpos(strtolower($session->url),'jcrop') == -1 // Unknown bug that leads to Jcrop.gif on upload pic for signup
+				) {  
 				echo "<p class='clear width-100 center medium margin-top'>or</p>";
 				$type = (strpos($session->url, 'game') != false ? 'game' : 'team');
 				echo "<div class='clear width-100'>

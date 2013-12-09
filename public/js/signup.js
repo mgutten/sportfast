@@ -9,6 +9,7 @@ var oftenConversion = new Array('30','7','2','0');
 var failedCity;
 var sportFormTimeout;
 var confirmAction;
+var typing;
 
 $(function()
 {
@@ -343,9 +344,14 @@ $(function()
 		
 		changeInputBackground($(this), isValid);
 		
-		if (isValid) {
-			testGeocode();
-		}
+		clearTimeout(typing)
+		
+		typing = setTimeout(function() {
+			typing = false;
+			if (isValid) {
+				testGeocode();
+			}
+		}, 500);
 	})
 	
 	$('#signup-account-address-container').hover(function()

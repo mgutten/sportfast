@@ -266,6 +266,8 @@ class UsersController extends Zend_Controller_Action
 			$user->streetAddress = $post['streetAddress'];
 			$user->city = $user->getCity()->city;
 			
+			$user->zipcode = $post['zipcode'];
+			
 			$user->userLocation->save();
 		}
 		
