@@ -17,7 +17,7 @@ class Application_Model_CitiesMapper extends Application_Model_MapperAbstract
 			   ->join(array('z' => 'zipcodes'),
 			   		  'c.cityID = z.cityID')
 		       ->where('z.zipcode = ?', $zipcode)
-			   ->where('z.zipcodeType = "STANDARD"');
+			   ->where('z.zipcodeType = "STANDARD" OR z.zipcodeType = "UNIQUE"');
 			   
 		$results = $table->fetchAll($select);
 		$result = $results->current();

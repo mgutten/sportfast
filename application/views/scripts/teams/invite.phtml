@@ -5,6 +5,7 @@
  */
 $this->headTitle(ucwords($this->type) . ' Invite');
 $this->headLink()->prependStylesheet($this->baseUrl() . '/css/profile.css');
+$this->headLink()->prependStylesheet($this->baseUrl() . '/css/invite.css');
 $this->headScript()->prependFile($this->baseUrl() . '/js/createsuccess.js');
 ?>
 
@@ -15,12 +16,20 @@ $this->headScript()->prependFile($this->baseUrl() . '/js/createsuccess.js');
 	//echo $this->partial('partials/global/sectionHeaderBold.phtml',array('title'   => 'Invite players')); 
 	?>
     
-    <form action='/mail/invite-type' method='post'>
+    <form action='/mail/invite-type' method='post' id='invite-form'>
     
-    <p class='clear larger-margin-top darkest heavy'>Copy and paste emails here <span class='dark'>(comma separated)</span></p>
-    <textarea class='white-back dropshadow clear' id='profile-invite-emails' name='emails'></textarea>
+    <p class='left medium heavy larger-margin-top' id='invite-numEmails-container'><span class='inherit' id='invite-numEmails'>0</span> recipients</p>
+    <div class='clear white-background dropshadow' id='profile-invite-emails-outer-container'>
+    	<div class='clear width-100' id='profile-invite-parsedEmails'>
+        </div>
+        <?php echo $this->form->emailsTextArea;?>
+    </div>
+        
     
-    <?php echo $this->note;?>
+    <?php 
+		echo $this->form->note;
+		echo $this->form->emails;
+	?>
     <p class='clear medium pointer margin-top' id='create-success-addNote'>+add personal note</p>
     <p class='clear medium pointer margin-top hidden' id='create-success-removeNote'>remove personal note</p>
     

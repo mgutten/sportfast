@@ -10,6 +10,8 @@ class Application_Model_CronMapper extends Application_Model_MapperAbstract
 	 */
 	public function moveGamesToOld()
 	{
+		$gameIDs = false;
+		
 		$db = Zend_Db_Table::getDefaultAdapter();
 		
 		$testGameUpdate = "SELECT MAX(gameID) as top FROM games 
@@ -518,7 +520,9 @@ class Application_Model_CronMapper extends Application_Model_MapperAbstract
 			   ->where('DATE(g.date) = DATE(NOW() + INTERVAL 1 DAY)')
 			   ->where('gi.numInvites = 1')
 			   ->where('gi.email != ""')
+			   ->where('DATEDIFF(CURDATE(), gi.firstSent) > 5')
 			   ->group(new Zend_Db_Expr('gi.email, gi.gameID'));
+			   
 
 		$results = $table->fetchAll($select);
 		

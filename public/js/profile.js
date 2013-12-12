@@ -59,6 +59,7 @@ $(function()
 			var isValid = $(this).isValid({regex: regexp})
 			
 			changeInputBackground($(this),isValid);
+			
 		})
 		
 		/* check email validation */
@@ -68,6 +69,7 @@ $(function()
 			var value   = $(this).val();
 			var regex	= /^\S+@\S+\.\S+$/;
 			var isValid = $(this).isValid({regex: regex});
+			
 			
 			changeInputBackground($(this), isValid);
 		})
@@ -90,7 +92,7 @@ $(function()
 			
 			changeInputBackground($(this),isValid);
 			
-			changeInputBackground($('#signupReenterPassword'), isValid);	
+			//changeInputBackground($('#signupReenterPassword'), isValid);	
 			
 		})/*
 		.focus(function()
@@ -128,6 +130,7 @@ $(function()
 		
 		$('.games-signup-option-container').click(function()
 		{
+			
 			var inputs = '#firstName,#lastName,#signupPassword';
 			var email = '';
 			if ($('#email').length > 0) {
@@ -137,20 +140,37 @@ $(function()
 				email = $('#user-email').text();
 			}
 			
+			
+			
 			var fail = false;
+			
 			$(inputs).trigger('keyup').each(function()
 			{
+				
 				if ($(this).is('.input-fail')) {
-					fail = true;
+					fail = $(this);
 				}
-			})
+			});
+			
 			
 			if (fail) {
+				var str;
+				
+				if (fail.is('#firstName') || fail.is('#lastName')) {
+					str = 'Please enter your full name';
+				} else if (fail.is('#email')) {
+					str = 'Please enter a valid email address';
+				} else if (fail.is('#signupPassword')) {
+					str = 'Your password must be at least 8 characters';
+				}
+				
+				showConfirmationAlert(str);
 				return false;
 			}
 			
 			if ($(this).is('#game-signup-minimal')) {
 				// Minimal signup
+				
 				$('#user-signup').attr('action', '/signup/minimal').submit();
 				//minimalSignup($('#firstName').val(), $('#lastName').val(), email, $('#signupPassword').val());
 			} else {

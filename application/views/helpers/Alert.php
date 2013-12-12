@@ -126,8 +126,8 @@ class Application_View_Helper_Alert
 		$output .= "<div class='game-signup-hover width-100 clear'>";
 		$output .= "<p class='game-signup-hover-target clear light width-100 center largest-margin-top'>Enter your name so other players can recognize you.</p>";
 		
-		$output .= $signupForm->firstName;
-		$output .= $signupForm->lastName;
+		$output .= "<div class='clear width-100'>" . $signupForm->firstName . "</div>";
+		$output .= "<div class='clear width-100'>" . $signupForm->lastName . "</div>";
 		$output .= "</div>";
 		
 		$output .= "<div class='game-signup-hover width-100 clear'>";

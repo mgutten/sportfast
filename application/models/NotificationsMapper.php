@@ -47,7 +47,6 @@ class Application_Model_NotificationsMapper extends Application_Model_MapperAbst
 		$select .=	 "ORDER BY nl.dateHappened DESC
 					 LIMIT " . $limit;
 		
-		
 		$results = $db->fetchAll($select);
 		
 		$savingClass->isNewsfeed = true;

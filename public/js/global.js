@@ -725,15 +725,19 @@ $(function()
 		if($(this).parents('.input-container').attr('tooltip')) {
 			startTooltipTimer($(this).parents('.input-container'));
 		}
-		
+				
 		
 	})
-	.on('keyup', 'input[type=text],input[type=password],textarea', function()
+	.on('keyup', 'input[type=text],input[type=password],textarea', function(e)
 	{
-		fadeOutInputOverlay($(this), false)
+
+		fadeOutInputOverlay($(this), false);
+		
+		
 	})
 	.on('focusout', 'input[type=text],input[type=password],textarea', function()
 	{
+
 		fadeOutInputOverlay($(this), false)
 		if (mouseoverDropdown == false) {
 			$(this).parents('.nav-dropdown').trigger('mouseout');
@@ -758,8 +762,9 @@ $(function()
 	
 	
 	/* force focus of textbox when overlay for input is clicked */
-	$(document).on('click', '.input-container', function() 
+	$(document).on('click', '.input-container', function(e) 
 	{
+
 		$(this).children('input,textarea').focus();
 	});
 	
@@ -2223,6 +2228,7 @@ function initializeMap(lat, lon, zoom, option, callback)
 		gmap.mapTypes.set("Dummy Style", mapType);
 		gmap.setMapTypeId("Dummy Style");
 		
+		
 		callback();
 		
 }
@@ -2320,9 +2326,12 @@ function showConfirmationAlert(str)
  */
 function changeInputBackground(ele, isValid)
 {
-	if (!(ele.val().length > 0)) {
-		return false;
+	
+	if (!(ele.val().length > 0) &&
+		typeof ele.attr('required') == 'undefined') {
+			return false;
 	}
+	
 	if (!isValid && (typeof ele.attr('required') != 'undefined')) {
 		// Failed validity test
 		ele.removeClass('input-success').addClass('input-fail');

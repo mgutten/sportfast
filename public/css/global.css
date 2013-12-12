@@ -18,6 +18,7 @@ html, body {
     margin: 0;
     padding: 0;
 	height:100%;
+	-webkit-font-smoothing: antialiased;
 }
 
 img {
@@ -722,6 +723,7 @@ div.nav-back:hover {
 .nav {
 	font-family:"Nevis";
 	font-size: 1.063em;
+	font-weight: bold;
 }
 
 .nav:hover {
@@ -1194,6 +1196,12 @@ input.input-fail, div.input-fail {
 	font-size:inherit;
 	color: inherit;
 	cursor:text;
+	width: 100%;
+}
+
+.input-asterisk {
+	float:right;
+	margin-right: 1em;
 }
 
 div#username-container {
@@ -1874,7 +1882,7 @@ div.dropdown-menu-container-reverse:hover {
 
 #confirm-alert {
 	max-width: 20em;
-	margin-left: -10em;
+	margin-left: -11em;
 	margin-top: -8em;
 	font-size: 1em;
 	display:none;

@@ -364,11 +364,12 @@ class CreateController extends Zend_Controller_Action
 		$userName = $form->text->setName('userName')
 							   ->setLabel("Start typing a player's name...");
 							   
-		$note = 	$form->textarea->setName('note')
-							   	   ->setLabel("Write note...");
+		$form = new Application_Form_Invite();
+		
+		$this->view->form = $form;
+		$this->view->note = $form->note;
 							   
 		$this->view->userName = $userName;
-		$this->view->note = $note;
 		
 		//$success->unsetAll();
 	}

@@ -9,9 +9,7 @@ var pastPlayedGmapMarkers = new Array();
 var homeMapTipHovered = false;
 
 $(function() {
-	
-
-	
+		
 	if ($('#member-find-minimal-container').length > 0) {
 		var top = $('#header-section-title-container-find').position().top
 		
@@ -476,8 +474,9 @@ function addMarkerListeners(marker)
         });
 		
 		google.maps.event.addListener(marker, "click", function() {
-			index = $.inArray(this,markers);
-			window.location = $('.member-game:eq(' + index +')').attr('href');
+			var index = $.inArray(this,markers);
+			var shownContainer = getShownContainer();
+			window.location = shownContainer.find('.member-game:eq(' + index +')').attr('href');
         });
 }
 

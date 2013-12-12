@@ -188,7 +188,13 @@ class GamesController extends Zend_Controller_Action
 		
 		if ($game->isRecurring()) {
 			// Test to see if there are similar games that members play in
-			$this->view->similarGames = $similarGames = $game->getSimilarGames($this->view->user->userID);
+			$similarGames = false;
+			if (mt_rand(1,10) < 9) {
+				// Test for similar games 80% of the time
+				$similarGames = $game->getSimilarGames($this->view->user->userID);
+			}
+			
+			$this->view->similarGames = $similarGames;
 			
 		}
 			
@@ -365,13 +371,11 @@ class GamesController extends Zend_Controller_Action
 		
 		$this->view->type = 'game';
 		$this->view->typeID = $gameID;
-		
-		$form = new Application_Form_General();
 							   
-		$note = $form->textarea->setName('note')
-							   ->setLabel("Write note...");
-
-		$this->view->note = $note;
+		$form = new Application_Form_Invite();
+		
+		$this->view->form = $form;
+		$this->view->note = $form->note;
 		
 	}
 	

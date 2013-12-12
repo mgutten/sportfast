@@ -7,7 +7,7 @@ $(function()
 	
 	/* usermap stuff */
 	if (gmapMarkers.length > 0) {
-		initializeMap(37.98, -122.5, 12, createMarkers);
+		initializeMap(37.98, -122.5, 12, false, createMarkers);
 		setZoom();
 	}
 	

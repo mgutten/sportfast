@@ -150,7 +150,7 @@ class SignupController extends Zend_Controller_Action
 				return;
 			} else {
 				// Form is valid
-				$agePosted = $sportPosted = $sexPosted;
+				$agePosted = $sportPosted = $sexPosted = false;
 				
 				$user 	  = new Application_Model_User();
 				$userInfo = $user->getAttribs();
@@ -228,8 +228,8 @@ class SignupController extends Zend_Controller_Action
 				$sports = new Application_Model_Sports();
 				$sportsArray = $sports->getAllSportsInfo();
 				
-				$ratings = new Application_Model_Ratings();
-				$ratingArray = $ratings->getAvailableRatings('user', 'skill');
+				//$ratings = new Application_Model_Ratings();
+				//$ratingArray = $ratings->getAvailableRatings('user', 'skill');
 				
 				foreach ($sportsArray as $sport => $section) {
 					if ($post[$sport] !== 'true') {
@@ -246,9 +246,9 @@ class SignupController extends Zend_Controller_Action
 					$sportModel->sport = $sport;
 					
 					// Convert rating from slider (0-6) to meaningful rating (64-100)
-					//$sportModel->skillInitial = $sportModel->convertSliderToRating($post[$sport . 'Rating']);
-					$value = $ratingArray[$ratings->skillRatings[$post[$sport . 'Rating']]]['value'];
-					$sportModel->skillInitial =  $value + ($value < 99 ? mt_rand(-1,1) : 0); 
+					$sportModel->skillInitial = $sportModel->convertSliderToRating($post[$sport . 'Rating']);
+					//$value = $ratingArray[$ratings->skillRatings[$post[$sport . 'Rating']]]['value'];
+					//$sportModel->skillInitial =  $value + ($value < 99 ? mt_rand(-1,1) : 0); 
 					$sportModel->skillCurrent = $sportModel->skillInitial;
 					
 					$sportModel->sportsmanship = 80;

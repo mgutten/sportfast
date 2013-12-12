@@ -620,13 +620,6 @@ input[type=text].profile-manage-team-info-roster-limit {
 	margin-top: -14em;
 }
 
-#profile-invite-emails {
-	width: 96.5%;
-	max-width: 96.5%;
-	height: 5em;
-	max-height: 5em;
-}
-
 .profile-invite-back {
 	margin-top: 3.2em;
 }
@@ -666,23 +659,23 @@ input[type=text].profile-manage-team-info-roster-limit {
 
 #firstName,
 #lastName {
-	width: 9em;
+	width: 14em;
 }
 
-#lastName-container {
-	margin-left:.5em;
-	font-size:1.06em;
-}
-
+#lastName-container,
 #firstName-container {
-	margin-left:4em;
+	float:none;
+	margin:.5em auto;
 	font-size:1.06em;
+	display:block;
+	width: 14.7em;
 }
+
 
 #email-container,
 #signupPassword-container {
 	float:none;
-	width: 15em;
+	width: 14.7em;
 	display:block;
 	margin: .5em auto;
 	font-size:1.06em;

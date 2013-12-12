@@ -10,12 +10,21 @@ var failedCity;
 var sportFormTimeout;
 var confirmAction;
 var typing;
+var keyPressed;
 
 $(function()
 {
+	
 	/* update narrow column name value onkeyup */
-	$('#firstName,#lastName').keyup(function()
+	$('#firstName,#lastName').keyup(function(e)
 	{
+		
+		var keyCode = e.keyCode || e.which;
+		if (keyCode == 9) {
+			// Tab Pressed
+			return false;
+		}
+		
 		
 		var firstOrLast = true;
 		if ($(this).attr('id') == 'lastName') {
@@ -33,7 +42,7 @@ $(function()
 		
 		toggleAll();
 	})
-	
+
 	
 	/* for age dropdown onclick validate 
 	$('#dropdown-menu-ageDropdown').children('.dropdown-menu-option-container').click(function()
@@ -88,8 +97,14 @@ $(function()
 	
 	
 	/* update age narrow column */
-	$('#dobDay,#dobMonth,#dobYear').keyup(function()
+	$('#dobDay,#dobMonth,#dobYear').keyup(function(e)
 	{
+		var keyCode = e.keyCode || e.which;
+		if (keyCode == 9) {
+			// Tab Pressed
+			return false;
+		}
+		
 		var value = $(this).val();
 		// eliminate all non-integer values
 		var newValue = value.replace(/[^\d+]/g,'');
@@ -142,8 +157,14 @@ $(function()
 	
 	
 	/* update dimensions narrow column */
-	$('#heightFeet,#heightInches,#weight').keyup(function()
+	$('#heightFeet,#heightInches,#weight').keyup(function(e)
 	{
+		var keyCode = e.keyCode || e.which;
+		if (keyCode == 9) {
+			// Tab Pressed
+			return false;
+		}
+		
 		var indicator = $('#' + $(this).attr('id') + '-indicator');
 		var heightInches,heightFeet,weight;
 		var value = $(this).val();
@@ -260,8 +281,15 @@ $(function()
 	})
 	
 	/* check email validation */
-	$('#email').keyup(function()
+	$('#email').keyup(function(e)
 	{
+		var keyCode = e.keyCode || e.which;
+		
+		if (keyCode == 9) {
+			// Tab Pressed
+			return false;
+		}
+		
 		var value   = $(this).val();
 		var regex	= /^\S+@\S+\.\S+$/;
 		var isValid = $(this).isValid({regex: regex});
@@ -296,8 +324,14 @@ $(function()
 	
 
 	/* validate signup password and reenter password */
-	$('#signupPassword,#signupReenterPassword').keyup(function()
+	$('#signupPassword,#signupReenterPassword').keyup(function(e)
 	{
+		var keyCode = e.keyCode || e.which;
+		if (keyCode == 9) {
+			// Tab Pressed
+			return false;
+		}
+		
 		var value   = $.trim($(this).val());
 		var isValid = $(this).isValid({minLength: 8, maxLength: 30});
 		
@@ -329,8 +363,14 @@ $(function()
 	
 	
 	/* validate street address */
-	$('#streetAddress').keyup(function()
+	$('#streetAddress').keyup(function(e)
 	{
+		var keyCode = e.keyCode || e.which;
+		if (keyCode == 9) {
+			// Tab Pressed
+			return false;
+		}
+		
 		var value   = $(this).val();
 		if (value == $(this).attr('oldVal')) {
 			// Value has not changed
@@ -365,8 +405,14 @@ $(function()
 	
 	
 	/* validate zipcode */
-	$('#zipcode').keyup(function()
+	$('#zipcode').keyup(function(e)
 	{
+		var keyCode = e.keyCode || e.which;
+		if (keyCode == 9) {
+			// Tab Pressed
+			return false;
+		}
+		
 		var value   = $(this).val();
 		if (value == $(this).attr('oldVal')) {
 			// Value has not changed

@@ -1,6 +1,7 @@
 // Success page for create game or team
 
 var selectedUsers = new Array();
+var typing;
 
 $(function()
 {
@@ -130,7 +131,7 @@ $(function()
 		searchDatabase($(this).val(), populateSearchResultsInvite, limit, $('#invite-alert-results'));
 	});
 	
-	$('#create-success-emails').focus(function()
+	$('#profile-invite-emails').focus(function()
 	{
 		if ($('#create-send-invites').css('display') == 'none') {
 			// Send button is hidden, show
@@ -159,6 +160,44 @@ $(function()
 		$(this).hide();
 		$('#create-success-addNote').show();
 		$('#note-container').hide();
+	})
+	
+	$('.emails').keyup(function()
+	{
+		convertEmails($(this).val());
+		
+		clearTimeout(typing);
+		typing = setTimeout(function() {
+			inputEmail();
+		}, 1200);
+		
+	})
+	
+	$('#profile-invite-emails-outer-container').click(function()
+	{
+		$('.emails').focus();
+	});
+	
+	/* remove email from list */
+	$(document).on('click', '.invite-email-x', function() {
+		clearTimeout(typing);
+		
+		$(this).parents('.invite-email-container').remove();
+		updateNumRecipients();
+	})
+	
+	/* edit parsedEmail */
+	$(document).on('click', '.invite-email', function() {
+		clearTimeout(typing);
+				
+		inputEmail();
+
+		$('.emails').focus();
+		$('.emails').val($(this).text());
+		
+		$(this).parents('.invite-email-container').remove();
+		updateNumRecipients();
+		
 	})
 	
 	
@@ -198,6 +237,13 @@ $(function()
 		
 		$(this).parent().remove();
 		
+	})
+	
+	$('#invite-form').submit(function(e)
+	{
+		convertEmails($('.emails').val());
+		
+		setEmails();
 	})
 	
 })
@@ -249,6 +295,132 @@ function populateSearchResultsInvite(results, container)
 	}
 	
 	
+}
+
+/**
+ * set emails to hidden input
+ */
+function setEmails()
+{
+	var str = '';
+	var counter = 0;
+	
+	$('.invite-email').each(function()
+	{
+		if (counter != 0) {
+			str += ',';
+		}
+		
+		str += $(this).text();
+		counter++;
+	})
+	
+	$('#emails').val(str);
+}
+
+function inputEmail()
+{
+	var val = $('.emails').val();
+	$('.emails').val(val + ' '); // Trigger attempted input of current name
+	
+	var output = convertEmails($('.emails').val());
+	
+	if (output) {
+		// It was submitted
+		$('.emails').val('');
+	} else {
+		$('.emails').val(val);  // Bring back to original
+	}
+}
+
+/**
+ * full process of parsing emails and converting to html
+ */
+function convertEmails(text)
+{
+	
+	var emails = parseEmails(text);
+	  
+	var output = convertParsedEmails(emails);
+	
+	
+	if (output) {
+		updateParsedEmails(output);
+	}
+	
+	updateNumRecipients();
+	
+	
+	$('#profile-invite-parsedEmails').scrollTop($('#profile-invite-parsedEmails')[0].scrollHeight);
+	
+	return output;
+	
+}
+
+/**
+ * update number of recipients in list
+ */
+function updateNumRecipients()
+{
+	if ($('.invite-email').length > 0) {
+		// Hide overlay
+		$('#invite-numEmails-container').css('opacity', 1);
+		$('#input-overlay-emailsTextArea').css('visibility', 'hidden');
+	} else {
+		$('#invite-numEmails-container').css('opacity', 0);
+		$('#input-overlay-emailsTextArea').css('visibility', 'visible');
+	}
+	
+	$('#invite-numEmails').text($('.invite-email').length);
+}
+
+/**
+ * parse emails into separate, easy-to-see
+ * @params(text => text of emails)
+ */
+function parseEmails(text)
+{ 
+	var emails = text.match(/([a-zA-Z0-9.(\+)_-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9._-]+)(?=(>)?(\,|\s)+)/gi); // Array of emails
+	
+	return emails;
+		
+}
+	
+/**
+ * convert array of emails to proper html
+ */
+function convertParsedEmails(emails)
+{ 
+	if (emails == null) {
+		return false;
+	}
+	
+	var output = '';
+	for (i = 0; i < emails.length; i++) {
+		output += "<div class='invite-email-container clear'>\
+						<p class='medium clear invite-email light-back'>" + emails[i] + "</p>\
+						<p class='medium left light-back invite-email-x pointer' tooltip='Remove'>x</p>\
+					</div>";
+				 
+	}
+	
+	return output;
+		
+}	
+
+/**
+ * take html of parsed emails and place in DOM
+ */
+function updateParsedEmails(output)
+{
+	$('#profile-invite-emails').val('');
+	var ele = $('#profile-invite-parsedEmails').children('.invite-email-container').last();
+	if (ele.length > 0) {
+		// There is already an email, place after
+		ele.after(output);
+	} else {
+		$('#profile-invite-parsedEmails').prepend(output);
+	}
 }
 
 /**

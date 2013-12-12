@@ -241,7 +241,7 @@ $(function()
 	if (isGame()) {
 		// Create game, initialize google map
 		
-		initializeMap(37.98, -122.5, 11, mapLoaded);
+		initializeMap(37.98, -122.5, 11, false, mapLoaded);
 	}
 	
 })
@@ -388,6 +388,7 @@ function mapLoaded()
 		$('.create-section-inner-gmap').css({display:'none'});
 	});
 	
+	
 	mapListeners();
 }
 
@@ -398,6 +399,7 @@ function mapListeners()
 {
 	google.maps.event.addListener(gmap, "rightclick", function(event)
     {
+		
 		if (userMarker) {
 			userMarker.setMap(null);
 		}

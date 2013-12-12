@@ -225,7 +225,13 @@ class Application_Model_Sport extends Application_Model_ModelAbstract
 	 */
 	public function convertSliderToRating($rating)
 	{
-		return floor(($rating * 5.5) + mt_rand(64, 66));
+		$ratings = new Application_Model_Ratings();
+		$ratingArray = $ratings->getAvailableRatings('user', 'skill');
+		
+		$value = $ratingArray[$ratings->skillRatings[$rating]]['value'];
+		return $value + ($value < 99 ? mt_rand(-1,1) : 0); 
+		
+		//return floor(($rating * 5.5) + mt_rand(64, 66));
 	}
 		
 	

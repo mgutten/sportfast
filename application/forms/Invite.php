@@ -1,10 +1,10 @@
 <?php
-class Application_Form_General extends Zend_Form
+class Application_Form_Invite extends Zend_Form
 {
 
     public function init()
     {
-        $this->setName('generalForm');
+        $this->setName('inviteForm');
 		$this->setMethod('POST');
 		$this->setAction('');
 		$this->setDecorators(array('FormElements', 'Form'));
@@ -15,27 +15,21 @@ class Application_Form_General extends Zend_Form
 									'decorator');
 		
 								
-		$this->addElement('text', 'text', array(
+		$this->addElement('textarea', 'note', array(
 				'required'		=> false,
 				'decorators'	=> array('Overlay'),
-				'label'			=> '',
+				'label'			=> 'Write note...',
 				'class'			=> 'dropshadow',
 				'autocomplete'  => 'off'
 				));
 				
-		$this->addElement('textarea', 'textarea', array(
+		$this->addElement('textarea', 'emailsTextArea', array(
 				'required'		=> false,
 				'decorators'	=> array('Overlay'),
-				'label'			=> '',
-				'class'			=> 'dropshadow',
+				'label'			=> '<span class="heavy medium larger-text">Copy and paste emails</span>',
+				'class'			=> 'emails',
+				'id'			=> 'profile-invite-emails',
 				'autocomplete'  => 'off'
-				));
-				
-		$this->addElement('checkbox', 'checkbox',  array(
-				'required'		=> false,
-				'decorators'	=> array('Checkbox'),
-				'checked'		=> false,
-				'class'			=> 'medium'
 				));
 				
 		$this->addElement('submit', 'submit', array(
@@ -44,7 +38,7 @@ class Application_Form_General extends Zend_Form
 				'autocomplete'  => 'off'
 				));
 				
-		$this->addElement('hidden', 'hidden', array(
+		$this->addElement('hidden', 'emails', array(
 				'label'			=> '',
 				'class'			=> '',
 				'autocomplete'  => 'off'
