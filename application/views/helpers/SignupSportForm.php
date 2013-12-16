@@ -197,7 +197,7 @@ class Application_View_Helper_SignupSportForm
 			if (!empty($sport['position'])) {
 				// Position section to be shown
 				$output .= "<div class='signup-sports-position hidden signup-sports-form-section' section='position' id='signup-sports-position-" . $sport['sport'] . "'>
-							<p class='signup-sports-form-section-title'>Position <span class='light'>only used for league play, select up to two</p>";
+							<p class='signup-sports-form-section-title'>Position <span class='light'>only used for league play, select up to two</span></p>";
 				
 				$userPositions = array();
 				if ($userSport) {

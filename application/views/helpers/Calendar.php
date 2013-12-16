@@ -95,6 +95,7 @@ class Application_View_Helper_Calendar
 				$eventDate = $date->format('mjy');
 				$curDate = new DateTime('now');
 				
+				
 				if ($tooltips) {
 					if (!empty($event->_attribs['teamGameID'])) {
 						// Is team game
@@ -164,6 +165,7 @@ class Application_View_Helper_Calendar
 				}
 				
 			}
+			
 	}
 
 	/**
@@ -247,28 +249,37 @@ class Application_View_Helper_Calendar
 					//if its the month before then use last months days
 					if($i == 0){
 						$day = $this->lastMonthDays - $lastMonthDay;
-						$lastMonthDay--;
+						
 						$class .= ' calendar-last-month';
 						$month = $month - 1;
 						$lastMonth = true;
 						if ($month == 0) {
 							$month = 12;
+							if ($nextMonthDay == $this->lastMonthDays) {
+								// Only subtract year once
+								$this->year--;
+							}
 						}
 						$month = ($month <= 9 ? '0' . $month : $month);
+						$lastMonthDay--;
 						
 					}
 					//else its next month and should start at 1
 					else {
 						$day = $nextMonthDay;
-						$nextMonthDay++;
+						
 						$class .= ' calendar-next-month';
 						//if ($nextMonthDay == 2) {
 							// Only increase month once
 							$month = $month + 1;
 							if ($month == 13) {
 								$month = 1;
+								if ($nextMonthDay == 1) {
+									$this->year++;
+								}
 							}
 							$month = ($month <= 9 ? '0' . $month : $month);
+							$nextMonthDay++;
 						//}
 
 					}
@@ -345,8 +356,7 @@ class Application_View_Helper_Calendar
 						}
 					}
 					
-					
-					if ($c < $this->today) {
+					if ($c < $this->today && !$selectedMonth) {
 						// Event happened before today, make more transparent
 						$class .= ' calendar-more-transparent';
 						$inner  = '<p class="left width-100 center margin-top white calendar-old-event">' . $eventArray[2] . '</p>';					

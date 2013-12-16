@@ -1529,13 +1529,13 @@ function updateSportHiddenInputSelectable(sectionEle)
  */
 function updateSkillHiddenInput(sliderEle, value) 
 {
-	
+
 	var sport		   = getSportName(sliderEle);
-	var hiddenEle 	   = $('#' + sport + 'Rating');
+	var hiddenEle 	   = $('#' + sport + 'Rating');	
 	
 	hiddenEle.val(value);
-		
-	populateSliderText (sliderEle, value);
+			
+	populateSliderText(sliderEle, value);
 }
 
 

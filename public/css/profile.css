@@ -282,7 +282,7 @@
 .profile-player-overlay-container-small {
 	width: 96px;
 	height: 96px;
-	position:relative;
+	position:absolute;
 	z-index: 3;
 	top:0;
 	left:0;
@@ -295,6 +295,7 @@
 	height:45px;
 	opacity:1;
 	z-index:0;
+	filter: alpha(opacity=100);
 }
 
 .team-player-container-small {
@@ -312,7 +313,8 @@
 .team-player-container-small > .team-confirm-img {
 	position:relative;
 	z-index:5;
-	opacity:1
+	opacity:1;
+	filter: alpha(opacity = 100);
 }
 
 .team-player-container-small > .hover-dark {
@@ -368,6 +370,7 @@ textarea.post-message {
 
 /* players section */
 .team-player-going-description-container {
+	filter: alpha(opacity = 0);
 	opacity: 0;
 }
 
@@ -378,6 +381,7 @@ textarea.post-message {
 .team-player-container,
 .team-player-container-small {
 	padding: 1px 1px 0 0;
+	position:relative;
 }
 
 .team-confirm-img {
@@ -695,6 +699,7 @@ input[type=text].profile-manage-team-info-roster-limit {
 }
 
 .game-signup-hover-target {
+	filter: alpha(opacity = 0);
 	opacity:0;
 }
 
@@ -744,6 +749,7 @@ input[type=text].profile-manage-team-info-roster-limit {
 }
 
 .profile-pending-actions-container { 
+	filter: alpha(opacity = 0);
 	opacity: 0;
 }
 

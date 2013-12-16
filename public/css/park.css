@@ -83,6 +83,7 @@
 	left:0;
 	width: 96%;
 	background: #fff;
+	filter: alpha(opacity = 85);
 	opacity: .85;
 	padding: .2em 2% .2em 2%;
 }

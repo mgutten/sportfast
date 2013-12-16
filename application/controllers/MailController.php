@@ -341,6 +341,7 @@ class MailController extends Zend_Controller_Action
 				$mail->AltBody = $body['text'];
 				
 				$mail->send();
+				//mail($email, 'Reminder', $body['html']);
 				
 				$adminMessage .= $email . "\n";
 				
@@ -389,6 +390,7 @@ class MailController extends Zend_Controller_Action
 				$mail->AltBody = $body['text'];
 				
 				$mail->send();
+				//mail($email, 'Reminder', $body);
 				
 				$adminMessage .= $email . "\n";
 				
@@ -418,8 +420,17 @@ class MailController extends Zend_Controller_Action
 
 			$output .= "<tr>
 						<td colspan='3'>
+							<p style='font-family: Arial, Helvetica, Sans-Serif; color: #333;font-size:24px;text-align:center;font-weight:bold'>You must choose any option below to continue receiving email reminders.</p>
+						</td>
+					 </tr>
+					 <tr>
+						<td height='20'>
+						</td>
+					 </tr>
+					 <tr>
+						<td colspan='3'>
 							<p style='font-family: Arial, Helvetica, Sans-Serif; color: #333;font-size:14px;text-align:center'>You have been invited to join a weekly " . strtolower($typeModel->sport) . " game at " . $typeModel->park->parkName . ".  
-							<br><br>If you wish to view this game's details and/or receive future communications regarding any game-related updates <strong>you should select an option below</strong> to join. If you have already joined using a different email address than this one, then you can disregard this message.  
+							<br><br>If you wish to view this game's details and/or receive future communications regarding any game-related updates <strong>you should select an option below</strong> to join.  
 							Otherwise, this will be your last email reminder regarding this game.</p>
 						</td>
 					 </tr>
@@ -496,6 +507,10 @@ class MailController extends Zend_Controller_Action
 			}
 			
 			$buttonSection = $this->buildConfirmedButtons($inUrl, $outUrl, $maybeUrl);
+			
+			if ($typeModel->isRecurring()) {
+				$buttonSection .= $this->buildMemberButtons($typeModel->gameID, false, $email);
+			}
 			
 			$text .= "\n \n \t IN: " . $inUrl;
 			$text .= "\n \t OUT: " . $outUrl;
@@ -831,7 +846,9 @@ class MailController extends Zend_Controller_Action
 			// Add personalized note
 			$output .= "<tr><td colspan='3'>
 							<p style='font-family: Arial, Helvetica, Sans-Serif; font-size: 12px; color: #8d8d8d; margin: 0;text-align:left;'>" . $actingUser->firstName . " said...</p>
-							<p style='font-family: Arial, Helvetica, Sans-Serif; font-size: 14px; color: #777; margin: 0;text-align:left;background:#e9e9e9;padding:5px;'>" . $note . "</p></td></tr>
+							<p style='font-family: Arial, Helvetica, Sans-Serif; font-size: 14px; color: #777; margin: 0;text-align:left;background:#e9e9e9;padding:5px;'>" . $note . "</p>
+							</td>
+						</tr>
 						<tr height='20'>
 							<td></td>
 						</tr>";
@@ -841,6 +858,17 @@ class MailController extends Zend_Controller_Action
 		
 		if (!$isUser) {
 			$text .= "\n I've moved our " . $typeModel->sport . " " . $type . " to Sportfast so we can coordinate easier.  With Sportfast, you can:";
+			
+			if ($typeModel->isRecurring()) {
+				$output .= "<tr><td colspan='3'>
+								<p style='font-family: Arial, Helvetica, Sans-Serif; font-size: 24px; color: #333;font-weight:bold; margin: 0;text-align:center;'>You must choose any option below to continue receiving email reminders.</p>
+								</td>
+							</tr>
+							<tr height='20'>
+								<td></td>
+							</tr>";
+			}
+			
 			$output .= "<tr><td colspan='3'>
 							<p style='font-family: Arial, Helvetica, Sans-Serif; font-size: 14px; color: #333; margin: 0;'>I've moved our " . $typeModel->sport . " " . $type . " to Sportfast so we can coordinate easier.  With Sportfast, you can:</p>
 							<ul class='bold' style='font-family: Arial, Helvetica, Sans-Serif; font-size: 14px; color: #333; font-weight: bold;'>";

@@ -136,6 +136,7 @@ header {
 /* games */
 .settings-x {
 	margin-top: 0em;
+	filter: alpha(opacity = 0);
 	opacity: 0;
 }
 
@@ -254,6 +255,7 @@ header {
 	-moz-border-radius: 3px;
 	font-size:.8em;
 	border-radius: 3px;
+	filter: alpha(opacity = 0);
 	opacity: 0;
 }
 

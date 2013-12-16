@@ -6,6 +6,7 @@
 }
 
 .calendar-past > p {
+	filter: alpha(opacity = 50);
 	opacity: .5;
 }
 
@@ -44,6 +45,7 @@
 
 .create-section-inner-gmap {
 	display:block;
+	filter: alpha(opacity = 0);
 	opacity:0;
 	position:relative;
 	z-index: -4;

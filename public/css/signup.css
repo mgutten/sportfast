@@ -69,6 +69,7 @@
 #signup-account-address-warning {
 	margin: -2.5em 0 .5em 1.5em;
 	opacity: 0;
+	filter: alpha(opacity = 0);
 }
 
 /* end signup section overlay */
@@ -210,6 +211,7 @@ input.short-input {
 
 .signup-dimension-indicator {
 	opacity: 0;
+	filter: alpha(opacity = 0);
 	margin-top: -.2em;
 }
 
@@ -395,6 +397,7 @@ div.signup-narrow-column-img-container {
 
 .signup-sports-form-section-title-description {
 	opacity: 0;
+	filter: alpha(opacity = 0);
 }
 
 .signup-skill-slider {
@@ -447,6 +450,7 @@ div.signup-narrow-column-img-container {
 	font-size:.8em;
 	border-radius: 3px;
 	opacity: 0;
+	filter: alpha(opacity = 0);
 }
 
 .signup-sports-availability {

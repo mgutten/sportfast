@@ -227,6 +227,7 @@
 }
 
 .team-reserve-player > div > img.animate-opacity {
+	filter: alpha(opacity = 60);
 	opacity: .6;
 }
 
