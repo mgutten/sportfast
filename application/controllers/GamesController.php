@@ -124,6 +124,8 @@ class GamesController extends Zend_Controller_Action
 		
 		$this->view->subscribed = $subscribed = $game->isSubscriber($this->view->user->userID);
 		
+		$this->view->emailGameOn = $game->isEmailGameOn($this->view->user->userID);
+		
 		$game->sortPlayersByConfirmed();
 		
 		$this->view->pendingInvites = $game->getPendingInvites($this->view->user->userID);

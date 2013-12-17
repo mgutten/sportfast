@@ -38,6 +38,7 @@ class Application_Model_User extends Application_Model_ModelAbstract
 									'account'		=> '',
 									'avatar'		=> '',
 									'homeMapTip'	=> '',
+									'emailGameOn'	=> '', // To email whether game is on or not
 									'noEmail'		=> '',  // Do not email when game is created for them
 									'ratingSet'		=> '',   // Used by setUserRating to not update old_user_ratings twice
 									'tempAttribs'	=> array()  // Used to store temporary attribs in

@@ -7,6 +7,20 @@
 .schedule-in {
 	margin-left:1em;
 }
+
+.selectable-text {
+	padding: .1em .3em;
+}
+
+.selectable-text:hover {
+	background:#e9e9e9;
+}
+
+.selectable-text.green-bold {
+	background: #58bf12;
+	color: #fff;
+}
+
 /* top section */
 /*
 .game-title-suffix {
@@ -155,7 +169,7 @@
 #reminder-hour,
 #reminder-ampm {
 	width: 3.4em;
-	margin-left:12.2em;
+	margin-left:1.5em;
 }
 
 #reminder-ampm {

@@ -344,7 +344,7 @@ class Application_Model_CronMapper extends Application_Model_MapperAbstract
 		// Only run next morning game status at 7:59pm for games UP TO 8:59am
 		$db = Zend_Db_Table::getDefaultAdapter();
 		$statement = "SELECT g.gameID, g.sportID, g.minPlayers, ug.totalPlayers, 
-							 g.sport, g.parkName, g.date
+							 g.sport, g.parkName, g.date, g.gameOn, g.recurring
 						FROM games g
 						LEFT JOIN (SELECT u2.userID, ug2.gameID, (COUNT(ug2.userID) + SUM(ug2.plus)) as totalPlayers FROM users u2
 									INNER JOIN user_games ug2 ON u2.userID = ug2.userID 
@@ -354,21 +354,22 @@ class Application_Model_CronMapper extends Application_Model_MapperAbstract
 							AND g.canceled = 0
 						GROUP BY g.gameID";
 
-		
 		$results = $db->fetchAll($statement);
 		
 		$returnArray = array('canceled' => array(),
 							 'on'		=> array());
 							 
 		foreach ($results as $result) {
-			
-			if ($result['minPlayers'] > $result['totalPlayers']) {
-				// Not enough players for game, cancel
-				$returnArray['canceled'][$result['gameID']] = new Application_Model_Game($result);
-				$returnArray['canceled'][$result['gameID']]->cancelReason = 'Not enough players';
-			} else {
-				// Game is on
-				$returnArray['on'][$result['gameID']] = new Application_Model_Game($result);
+			if ($result['gameOn'] != '0') {
+				// Wants to send game on email
+				if ($result['minPlayers'] > $result['totalPlayers']) {
+					// Not enough players for game, cancel
+					$returnArray['canceled'][$result['gameID']] = new Application_Model_Game($result);
+					$returnArray['canceled'][$result['gameID']]->cancelReason = 'Not enough players';
+				} else {
+					// Game is on
+					$returnArray['on'][$result['gameID']] = new Application_Model_Game($result);
+				}
 			}
 		}
 		
@@ -389,9 +390,24 @@ class Application_Model_CronMapper extends Application_Model_MapperAbstract
 		
 		// Loop through games and get players
 		foreach ($returnArray as $section) {
+			
 			foreach ($section as $game) {
-				if ($game->hasValue('totalPlayers')) {
-					$game->getGamePlayers(true);
+				if ($game->gameOn == '1') {
+					// Send to all members
+					$members = $game->getGameSubscribers();
+					$game->players = $members;
+					
+					foreach ($game->players->getAll() as $user) {
+						if ($user->emailGameOn == '1') {
+							$game->addEmailGameOn($user->userID);
+						}
+					}
+					
+				} else {
+					if ($game->hasValue('totalPlayers')) {
+						$game->getGamePlayers(true);
+					}
+
 				}
 			}
 		}

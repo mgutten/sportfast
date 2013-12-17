@@ -424,7 +424,14 @@ class AjaxController extends Zend_Controller_Action
 		$where = array('userID = ?' => $this->view->user->userID,
 					   'gameID = ?' => $options['gameID']);
 		
-		$data = array('doNotEmail' => $options['onOrOff']);
+		$data = array($options['column'] => $options['onOrOff']);	
+		
+		if ($options['column'] == 'gameOn') {
+			// Updating games table instead
+			$table = new Application_Model_DbTable_Games(); 
+			$where = array('gameID = ?' => $options['gameID']);
+		}		
+		
 		
 		$table->update($data, $where);
 	 }

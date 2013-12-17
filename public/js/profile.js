@@ -366,7 +366,7 @@ $(function()
 		
 	$('#profile-option-reminder').click(function()
 	{
-		showAlert($('#reminders-alert-container'));
+		showAlert($('#emails-alert-container'));
 	})
 	
 	$('#profile-option-message').click(function()
@@ -966,13 +966,15 @@ function minimalSignup(firstName, lastName, email, password)
 
 
 /**
- * update game_subscribers doNotEmail for game
- * @params (onOrOff => 1 = no emails, 0 = emails)
+ * update game_subscribers email details
+ * @params (onOrOff => can be 0, 1, or 2,
+ *			column => what is the db column name being effected)
  */
-function updateEmailAlert(gameID, onOrOff)
+function updateEmailAlert(gameID, onOrOff, column)
 {
 	var options = {gameID: gameID,
-				   onOrOff: onOrOff};
+				   onOrOff: onOrOff,
+				   column: column};
 				   
 	$.ajax({
 		url: '/ajax/update-email-alert-subscribed-game',

@@ -133,10 +133,11 @@ echo $this->placeholder('absolute')->captureStart();
 		echo $this->alert()->messageAlert();
 		
 		if ($this->game->isRecurring()) {
-			echo $this->alert()->start('reminders', 'Reminders');
+			echo $this->alert()->start('emails', 'Manage what emails you receive.');
 			
-			echo "<p class='light width-100 center clear margin-top'>This game happens every week.</p>
-					<p class='heavy darkest width-100 center clear'>Would you like to receive weekly email reminders for this game?</p>";
+			echo "<p class='heavy white dark-back clear section-header'>Weekly Reminder</p>
+					<div class='clear margin-top larger-indent'>
+						<p class='darkest clear' tooltip='Email reminders are sent the day before the game.'>Would you like to receive weekly reminders for this game?</p>";
 			
 			$yes = $no = false;
 			if ($this->subscribed) {
@@ -147,14 +148,14 @@ echo $this->placeholder('absolute')->captureStart();
 			
 			$options = array('yes' => array('selected' => $yes),
 							 'no' => array('selected' => $no));	
-			echo "<div class='clear margin-top' id='reminders-alert-yesno-container'>";
+			echo "<div class='clear margin-top reminders-alert-yesno-container' id='reminders-alert-yesno-container'>";
 			echo	$this->signupsportform()->selectableText($options, true);
 			echo "</div>";
 			
 			if ($this->captain) {
 				echo "<div class='clear larger-margin-top width-100'>
-						<p class='clear margin-top light width-100 center'>Email reminders are sent to subscribed players the day before.</p>
-						<p class='clear darkest heavy width-100 center'>What time would you like these reminders sent to your players?</p>
+						<p class='clear margin-top light width-100 smaller-text'>Email reminders are sent to members <span class='medium'>the day before.</span></p>
+						<p class='clear darkest  width-100'>What time would you like these reminders sent to your players?</p>
 					  </div>";
 				
 				echo "<div class='clear width-100 larger-margin-top'>";
@@ -162,6 +163,82 @@ echo $this->placeholder('absolute')->captureStart();
 				echo $this->reminderAmpmDropdown;
 				echo "</div>";
 			}
+			echo "</div>";
+			
+			echo "<p class='heavy white dark-back clear section-header largest-margin-top'>Game On</p>";
+			echo "<div class='clear margin-top larger-indent'>";
+
+
+			$yes = $no = false;
+			if ($this->game->gameOn) {
+				$yes = true;
+			} else {
+				$no = true;
+			}
+			
+			$options = array('yes' => array('selected' => $yes),
+							 'no' => array('selected' => $no));	
+
+			if ($this->captain) {
+				echo "<p class='clear darkest width-100' tooltip='The system will check whether the minimum player limit has been reached and alert players accordingly.'>Do you want to send game on/off emails to members an hour before game time?</p>";
+				
+				echo "<div class='clear margin-top width-100 reminders-alert-yesno-container' id='reminders-alert-gameon-admin-yesno-container'>";
+				echo	$this->signupsportform()->selectableText($options, true);
+				echo "</div>";
+
+			}
+			
+			
+			
+			if ($this->captain) {
+				$members = $ins = false;
+				if ($this->game->gameOn == '1') {
+					$members = true;
+				} else {
+					$ins = true;
+				}
+				
+				$class = '';
+				if (!$members && !$ins) {
+					// Game on is set to "no"
+					$class = 'hidden';
+				}
+				
+				echo "<div class='clear width-100 " . $class . "' id='reminders-alert-gameon-container'>";
+				
+				echo "<p class='clear darkest larger-margin-top'>Who should receive these game on emails?</p>";
+				
+				
+				$options = array('ins & maybes' => array('selected' => $ins,
+								 						 'tooltip' => 'The game on email will only be sent to those players who have responded "in" or "maybe"'),
+								 'all members' => array('selected' => $members),
+								 );	
+								 
+				echo "<div class='clear margin-top width-100 reminders-alert-yesno-container' id='reminders-alert-gameon-admin-who-container'>";
+				echo	$this->signupsportform()->selectableText($options, true);
+				echo "</div>";
+				
+				echo "</div>";
+
+			}
+			echo "<p class='darkest clear larger-margin-top' tooltip='The system alerts members whether there are enough players for their game an hour before game time.'>Would you like to receive" . ($this->captain ? ' these' : '') . " game on emails?</p>";
+				
+			$yes = $no = false;
+			if ($this->emailGameOn) {
+				$yes = true;
+			} else {
+				$no = true;
+			}
+			
+			$options = array('yes' => array('selected' => $yes),
+							 'no' => array('selected' => $no));		
+				
+			echo "<div class='clear margin-top reminders-alert-yesno-container' id='reminders-alert-gameon-yesno-container'>";
+			echo	$this->signupsportform()->selectableText($options, true);
+			echo "</div>";
+			
+			echo "</div>";
+			
 			
 			echo $this->alert()->end();
 		}
@@ -301,9 +378,9 @@ if ($this->userInGame ||
 									'img'  => 'stats',
 									'href' => '/games/' . $this->game->gameID . '/stats',
 									'tooltip' => 'View historical stats for this game'),
-							  array('text' => 'reminders',
+							  array('text' => 'emails',
 									'img'  => 'reminder',
-									'tooltip' => 'Manage any reminders for this game')
+									'tooltip' => 'Manage any emails for this game')
 							  );
 									
 	$captainOptions = array(array('text' => 'edit game',

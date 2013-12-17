@@ -47,6 +47,7 @@ class Application_Model_Game extends Application_Model_ConfirmationsAbstract
 									'messages'		=> '',
 									'captains'		=> '',
 									'subscribers'	=> '',
+									'emailGameOn'	=> '',
 									'city'			=> '',
 									'cityID'		=> '',
 									'canceled'		=> '',
@@ -57,6 +58,7 @@ class Application_Model_Game extends Application_Model_ConfirmationsAbstract
 									'doNotEmail'    => '',
 									'sendReminder'  => '',
 									'sendConfirmation' => '',
+									'gameOn'		=> '', // game on email (0 = none, 1 = all members, 2 = ins and maybes)
 									'plus'			=> ''
 									);
 									
@@ -405,6 +407,19 @@ class Application_Model_Game extends Application_Model_ConfirmationsAbstract
 		}
 	}
 	
+	/**
+	 * does userID receive game on emails (stored in emailGameOn attrib)
+	 */
+	public function isEmailGameOn($userID)
+	{
+		if (isset($this->_attribs['emailGameOn'][$userID])) {
+			// User receives emails
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
 	
 	public function isGameOn()
 	{
@@ -673,6 +688,16 @@ class Application_Model_Game extends Application_Model_ConfirmationsAbstract
 		}
 		
 		$this->_attribs['subscribers'][$userID] = true;
+		return $this;
+	}
+	
+	public function addEmailGameOn($userID)
+	{
+		if (!is_array($this->_attribs['emailGameOn'])) {
+			$this->_attribs['emailGameOn'] = array();
+		}
+		
+		$this->_attribs['emailGameOn'][$userID] = true;
 		return $this;
 	}
 	

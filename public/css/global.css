@@ -96,6 +96,11 @@ ul {
 	font-weight: bold;
 }
 
+.section-header {
+	padding: .1em 0 .1em 1%;
+	width:99%;
+}
+
 .smaller-text {
 	font-size: .75em;
 }
@@ -1840,6 +1845,9 @@ div.dropdown-menu-container-reverse:hover {
 	left: 50%;
 	max-width: 61.25em;
 	z-index: 996;
+	width: 34em;
+	margin-left: -17em;
+	margin-top: -6em;
 }
 
 .alert-header {

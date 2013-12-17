@@ -6,7 +6,7 @@ if (!$this->noDefaultHeadTitle) {
 	$this->headTitle()->append('Sportfast');
 }
 */
-//$this->setEncoding('UTF-8'); woot
+//$this->setEncoding('UTF-8');
 //echo $this->doctype('XHTML1_TRANSITIONAL') . PHP_EOL; ?>
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
@@ -22,7 +22,7 @@ if (!$this->noDefaultHeadTitle) {
 		
 		$this->headLink()->prependStylesheet($this->baseUrl() . '/css/global.css') . PHP_EOL;
 		
-		$version = '1.121'; // VERSION FOR JS AND CSS
+		$version = '1.122'; // VERSION FOR JS AND CSS
 		
 		foreach ($this->headLink() as $key => $item) {
 			// Add version number to css

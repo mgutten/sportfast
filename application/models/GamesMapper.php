@@ -529,17 +529,27 @@ class Application_Model_GamesMapper extends Application_Model_TypesMapperAbstrac
 		}
 		
 		
-		$select = $table->select();
-		$select->setIntegrityCheck(false);
-		
-		$select->from(array('gs' => 'game_subscribers'))
-			   ->where('gs.gameID = ?', $gameID)
-			   ->where('gs.doNotEmail = ?', 0);
-			   
-		$players = $table->fetchAll($select);
-		
-		foreach ($players as $player) {
-			$savingClass->addSubscriber($player->userID);
+		if ($savingClass->isRecurring()) {
+			// Is recurring, get subscribers
+			
+			$select = $table->select();
+			$select->setIntegrityCheck(false);
+			
+			$select->from(array('gs' => 'game_subscribers'))
+				   ->where('gs.gameID = ?', $gameID);
+				   
+			$players = $table->fetchAll($select);
+			
+			foreach ($players as $player) {
+				if ($player->doNotEmail == '0') {
+					// Receives reminder email
+					$savingClass->addSubscriber($player->userID);
+				}
+				if ($player->emailGameOn == '1') {
+					// Receives reminder email
+					$savingClass->addEmailGameOn($player->userID);
+				}
+			}
 		}
 		
 		return $savingClass;
@@ -1327,7 +1337,6 @@ class Application_Model_GamesMapper extends Application_Model_TypesMapperAbstrac
 			} else {
 				$user->setTempAttrib('totalGames', 0);
 			}
-			
 			
 		}
 		

@@ -96,13 +96,20 @@
 }
 
 #invite-alert-container,
-#reminders-alert-container,
 #message-alert-container{
 	width: 34em;
 	min-height: 6em;
 	margin-top: -8em;
 	margin-left: -17em;
 }
+
+#emails-alert-container {
+	margin-top: -15em;
+	width: 38em;
+	margin-left: -19em;
+	
+}
+
 
 #invite-alert-results {
 	width: 95%;
@@ -120,11 +127,11 @@
 }
 
 
-#reminders-alert-yesno-container > .selectable-text:first-child {
-	margin-left: 10.5em;
+.reminders-alert-yesno-container > .selectable-text:first-child {
+	margin-left: 1.5em;
 }
 
-#reminders-alert-yesno-container > .selectable-text:nth-child(2) {
+.reminders-alert-yesno-container > .selectable-text:nth-child(2) {
 	margin-left: 2em;
 }
 

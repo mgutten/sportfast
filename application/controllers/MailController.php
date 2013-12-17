@@ -2840,8 +2840,12 @@ class MailController extends Zend_Controller_Action
 			}*/
 			
 			foreach ($game->players->getAll() as $user) {
-				if ($game->userNotConfirmed($user->userID)) {
+				if ($game->userNotConfirmed($user->userID) && $game->gameOn == '2') {
 					// Only email maybes and ins
+					continue;
+				}
+				if (!$game->isEmailGameOn($user->userID)) {
+					// Does not want game on emails
 					continue;
 				}
 				
@@ -2857,14 +2861,20 @@ class MailController extends Zend_Controller_Action
 			}*/
 			$emailedUsers = array();
 			foreach ($game->players->getAll() as $user) {
-				if ($game->userNotConfirmed($user->userID)) {
+				if ($game->userNotConfirmed($user->userID) && $game->gameOn == '2') {
 					// Only email maybes and ins
 					continue;
 				}
+				if (!$game->isEmailGameOn($user->userID)) {
+					// Does not want game on emails
+					continue;
+				}
+				
 				$this->mailGameOn($user->username, $game);
 				
 				$emailedUsers[] = $user->fullName;
 			}
+
 			mail('guttenberg.m@gmail.com', 'ADMIN: Game on', $game->sport . implode('\n',$emailedUsers));
 		}
 	}
