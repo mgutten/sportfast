@@ -14,10 +14,17 @@ $(function()
 	/* if Tennis is selected, show type section */
 	$('#narrow-column-body-sports').children('.selectable-text.narrow-sport').click(function()
 	{
-		if ($(this).text().toLowerCase() == 'tennis' && $(this).is('.green-bold')) {
+		var sport = $(this).text().toLowerCase();
+		if (sport == 'tennis' && $(this).is('.green-bold')) {
 			$('#narrow-column-type').show();
-		} else if ($(this).text().toLowerCase() == 'tennis' && !$(this).is('.green-bold')){
+		} else if (sport == 'tennis' && !$(this).is('.green-bold')){
 			$('#narrow-column-type').hide();
+		}
+		
+		if (sport == 'other' && $(this).is('.green-bold')) {
+			$('#otherSport').show();
+		} else {
+			$('#otherSport').hide();
 		}
 	})
 	

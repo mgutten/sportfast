@@ -828,7 +828,7 @@ class Application_Model_GamesMapper extends Application_Model_TypesMapperAbstrac
 			   ->where('gs3.gameID IS NULL')
 			   ->where('gs.gameID = ?', $game->gameID)
 			   ->group('gs2.gameID')
-			   ->having('sharedPlayers > 8')
+			   ->having('sharedPlayers > 7')
 			   ->order('(RAND() * COUNT(gs2.userID)) DESC');
 
 		

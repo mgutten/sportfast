@@ -733,7 +733,6 @@ $(function()
 
 		fadeOutInputOverlay($(this), false);
 		
-		
 	})
 	.on('focusout', 'input[type=text],input[type=password],textarea', function()
 	{
@@ -819,15 +818,18 @@ $(function()
 			
 			if (newMonthEle.length < 1) {
 				// Does not exist
+
 				return false;
 			}
 			
+			/*
 			if (newMonth > (curDate.getMonth() + 1)) {
 				// Show arrows if currently in past month and move to current month 
 				newMonthEle.find('#calendar-right-arrow').hide();
 			} else {
 				newMonthEle.find('#calendar-right-arrow').show();
 			}
+			*/
 			
 		} else {
 			// Left arrow
@@ -839,12 +841,14 @@ $(function()
 				return false;
 			}
 			
+			/*
 			if (newMonth < (curDate.getMonth() + 1)) {
 				// Show arrows if currently in past month and move to current month 
 				newMonthEle.find('#calendar-left-arrow').hide();
 			} else {
 				newMonthEle.find('#calendar-left-arrow').show();
 			}
+			*/
 		}
 		
 		curMonthEle.hide();

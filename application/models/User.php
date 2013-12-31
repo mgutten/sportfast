@@ -23,6 +23,7 @@ class Application_Model_User extends Application_Model_ModelAbstract
 									'city'			=> '',
 									'zipcode'		=> '',
 									'sports'		=> array(),
+									'otherSports'	=> array(),
 									'picture'		=> '',
 									'notifications' => '',
 									'userLocation'	=> '',
@@ -386,6 +387,18 @@ class Application_Model_User extends Application_Model_ModelAbstract
 		}
 		
 		return $sex;
+	}
+	
+	public function addOtherSport($sport)
+	{
+		$otherSport = new Application_Model_OtherSport();
+		$otherSport->sport = $sport;
+		
+		if (!is_array($this->_attribs['otherSports'])) {
+			$this->_attribs['otherSports'] = array();
+		}
+		
+		return $this->_attribs['otherSports'][$sport] = $otherSport;
 	}
 
 	

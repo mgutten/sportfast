@@ -209,7 +209,9 @@ class CreateController extends Zend_Controller_Action
 	public function teamAction()
 	{
 		$sports = new Application_Model_Sports();
-		$this->view->sports = $sports->getAllSportsInfo(true);
+		
+		$sports->getAllSportsInfo(true);
+		
 		
 		$dropdown = Zend_Controller_Action_HelperBroker::getStaticHelper('Dropdown');
 		
@@ -224,6 +226,9 @@ class CreateController extends Zend_Controller_Action
 		}
 		
 		$this->view->missingSports = $missingSports;
+		
+		$sports->addSport(array('sport' => 'other'));
+		$this->view->sports = $sports;
 		
 		$avatarNames = array();
 		if ($handle = opendir(PUBLIC_PATH . '/images/teams/avatars/small')) {
@@ -282,6 +287,9 @@ class CreateController extends Zend_Controller_Action
 		$team->sport  = $post['sport'];
 		$team->sportID = $post['sportID'];
 		$team->public = ($post['visibility'] == 'public' ? '1' : '0');
+		if (empty($post['rosterLimit'])) {
+			$post['rosterLimit'] = 99;
+		}
 		$team->rosterLimit = $post['rosterLimit'];
 		$team->cityID = $this->view->user->city->cityID;
 		$team->city   = $this->view->user->city->city;

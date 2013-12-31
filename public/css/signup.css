@@ -1,5 +1,17 @@
 /* signup.css */
 
+/* overwrite */
+#profile-invite-emails-container {
+	height: 1.2em;
+}
+
+#profile-invite-emails-outer-container {
+	width: 25%;
+	float: right;
+	margin: .5em 7em 0 0;
+	visibility:hidden;
+}
+
 /* signup section overlay */
 
 .signup-section-container {
@@ -19,6 +31,10 @@
 
 #signup-section-container1 > .input-container > input#email {
 	width: 24.7em;
+}
+
+#signup-section-container3 {
+	margin-top: 1em;
 }
 
 .header-section-title-container {
@@ -353,6 +369,14 @@ div.signup-narrow-column-img-container {
 	background: #8d8d8d;
 }
 
+.signup-sport-icon:hover {
+	background: #666;
+}
+
+.signup-sport-icon.selected-green {
+	background: #58bf12;
+}
+
 .signup-sport-icon-narrow-column{
 	clear:none;
 	margin-left: .4em;
@@ -362,7 +386,7 @@ div.signup-narrow-column-img-container {
 
 #signup-sports-icons-container {
 	margin: 0 auto;
-	width: 26em;
+	width: 29em;
 
 }
 

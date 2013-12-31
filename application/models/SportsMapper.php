@@ -58,6 +58,7 @@ class Application_Model_SportsMapper extends Application_Model_MapperAbstract
 		
 		return $sports;
 	}
+
 	
 	/**
 	 * get skills (shooter/shooting, quick/quickness, etc) from db

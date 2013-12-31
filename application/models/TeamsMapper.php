@@ -218,6 +218,7 @@ class Application_Model_TeamsMapper extends Application_Model_TypesMapperAbstrac
 		
 		$select->limit($totalLimit,$offsetLimit);
 		
+		
 		$results = $table->fetchAll($select);
 		
 		$db = Zend_Db_Table::getDefaultAdapter();
@@ -441,7 +442,7 @@ class Application_Model_TeamsMapper extends Application_Model_TypesMapperAbstrac
 							'us.attendance',
 							'us.sportsmanship',
 							'us.noRatings'))
-			   ->join(array('s' => 'sports'),
+			   ->joinLeft(array('s' => 'sports'),
 			   		  's.sportID = ' . $sportID)
 			   ->where('ut.teamID = ?', $teamID)
 			   ->group('ut.userID');

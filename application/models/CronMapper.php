@@ -14,15 +14,18 @@ class Application_Model_CronMapper extends Application_Model_MapperAbstract
 		
 		$db = Zend_Db_Table::getDefaultAdapter();
 		
+		$table = $this->getDbTable();
+		
 		$testGameUpdate = "SELECT MAX(gameID) as top FROM games 
 							HAVING top = (SELECT gameID FROM games WHERE parkID = 0 AND sportID = 0 AND public = 0)";
 		
-		$results = $db->query($testGameUpdate);
+		$results = $table->fetchRow($testGameUpdate);
 		
 		if (!$results) {
 			// Max gameID != the holder game for bug fix, continue to move bug fix gameID to maxID
 		
 			// BUG FIX to move empty holder game in db to new position as max(id)
+			
 			$moveGame = "UPDATE games SET gameID = ((
 														SELECT gameID
 														FROM (SELECT MAX(gameID) as gameID FROM games) AS g2

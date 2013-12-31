@@ -63,6 +63,10 @@ a.find-result-container.light-back {
 	margin-left: .4em;
 }
 
+#otherSport-container {
+	display:none;
+}
+
 #slider-container-skill {
 	float:left;
 	margin-top: .5em;

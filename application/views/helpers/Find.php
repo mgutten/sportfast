@@ -259,7 +259,7 @@ class Application_View_Helper_Find
 			// Only show match img for pickup games
 			$matchImg .= "<img src='" . $match->getMatchImage() . "' tooltip='" . $match->getMatchDescription() . "' class='left find-result-match-img'/>" ;
 
-			$matchImg .= ($userInGame ? "<p class='left " . $class . " smaller-text green find-results-joined'> You're on this team!</p>" : '');
+			$matchImg .= ($userInGame ? "<p class='left smaller-text green find-results-joined'> You're on this team!</p>" : '');
 		}
 		
 		if ($number) {

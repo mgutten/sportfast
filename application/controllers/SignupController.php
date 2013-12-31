@@ -122,14 +122,15 @@ class SignupController extends Zend_Controller_Action
 	public function validateAction()
 	{
 		
-		
 		$fail = false;
 		$form = new Application_Form_Signup();
 		$request = $this->getRequest();
-	
+		
+		
 		if ($request->isPost()) {
 			$post = $request->getPost();
-
+			
+			
 			if (!$form->isValid($post)) {
 				// Form failed validation, redirect back with error
 				Zend_Session::namespaceUnset('signup');
@@ -342,6 +343,17 @@ class SignupController extends Zend_Controller_Action
 					}
 					
 				}
+				
+				if (!empty($post['otherSports'])) {
+					$otherSports = explode(',',$post['otherSports']);
+					
+					foreach ($otherSports as $sport) {
+						$sportPosted = true;
+						
+						$user->addOtherSport($sport);
+					}
+				}
+					
 
 				if ($agePosted && $sportPosted && $sexPosted) {
 					$user->account = '2';
@@ -349,10 +361,10 @@ class SignupController extends Zend_Controller_Action
 					$user->account = '1';
 				}
 				
-				
 				$user->save(true);
+
 				
-				
+				/*
 				$subject  = 'Sportfast Account Verification';
 				$message  = "<html>
 								<head>

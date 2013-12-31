@@ -5,7 +5,9 @@
 */
 $this->headTitle('Signup');
 $this->headLink()->prependStylesheet($this->baseUrl() . '/css/signup.css');
+$this->headLink()->prependStylesheet($this->baseUrl() . '/css/invite.css');
 $this->headLink()->prependStylesheet($this->baseUrl() . '/css/plugins/jcrop.min.css');
+$this->headScript()->prependFile($this->baseUrl() . '/js/createsuccess.js');
 $this->headScript()->prependFile($this->baseUrl() . '/js/signup.js');
 $this->headScript()->prependFile($this->baseUrl() . '/js/plugins/smartslider.js');
 $this->headScript()->prependFile($this->baseUrl() . '/js/plugins/jcrop.min.js');
@@ -205,18 +207,25 @@ $currentStep++;
 <div id='signup-sports-icons-container'>
 <?php
 	$sports = $this->sports;
-
+	$sports['other'] = array();
+	
 foreach ($sports as $sport => $values) {
-	echo $this->partial('partials/signup/sportIcon.phtml',array('sport' =>$sport));
+	echo $this->partial('partials/signup/sportIcon.phtml',array('sport' => $sport));
 }
 
 ?>
 </div>
 
+<div class='clear white-background dropshadow' id='profile-invite-emails-outer-container'>
+    <div class='clear width-100' id='profile-invite-parsedEmails'>
+    </div>
+    <?php echo $this->form->otherSports;?>
+</div>
+
 
 	<?php
 	// create sportForms							
-    echo $this->signupsportform()->loop($sports);
+    echo $this->signupsportform()->loop($this->sports);
 
 	?>
 

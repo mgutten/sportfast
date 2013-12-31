@@ -395,3 +395,13 @@ input[type=text].create-input {
 #create-description {
 	margin-top: 3em;
 }
+
+/* otherSport */
+#otherSport-container {
+	margin: 0em 0 0 9em;
+	font-size: 1.25em;
+}
+
+#otherSport {
+	width: 10em;
+}

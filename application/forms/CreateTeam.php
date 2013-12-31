@@ -46,6 +46,16 @@ class Application_Form_CreateTeam extends Zend_Form
 				'autocomplete'  => 'off',
 				'maxlength'		=> 26
 				));
+				
+		$this->addElement('text', 'otherSport', array(
+				'filters'		=> array('StringTrim'),
+				'required'		=> false,
+				'decorators'	=> array('Overlay'),
+				'label'			=> 'What sport?',
+				'class'			=> 'dropshadow heavy',
+				'autocomplete'  => 'off',
+				'maxlength'		=> 40
+				));
 		
 		$detailsClass = 'create-input';	
 				

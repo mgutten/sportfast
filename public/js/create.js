@@ -38,6 +38,14 @@ $(function()
 		$('#create-header-sport').attr('clicked', 'true')
 		
 		$('.create-game-sport-type-container').hide();
+		$('#otherSport-container').hide();
+		
+		if (sport.toLowerCase() == 'other') {
+			$('#otherSport-container').show();
+			$('.create-section-inner').css('visibility','visible');
+			$('#missingSport-container').hide();
+			return;
+		}
 		
 		if (typeof $(this).attr('missingSport') != 'undefined') {
 			// User is missing this sport from profile, show link to account settings
@@ -68,6 +76,19 @@ $(function()
 		var sport = $(this).parents('.create-game-sport-type-container').attr('sport');
 
 		selectSport($('#' + sport));
+		
+		testDate();
+	})
+	
+	/* entering custom sport */
+	$('#otherSport').keyup(function()
+	{
+		var sport = $(this).val();
+		$(this).attr('sport', sport);
+		
+		$('#create-header-sport').text(capitalize(sport));
+		
+		selectSport($(this));
 	})
 	
 	
@@ -662,6 +683,8 @@ function selectSport(ele)
 	
 	$('#narrow-column-sport').text(capitalize(sport));
 	$('#narrow-column-team').show();
+	
+	
 	
 	if (isGame()) {
 		mapMoved();

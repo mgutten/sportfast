@@ -111,11 +111,16 @@ class FindController extends Zend_Controller_Action
 		$this->view->numMatches = $matches->totalRows;
 		
 		$sports = new Application_Model_Sports();
+			
 		$this->view->sports = $sports->getAllSportsInfo();
+		$this->view->sports['other'] = array();
 		
 		$form = new Application_Form_General();
 		$this->view->inputText = $form->text;
 		$this->view->checkbox  = $form->checkbox;
+		$this->view->otherSport = $form->text->setAttrib('id', 'otherSport')
+											 ->setAttrib('name', 'otherSport')
+											 ->setLabel('What sport?');
 		
     }
 	

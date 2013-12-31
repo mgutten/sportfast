@@ -5,6 +5,7 @@ var typing;
 
 $(function()
 {
+
 	/* prevent form submit on enter */
 	$('#userName').keydown(function(e)
 	{
@@ -299,8 +300,9 @@ function populateSearchResultsInvite(results, container)
 
 /**
  * set emails to hidden input
+ * @params(ele => element to set emails to)
  */
-function setEmails()
+function setEmails(ele)
 {
 	var str = '';
 	var counter = 0;
@@ -315,13 +317,18 @@ function setEmails()
 		counter++;
 	})
 	
-	$('#emails').val(str);
+	if (typeof ele == 'undefined') {
+		ele = $('#emails');
+	}
+	
+
+	ele.val(str);
 }
 
 function inputEmail()
 {
 	var val = $('.emails').val();
-	$('.emails').val(val + ' '); // Trigger attempted input of current name
+	$('.emails').val(val + '\n'); // Trigger attempted input of current name
 	
 	var output = convertEmails($('.emails').val());
 	
@@ -365,10 +372,12 @@ function updateNumRecipients()
 	if ($('.invite-email').length > 0) {
 		// Hide overlay
 		$('#invite-numEmails-container').css('opacity', 1);
-		$('#input-overlay-emailsTextArea').css('visibility', 'hidden');
+		$('.emails').siblings('.input-overlay').css('visibility', 'hidden');
 	} else {
 		$('#invite-numEmails-container').css('opacity', 0);
-		$('#input-overlay-emailsTextArea').css('visibility', 'visible');
+		if ($('.emails').parents('#profile-invite-emails-outer-container').css('visibility') != 'hidden') {
+			$('.emails').siblings('.input-overlay').css('visibility', 'visible');
+		}
 	}
 	
 	$('#invite-numEmails').text($('.invite-email').length);
@@ -380,7 +389,21 @@ function updateNumRecipients()
  */
 function parseEmails(text)
 { 
-	var emails = text.match(/([a-zA-Z0-9.(\+)_-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9._-]+)(?=(>)?(\,|\s)+)/gi); // Array of emails
+	var emailRegexFinal;
+	if (typeof emailRegex == 'undefined') {
+		// custom regex not defined
+		emailRegexFinal = "([a-zA-Z0-9.(\\+)_-]+@[a-zA-Z0-9._-]+\\.[a-zA-Z0-9._-]+)(?=(>)?(\\,|\\s)+)";
+	} else {
+		emailRegexFinal = emailRegex;
+	}
+	
+	/* /([a-zA-Z0-9.(\+)_-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9._-]+)(?=(>)?(\,|\s)+)/gi*/
+	
+	var regex = new RegExp(emailRegexFinal, "gi");
+	
+	var emails = text.match(regex); // Array of emails
+	
+	
 	
 	return emails;
 		

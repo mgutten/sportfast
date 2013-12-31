@@ -51,7 +51,7 @@
 	overflow-y: auto;
 }
 
-#input-overlay-emailsTextArea {
+#profile-invite-emails-container > .input-overlay {
 	margin-top: -.9em;
 	
 }

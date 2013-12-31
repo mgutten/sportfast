@@ -14,7 +14,16 @@ class Application_Form_Signup extends Zend_Form
 									'My/Form/Decorator/',
 									'decorator');
 		
-								
+		
+		$this->addElement('textarea', 'otherSports', array(
+				'required'		=> false,
+				'decorators'	=> array('Overlay'),
+				'label'			=> '<span class="heavy inherit">What other sports?</span>',
+				'class'			=> 'emails',
+				'id'			=> 'profile-invite-emails',
+				'autocomplete'  => 'off'
+				));
+							
 		$this->addElement('text', 'firstName', array(
 				'filters'		=> array('StringTrim'),
 				'required'		=> true,

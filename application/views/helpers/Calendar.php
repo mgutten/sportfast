@@ -113,6 +113,7 @@ class Application_View_Helper_Calendar
 						$tooltip .= $extraTooltip;
 						$tooltip .= '<p class="clear dark">' . $event->getDay() . ' at ' . $event->getHour() . '</p>';
 						$tooltip .= '<p class="clear dark">' . $event->locationName . '</p>';
+						
 						$url = '/teams/' . $event->teamID;
 						$winOrLoss = $event->winOrLoss;
 					} elseif (!empty($event->_attribs['gameID'])) {
@@ -346,7 +347,8 @@ class Application_View_Helper_Calendar
 					$innerTooltip = $eventArray[0];
 					if ($tooltips) {
 						// Set tooltip
-						$tooltip = "tooltip='" . $innerTooltip . "'";
+						$innerTooltip = str_replace("'", "&#39;", $innerTooltip);
+						$tooltip = "tooltip='" . htmlspecialchars($innerTooltip) . "'";
 					} else {
 						// Display custom attributes as stored from setScheduledDays
 						$tooltip = implode(' ', $eventArray);
@@ -392,6 +394,7 @@ class Application_View_Helper_Calendar
 			$curMonth = $this->month;
 			$lastMonth = $curMonth - 1;
 			$year = false;
+			/*
 			if ($lastMonth < 1) {
 				$year = -1;
 				$lastMonth = 12;
@@ -406,8 +409,49 @@ class Application_View_Helper_Calendar
 			}
 			$output .= $this->createCalendar($eventsArray, $days, $tooltips, $nextMonth, $year, $numberedDays, false);
 			
+			$monthArray = roundMonth($curMonth, -2);
+			$output .= $this->createCalendar($eventsArray, $days, $tooltips, $monthArray['month'], $monthArray['year'], $numberedDays, false);
+			
+			$monthArray = roundMonth($curMonth, 2);
+			$output .= $this->createCalendar($eventsArray, $days, $tooltips, $monthArray['month'], $monthArray['year'], $numberedDays, false);
+			*/
+			for ($i = -2; $i <= 2; $i++) {
+				if ($i == 0) {
+					continue;
+				}
+				$monthArray = $this->roundMonth($curMonth, $i);
+				$output .= $this->createCalendar($eventsArray, $days, $tooltips, $monthArray['month'], $monthArray['year'], $numberedDays, false);
+			}
+			
 		}
 		
 		return $output;
 	}
+	
+	
+	public function roundMonth($month, $interval = 1)
+	{
+		$year = false;
+		for ($i = 0; $i < abs($interval); $i++) {
+			if ($interval > 0) {
+				$month++;
+			} else {
+				$month--;
+			}
+			
+			if ($interval < 0 && $month < 1) {
+				// Moving negative and month is less than 1, is december now
+				$month = 12;
+				$year = -1;
+			} elseif ($interval > 0 && $month > 12) {
+				// Moving positive and month is greater than 12, is january now
+				$month = 1;
+				$year = 1;
+			}
+		}
+		
+		return array('month' => $month,
+					 'year'	 => $year);
+	}
+		
 }
