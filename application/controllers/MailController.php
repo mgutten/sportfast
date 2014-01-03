@@ -1610,17 +1610,22 @@ class MailController extends Zend_Controller_Action
 	 */
 	public function warnInactiveAction()
 	{
-		$inactive = $this->getRequest()->getParam('inactive');
+		$inactiveTeams = $this->getRequest()->getParam('inactiveTeams');
+		$inactiveGames = $this->getRequest()->getParam('inactiveGames');
 		
 		require_once($_SERVER['DOCUMENT_ROOT'] . '/plugins/PHPMailer/class.phpmailer.php');	
 		
-		foreach ($inactive as $email) {
-			$subject  = 'Account Inactivity';
-			$message  = (isset($email['firstName']) ? $this->buildWarnInactiveUserMessage($email) : $this->buildWarnInactiveTeamMessage($email));
-			$headers  = "MIME-Version: 1.0" . "\r\n";
+		foreach ($inactiveTeams as $array) {
+			$team = $array['team'];
+			$captain = $array['captain'];
+			
+			$subject  = 'Your ' . $team->sport . ' Team, ' . $team->teamName  . ', Will Be Deleted';
+			$message  = $this->buildWarnInactiveTeamMessage($team);
+			/*$headers  = "MIME-Version: 1.0" . "\r\n";
 			$headers .= "Content-type: text/html; charset=iso-8859-1" . "\r\n";
 			$headers .= "From: support@sportfast.com\r\n";	 
-			$headers .= "Reply-To: support@sportfast.com\r\n";			
+			$headers .= "Reply-To: support@sportfast.com\r\n";	
+			*/		
 			
 			$mail = new PHPMailer;
 			$mail->isSMTP();                                      
@@ -1633,21 +1638,57 @@ class MailController extends Zend_Controller_Action
 			
 			$mail->From = 'support@sportfast.com';
 			$mail->FromName = 'Sportfast';
-			$mail->addAddress($email['username']);  
+			$mail->addAddress($captain->username);  
 			$mail->addReplyTo('donotreply@sportfast.com');
 			
 			$mail->isHTML(true);                                  
 			
 			$mail->Subject = $subject;
-			
-			$body = $this->buildUpcomingSubscribedGameMessage($game, $user->userID);
-			
-			$mail->Body    = $message;
-			//$mail->AltBody = $body['text'];
+						
+			$mail->Body    = $message['html'];
+			$mail->AltBody = $message['text'];
 			
 			$mail->send();
 			
-			//mail($email['username'], $subject, $message, $headers);
+			//mail($captain->username, $subject, $message['html'], $headers);
+		}
+		
+		foreach ($inactiveGames as $array) {
+			$game = $array['game'];
+			$captain = $array['captain'];
+			
+			$subject  = 'Deleting Your ' . $game->sport . ' Game at ' . ucwords($game->parkName);
+			$message  = $this->buildWarnInactiveGameMessage($game);
+			/*$headers  = "MIME-Version: 1.0" . "\r\n";
+			$headers .= "Content-type: text/html; charset=iso-8859-1" . "\r\n";
+			$headers .= "From: support@sportfast.com\r\n";	 
+			$headers .= "Reply-To: support@sportfast.com\r\n";	
+			*/		
+			
+			$mail = new PHPMailer;
+			$mail->isSMTP();                                      
+			$mail->Host = 'box774.bluehost.com';  				 
+			$mail->SMTPAuth = true;                               
+			$mail->Username = 'support@sportfast.com';                            
+			$mail->Password = 'sportfast.9';                           
+			//$mail->SMTPSecure = "ssl";
+			
+			
+			$mail->From = 'support@sportfast.com';
+			$mail->FromName = 'Sportfast';
+			$mail->addAddress($captain->username);  
+			$mail->addReplyTo('donotreply@sportfast.com');
+			
+			$mail->isHTML(true);                                  
+			
+			$mail->Subject = $subject;
+						
+			$mail->Body    = $message['html'];
+			$mail->AltBody = $message['text'];
+			
+			$mail->send();
+			
+			//mail($captain->username, $subject, $message['html'], $headers);
 		}
 			
 	}
@@ -1683,6 +1724,126 @@ class MailController extends Zend_Controller_Action
 					 
 		
 		return $output;
+	}
+	
+	/**
+	 * build message for warnInactive action
+	 * @params ($array => array of user details (username, userID, firstName, lastActive))
+	 */
+	public function buildWarnInactiveTeamMessage($team)
+	{
+		$output  = $this->mailStart();
+								
+		$output .= "<tr>
+						<td>
+							<p style='font-family: Arial, Helvetica, Sans-Serif; color: #333;font-size: 14px;'>
+							Your " . $team->sport . " team, " . $team->teamName . ", has been inactive for over 30 days.  
+							<br>
+							<br>
+							In order to keep our database up-to-date and accurate for our users, <strong>" . $team->teamName . " will be deleted on " . date('l, F jS', strtotime('+7 days')) . "</strong>.
+							<br>
+							<br>
+							If you wish to keep this team, please click the link below.
+							</p>
+						</td>
+					</tr>";
+							
+		$text = "Your " . $team->sport . " team, " . $team->teamName . ", has been inactive for over 30 days.  
+					In order to keep our database clear of unused teams, " . $team->teamName . " will be deleted on " . date('l, F j', strtotime('+7 days')) . ".
+					If you wish to keep this team, please click the link below.";
+		
+		$text .= "DO NOT DELETE " . $team->teamName . ": http://www.sportfast.com/mail/keep-team/" . $team->teamID;
+					
+		$output .= "<tr>
+						<td height='30'></td>
+					</tr>
+					<tr>
+						<td colspan='3' align='center'>
+							<a href='http://www.sportfast.com/mail/keep-team/" . $team->teamID . "' class='green-button largest-text bold' style='text-decoration: none; font-family: Arial, Helvetica, Sans-Serif; font-size: 1.5em; font-weight: bold; color: #fff; background-color: #58bf12; padding: .2em 1.5em;'>Do Not Delete " . strtoupper($team->teamName) . "</a>
+						</td>
+					</tr>";
+					
+		$output .= "<tr>
+						<td height='30'></td>
+					</tr>
+					<tr>
+						<td>
+							<p style='font-family: Arial, Helvetica, Sans-Serif; color: #333;font-size: 14px;'>Please contact us if you have any questions or concerns.</p>
+						</td>
+					</tr>";
+		
+		$output .= $this->supportSignature(true);
+			
+						
+		$output .= $this->mailEnd();
+					 
+		
+		return array('html' => $output,
+					 'text' => $text);
+	}
+	
+	/**
+	 * build message for warnInactive action
+	 * @params ($array => array of user details (username, userID, firstName, lastActive))
+	 */
+	public function buildWarnInactiveGameMessage($game)
+	{
+		$output  = $this->mailStart();
+								
+		$output .= "<tr>
+						<td>
+							<p style='font-family: Arial, Helvetica, Sans-Serif; color: #333;font-size: 14px;'>
+							Your weekly " . $game->sport . " game on " . $game->getGameDays() . " has been canceled for past 4 weeks due to a lack of players (on Sportfast, at least).  
+							<br>
+							<br>
+							In order to keep our database up-to-date and accurate for our users, <strong>this " . strtolower($game->sport) . " game will be deleted on " . date('l, F jS', strtotime('+7 days')) . "</strong>.
+							<br>
+							<br>
+							If you wish to keep this game, please click the link below.
+							</p>
+						</td>
+					</tr>";
+							
+		$text = "Your weekly " . $game->sport . " game on " . $game->getGameDays() . " has been canceled for the past 4 weeks due to a lack of players (on Sportfast, at least). 
+					this " . strtolower($game->sport) . " game will be deleted on " . date('l, F jS', strtotime('+7 days')) . ".
+					If you wish to keep this game, please click the link below.";
+		
+		$text .= "DO NOT DELETE GAME: http://www.sportfast.com/mail/keep-game/" . $game->gameID;
+					
+		$output .= "<tr>
+						<td height='30'></td>
+					</tr>
+					<tr>
+						<td colspan='3' align='center'>
+							<a href='http://www.sportfast.com/mail/keep-game/" . $game->gameID . "' class='green-button largest-text bold' style='text-decoration: none; font-family: Arial, Helvetica, Sans-Serif; font-size: 1.5em; font-weight: bold; color: #fff; background-color: #58bf12; padding: .2em 1.5em;'>Do Not Delete This Game</a>
+						</td>
+					</tr>
+					<tr>
+					 	<td height='10px'></td>
+					 </tr>
+					 <tr>
+					 	<td align='center' colspan='3'>
+							<a href='http://www.sportfast.com/games/" . $game->gameID . "' class='medium' style='font-family: Arial, Helvetica, Sans-Serif; color: #58bf12;font-size:1.25em;'>view game</a>
+						</td>
+					 </tr>";
+					
+		$output .= "<tr>
+						<td height='30'></td>
+					</tr>
+					<tr>
+						<td>
+							<p style='font-family: Arial, Helvetica, Sans-Serif; color: #333;font-size: 14px;'>Please contact us if you have any questions or concerns.</p>
+						</td>
+					</tr>";
+		
+		$output .= $this->supportSignature(true);
+			
+						
+		$output .= $this->mailEnd();
+					 
+		
+		return array('html' => $output,
+					 'text' => $text);
 	}
 	
 	/**
@@ -2484,6 +2645,43 @@ class MailController extends Zend_Controller_Action
 	}
 	
 	/**
+	 * remove team from to be deleted
+	 */
+	public function keepTeamAction()
+	{
+		$teamID = $this->getRequest()->getParam('id');
+		
+		$team = new Application_Model_Team();
+		$team->teamID = $teamID;
+		
+		$team->remove = '0000-00-00';
+		$team->setCurrent('lastActive');
+		
+		$team->save(false);
+		
+		return $this->_redirect('/teams/' . $teamID);
+	}
+	
+	/**
+	 * remove game from to be deleted
+	 */
+	public function keepGameAction()
+	{
+		$gameID = $this->getRequest()->getParam('id');
+		
+		$game = new Application_Model_Game();
+		
+		$game->gameID = $gameID;
+		$game->keepGame = date('Y-m-d', strtotime('+30 days'));
+		$game->remove = '0000-00-00';
+		
+		$game->save(false);
+		
+		
+		return $this->_redirect('/games/' . $gameID);
+	}
+	
+	/**
 	 * add user as member of game 
 	 */
 	public function addUserMemberAction()
@@ -2889,11 +3087,11 @@ class MailController extends Zend_Controller_Action
 					 </tr>
 					 <tr>
 						<td align='right' width='325'>
-							<a href='" . $inUrl . "' class='green-button largest-text bold' style='text-decoration: none; font-family: Arial, Helvetica, Sans-Serif; font-size: 2.2em; font-weight: bold; color: #fff; background-color: #58bf12; padding: .2em 1.5em;'>in</a>
+							<a href='" . $inUrl . "' class='green-button largest-text bold' style='text-decoration: none; font-family: Arial, Helvetica, Sans-Serif; font-size: 2.2em; font-weight: bold; color: #fff; background-color: #58bf12; padding: .2em 52px;'>in</a>
 						</td>
 						<td width='10'></td>
 						<td align='left' width='322'>
-							<a href='" . $outUrl . "' class='green-button largest-text bold' style='text-decoration: none; font-family: Arial, Helvetica, Sans-Serif; font-size: 2.2em; font-weight: bold; color: #fff; background-color: #58bf12; padding: .2em 1.15em;'>out</a>
+							<a href='" . $outUrl . "' class='green-button largest-text bold' style='text-decoration: none; font-family: Arial, Helvetica, Sans-Serif; font-size: 2.2em; font-weight: bold; color: #fff; background-color: #58bf12; padding: .2em 42px;'>out</a>
 						</td>
 					 </tr>";
 		
@@ -2903,7 +3101,7 @@ class MailController extends Zend_Controller_Action
 						 </tr>
 						 <tr>
 							 <td align='center' colspan='3'>
-								<a href='" . $maybeUrl . "' class='green-button largest-text bold' style='text-decoration: none; font-family: Arial, Helvetica, Sans-Serif; font-size: 1em; font-weight: bold; color: #fff; background-color: #58bf12; padding: .2em 7.2em;'>maybe</a>
+								<a href='" . $maybeUrl . "' class='green-button largest-text bold' style='text-decoration: none; font-family: Arial, Helvetica, Sans-Serif; font-size: 1em; font-weight: bold; color: #fff; background-color: #58bf12; padding: .2em 110px;'>maybe</a>
 							 </td>
 						 </tr>";
 		}

@@ -98,10 +98,11 @@ class CronController extends Zend_Controller_Action
 	 * delete teams marked for deletion
 	 * OFTEN: PER DAY
 	 */
-	public function deleteTeamsAction()
+	public function deleteTypesAction()
 	{
 		$mapper = $this->getMapper();
 		$mapper->deleteTeams();
+		$mapper->deleteGames();
 	}
 	
 	/**
@@ -134,9 +135,8 @@ class CronController extends Zend_Controller_Action
 	{
 		$mapper = $this->getMapper();
 		
-		
 		return;
-		
+				
 		$mapper->removeInactiveUsers();
 		$mapper->removeInactiveTeams();
 	}
@@ -149,10 +149,13 @@ class CronController extends Zend_Controller_Action
 	{
 		$mapper = $this->getMapper();
 		
-		return;
-		$inactive = $mapper->getInactiveUsers();
 		
-		return $this->_forward('warn-inactive', 'mail', null, array('inactive' => $inactive));
+		//$inactiveUsers = $mapper->getInactiveUsers();
+		$inactiveTeams = $mapper->getInactiveTeams();
+		$inactiveGames = $mapper->getInactiveGames();
+		
+		return $this->_forward('warn-inactive', 'mail', null, array('inactiveTeams' => $inactiveTeams,
+																	'inactiveGames'	=> $inactiveGames));
 		//$mapper->removeInactiveTeams();
 	}
 	

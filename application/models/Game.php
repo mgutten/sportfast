@@ -59,7 +59,8 @@ class Application_Model_Game extends Application_Model_ConfirmationsAbstract
 									'sendReminder'  => '',
 									'sendConfirmation' => '',
 									'gameOn'		=> '', // game on email (0 = none, 1 = all members, 2 = ins and maybes)
-									'plus'			=> ''
+									'plus'			=> '',
+									'keepGame'		=> ''  // if set to a date, do not warn user about inactive game until after that date
 									);
 									
 	protected $_primaryKey = 'gameID';
@@ -316,7 +317,7 @@ class Application_Model_Game extends Application_Model_ConfirmationsAbstract
 	 */
 	public function getGameDays()
 	{
-		return $this->gameDate->format('l') . 's at ' . ($this->gameDate->format('i') > 0 ? $this->gameDate->format('g:ia') : $this->gameDate->format('ga'));
+		return $this->gameDate->format('l') . 's at ' . $this->getGameTime();
 	}
 		
 
@@ -531,16 +532,21 @@ class Application_Model_Game extends Application_Model_ConfirmationsAbstract
 		$hourDiff = $diff->format("%h");
 		$minDiff  = $diff->format("%i");
 		
+		$dateInterval = new DateInterval('P' . $dayDiff . 'D');
+		
+		$newDate = $curDate;
+		
 		if ($hourDiff > 12 && $hourDiff < 24) {
 			// Correct for ::diff() failure when event is (eg 2 days ahead but under 48 hours, returns 1 day)
+			
 			$dayDiff += 1;
-		} elseif ($dayDiff == 0 && 
-				  ($gameDate->format('m-d') != $curDate->format('m-d'))) {
+		} elseif (($gameDate->format('m-d') != $newDate->add($dateInterval)->format('m-d'))) {
 			// Correct for case when under 12 hours before gametime but still before 12AM
 			$dayDiff += 1;
 		}
 		
 		$diff = $posOrNeg . $dayDiff;
+		
 		$endNextWeek = (7 - $curDate->format('w')) + 7;
 		
 		if ($diff <= -7 || $diff >= $endNextWeek) {

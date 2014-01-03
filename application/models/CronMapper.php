@@ -157,6 +157,29 @@ class Application_Model_CronMapper extends Application_Model_MapperAbstract
 	}
 	
 	/**
+	 * delete games who are marked for deletion with remove column
+	 */
+	public function deleteGames()
+	{
+		$db = Zend_Db_Table::getDefaultAdapter();
+		/*
+		$insert = "INSERT INTO old_teams (teamID, sportID, sport, rosterLimit, teamName, public, 
+										  city, cityID, captain, systemCreated, minSkill, maxSkill,
+										  minAge, maxAge, picture, remove, lastActive, movedDate)
+								 (SELECT teamID, sportID, sport, rosterLimit, teamName, public,
+										  city, cityID, captain, sportfastCreated, minSkill, maxSkill,
+										  minAge, maxAge, picture, remove, lastActive, NOW() 
+										FROM teams 
+										WHERE remove = CURDATE())";
+										
+		$db->query($insert);
+		*/
+		
+		$delete = "DELETE FROM games WHERE remove = CURDATE()";
+		$db->query($delete);
+	}
+	
+	/**
 	 * send follow up email to users who signed up but did not verify
 	 */
 	public function getUnverifiedUsers()
@@ -294,6 +317,91 @@ class Application_Model_CronMapper extends Application_Model_MapperAbstract
 		
 		return $returnArray;
 	}
+	
+	/**
+	 * get teams to warn them about impending inactivity and removal
+	 */
+	public function getInactiveTeams()
+	{
+		$table = $this->getDbTable();
+		$select = $table->select();
+		$select->setIntegrityCheck(false);
+		
+		$select->from(array('t' =>'teams'),
+					  array('t.*','DATEDIFF(now(), t.lastActive) as dateDiff'))
+			   ->join(array('tc' =>'team_captains'),
+			   		  'tc.teamID = t.teamID')
+			   ->join(array('u' => 'users'),
+			   		  'u.userID = tc.userID')
+			   ->where('t.lastActive < (now() - INTERVAL 30 DAY)')
+			   ->where('t.remove IS NULL OR t.remove = "0000-00-00"');
+			   
+			   
+		$results = $table->fetchAll($select);
+		
+		$returnArray = array();
+		foreach ($results as $result) {
+			$team = new Application_Model_Team($result);
+			$team->remove = date('Y-m-d', strtotime('+7 days'));
+			$team->save(false);
+			
+			$returnArray[] = array('team' => $team,
+								   'captain' => new Application_Model_User($result),
+								   'lastActive' => $result->dateDiff);
+		}
+		
+		return $returnArray;
+	}
+	
+	/**
+	 * get games to warn them about impending inactivity and removal
+	 */
+	public function getInactiveGames()
+	{
+		$table = $this->getDbTable();
+		$select = $table->select();
+		$select->setIntegrityCheck(false);
+		
+		$sql = "(SELECT COUNT(og2.oldGameID) as oldGames, og2.* FROM old_games og2 
+					WHERE og2.totalPlayers < 2
+						AND og2.date > (NOW() - INTERVAL 4 WEEK)
+						AND og2.canceled = 1
+						AND og2.cancelReason = 'Not enough players'
+					GROUP BY og2.gameID)";
+		
+		$select->from(array('og' =>new Zend_Db_Expr($sql)),
+					  array('og.*'))
+			   ->join(array('gc' =>'game_captains'),
+			   		  'gc.gameID = og.gameID')
+			   ->join(array('u' => 'users'),
+			   		  'u.userID = gc.userID')
+			   ->join(array('g' => 'games'),
+			   		  'g.gameID = og.gameID')
+			   ->where('og.oldGames > 0')
+			   ->where('g.remove IS NULL OR g.remove = "0000-00-00"')
+			   ->where('g.keepGame < CURDATE() OR g.keepGame IS NULL')
+			   ->where('g.gameID IS NOT NULL')
+			   ->where('g.recurring = 1');
+		
+			   
+		$results = $table->fetchAll($select);
+		
+		$returnArray = array();
+		foreach ($results as $result) {
+			$game = new Application_Model_Game();
+			$game->gameID = $result->gameID;
+			$game->remove = date('Y-m-d', strtotime('+7 days'));
+			$game->save(false);
+			
+			$game->setAttribs($result);
+			
+			$returnArray[] = array('game' => $game,
+								   'captain' => new Application_Model_User($result));
+		}
+		
+		return $returnArray;
+	}
+
 	
 	/**
 	 * internal function to move teams to old_teams $where

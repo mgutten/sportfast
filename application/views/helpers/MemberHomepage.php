@@ -402,8 +402,7 @@ class Application_View_Helper_MemberHomepage
 						$output .= "<a href='/games/" . $game->gameID . "' class='member-schedule-day-body-game-container schedule-outer-container'>";
 						$output .= "<div class='member-schedule-day-body-game-left-container'>";
 						$output .= "<p class='left bold darkest largest-text'>" . $game->getGameTitle() . '</p>' . $canceled;
-						$output .= "<p class='clear'>" . $game->getDay() . "</p>";
-						$output .= "<p class='clear'>" . $game->getHour() . "</p>";
+						$output .= "<p class='clear'>" . $game->getDay() . " at " . $game->getHour() . "</p>";
 						$output .= "<p class='clear medium'>" . $game->getPark()->parkName . "</p>";
 						$output .= "</div>";
 						$output .= "<div class='member-schedule-day-body-players-container darkest heavy'>";

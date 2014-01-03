@@ -1811,7 +1811,8 @@ function animateNotShow(ele, down, fadeIn)
  */
 function showAlert(alertEle, opacity)
 {
-	if ($('.alert-black-back').css('display') != 'none') {
+	if ($('.alert-black-back').css('display') != 'none' &&
+		!alertEle.is('#confirm-action-alert-container')) {
 		return;
 	}
 	var finalOpacity = (typeof opacity != 'undefined' ? opacity : '.85')
