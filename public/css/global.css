@@ -2621,11 +2621,7 @@ input[type=text].selectable-input {
 }
 
 /* ratings alert */
-#rateGame-alert-container {
-	margin-top: -15em;
-	margin-left: -16em;
-	width: 28.2em;
-}
+
 
 #rateGame-alert-container > .alert-body-container {
 	width: 13em;

@@ -859,14 +859,16 @@ class MailController extends Zend_Controller_Action
 		if (!$isUser) {
 			$text .= "\n I've moved our " . $typeModel->sport . " " . $type . " to Sportfast so we can coordinate easier.  With Sportfast, you can:";
 			
-			if ($typeModel->isRecurring()) {
-				$output .= "<tr><td colspan='3'>
-								<p style='font-family: Arial, Helvetica, Sans-Serif; font-size: 24px; color: #333;font-weight:bold; margin: 0;text-align:center;'>You must choose any option below to continue receiving email reminders.</p>
-								</td>
-							</tr>
-							<tr height='20'>
-								<td></td>
-							</tr>";
+			if ($type == 'game') {
+				if ($typeModel->isRecurring()) {
+					$output .= "<tr><td colspan='3'>
+									<p style='font-family: Arial, Helvetica, Sans-Serif; font-size: 24px; color: #333;font-weight:bold; margin: 0;text-align:center;'>You must choose any option below to continue receiving email reminders.</p>
+									</td>
+								</tr>
+								<tr height='20'>
+									<td></td>
+								</tr>";
+				}
 			}
 			
 			$output .= "<tr><td colspan='3'>

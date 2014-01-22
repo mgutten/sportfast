@@ -1,0 +1,113 @@
+/* CSS Document */
+
+#rateGame-alert-container {
+	margin-top: -15em;
+	margin-left: -14em;
+	width: 27.5em;
+}
+
+.rateGame-alert-games-tab-container {
+}
+
+.rateGame-alert-game-tab-container {
+	padding: .15em .7em .15em .6em;
+}
+
+.rateGame-alert-game-tab-container:hover {
+	background:#444;
+}
+
+.rateGame-alert-game-tab-container.selected {
+	background: #fff;
+}
+
+.rateGame-alert-game-tab-container.selected > img.solid {
+	display:none;
+}
+
+.rateGame-alert-game-tab-container.selected > img.outline {
+	display:block;
+}
+
+.rateGame-alert-game-tab-container.selected > p {
+	color: #444;
+}
+
+.rateGame-alert-game-tab-container > p.parkName {
+	margin-left:2em;
+}
+
+/* inner section */
+.rateGame-alert-outer-container {
+	margin-top: 1em;
+}
+
+.rateGame-alert-inner-container {
+	position:relative;
+	min-height: 15em;
+	background: ;
+}
+
+#rateGame-sportRating-container {
+	position:absolute;
+	top: 0;
+	left: 50%;
+	margin-left: -6.5em;
+	width: 12em;
+	padding: .1em .5em;
+	z-index: 5;
+}
+
+#rateGame-sportRating-back,
+#rateGame-sportRating-text-container {
+	position:absolute;
+	top: 0;
+	left:0;
+	width: 100%;
+	height: 100%;
+	opacity: .9;
+}
+
+#rateGame-sportRating-text-container {
+	opacity: 1;
+	position:relative;
+	float:left;
+}
+
+.rateGame-sportRating-user-container {
+	padding: .4em;
+	background:#fff;
+	margin-top:3.8em;
+	cursor: pointer;
+}
+
+.rateGame-sportRating-user-container.selected {
+	opacity: 1 !important;
+	background: #58bf12;
+}
+
+.rateGame-sportRating-user-img-container {
+	position:relative;
+}
+
+.rateGame-sportRating-user-name-container {
+	position:absolute;
+	bottom: 0;
+	left:0;
+	width: 199px;
+	z-index: 10;
+}
+
+.rateGame-sportRating-user-name-container > .transparent-black,
+.rateGame-sportRating-user-name-container > p {
+	width: 100%;
+	height: 100%;
+	position:absolute;
+	top:0;
+	left:0;
+}
+
+.rateGame-sportRating-user-name-container > p {
+	position: relative;
+	height: auto;
+}

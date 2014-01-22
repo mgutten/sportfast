@@ -377,7 +377,7 @@ class Application_Model_CronMapper extends Application_Model_MapperAbstract
 			   		  'u.userID = gc.userID')
 			   ->join(array('g' => 'games'),
 			   		  'g.gameID = og.gameID')
-			   ->where('og.oldGames > 0')
+			   ->where('og.oldGames > 3')
 			   ->where('g.remove IS NULL OR g.remove = "0000-00-00"')
 			   ->where('g.keepGame < CURDATE() OR g.keepGame IS NULL')
 			   ->where('g.gameID IS NOT NULL')

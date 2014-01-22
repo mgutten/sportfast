@@ -63,6 +63,7 @@ class Application_Model_User extends Application_Model_ModelAbstract
 		$this->getUserSportsInfo();
 		$this->getUserInfo();
 		$this->getOldUserNotifications();
+		$this->getUserSportRatings();
 		
 		return $this;
 	}
@@ -84,10 +85,10 @@ class Application_Model_User extends Application_Model_ModelAbstract
 	/**
 	 * get last game that user played in that is in the past week
 	 */
-	public function getLastGame()
+	public function getLastGames()
 	{
-		return false;
-		return $this->getMapper()->getLastGame($this->userID);
+		//return false;
+		return $this->getMapper()->getLastGames($this->userID);
 	}
 	
 	
@@ -103,6 +104,42 @@ class Application_Model_User extends Application_Model_ModelAbstract
 	{
 		return $this->getMapper()->getUserRatings($this);
 	}
+	
+	public function getUserSportRatings($sports = false)
+	{
+		return $this->getMapper()->getUserSportRatings($this, $sports);
+	}
+	
+	public function getUserSportStats($daysBack = 7, $sports = false)
+	{
+		$this->getMapper()->getUserSportRatings($this, $sports);
+		$this->getMapper()->getUserSkillsChange($this, $daysBack, $sports);
+	}
+	
+	public function getUserAvgChange($daysBack = 90, $sports = false)
+	{
+		return $this->getMapper()->getUserAvgChange($this, $daysBack, $sports);
+	}
+	
+	public function getUserPickupGamesPerWeek($daysBack = 90, $sports = false, $array = false)
+	{
+		return $this->getMapper()->getUserPickupGamesPerWeek($this, $daysBack, $sports, $array);
+	}
+	
+	public function getUserTeamGamesPerWeek($daysBack = 90, $sports = false, $array = false)
+	{
+		return $this->getMapper()->getUserTeamGamesPerWeek($this, $daysBack, $sports, $array);
+	}
+	
+	public function getUserAvgChart($daysBack = 90, $sports = false)
+	{
+		$array = $this->getUserAvgChange($daysBack, $sports);
+		
+		$array = $this->getUserTeamGamesPerWeek($daysBack, $sports, $array);
+		
+		return $this->getUserPickupGamesPerWeek($daysBack, $sports, $array);
+	}
+	
 	
 	public function getSubscribedGames()
 	{
@@ -697,25 +734,6 @@ class Application_Model_User extends Application_Model_ModelAbstract
 		}
 	}
 	
-	/**
-	 * get tempAttrib
-	 */
-	public function getTempAttrib($attrib)
-	{
-		if (!isset($this->_attribs['tempAttribs'][$attrib])) {
-			return false;
-		} else {
-			return $this->_attribs['tempAttribs'][$attrib];
-		}
-	}
-	
-	/**
-	 * set tempAttrib
-	 */
-	public function setTempAttrib($attrib, $val)
-	{
-		$this->_attribs['tempAttribs'][$attrib] = $val;
-	}
 	
 	/**
 	 * verify user based on input hash (for signup verifyHash)

@@ -2516,6 +2516,91 @@ function clearMarkers() {
 };
 	
 
+function getRandomInt (min, max, exclude) {
+	var value;
+	if (typeof exclude != 'undefined' &&
+		exclude.length > 0) {
+		var tempMin,tempMax,tempValue,tempWeight;
+		var potentialValues = new Array();
+		var tempValueArray;
+		tempMin = min;
+    	for (var i = 0; i < exclude.length + 1; i++) {
+			if (i == (exclude.length)) {
+				// Last one
+				if (max != exclude[i - 1]) {
+					tempMax = max;
+				} else {
+					break;
+				}
+				
+			} else {
+				tempMax = exclude[i] - 1;
+			}
+			
+			if (i == 0) {
+				if (exclude[i] == min) {
+					tempMin += 1;
+				}
+			}
+			
+			tempValue = getRandomInt(tempMin, tempMax);
+			tempWeight = (tempMax - tempMin + 2)/max;
+			
+			tempValueArray = [tempValue, tempWeight];
+			
+			potentialValues.push(tempValueArray);
+			
+			tempMin = tempMax + 2;
+		}
+		
+		for (var i = 0; i < potentialValues.length; i++) {
+			
+			var weight = potentialValues[i][1];
+
+			if (weight + Math.random() >= 1) {
+				value = potentialValues[i][0];
+				break;
+			} else if (i == (potentialValues.length - 1)) {
+				value = potentialValues[i][0];
+			}
+		}
+			
+	} else {
+		value = Math.floor(Math.random() * (max - min + 1)) + min;
+	}
+	
+	return value;
+	
+	/**
+	 * used to test this function for accuracy
+	 
+	var used;
+	var b = 0;
+	var second, first;
+	var min = 2;
+	var max = 3;
+	for (var i = 0; i < 1000; i++) {
+		if (b == 0) {
+			used = new Array();
+			first = getRandomInt(min, max);
+			used.push(first);
+			b++;
+		} else {
+			
+			second = getRandomInt(min, max,used);
+			if (isNaN(second)) {
+				alert(first);
+			}
+				
+			b = 0;
+			if (first != second) {
+				alert(first + '-' + second);
+			}
+		}
+	}
+		*/
+}
+
 /**
  * reload page after settimeout delay to allow ajax to complete
  */

@@ -34,17 +34,17 @@ if (!$this->noDefaultHeadTitle) {
 			
 		}
 		
+		if ($this->rateGame) {
+		// Popup to rate users/park from last game
+			$this->headLink()->prependStylesheet($this->baseUrl() . '/css/rategame.css');
+			$this->headScript()->prependFile($this->baseUrl() . '/js/rategame.js');
+			$this->headScript()->prependFile($this->baseUrl() . '/js/objects.js');			
+		}
+		
 		echo $this->headLink() . PHP_EOL;
 		
 		$this->headScript()->prependFile($this->baseUrl() . '/js/global.js');
-		
-		if ($this->rateGame) {
-		// Popup to rate users/park from last game
-			$this->headScript()->prependFile($this->baseUrl() . '/js/rategame.js');
-			$this->headScript()->prependFile($this->baseUrl() . '/js/rating.js');
-			$this->headScript()->prependFile($this->baseUrl() . '/js/plugins/smartslider.js');
-		}
-		
+			
 		
 		foreach ($this->headScript() as $key => $item) {
 			// Add version number to javascript

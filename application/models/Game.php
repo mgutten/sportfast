@@ -6,6 +6,7 @@ class Application_Model_Game extends Application_Model_ConfirmationsAbstract
 	
 	protected $_attribs     = array('gameID' 	    => '',
 									'teamGameID'	=> '',
+									'oldGameID'		=> '',
 									'park' 			=> '',
 									'parkID'		=> '',
 									'parkName'		=> '',
@@ -14,6 +15,7 @@ class Application_Model_Game extends Application_Model_ConfirmationsAbstract
 									'public'		=> '',
 									'sport'			=> '',
 									'sportID' 		=> '',
+									'sportRatings'  => '',
 									'rosterLimit' 	=> '',
 									'minPlayers'	=> '',
 									'maxSkill'  	=> '',
@@ -53,6 +55,7 @@ class Application_Model_Game extends Application_Model_ConfirmationsAbstract
 									'canceled'		=> '',
 									'cancelReason'  => '',
 									'remove'		=> '',
+									'deleted'		=> '',
 									'teamPage'		=> '', // Used in getTeamByID for Calendar.php to show future games on team page
 									'sportfastCreated' => '',
 									'doNotEmail'    => '',
@@ -300,6 +303,13 @@ class Application_Model_Game extends Application_Model_ConfirmationsAbstract
 		return $this->_attribs['players'];
 	}
 
+	public function getSportRatings() 
+	{
+		if (!$this->hasValue('sportRatings')) {
+			$this->_attribs['sportRatings']= new Application_Model_SportRatings();
+		}
+		return $this->_attribs['sportRatings'];
+	}
 	
 	public function getPark()
 	{
@@ -370,7 +380,8 @@ class Application_Model_Game extends Application_Model_ConfirmationsAbstract
 		}
 		
 		$gameTitle = '<span ' . $css . '>' . $this->type->typeName . '</span> ' . $this->sport;
-		if ($this->type->hasValue('typeSuffix')) {
+		if ($this->type->hasValue('typeSuffix') &&
+			strtolower($this->type->typeSuffix) != 'null') {
 			$gameTitle .= ' <span ' . $css . '>' . $this->type->typeSuffix . '</span>';
 		}
 		return $gameTitle;
@@ -457,6 +468,11 @@ class Application_Model_Game extends Application_Model_ConfirmationsAbstract
 		return false;
 	}
 	
+	public function isPickupGame()
+	{
+		return $this->isPickup();
+	}
+	
 	public function isTeamGame()
 	{
 		if ($this->hasValue('teamGameID')) {
@@ -536,16 +552,20 @@ class Application_Model_Game extends Application_Model_ConfirmationsAbstract
 		
 		$newDate = $curDate;
 		
-		if ($hourDiff > 12 && $hourDiff < 24) {
-			// Correct for ::diff() failure when event is (eg 2 days ahead but under 48 hours, returns 1 day)
-			
+		
+		if (($posOrNeg == '-') &&
+			$gameDate->format('m-d') != $newDate->sub($dateInterval)->format('m-d')) {
+				// Is under 24 hours ago, but is yesterday
 			$dayDiff += 1;
-		} elseif (($gameDate->format('m-d') != $newDate->add($dateInterval)->format('m-d'))) {
+		} elseif (($posOrNeg == '+') &&
+				   $gameDate->format('m-d') != $newDate->add($dateInterval)->format('m-d')) {
 			// Correct for case when under 12 hours before gametime but still before 12AM
 			$dayDiff += 1;
 		}
 		
+		
 		$diff = $posOrNeg . $dayDiff;
+
 		
 		$endNextWeek = (7 - $curDate->format('w')) + 7;
 		

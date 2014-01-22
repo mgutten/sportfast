@@ -16,7 +16,6 @@ rosterLimits.ultimate 	= {upper: 22};
 
 $(function()
 {
-	
 	/* hide buttons container if exists */
 	if ($('.profile-options-inner-container').length > 0) {
 		var ua = window.navigator.userAgent

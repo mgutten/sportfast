@@ -748,7 +748,7 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 			//$sportModel->setAvailability($result->day, $result->hour)->setAttribs($result);	
 			
 		}
-			$modelClass->sortSportsByOverall();
+		$modelClass->sortSportsByOverall();
 
 		return $modelClass;
 
@@ -786,6 +786,264 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 			$savingClass->getSport($sport)->ratings->addRating($result);
 		}
 
+		return $savingClass;
+	}
+	
+	/**
+	 * get all of user's sport skill ratings
+	 * @params($savingClass => user model)
+	 */
+	public function getUserSportRatings($savingClass, $sports = false)
+	{
+	 	$table   = $this->getDbTable();
+		$select  = $table->select();
+		
+		$userID = $savingClass->userID;
+		
+		$select->setIntegrityCheck(false);
+		$select->from(array('usr'  => 'user_sport_ratings'))
+			   ->join(array('sr' => 'sport_ratings'),
+			   		  'usr.sportRatingID = sr.sportRatingID')
+			   ->join(array('us' => 'user_sports'),
+			   		  'us.sportID = sr.sportID AND us.userID = usr.userID')
+			   ->where('usr.userID = "' . $userID . '"');
+			   		
+		
+		if ($sports) {
+			$sql = 'sr.sport IN (';
+			$counter = 0;
+			foreach ($sports as $sport) {
+				if ($counter != 0) {
+					$sql .= ',';
+				}
+				$sql .= "'" . $sport . "'";
+				$counter++;
+			}
+			$sql .= ')';
+			
+			$select->where($sql);
+		}
+
+		$results = $table->fetchAll($select);
+		
+		foreach ($results as $result) {
+			$sport = strtolower($result->sport);
+			$savingClass->getSport($sport)->sportRatings->addRating($result);
+		}
+
+		return $savingClass;
+	}
+	
+	/**
+	 * get the past info for change in user's avgSkill for a sport
+	 * @params ($savingClass => user model,
+	 *			$daysBack => # of days to look back,
+	 *			$sports => optional array of sports to retrieve (default to all of user's sports))
+	 */
+	public function getUserAvgChange($savingClass, $daysBack, $sports = false)
+	{
+		$table   = $this->getDbTable();
+		$select  = $table->select();
+		$select->setIntegrityCheck(false);
+		
+		$userID = $savingClass->userID;
+		
+		$select->from(array('ous' => 'old_user_sports'),
+					  array('ous.*','YEARWEEK(ous.dateMoved) as yearWeek', 'dateMoved'))
+			   ->join(array('s' => 'sports'),
+			   		  's.sportID = ous.sportID')
+			   ->where('ous.userID = ?', $userID)
+			   ->where('ous.dateMoved > (NOW() - INTERVAL ' . $daysBack . ' DAY)')
+			   ->group('YEARWEEK(ous.dateMoved)')
+			   ->order('ous.dateMoved ASC');
+			   
+		$results = $table->fetchAll($select);
+		
+		$returnArray = array();
+		foreach ($results as $result) {
+			if (!isset($returnArray[$result->sport])) {
+				$returnArray[$result->sport] = array();
+			}
+			if (!isset($returnArray[$result->sport][$result->yearWeek])) {
+				$returnArray[$result->sport][$result->yearWeek] = array();
+			}
+						
+			$sport = new Application_Model_Sport($result);
+			$sport->setTempAttrib('dateMoved', $result->dateMoved);
+			
+			$returnArray[$result->sport][$result->yearWeek]['avgSkill'] = $sport;
+			$returnArray[$result->sport][$result->yearWeek]['date'] = $result->dateMoved;
+		}
+		
+		return $returnArray;
+	}
+	
+	/**
+	 * get number of games played per week
+	 * @params ($savingClass => Application_Model_User,
+	 *			$daysBack => # of days back to look,
+	 *			$sports => NOT INCLUDED, DEFAULTS TO ALL SPORTS
+	 *			$array => if set, results will be added to this array (used on rating page with getUserAvgChange for chart)
+	 */
+	public function getUserPickupGamesPerWeek($savingClass, $daysBack = 90, $sports = false, $array = false)
+	{
+		$table   = $this->getDbTable();
+		$select  = $table->select();
+		$select->setIntegrityCheck(false);
+		
+		$userID = $savingClass->userID;
+		
+		$select->from(array('oug' => 'old_user_games'),
+					  array('COUNT(oug.oldUserGameID) as games','YEARWEEK(og.date) as yearWeek'))
+			   ->join(array('og' => 'old_games'),
+			   		  'og.oldGameID = oug.oldGameID')
+			   ->where('oug.userID = ?', $userID)
+			   ->where('oug.confirmed = ?', 1)
+			   ->where('og.date > (NOW() - INTERVAL ' . $daysBack . ' DAY)')
+			   ->where('og.canceled = 0')
+			   ->group('YEARWEEK(og.date)')
+			   ->order('og.date ASC');
+			   
+		$results = $table->fetchAll($select);
+		
+		$returnArray = array();
+		
+		if ($array) {
+			$returnArray = $array;
+		}
+		foreach ($results as $result) {
+			if (!isset($returnArray[$result->sport])) {
+				$returnArray[$result->sport] = array();
+			}
+			if (!isset($returnArray[$result->sport][$result->yearWeek])) {
+				$returnArray[$result->sport][$result->yearWeek] = array();
+			}
+						
+			$sport = new Application_Model_Sport($result);
+			
+			$sport->setTempAttrib('games', $result->games);
+			
+			$returnArray[$result->sport][$result->yearWeek]['pickupGames'] = $sport;
+			$returnArray[$result->sport][$result->yearWeek]['date'] = $result->date;
+		}
+		
+		return $returnArray;
+	}
+
+	/**
+	 * get number of games played per week
+	 * @params ($savingClass => Application_Model_User,
+	 *			$daysBack => # of days back to look,
+	 *			$sports => NOT INCLUDED, DEFAULTS TO ALL SPORTS
+	 *			$array => if set, results will be added to this array (used on rating page with getUserAvgChange for chart)
+	 */
+	public function getUserTeamGamesPerWeek($savingClass, $daysBack = 90, $sports = false, $array = false)
+	{
+		$table   = $this->getDbTable();
+		$select  = $table->select();
+		$select->setIntegrityCheck(false);
+		
+		$userID = $savingClass->userID;
+		
+		$select->from(array('utg' => 'user_team_games'),
+					  array('COUNT(utg.userTeamGameID) as games','YEARWEEK(tg.date) as yearWeek'))
+			   ->join(array('tg' => 'team_games'),
+			   		  'tg.teamGameID = utg.teamGameID')
+			   ->join(array('t' => 'teams'),
+			   		  'tg.teamID = t.teamID')
+			   ->where('utg.userID = ?', $userID)
+			   ->where('utg.confirmed = ?', 1)
+			   ->where('tg.date > (NOW() - INTERVAL ' . $daysBack . ' DAY)')
+			   ->group('YEARWEEK(tg.date)')
+			   ->order('tg.date ASC');
+					   
+		$results = $table->fetchAll($select);
+		
+		$returnArray = array();
+		
+		if ($array) {
+			$returnArray = $array;
+		}
+		foreach ($results as $result) {
+			if (!isset($returnArray[$result->sport])) {
+				$returnArray[$result->sport] = array();
+			}
+			if (!isset($returnArray[$result->sport][$result->yearWeek])) {
+				$returnArray[$result->sport][$result->yearWeek] = array();
+			}
+						
+			$sport = new Application_Model_Sport($result);
+			
+			$sport->setTempAttrib('games', $result->games);
+			
+			$returnArray[$result->sport][$result->yearWeek]['teamGames'] = $sport;
+			$returnArray[$result->sport][$result->yearWeek]['date'] = $result->date;
+		}
+		
+		return $returnArray;
+	}
+	
+	/**
+	 * get the past info for user_sport_ratings for a user
+	 * @params ($savingClass => user model,
+	 *			$daysBack => # of days to look back,
+	 *			$sports => optional array of sports to retrieve (default to all of user's sports))
+	 */
+	public function getUserSkillsChange($savingClass, $daysBack, $sports)
+	{
+		$table   = $this->getDbTable();
+		$select  = $table->select();
+		$select->setIntegrityCheck(false);
+		
+		$userID = $savingClass->userID;
+		
+		$userSportRatings = "(SELECT userSportRatingID, value 
+								FROM (SELECT * FROM old_user_sport_ratings
+										WHERE dateMoved > (NOW() - INTERVAL " . $daysBack . " DAY)
+										ORDER BY dateMoved ASC) ousr2
+								GROUP BY userSportRatingID)";
+		
+		$select->from(array('usr'  => 'user_sport_ratings'))
+			   ->join(array('ousr' => new Zend_Db_Expr($userSportRatings)),
+			   		  'usr.userSportRatingID = ousr.userSportRatingID',
+					  array('(usr.value - ousr.value) as valueChange'))
+			   ->join(array('sr' => 'sport_ratings'),
+			   		  'usr.sportRatingID = sr.sportRatingID')
+			   ->join(array('s' => 'sports'),
+			   		  's.sportID = sr.sportID')
+			   ->where('usr.userID = "' . $userID . '"');
+			   
+		$results = $table->fetchAll($select);
+		
+		foreach ($results as $result) {
+			$savingClass->getSport($result->sport)->sportRatings->exists($result->userSportRatingID)->setTempAttrib('valueChange', $result->valueChange);
+		}
+		
+		$select  = $table->select();
+		$select->setIntegrityCheck(false);
+		
+		// Get MAX avgSkill
+		$select->from(array('ous'  => 'old_user_sports'),
+					  array('ous.*', 
+					  		'MAX(ous.avgSkill) as max',
+							'AVG(ous.avgSkill) as avg'))
+			   ->join(array('us' => 'user_sports'),
+			   		  'us.sportID = ous.sportID AND us.userID = ous.userID')
+			   ->join(array('s' => 'sports'),
+			   		  's.sportID = us.sportID')
+			   ->where('us.userID = "' . $userID . '"')
+			   ->group('us.sportID');
+			   
+		$results = $table->fetchAll($select);
+		
+		foreach ($results as $result) {
+			$max = ($result->avgSkill > $result->max ? $result->avgSkill : $result->max);
+			$savingClass->getSport($result->sport)->setTempAttrib('maxSkill', $max);
+			$savingClass->getSport($result->sport)->setTempAttrib('avgSkill', number_format($result->avg, 1));
+		}
+		
+		
+		
 		return $savingClass;
 	}
 	
@@ -1172,7 +1430,7 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 		return $games;
 	}
 	
-	public function getLastGame($userID)
+	public function getLastGames($userID)
 	{
 		$table = $this->getDbTable();
 		$select = $table->select();
@@ -1181,79 +1439,51 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 		$select->from(array('og' => 'old_games'))
 			   ->join(array('oug' => 'old_user_games'),
 			   		  'og.oldGameID = oug.oldGameID')
-			   ->where('og.date > (now() - INTERVAL 5 DAY) AND og.date < (NOW() + INTERVAL ' . $this->getTimeOffset() . ' HOUR)')
+			   ->joinLeft(array('urr' => 'user_relative_ratings'),
+			   			'urr.actingUserID = oug.userID AND urr.oldGameID = og.oldGameID',
+						array())
+			   ->where('urr.userRelativeRatingID IS NULL')
+			   ->where('og.date > (now() - INTERVAL 6 DAY) AND og.date < (NOW() + INTERVAL ' . $this->getTimeOffset() . ' HOUR)')
 			   ->where('og.canceled = ?', 0)
 			   ->where('oug.userID = ?', $userID)
-			   ->order('og.date desc')
-			   ->limit(1);
+			   ->where('oug.confirmed = ?', 1)
+			   ->order('og.date desc');
+
 		
-				 
-		$result = $table->fetchRow($select);
+		$results = $table->fetchAll($select);
 		
-		if (!$result) {
+		if (count($results) < 1) {
 			return false;
 		}
 		
-		$game = new Application_Model_Game($result);
-		$gameID = $game->gameID;
+		$games = new Application_Model_Games();
+		$oldGameIDs = $gameIDs = array();
 		
-		$oldGameID = $result['oldGameID'];
-		$parkID = $result['parkID'];
-
-		// Test if user has already rated for this game
-		$select = $table->select();
-		$select->setIntegrityCheck(false);
+		foreach ($results as $result) {
+			$games->addGame($result);
+			$oldGameIDs[] = $result->oldGameID;
+			$gameIDs[] = $result->gameID;
+		}	
+			
 		
-		$select->from(array('ur' => 'user_ratings'))
-			   ->where('ur.givingUserID = ?', $userID)
-			   ->where('ur.gameID = ?', $gameID)
-			   ->where('ur.dateHappened > (now() - INTERVAL 6 DAY)');
-			   
-		$result = $table->fetchRow($select);
-		
-		
-		if ($result) {
-			// Rating was found
-			return false;
-		}
-		
-		
-		// Get all players
-		/*
-		$select = $table->select();
-		$select->setIntegrityCheck(false);
-
-		$select->from(array('ug' => 'user_games'))
-			   ->join(array('u' => 'users'),
-			   		  'ug.userID = u.userID')
-			   ->where('ug.gameID = ?', $gameID)
-			   ->where('u.fake != ?', 1);
-		*/
-		// Only get players that user has not rated recently
+		// Only get players that have fewer than 2 winning ratings for this game
 		$sql = "SELECT `oug`.*, `u`.* 
 					FROM `old_user_games` AS `oug` 
+					INNER JOIN old_games og ON og.oldGameID = oug.oldGameID
 					INNER JOIN `users` AS `u` ON oug.userID = u.userID 
-					INNER JOIN `user_sports` AS `us` ON (us.sportID = '" . $game->sportID . "' AND us.userID = oug.userID)
-					WHERE (oug.oldGameID = '" . $oldGameID . "') 
+					LEFT JOIN `user_sports` AS `us` ON (us.sportID = og.sportID AND us.userID = oug.userID)
+					WHERE (oug.oldGameID IN (" . implode(',', $oldGameIDs) . "))
 						AND (oug.confirmed = 1)
-						AND us.noRatings = 0
+						AND (us.noRatings = 0
+							OR us.userSportID IS NULL)
 						AND (u.fake != 1) 
 						AND u.userID != '" . $userID . "'
-						AND u.userID NOT IN (SELECT receivingUserID 
-												FROM user_ratings 
-												WHERE (givingUserID = '" . $userID . "' 
-														AND dateHappened > (NOW() - INTERVAL 60 DAY)
-														AND sportID = '" . $game->sportID . "')
-													OR receivingUserID IN (SELECT receivingUserID 
-																			FROM user_ratings
-																			WHERE DATE(dateHappened) > DATE(NOW() - INTERVAL 6 DAY)
-																				AND sportID = '" . $game->sportID . "'
-																				AND gameID = '" . $gameID . "'
-																			GROUP BY receivingUserID
-																			HAVING (COUNT(receivingUserID) > 1))
-											)";
-		
-		
+						AND u.userID NOT IN (SELECT winningUserID 
+												FROM user_relative_ratings 
+												WHERE oldGameID IN (" . implode(',', $oldGameIDs) . ")
+											 GROUP BY winningUserID, oldGameID
+											 HAVING COUNT(winningUserID) > 1)";
+	
 		$db = Zend_Db_Table::getDefaultAdapter();
 		$results = $db->query($sql);
 		
@@ -1261,14 +1491,18 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 			$user = new Application_Model_User();
 			$user->userID = $result['userID'];
 			
-			
-			if ($user->hasProfilePic()) {
-				// User must have profile pic to be rated
-				$game->addPlayer($result);
-			}
+			$games->exists($result['gameID'])->addPlayer($result);
+
 		}
 		
+		
+		
+		// Get potential ratings for sport
+		foreach ($games->getAll() as $game) {
+			$game->sportRatings->getAllSportRatings($game->sportID);
+		}
 		// Only retrieve park if have not rated it recently
+		/*
 		$table = $this->getDbTable();
 		$select = $table->select();
 		$select->setIntegrityCheck(false);
@@ -1284,8 +1518,10 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 			
 			$game->park = '';
 		}
+		*/
 		
-		return $game;
+		
+		return $games;
 	}
 	
 	/**

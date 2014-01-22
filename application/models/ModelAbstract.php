@@ -5,6 +5,7 @@ abstract class Application_Model_ModelAbstract
 
 	protected $_mapperClass;	
 	protected $_mapper;
+	protected $_tempAttribs = array();
 	
 	public function __construct($resultRow = false) 
 	{
@@ -33,6 +34,26 @@ abstract class Application_Model_ModelAbstract
 		} else {
 			return false;
 		}
+	}
+	
+	/**
+	 * get tempAttrib
+	 */
+	public function getTempAttrib($attrib)
+	{
+		if (!isset($this->_tempAttribs[$attrib])) {
+			return false;
+		} else {
+			return $this->_tempAttribs[$attrib];
+		}
+	}
+	
+	/**
+	 * set tempAttrib
+	 */
+	public function setTempAttrib($attrib, $val)
+	{
+		$this->_tempAttribs[$attrib] = $val;
 	}
 	
 	/**
@@ -321,6 +342,10 @@ abstract class Application_Model_ModelAbstract
 			}
 			if (is_object($this->_attribs[$key])) {
 				// Value is set and is object
+				continue;
+			}
+			
+			if (is_null($attrib)) {
 				continue;
 			}
 

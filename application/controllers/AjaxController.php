@@ -1578,8 +1578,8 @@ class AjaxController extends Zend_Controller_Action
 		}
 		
 		$games->setPrimaryKey('teamGameID')
-			  ->remove($teamGameID)
-			  ->setPrimaryKey('gameID');
+			  ->remove($teamGameID);
+		$games->setPrimaryKey('gameID');
 	}
 			  
 		

@@ -11,126 +11,360 @@ $this->headScript()->prependFile($this->baseUrl() . '/js/profile.js');
 $this->headScript()->prependFile('https://www.google.com/jsapi');
 ?>
 
-
-<?php
-// Narrow right column
-$this->placeholder('narrowColumn')->captureStart();
-echo "<img src='" . $this->currentUser->getProfilePic('large') . "' class='narrow-column-picture dropshadow'/>";
-
-echo "<p class='width-100 center dark clear larger-margin-top'>" . $this->sport->sport . "</p>";
-echo "<div class='width-100 clear center green bold jumbo-text'>" . $this->sport->getOverall() . "</div>";
-echo "<div class='width-100 clear'>";
-
-foreach ($this->ratingOrder as $rating => $label) {
-	// Create individual rating breakdown
-	echo "<div class='rating-individual-container'>";
-	echo 	"<p class='green smaller-text width-100 center clear rating-label'>" . $label . "</p>";
-	echo 	"<p class='green bold larger-text width-100 center clear'>" . $this->sport->$rating . "</p>";
-	echo "</div>";
-}
-
-echo "</div>";
-
-
-// Top skills
-echo $this->narrowcolumnsection()->start(array('title' => 'Top Skills'));
-
-echo "<div class='clear width-100'>";
-foreach ($this->ratings->getBestSkills() as $skiller => $count) {
-	echo "<p class='clear dark'>" . ucwords($skiller) . "</p>";
-	echo "<p class='right light'>" . $count . "</p>";
-}
-echo "</div>";
-
-echo $this->narrowcolumnsection()->end();
-
-// Stats
-echo $this->narrowcolumnsection()->start(array('title' => $this->sport->sport . ' Stats'));
-
-echo "<p class='clear light'>Games played:</p>";
-echo "<p class='right dark'>" . $this->sportStats['totalGames'] . "</p>";
-
-echo "<p class='clear light margin-top' tooltip='Total number of " . strtolower($this->sport->sport) . " ratings given.'>
-		Ratings given:
-	  </p>";
-echo "<p class='right dark margin-top'>" . $this->sportStats['totalRatings'] . "</p>";
-
-echo "<p class='clear light margin-top' tooltip='Total number of different players you have played " . strtolower($this->sport->sport) . " with.'>
-		Different players:
-	  </p>";
-echo "<p class='right dark margin-top'>" . $this->sportStats['totalPlayers'] . "</p>";
-
-
-echo "<p class='clear light margin-top' tooltip='You have played the most " . strtolower($this->sport->sport) . " games with these players.'>Most games with:</p>";
-foreach ($this->sportStats['mostPlayer'] as $player) {
-
-	if (empty($player['name'])) {
-		// No most played with player
-		$name = 'None';
-	} else {
-		$name = $player['name'] . " <span class='right dark'>" . $player['times'] . "</span>";
-	}
-	
-	echo "<a href='/users/" . $player['userID'] . "' class='clear width-100 dark'>" . $name . "</a>";
-}
-
-echo "<p class='clear light margin-top' tooltip='Estimated total calories burned'>
-		Calories burned:
-	  </p>";
-echo "<p class='right dark margin-top'>" . $this->sportStats['calories'] . "</p>";	 
-
-echo "<p class='clear light margin-top' tooltip='Avg calories burned per week'>
-		Calories/week:
-	  </p>";
-echo "<p class='right dark margin-top'>" . $this->sportStats['caloriesPerWeek'] . "</p>"; 
-
-echo $this->narrowcolumnsection()->end();
-
-$this->placeholder('narrowColumn')->captureEnd();
-
-?>
-
-<a href='<?php echo $this->baseURI;?>' class='left smaller-text medium'><img src='/images/global/body/single_left_arrow.png' class='back-arrow'/>Back to profile</a>
-
-
-<div class='clear width-100' id='chart-container'>
-	<div class='clear width-100'>
-    	<?php
-		$ratings = array('Overall', 'Skill', 'Sportsmanship');
-		$counter = 0;
-		foreach ($ratings as $rating) {
-			$class = 'light rating-chart-option';
-			if ($counter == 0) {
-				$class = 'green-bold largest-text rating-chart-option';
-			}
-			echo "<p class='left pointer " . $class . "'>" . $rating . "</p>";
-			$counter++;
-		}
-		?>
-    <div class='right larger-text' id='rating-sports'><?php echo $this->sportButton;?></div>
+<div class='width-100 clear larger-margin-top rating-top-container'>
     
-    </div>
-    <div id='chart' class='left width-100' style='height: 250px'>
+    <a href='<?php echo $this->baseURI;?>' class='left'>
+    	<img src='<?php echo $this->currentUser->getProfilePic('small');?>' class='left narrow-column-picture'/>
+    	<p class='left indent largest-text darkest heavy rating-name'><?php echo $this->currentUser->shortName;?></p>
+<!--    	<p class='clear darkest hidden'><?php echo $this->currentUser->age;?> years old</p>
+        <p class='clear darkest hidden'><?php echo $this->currentUser->getHeightInFeet();?></p>
+        <p class='light clear hidden'>Last active <?php echo $this->currentUser->getLastActiveFromNow();?></p>
+        --> 
+    </a>
+
+    <div class='right' id='rating-icons-container'>
+    	<!--<p class='largest-text green heavy center left width-100' id='selected-sport'><?php echo $this->sport->sport;?></p>-->
+        <div class='clear'>
+    	<?php 
+			/* sport icons */
+			foreach ($this->currentUser->sports as $sport) {
+				$class = 'medium-background';
+				$selected = false;
+				if ($sport->sport == $this->sport->sport) {
+					// Is currently selected sport
+					$class .= ' selected';
+					$selected = true;
+				}
+				
+				$count = 0;
+				$num = '';
+				if (isset($this->recentRatings[strtolower($sport->sport)])) {
+					// There are recent ratings for this sport, count them
+					foreach ($this->recentRatings[strtolower($sport->sport)] as $ing => $r) {
+						$count++;
+					}
+				}
+				
+				if ($count > 0) {
+					$num = "<p class='green-back white smaller-text rating-icon-num pointer absolute-position " . ($selected ? 'hidden' : '') . "'>" . $count . "</p>";
+				}
+				
+				echo "<div class='rating-icon-container left larger-indent'>
+						" . $num . "
+						<img src='" . $sport->getIcon('large') . "' class='left rating-icon " . $class . " pointer' sport='" . strtolower($sport->sport) . "'/>
+					  </div>";
+			}
+		?>
+        </div>
     </div>
 </div>
 
-<header class='width-100 left'>
-	<p class='jumbo-text heavy darkest left larger-margin-top'><?php echo $this->numRatings . ' ' . strtolower($this->sport->sport) . ($this->numRatings == 1 ? ' rating' : ' ratings');?></p>
-    <!--<p class='left largest-text darkest profile-header-sub'>for <div class='left larger-text' id='rating-sports'><?php echo $this->sportButton;?></div> </p>-->
-</header>
+    	<?php 
+										
+			foreach ($this->currentUser->sports as $sport) {
+				$hiddenClass = 'hidden shown';
+				if ($sport->sport == $this->sport->sport) {
+					$hiddenClass = '';
+				}
+				$avgTop = (100 - ($this->currentUser->getSport($sport->sport)->avgSkill * 10));
+				echo "<div class='clear width-100 " . $hiddenClass . " rating-sport-container' id='rating-" . strtolower($sport->sport) . "-container'>
+						<!--" . $this->partial('partials/global/sectionHeaderBold.phtml',array('title'   => $sport->sport . ' ratings')) . "-->
+						<p class='clear darkest larger-text heavy'>" . $sport->sport . " Ratings</p>
+						
+						<p class='clear rating-section-tab selected light larger-text pointer heavy margin-top' container='skills'>Skills</p>
+						<p class='left rating-section-tab light larger-text pointer heavy margin-top' container='stats'>Stats</p>
+						
+						<div class='clear width-100 rating-section-container rating-section-skills'>
+							<div class='clear rating-skillChart-legend-container'>
+								<div class='left rating-skillChart-legend-color medium-back'></div>
+								<p class='left rating-skillChart-legend-type medium heavy smaller-text'>Top Skill</p>
+							</div>
+							<div class='left rating-skillChart-legend-container'>
+								<div class='left rating-skillChart-legend-color light-back'></div>
+								<p class='left rating-skillChart-legend-type medium heavy smaller-text'>Secondary Skill</p>
+							</div>
+							<div class='left rating-skillChart-legend-container'>
+								<div class='left rating-skillChart-legend-color green-back' style='width:6px;margin-right:1px'></div>
+								<div class='left rating-skillChart-legend-color dark-red-back' style='width:6px'></div>
+								<p class='left rating-skillChart-legend-type medium heavy smaller-text'>Change in past 7 days</p>
+							</div>
+						<div class='clear width-100 rating-skillChart-container'>
+							<div class='absolute-position rating-skillChart-avg-line' style='top:" . $avgTop . "%;'></div>
+							<div class='absolute-position' style='right:0px;top:" . ($avgTop - 7.6) . "%' tooltip=\"This average is calculated using a player's top 4 skills.\">
+								<p class='clear width-100 center light smaller-text' style='margin-bottom:-.3em'>average</p>
+								<p class='clear width-100 center heavy largest-text dark'>" . $this->currentUser->getSport($sport->sport)->avgSkill . "</p>
+							</div>";
+				
+				echo "<img src='/images/ratings/10_y_axis.jpg' class='clear rating-skillChart-y-axis'/>";
+				$sportRatings = $this->currentUser->getSport($sport->sport)->sportRatings;
+				$topRatings = $sportRatings->getTopSkills(4);
+				$topArray = array();
+				foreach ($topRatings as $rating) {
+					$topArray[$rating->ing] = true;
+				}
+				foreach ($sportRatings->getAll() as $rating) {
+					$innerClass = 'medium';
+					$class = '';
+					if (!empty($topArray[$rating->ing])) {
+						$class .= ' rating-top-skill';
+					}
+					$height = ($rating->value * 10);
+					
+					$valueTop = 100 - $height - 5.4;
+					
+					$topPortion = '';
+					$change = $rating->getTempAttrib('valueChange');
+					if ($change > 0) {
+						$height = $height - ($change * 10);
+						$top = 100 - $height;
+						$splitHeight = .05;
+						$changeHeight = ($change * 10) * (100/$top);
+						
+						$topPortion = "<div class='green-back absolute-position bottom width-100' tooltip='<span class=\"heavy green\">+" . $change . "</span><br><span class=\"medium smaller-text\">see below for details</span>' style='height:" . $changeHeight . "%;z-index:5; outline: solid 1px #fff'></div>";
+					}
+					
+					$top = 100 - $height;
+					
+					echo "<div class='left rating-skillChart-column-container " . $class . "'>
+							<p class='medium width-100 center heavy rating-skillChart-value' style='top:" . $valueTop . "%'>" . $rating->value . "</p>
+							<div class='left medium-back rating-skillChart-currentColumn' style='height: " . $height . "%'>
+								<p class='left white rating-skillChart-ing width-100 center'>" . $rating->ing . "</p>
+								<img src='" . $rating->getIcon('small', 'white') . "' class='absolute-position bottom rating-skillChart-skill hidden'>
+								
+							</div>
+							<!--
+							<div class='rating-skillChart-remainder width-100' style='height:" . (100-$height) . "%'>
+								<p class='rating-skillChart-value heavy " . $innerClass . " width-100 center'>" . $rating->value . "</p>
+							</div>
+							-->
+							<div class='absolute-position top width-100' style='height:" . $top . "%'>
+							" . $topPortion . "
+							</div>
+						  </div>";
+				}
+				
+				echo "</div>";
+				
+				/* recent ratings section */
+				if (isset($this->recentRatings[strtolower($sport->sport)])) {
+					echo "<div class='clear width-100'>";
+					echo "<div class='left rating-skillChart-y-axis'></div>";
+					foreach ($sportRatings->getAll() as $rating) {
+						
+						echo "<div class='rating-skillChart-recent-container left'>";
+						
+						if (isset($this->recentRatings[strtolower($sport->sport)][$rating->ing])) {
+							foreach ($this->recentRatings[strtolower($sport->sport)][$rating->ing] as $r) {
+								if ($r->losingUser->userID == $this->user->userID) {
+									// Do not show if current user viewing page was the one who lost
+									continue;
+								}
+								$new = '';
+								if ($this->isUser) {
+									if ($r->unlockDate->format('U') > $this->lastRating) {
+										$new = "<p class='rating-recent-new white absolute-position green-back smaller-text'>New</p>";
+									}
+								}
+								
+								if ($r->locked) {
+									$pic = "<div class='box-img-container-medium'>
+												<img src='/images/ratings/locked.jpg' class='box-img-medium'/>
+											</div>";
+											
+									$inner = "<p class='width-100 center clear light default smaller-text larger-
+									margin-top'>This rating is locked until you rate at least one player from this game.</p>";
+								} else {
+									$pic = $r->losingUser->getBoxProfilePic('medium');
+									$inner = "<p class='clear medium width-100 center smaller-text larger-margin-top default'>Chosen over</p>
+												<p class='clear white width-100 center default'>" . $r->losingUser->shortName . "</p>
+												<p class='clear medium width-100 center smaller-text default'>for " . $rating->ing . "</p>
+												<p class='clear rating-recent-overlay-value center largest-text heavy white default '><span class='inherit' style='font-size:.5em'>+</span>" . $r->valueGained . "</p>";
+								}
+								echo "<div class='clear larger-margin-top rating-recent-outer-container'>
+										" .  $new 
+										. $pic . "
+										<div class='rating-recent-overlay-container'>
+											<div class='rating-recent-overlay-back transparent-black'></div>
+											<div class='rating-recent-overlay'>
+												" . $inner . "
+											</div>
+											<div class='rating-recent-game white-background default'>
+												<p class='left margin-top darkest width-100 center'>" . $r->game->getGameTitle() . "</p>
+												<p class='clear width-100 darkest smaller-text center'>" . $r->game->getDay() .  "</p>
+												<p class='green-button rating-recent-rate clear larger-margin-top smaller-text'>rate now</p>
+											</div>
+										</div>
+									  </div>";
+							}
+						}
+						
+						echo "</div>";
+					}
+					
+					echo "</div>";
+					
+				}
+				echo "</div>";
+				
+				/* stats section for sport */
+				echo "<div class='clear width-100 rating-section-container rating-section-stats hidden'>";
+				
+				/* avg skill & games/week chart */
+				echo "<div class='left rating-chart-container rating-avgSkillChart-container'>
+							<div class='clear rating-avgSkillChart' id='rating-avgSkillChart-" . strtolower($sport->sport) . "'></div>
+						</div>";
+						
+				/* avgSkill and game stats */
+				$categories = array('Total Pickup Games' => array('value' => $this->sportStats[strtolower($sport->sport)]['totalPickupGames'],
+																  'tooltip' => 'Total pickup games this player has played this year',
+																  'percentage' => $this->sportStats[strtolower($sport->sport)]['pickupGamesPercentage']),
+									'Total Team Games'	 => array('value' => $this->sportStats[strtolower($sport->sport)]['totalTeamGames'],
+																  'tooltip' => 'Total team games this player has played this year',
+																  'percentage' => $this->sportStats[strtolower($sport->sport)]['teamGamesPercentage']),
+									'Max Skill'			 => array('value' => $this->currentUser->getSport($sport->sport)->getTempAttrib('maxSkill'),
+																  'tooltip' => 'Peak average skill for this player'),
+									'Avg Skill'			 => array('value' => $this->currentUser->getSport($sport->sport)->getTempAttrib('avgSkill'),
+																  'tooltip' => 'Overall average skill for this player'));
+								
+				echo "<div class='left rating-chart-container rating-gameStats-container'>
+						<p class='left medium heavy width-100 center'>General Stats</p>
+						<p class='left smaller-text light width-100 center'>for current year</p>";
+				
+				foreach ($categories as $title => $array) {
+					$percentage = (isset($array['percentage']) ? $array['percentage'] . '%' : '');
+					echo "<div class='left rating-gameStat-container default'>
+							<p class='left medium smaller-text rating-gameStat-title' tooltip='" . $array['tooltip'] . "'>" . $title . "</p>
+							<p class='left larger-indent heavy medium rating-gameStat-val'>" . $array['value'] . "</p>
+							<p class='left indent medium smaller-text rating-gameStat-percentage' tooltip='In the top <span class=\"heavy inherit\">" . $percentage . "</span> of players for this category'>" . $percentage . "</p>
+						  </div>";
+				}
+				echo "</div>";
+						
+				
+				
+				$charts = array('giveStats'	   => array('title' => 'Ratings given and received',
+														'subtitle' => 'since joined'),
+							    'decisiveness' => array('title' => 'Decisiveness',
+														'subtitle' => 'In or out vs. maybe'));				
+				foreach ($charts as $id => $desc) {
+					$sub = '';
+					if (isset($desc['subtitle'])) {
+						$sub = "<p class='clear width-100 center light smaller-text'>" . $desc['subtitle'] . "</p>";
+					}
+					echo "<div class='left rating-chart-container rating-" . $id . "-container'>
+							<p class='left medium heavy width-100 center'>" . $desc['title'] . "</p>
+							" . $sub . "
+							<div class='clear rating-" . $id . "' id='rating-" . $id . "-" . strtolower($sport->sport) . "' sport='" . strtolower($sport->sport) . "'></div>
+						</div>";
+				}
+				
+				
+				echo "<div class='left rating-chart-container rating-frequentPlayers-container'>
+							<p class='left medium heavy width-100 center'>Plays with</p>
+							<p class='clear light width-100 center smaller-text'>average times/week</p>";
+							
+				foreach ($this->sportStats[strtolower($sport->sport)]['mostPlayer'] as $user) {
+					if (!($user instanceof Application_Model_User)) {
+						continue;
+					}
+					echo "<a href='/users/" . $user->userID . "' class='clear rating-player-small animate-darker white-background'>
+							<img src='" . $user->getProfilePic('tiny') . "' class='left'/>
+							<p class='left indent medium margin-top heavy' >" . $user->shortName . "</p>
+							<p class='right medium margin-top'>" . $user->getTempAttrib('times') . "</p>
+							</a>";
+				}
+				echo "</div>";
 
+				echo "</div></div>";
 
-<div class='width-100 clear ratings-container'>
-	<?php
-	echo $this->ratings()->loopUserRatings($this->ratings->getAll());
-	
-	?>
-</div>
+			}
+		
+?>
 
 <script type='text/javascript'>
 sportID = '<?php echo $this->sport->sportID;?>';
 userID = '<?php echo $this->currentUser->userID;?>';
+
 <?php
+	foreach ($this->currentUser->sports as $sport => $obj) {
+		echo "sports['" . $sport . "'] = true;";
+		echo "decisiveness['" . $sport . "'] = [
+						  ['Type', 'Total'],
+						  ['Maybe', " . $this->sportStats[$sport]['decisiveness']['maybe'] . "],
+						  ['In or Out'," . $this->sportStats[$sport]['decisiveness']['decided'] . "]
+						];";
+	}
+
+	foreach ($this->giveStats->getAll() as $sport) {
+		echo "giveStats['" . strtolower($sport->sport) . "'] = [
+						  ['Type', 'Total'],
+						  ['Received', " . $sport->getTempAttrib('ratingsReceived') . "],
+						  ['Given'," . $sport->getTempAttrib('ratingsGiven') . "]
+						];";
+
+	}
+	
+	
+	foreach ($this->currentUser->sports as $sport => $obj) {
+		
+		echo "avgStats['" . $sport . "'] = [['Date', 'Average Skill', 'Team Games', 'Pickup Games'],";
+		
+		
+			$days = 90;
+			$date = DateTime::createFromFormat('Y-m-d', date('Y-m-d', strtotime('-' . $days . ' DAY')));
+			
+			$cap = round($days/7);
+			
+			for ($i = 0; $i < $cap; $i++) {
+				$dateInterval = new DateInterval('P7D');
+				$week = $date->add($dateInterval)->format('YW');
+				
+				$pickupGames = $teamGames = 0;
+				$avgSkill = 'null';
+				
+				if (isset($this->avgStats[$sport])) {
+					$inner = $this->avgStats[$sport];
+					if (isset($inner[$week])) {
+						if (isset($inner[$week]['avgSkill'])) {
+							// Is rating
+							$avgSkill = $inner[$week]['avgSkill']->avgSkill;
+						}
+						if (isset($inner[$week]['pickupGames'])) {
+							// Is # of games
+							$pickupGames = $inner[$week]['pickupGames']->getTempAttrib('games');
+						}
+						if (isset($inner[$week]['teamGames'])) {
+							// Is # of games
+							$teamGames = $inner[$week]['teamGames']->getTempAttrib('games');
+						}
+					}
+				}
+				
+				if ($i == $cap - 1) {
+					// Final week
+					if ($avgSkill == 'null') {
+						$avgSkill = $this->currentUser->getSport($sport)->avgSkill;
+					}
+				}
+				
+				echo "[new Date(" . $date->format('Y') . "," . ($date->format('m') - 1) . "," . $date->format('d') . ")," . $avgSkill . ", " . $teamGames . ", " . $pickupGames . "],";
+			}
+		
+			
+			/*
+		
+		foreach ($inner as $array) {
+		
+			$avgSkill = ($array[0]->hasValue('avgSkill') ? $array[0]->avgSkill : 'null');
+			
+			$date = DateTime::createFromFormat('Y-m-d H:i:s', $array['date']);
+			echo 	"[new Date(" . $date->format('Y') . "," . ($date->format('m') - 1) . "," . $date->format('d') . ")," . $avgSkill . ", 1],";
+		}
+		*/
+		echo "];";
+	}
+
+/*
 	foreach ($ratings as $rating) {
 		
 		echo '
@@ -146,6 +380,7 @@ userID = '<?php echo $this->currentUser->userID;?>';
 		
 		echo '];';
 	}
+	*/
 ?>
 		
 </script>

@@ -105,15 +105,15 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 			
 			$session = new Zend_Session_Namespace('rating');
 			
-			if (!isset($session->rating)) {
+			if (!isset($session->rating) || true == true) {
 				
 				// Only show ratings popups once per session
-				$game = $user->getLastGame();
-				if ($game) {
-					if ($game->players->hasValue('users')) {
-						// Game happened in the last week that user played in, make rate 2 users or park and user
-						$this->view->rateGame = $game;
+				$games = $user->getLastGames();
+				if ($games) {
+					// Game happened in the last week that user played in, make rate 2 users or park and user
+						$this->view->rateGame = $games;
 						
+						/*
 						$sport = new Application_Model_Sport();
 						$sport->sportID = $game->sportID;
 						$sport->sport   = $game->sport;
@@ -125,8 +125,9 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 						$form = new Application_Form_RateGame();
 						$form->sport->setValue($game->sport);
 						$this->view->rateGameForm = $form;
+						*/
 						
-					}
+					
 				}
 			}
 			$session->rating = true;

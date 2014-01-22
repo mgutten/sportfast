@@ -316,14 +316,15 @@ class Application_View_Helper_MemberHomepage
 				$dateCombo = 'this ' . $date;
 			}
 			
+			
 			if (isset($schedule[$b])) {
 				// Event for today
 				if ($i == $curDay) {
 					// Today
 					$display = " style='display:block'";
 					$firstDayEvent = true;
-				} elseif ($i == date('w', strtotime('+1 day')) && !$firstDayEvent) {
-					// Tomorrow				
+				} elseif ($b == date('w', strtotime('+1 day')) && !$firstDayEvent) {
+					// Tomorrow	
 					$display = " style='display:block'";
 				} elseif ((date('w', strtotime('+1 day')) == 0) && !$firstDayEvent && $dayNum == 2) {
 					// Special case for Saturday - Sunday switch
@@ -456,7 +457,7 @@ class Application_View_Helper_MemberHomepage
 				$output .= "</div></div></div>";
 				
 			} else {
-				if ($i == date('w', strtotime('+1 day')) && !$firstDayEvent) {
+				if ($b == date('w', strtotime('+1 day')) && !$firstDayEvent) {
 					// Show tomorrow by default
 					$display = " style='display:block'";
 				}
@@ -716,16 +717,24 @@ class Application_View_Helper_MemberHomepage
 			$iconsOutput   .= "<img src='" . $sport->getIcon('small', 'outline') . "' class='medium-background member-narrow-rating-icon pointer " . $class . "' />";
 			$ratingsOutput .= "<div class='member-narrow-rating-container'>";
 			$ratingsOutput .= "<p class='width-100 clear center darkest'>" . $sport->sport . "</p>";
-			$ratingsOutput .= "<a href='/users/" . $this->_view->user->userID . "/ratings/" . strtolower($sport->sport) . "' class='width-100 clear center green bold jumbo-text'>" . $sport->getOverall() . "</a>";
+			$ratingsOutput .= "<a href='/users/" . $this->_view->user->userID . "/ratings/" . strtolower($sport->sport) . "' class='width-100 clear center green bold jumbo-text'>" . $sport->avgSkill . "</a>";
 			$ratingsOutput .= "<div class='width-100 clear'>";
 			
+			foreach ($sport->sportRatings->getTopSkills(3) as $rating) {
+				// Create individual rating breakdown
+				$ratingsOutput .= "<div class='rating-individual-container'>";
+				$ratingsOutput .= "<p class='green smaller-text width-100 center clear rating-label'>" . $rating->ing . "</p>";
+				$ratingsOutput .= "<p class='green bold larger-text width-100 center clear'>" . $rating->value . "</p>";
+				$ratingsOutput .= "</div>";
+			}
+			/*
 			foreach ($ratingOrder as $rating => $label) {
 				// Create individual rating breakdown
 				$ratingsOutput .= "<div class='rating-individual-container'>";
 				$ratingsOutput .= "<p class='green smaller-text width-100 center clear rating-label'>" . $label . "</p>";
 				$ratingsOutput .= "<p class='green bold larger-text width-100 center clear'>" . $sport->$rating . "</p>";
 				$ratingsOutput .= "</div>";
-			}
+			}*/
 			
 			/*$ratingsOutput .= "<div class='rating-individual-container'>";
 			$ratingsOutput .= "<p class='green smaller-text width-100 center clear'>skill</p>";

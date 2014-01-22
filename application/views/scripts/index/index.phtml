@@ -18,6 +18,7 @@ if (!$this->loggedIn) {
 	$this->headLink()->prependStylesheet($this->baseUrl() . '/css/member.css');
 	$this->headScript()->prependFile($this->baseUrl() . '/js/member.js');
 	$this->headScript()->prependFile('https://maps.googleapis.com/maps/api/js?key=AIzaSyAhxSMQ-WQux2nzTW4dBoKmpfGHVQOk7r8&sensor=false');
+	$this->headScript()->prependFile($this->baseUrl() . '/js/objects.js');
 	echo $this->memberhomepage();
 	?>
     <script type='text/javascript'>

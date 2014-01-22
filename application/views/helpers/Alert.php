@@ -221,10 +221,122 @@ class Application_View_Helper_Alert
 	
 	/**
 	 * alert for post-game ratings of users or park that game was played at
-	 * @params ($game => game model with stored park and players)
+	 * @params ($game => games model with stored games with park and players)
 	 */
-	public function ratingAlert($game)
+	public function ratingAlert($games)
 	{
+		$output = '';
+		$countGames = count($games->getAll());
+		$players = "<span class='rateGame-alert-players'>";
+		$html = "<div id='rateGame-alert-container' class='alert-container'>
+					<!--<p class='clear white smaller-text '>" . $countGames . " recent game" . ($countGames == 1 ? '' : 's') . "</p>-->
+					<div class='rateGame-alert-games-tab-container clear margin-top width-100'>"; 
+		$js   = "<script type='text/javascript'>";
+		
+		$counter = 0;
+		foreach ($games->getAll() as $game) {
+			if ($game->isPickupGame()) {
+				$id = 'pickup' . $game->oldGameID;
+				$parkName = $game->getLimitedName('parkName', 14);
+				$fullParkName = $game->parkName;
+				$gameOpts = "{gameID:" . $game->gameID . ",
+							  oldGameID:" . $game->oldGameID . ",";
+			} else {
+				$id = 'teamGame' . $game->teamGameID;
+				$parkName = $game->getLimitedName('leagueLocationName', 14);
+				$fullParkName = $game->leagueLocationName;
+				$gameOpts = "{teamGameID:" . $game->teamGameID . ",";
+			}
+			$gameOpts .= "date:'" . $game->date . "',
+						  park:'" . $fullParkName . "',
+						  sport: '" . strtolower($game->sport) . "',
+						  sportID: '" . $game->sportID . "'}";
+			$js .= "var game = new Game(" . $gameOpts . ");";
+			
+			foreach ($game->players->getAll() as $user) {
+				$js .= "game.addPlayer({userID: " . $user->userID . ",
+										firstName: '" . $user->firstName . "',
+										lastName: '" . $user->lastName . "'});";
+			}
+			
+			foreach ($game->sportRatings->getAll() as $rating) {
+				$js .= "game.addRating({sportRatingID: " . $rating->sportRatingID . ",
+										ing: '" . $rating->ing . "',
+										description: '" . $rating->description . "'});";
+			}
+			
+			$js .= "games.push(game);";
+			
+
+			foreach ($game->players->getAll() as $user) {
+				$players .= "<div class='rateGame-alert-player-container hidden' id='player-" . $user->userID . "'>
+								<img src='" . $user->getProfilePic('large') . "' class='clear'/>
+								<p class='clear margin-top largest-text darkest heavy'>" . $user->getShortName() . "</p>
+							 </div>";
+			}
+			
+			$selected = '';
+			if ($counter == 0) {
+				$selected = 'selected';
+			}
+			
+			$sport = new Application_Model_Sport();
+			$sport->sportID = $game->sportID;
+			$sport->sport = $game->sport;
+			
+			$html .= "<div class='left rateGame-alert-game-tab-container " . $selected . " pointer rounded-corners' >
+						<img src='" . $sport->getIcon('tiny', 'solid', 'white') . "' class='left solid' tooltip='" . $sport->sport . "'/>
+						<img src='" . $sport->getIcon('tiny', 'outline') . "' class='left dark-back outline hidden'/>
+						<p class='left indent heavy white'>" . $game->getDay() . "</p>
+						<p class='clear white smaller-text parkName' tooltip='" . $fullParkName . "'>at " . $parkName . "</p>
+					  </div>";
+			
+			$counter++;
+		}
+		
+		$players .= "</span>";
+		$js .= "</script>";
+		
+		$html .= "</div>";
+		
+		$html .= "<div class='clear rateGame-alert-outer-container width-100'>
+					<div class='left rateGame-arrow' id='rateGame-leftArrow'></div>";
+					
+		$html .=	"<div class='left rateGame-alert-inner-container width-100'>
+						<div id='rateGame-sportRating-container' class='white'>
+							<div id='rateGame-sportRating-back' class=''></div>
+							<div id='rateGame-sportRating-text-container' class='inherit'>
+								<p class='largest-text inherit heavy clear width-100 center' id='rateGame-sportRating-ing'>Shooting</p>
+								<p class='clear inherit smaller-text width-100 center'>Who <span class='inherit' id='rateGame-sportRating-description'>shot better</span>?</p>
+							</div>
+						</div>
+						<div class='left rateGame-sportRating-user-container animate-opacity'>
+							<div class='clear rateGame-sportRating-user-img-container'>
+								<img src='" . $user->getProfilePic('large') . "' class='left'/>
+								<div class='rateGame-sportRating-user-name-container'>
+									<div class='transparent-black'></div>
+									<p class='width-100 center larger-text heavy white rateGame-sportRating-user-name'>" . $user->getShortName() . "</p>
+								</div>
+							</div>					
+						</div>
+						<div class='right rateGame-sportRating-user-container animate-opacity'>
+							<div class='clear rateGame-sportRating-user-img-container'>
+								<img src='" . $user->getProfilePic('large') . "' class='left'/>
+								<div class='rateGame-sportRating-user-name-container'>
+									<div class='transparent-black'></div>
+									<p class='width-100 center larger-text heavy white rateGame-sportRating-user-name'>" . $user->getShortName() . "</p>
+								</div>
+							</div>					
+						</div>
+					</div>";
+		
+		$html .= " <div class='left rateGame-arrow' id='rateGame-rightArrow'></div>
+				  </div>";
+					
+		
+		$html .= "</div>";
+		
+		/*
 		$ratings = $this->getRandomRatings($game);
 		if (!$ratings[0]->hasValue('userID')) {
 			$please = 'the location.';
@@ -368,11 +480,15 @@ class Application_View_Helper_Alert
 		$output .= "</div>";
 		*/
 		
+		/*
 		$output .= "<div class='alert-body-container margin-top hidden clear alert-submit-container'>";
 		$output .=		"<p class='button rating-submit larger-text'>Submit</p>";
 		$output .= "</div>";
 		
 		$output .= "</div>";
+		*/
+		
+		$output = $js . $html . $players;
 		
 		return $output;
 		

@@ -3,9 +3,76 @@ var ratingClicked;
 var chartData = new Object();
 var data;
 var lineChart;
+var giveStats = new Array();
+var avgStats = new Array();
+var decisiveness = new Array();
+var sports = new Object();
+var hovering = false
 
 $(function()
 {
+	
+	/* bug fix to display container of charts so they can be drawn properly */
+	$('.rating-section-container.hidden').addClass('shown');
+	
+	/* change section from skills->stats or vice versa for each sport */
+	$('.rating-section-tab').click(function()
+	{
+		if ($(this).is('.selected')) {
+			// Already selected
+			return false;
+		}
+		$(this).parent().children('.rating-section-tab').toggleClass('selected');
+		
+		var container = $(this).attr('container');
+		
+		$(this).parents('.rating-sport-container').find('.rating-section-container').toggleClass('hidden');
+	})
+	
+	$('.rating-icon-container').click(function()
+	{
+		var sport = $(this).find('.rating-icon').attr('sport');
+		
+		$('.rating-sport-container').hide();
+		
+		$('.rating-icon-num').show();
+		$(this).children('.rating-icon-num').hide();
+		
+		$('#rating-' + sport + '-container').show();
+		
+		$('.rating-icon.selected').removeClass('selected');
+		$(this).find('.rating-icon').addClass('selected');
+		
+
+		$('#selected-sport').text(capitalize(sport));
+	})
+	
+	
+	$('.rating-recent-outer-container').hover(function()
+	{
+		$(this).addClass('selected');
+		$(this).find('.rating-recent-overlay-container').stop().animate({opacity: 1}, 300);
+		$(this).find('.rating-recent-new').fadeOut();
+		$(this).find('.rating-recent-game').stop().animate({left: '96px'}, 300);
+	}, function()
+	{
+		$(this).removeClass('selected');
+		$(this).find('.rating-recent-overlay-container').stop().animate({opacity: 0}, 300);
+		$(this).find('.rating-recent-game').stop().animate({left: '0px'}, 300);
+	});
+	
+	
+	$('.rating-skillChart-column-container').hover(function()
+	{
+		$(this).find('.rating-skillChart-value').stop().animate({opacity: 1}, 300);
+		/*$(this).find('.rating-skillChart-skill').stop().animate({opacity: 0}, 300);
+		$(this).find('.rating-skillChart-ing').stop().animate({opacity: 1}, 300);*/
+	}, function()
+	{
+		$(this).find('.rating-skillChart-value').stop().animate({opacity: 0}, 300);
+		/*$(this).find('.rating-skillChart-skill').stop().animate({opacity: 1}, 300);
+		$(this).find('.rating-skillChart-ing').stop().animate({opacity: 0}, 300);*/
+	})
 	
 	$('.rating-star-clickable').mousemove(function(e)
 	{
@@ -69,14 +136,17 @@ $(function()
 		flagRemoval($(this).attr('userRatingID'));
 	})
 	
-   
+   /*
 	if ($('#chart').length > 0) {
 		// Only load charts on rating page
 		
 		google.load("visualization", "1", {"callback" : createInitialChart,
 										   "packages" :["corechart"]});
 	}
+	*/
 	
+	google.load("visualization", "1", {callback: createInitialChart,
+									   packages: ["corechart"]});
 	
 	
 })
@@ -96,6 +166,56 @@ function flagRemoval(userRatingID)
 		}
 	})
 }
+
+function createPieChart(dataArray, eleID, opts)
+{
+        var data = google.visualization.arrayToDataTable(dataArray);
+		
+		
+        var options = {
+		  chartArea:{left:0,top:15,width:"100%",height:"88%"},
+		  //backgroundColor: '#222',
+		  colors:['#8d8d8d','#58bf12'],
+		  fontName: 'Futura-Heavy',
+		  is3D: false,
+		  width: 300,
+		  tooltip: {textStyle: {color: '#8d8d8d', 
+		  						fontName: 'Futura-Heavy',
+								fontSize: 12}, 
+		  			showColorCode: true},
+		  legend: {textStyle:{color: '#8d8d8d'},
+		  		   alignment: 'center',
+				   position: 'none'},
+		  pieSliceBorderColor: 'white',
+		  pieSliceText: 'none'
+		  /*pieSliceTextStyle: {color: '#ffffff',
+		  					  fontName: 'Futura-Heavy',
+		  					  fontSize: 1},
+		  slices: [{}, {textStyle: {fontSize: 20}}]*/
+		  
+        };
+
+		
+		if (typeof opts != 'undefined') {
+			$.each(opts, function(i, v) {
+				options[i] = v;
+			})
+		}
+        var chart = new google.visualization.PieChart(document.getElementById(eleID));
+        chart.draw(data, options);
+		
+		/*
+		var ele = $('#' + eleID).find('svg').children('g').children('text');
+		
+		if (parseInt(ele.text(),10) < 50) {
+			
+			var left = ele.attr('x') - 18;
+			ele.attr('x', left);
+		}
+		*/
+		
+}
+
 
 /**
  * ajax to retrieve ratings and then create chart
@@ -117,38 +237,48 @@ function getRatingsForChart(userID, sportID, rating)
 
 // bug fix to allow callback in document.ready "google.load(..." line
 function createInitialChart()
-{
-	chart = new google.visualization.ScatterChart(document.getElementById('chart')); 
-	data = new google.visualization.DataTable();
+{ 
+	//data = new google.visualization.DataTable();
 	
-	
+
+	/*
 	var tempArray = new Array();
+	var sport = 'basketball';
 	
-	for (i = 0; i < chartData['overall'].length; i++) {
+	for (i = 0; i < avgStats[sport].length; i++) {
 		if (i == 0) {
-			tempArray[i] = chartData['overall'][i];
+			tempArray[i] = avgStats[sport][i];
 		} else {
-			var value = null;
-			if (chartData['overall'][i][1] !== null) {
-				value = 60;
-			}
+
 				
-			tempArray[i] = [chartData['overall'][i][0], value];
+			tempArray[i] = [avgStats[sport][i][0], avgStats[sport][i][1]];
 		}
 	}
 	
-	var listener = google.visualization.events.addListener(chart, 'ready',
-						  function() {
-						   google.visualization.events.removeListener(listener)
-						   setTimeout(function() {
-							   createScatterChart(chartData['overall'], false, 1000)
-						   }, 100);
-						   
-						  });
+	*/
 	
-	createScatterChart(tempArray, true);
 
-	
+	$.each(sports, function(sport, array) {
+		
+		chart = new google.visualization.LineChart(document.getElementById('rating-avgSkillChart-' + sport));
+		
+		var listener = google.visualization.events.addListener(chart, 'ready',
+						  function() {
+						   //google.visualization.events.removeListener(listener)
+						   $('#rating-avgSkillChart-' + sport).parents('.rating-section-container.hidden').removeClass('shown');
+						   $('#rating-' + sport + '-container.hidden').removeClass('shown');
+
+						  });
+		
+		if (typeof avgStats[sport] != 'undefined') {
+			createScatterChart(avgStats[sport], true);
+		}
+		
+		createPieChart(giveStats[sport], 'rating-giveStats-' + sport);
+		
+		createPieChart(decisiveness[sport], 'rating-decisiveness-' + sport);
+		
+	})
 	
 	
 }
@@ -169,8 +299,9 @@ function clearData() {
  */
 function createScatterChart(dataArray, initial, animation)
 {
+	//clearData();
 	
-	clearData();
+	var data = new google.visualization.DataTable();
 
 	for (i = 0; i < dataArray.length; i++) {
 		if (i == 0) {
@@ -178,6 +309,8 @@ function createScatterChart(dataArray, initial, animation)
 			if (initial) {
 				data.addColumn('date', dataArray[i][0]);
 				data.addColumn('number', dataArray[i][1]);
+				data.addColumn('number', dataArray[i][2]);
+				data.addColumn('number', dataArray[i][3]);
 			
 			} else {
 				data.removeColumn(1);
@@ -197,23 +330,24 @@ function createScatterChart(dataArray, initial, animation)
 		
     	//data = google.visualization.arrayToDataTable(dataArray);
 		var min = new Date();
-		min.setMonth(min.getMonth() - 6);
+		min.setMonth(min.getMonth() - 3);
 		
 		var max = new Date();
-		max.setDate(max.getDate() + 7);
+		max.setDate(max.getDate() + 1);
 		
         var options = {
-		  backgroundColor: '#222',
-		  chartArea:{left:50,top:15,width:"100%",height:"80%"},
-		  colors:['#58bf12'],
+		  backgroundColor: '#fff',
+		  chartArea:{left:50,top:30,width:"100%",height:"80%"},
+		  interpolateNulls: true,
+		  colors:['#58bf12', '#d0d0d0', '#8d8d8d'],
 		  fontName: 'Futura-Heavy',
-		  hAxis: {baselineColor: '#3f3f3f',
+		  hAxis: {baselineColor: '#bbb',
 		  	      minorGridlines: null,
 				  gridlines: {count: 0,
-				  			  color: '#222'},
-		  		  textStyle: {color: '#666',
+				  			  color: '#fff'},
+		  		  textStyle: {color: '#bbb',
 				  			  fontSize: 14},
-				  slantedText: true,
+				  slantedText: false,
 				  slantedTextAngle: 30,
 				  viewWindowMode: 'explicit',
 				  viewWindow: {max: max,
@@ -221,29 +355,31 @@ function createScatterChart(dataArray, initial, animation)
 							   },
 				  format: 'MMM'
 				  },
-		  pointSize: 6,
+		  lineWidth: 3,
+		  pointSize: 4,
 		  animation:{duration: animation,
 					 easing: 'out'},
-		  tooltip: {textStyle: {color: '#58bf12', 
+		  tooltip: {textStyle: {color: '#8d8d8d', 
 		  						fontName: 'Futura-Heavy'}, 
 		  			showColorCode: false
 					},
-		  legend: {position: 'none'},
-		  vAxis: {gridlines: {color: '#3f3f3f'},
-		  		  minorGridlines: {color:'#3f3f3f',
-		  					  	   count: 0},
-		  		  textStyle: {color: '#666',
+		  legend: {position: 'top',
+		  		   alignment: 'start',
+		  		   textStyle: {color: '#8d8d8d'}},
+		  vAxis: {gridlines: {color: '#e9e9e9',
+		  					  count: 6},
+				  textStyle: {color: '#ccc',
 				  			  fontSize: 14},
-				  baselineColor: '#3f3f3f',
-				  maxValue: 100,
-				  minValue: 60
+				  baselineColor: '#ccc',
+				  maxValue: 10,
+				  minValue: 0
 				  }
 		  
         };
 
         //chart = new google.visualization.LineChart(document.getElementById('chart')); 
         chart.draw(data, options);
-		
+		/*
 		google.visualization.events.addListener(chart, 'select', function() {
           // grab a few details before redirecting
           	var selection = chart.getSelection();
@@ -258,6 +394,7 @@ function createScatterChart(dataArray, initial, animation)
 			ele.addClass('light-back');
           
         });
+		*/
 }
 
 

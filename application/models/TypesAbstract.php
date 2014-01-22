@@ -25,8 +25,9 @@ class Application_Model_TypesAbstract extends Application_Model_ModelAbstract
 	{
 		$array = $this->getAll();
 		$primary = $this->_primaryKey;
-		
+
 		foreach ($array as $k => $type) {
+			
 			if ($type->_attribs[$primary] == $id) {
 					
 				if ($key) {

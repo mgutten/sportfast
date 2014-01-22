@@ -165,21 +165,120 @@ class Application_Model_SportsMapper extends Application_Model_MapperAbstract
 		$select = $table->select();
 		$select->setIntegrityCheck(false);
 		
-		// Total games
+		// Total pickup games
 		$select->from(array('oug' => 'old_user_games'),
 					  array('COUNT(oug.oldUserGameID) as totalGames'))
 			   ->join(array('og' => 'old_games'),
 			   		  'og.oldGameID = oug.oldGameID',
 					  array(''))
 			   ->where('og.sportID = ?', $sportID)
+			   ->where('YEAR(og.date) = YEAR(CURDATE())')
+			   ->where('oug.confirmed = ?', 1)
 			   ->where('oug.userID = ?', $userID);
-			   
+			   			   
 		$result = $table->fetchRow($select);
 		
 		$returnArray = array();
-		$returnArray['totalGames'] = $result['totalGames'];
+		$returnArray['totalPickupGames'] = $result['totalGames'];
 		
 		
+		// Total pickup games percentage
+		$select = $table->select();
+		$select->setIntegrityCheck(false);
+		
+		$position = "(SELECT COUNT(*) FROM 
+							(SELECT COUNT(oug2.oldUserGameID) as count
+							  FROM old_user_games oug2
+							  INNER JOIN old_games og2 ON og2.oldGameID = oug2.oldGameID
+							 WHERE oug2.confirmed = '1'
+								AND YEAR(og2.date) = YEAR(CURDATE())
+								AND og2.sportID = '" . $sportID . "'
+							GROUP BY oug2.userID) as t
+						WHERE t.count > " . $result['totalGames'] . ")";
+						
+		$totalUsers = "(SELECT oug3.userID 
+						FROM `old_user_games` AS `oug3` 
+						INNER JOIN `old_games` AS `og3` ON og3.oldGameID = oug3.oldGameID 
+						WHERE (og3.sportID = '" . $sportID . "') 
+							AND (YEAR(og3.date) = YEAR(CURDATE())) 
+							AND (oug3.confirmed = 1) 
+						GROUP BY oug3.userID)";
+		
+		$select->from(array('oug' => new Zend_Db_Expr($totalUsers)),
+					  array('COUNT(oug.userID) as totalUsers',
+					  		new Zend_Db_Expr($position) . ' as position'));
+		
+			   			   
+		$result = $table->fetchRow($select);
+		
+		$position = $result['position'];
+		$totalUsers = ($result['totalUsers'] == 0 ? 1 : $result['totalUsers']);
+		$percentage = ceil($position/$totalUsers * 100);
+		$returnArray['pickupGamesPercentage'] = ($percentage == 0 ? 1 : $percentage);
+		
+		
+		// Total team games
+		$select = $table->select();
+		$select->setIntegrityCheck(false);
+		
+		$select->from(array('utg' => 'user_team_games'),
+					  array('COUNT(utg.userTeamGameID) as totalGames'))
+			   ->join(array('tg' => 'team_games'),
+			   		  'tg.teamGameID = utg.teamGameID')
+			   ->join(array('t' => 'teams'),
+			   		  'utg.teamID = t.teamID',
+					  array(''))
+			   ->where('t.sportID = ?', $sportID)
+			   ->where('YEAR(tg.date) = YEAR(CURDATE())')
+			   ->where('utg.confirmed = ?', 1)
+			   ->where('utg.userID = ?', $userID);
+			   
+		$result = $table->fetchRow($select);
+		$returnArray['totalTeamGames'] = $result['totalGames'];
+		
+		
+		// Total team games percentage
+		$select = $table->select();
+		$select->setIntegrityCheck(false);
+		
+		$position = "(SELECT COUNT(*) FROM 
+							(SELECT COUNT(utg2.userTeamGameID) as count
+							  FROM user_team_games utg2
+							  INNER JOIN team_games tg2 ON tg2.teamGameID = utg2.teamGameID
+							  LEFT JOIN teams t2 ON t2.teamID = tg2.teamID
+							  LEFT JOIN old_teams ot2 ON ot2.teamID = tg2.teamID
+							 WHERE utg2.confirmed = '1'
+								AND YEAR(tg2.date) = YEAR(CURDATE())
+								AND (CASE WHEN t2.teamID IS NULL 
+										THEN ot2.sportID = '" . $sportID . "'
+										ELSE t2.sportID = '" . $sportID . "' END)
+							GROUP BY utg2.userID) as t
+						WHERE t.count > " . $result['totalGames'] . ")";
+						
+		$totalUsers = "(SELECT utg3.userID 
+						FROM `user_team_games` AS `utg3` 
+						INNER JOIN team_games tg3 ON tg3.teamGameID = utg3.teamGameID
+						LEFT JOIN teams t3 ON t3.teamID = tg3.teamID
+						LEFT JOIN old_teams ot3 ON ot3.teamID = tg3.teamID 
+						WHERE utg3.confirmed = '1'
+								AND YEAR(tg3.date) = YEAR(CURDATE())
+								AND (CASE WHEN t3.teamID IS NULL 
+										THEN ot3.sportID = '" . $sportID . "'
+										ELSE t3.sportID = '" . $sportID . "' END)
+						GROUP BY utg3.userID)";
+		
+		$select->from(array('oug' => new Zend_Db_Expr($totalUsers)),
+					  array('COUNT(oug.userID) as totalUsers',
+					  		new Zend_Db_Expr($position) . ' as position'));
+		
+			   			   
+		$result = $table->fetchRow($select);
+		
+		$position = $result['position'];
+		$totalUsers = ($result['totalUsers'] == 0 ? 1 : $result['totalUsers']);
+		$percentage = ceil($position/$totalUsers * 100);
+		$returnArray['teamGamesPercentage'] = ($percentage == 0 ? 1 : $percentage);
+		/*
 		// Total ratings
 		$select = $table->select();
 		$select->setIntegrityCheck(false);
@@ -191,14 +290,50 @@ class Application_Model_SportsMapper extends Application_Model_MapperAbstract
 			   
 		$result = $table->fetchRow($select);
 		$returnArray['totalRatings'] = $result['totalRatings'];
+		*/
+		
+		// Decisiveness
+		$select = $table->select();
+		$select->setIntegrityCheck(false);
+		
+		$decided = "(SELECT COUNT(oug2.oldUserGameID) as decided,
+							oug2.userID
+							  FROM old_user_games oug2
+							  INNER JOIN old_games og2 ON og2.oldGameID = oug2.oldGameID
+							 WHERE (oug2.confirmed = '1'
+							 		OR oug2.confirmed = '0')
+								AND YEAR(og2.date) = YEAR(CURDATE())
+								AND og2.sportID = '" . $sportID . "'
+								AND oug2.userID = '" . $userID . "')";
+						
+		$maybe = "(SELECT COUNT(oug3.oldUserGameID) as maybe,
+						  oug3.userID
+							  FROM old_user_games oug3
+							  INNER JOIN old_games og3 ON og3.oldGameID = oug3.oldGameID
+							 WHERE (oug3.confirmed = '2')
+								AND YEAR(og3.date) = YEAR(CURDATE())
+								AND og3.sportID = '" . $sportID . "'
+								AND oug3.userID = '" . $userID . "')";
+		
+		$select->from(array('oug' => new Zend_Db_Expr($decided)))
+			   ->joinLeft(array('x' => new Zend_Db_Expr($maybe)),
+			   		  'x.userID = "' . $userID . '"');
+
+		$result = $table->fetchRow($select);
+		$returnArray['decisiveness'] = array('decided' => $result['decided'],
+											 'maybe'   => (is_null($result['maybe']) ? 0 : $result['maybe']));
 		
 		
 		// Most played with player
 		$select = $table->select();
 		$select->setIntegrityCheck(false);
 		
+		$numWeeks = 8;
+		
 		$select->from(array('oug' => 'old_user_games'),
-					  array('oug.userID, COUNT(oug.userID) as times'))
+					  array('oug.userID, (COUNT(oug.userID)/' . $numWeeks . ') as times'))
+			   ->join(array('og' => 'old_games'),
+			   		  'og.oldGameID = oug.oldGameID')
 			   ->join(array('u' => 'users'),
 			   		  'u.userID = oug.userID',
 					  array('u.firstName',
@@ -208,9 +343,10 @@ class Application_Model_SportsMapper extends Application_Model_MapperAbstract
 											WHERE oug.userID = "' . $userID . '"
 												AND og.sportID = "' . $sportID . '")')
 			   ->where('oug.userID != ?', $userID)
+			   ->where('og.date > (NOW() - INTERVAL ' . $numWeeks . ' WEEK)')
 			   ->group('oug.userID')
 			   ->order('COUNT(oug.userID) DESC')
-			   ->limit('3');
+			   ->limit('5');
 			   
 		$results = $table->fetchAll($select);
 		
@@ -221,9 +357,9 @@ class Application_Model_SportsMapper extends Application_Model_MapperAbstract
 				if (!$result) {
 					continue;
 				} else {
-					$returnArray['mostPlayer'][] = array('name'   => ucwords($result['firstName']) . ' ' . ucwords($result['lastName'][0]),
-														 'times'  => $result['times'],
-														 'userID' => $result['userID']);
+					$user = new Application_Model_User($result);
+					$user->setTempAttrib('times', round($result['times'], 1));
+					$returnArray['mostPlayer'][] = $user;
 					
 				}
 			}
@@ -260,6 +396,7 @@ class Application_Model_SportsMapper extends Application_Model_MapperAbstract
 		
 		$returnArray['totalPlayers'] = $result['players'];
 		
+		/*
 		// Number of calories burned (data comes from 75 minutes of play)
 		$select = $table->select();
 		$select->setIntegrityCheck(false);
@@ -270,6 +407,7 @@ class Application_Model_SportsMapper extends Application_Model_MapperAbstract
 		$result = $table->fetchRow($select);
 		
 		$returnArray['calories'] = ($result['caloriesPerGame'] * $returnArray['totalGames']);
+		*/
 		
 		return $returnArray;
 

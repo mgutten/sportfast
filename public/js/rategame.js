@@ -1,12 +1,47 @@
 // rate users/park from previous game
+var games = new Array();
+var selectedGame
 
 $(function()
 {
-	
+		
 	if ($('#rateGame-alert-container').length > 0) {
 		// Rate user/park from last game is available, show it
 		
+		
+		
+		selectGame(0);
+		showAlert($('#rateGame-alert-container'));
+		
+		
+		$('.rateGame-sportRating-user-container').click(function()
+		{
+			if ($(this).is('.selected')) {
+				return false;
+			}
+			$(this).siblings('.rateGame-sportRating-user-container.selected').removeClass('selected').trigger('mouseout');
+			
+			$(this).addClass('selected');
+		})
+		
+		$('.rateGame-alert-game-tab-container').click(function()
+		{
+			if ($(this).is('.selected')) {
+				return false;
+			}
+			
+			$(this).siblings('.rateGame-alert-game-tab-container.selected').removeClass('selected');
+			
+			$(this).addClass('selected');
+			
+			var index = $(this).index('.rateGame-alert-game-tab-container');
+			selectGame(index);
+		})
+			
+		
+		/*
 		$('#rateGame-alert-container,.rating-section-container').show();
+		
 		$('.slider-container').each(function()
 		{
 			
@@ -41,8 +76,6 @@ $(function()
 		{
 			$(this).children('.rating-section-container').first().show();
 		})
-
-		showAlert($('#rateGame-alert-container'));
 		
 		$('#rateGame-alert-container').find('.button').click(function()
 		{
@@ -96,6 +129,7 @@ $(function()
 			$(this).addClass('underline');
 			
 		})
+		*/
 		
 		/**
 		 * picture is unidentifiable
@@ -253,6 +287,27 @@ function ratePark(parkID, gameID, sport, quality, comment, success)
 		success: function(data) {
 		}
 	})
+}
+
+/**
+ * select a game and populate html with appropriate details
+ */
+function selectGame(index)
+{
+	var game = games[index];
+	
+	var players = game.getRandomPlayers(2);
+	
+	for (var i = 0; i < 2; i++) {
+		var player = players[i];
+		var src = $('#player-' + player.userID).find('img').attr('src');
+		
+		var container = $('.rateGame-sportRating-user-container:eq(' + i + ')');
+		container.find('img').attr('src', src);
+		container.find('.rateGame-sportRating-user-name').text(player.getShortName());
+		
+	}
+	
 }
 
 
