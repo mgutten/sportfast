@@ -103,6 +103,7 @@ $(function()
 			$('#game-password-reqs').hide();
 		})*/
 		
+		
 		/* show description for minimal signup on hover */
 		$('.game-signup-hover').hover(function()
 		{
@@ -187,7 +188,32 @@ $(function()
 		}
 		
 	}
+	
+	/* populate number of new items for each tab */
+	populateNewItems();
 
+	/* toggle newsfeed show/not show */
+	$('.newsfeed-tab').click(function()
+	{
+		if ($(this).is('.selected')) {
+			return false;
+		}
+				
+		
+		$('.newsfeed-tab.selected').removeClass('selected');
+		$(this).addClass('selected');
+		
+		$(this).find('.new').hide();
+
+		
+		$('.newsfeed-notification-container').hide();
+		
+		if ($(this).attr('data-target') == 'all') {
+			$('.newsfeed-notification-container').show();
+			return false;
+		}
+		$('.newsItem-' + $(this).attr('data-target')).show();
+	})
 	
 	
 	/* fade in user description on mouseover */
@@ -1036,6 +1062,21 @@ function getType()
 	var type = detailsEle.attr('idType').replace('ID','');
 	
 	return type;
+}
+
+function populateNewItems()
+{
+	// Count status
+	var status = $('.newsItem-status.light-back').length;
+	if (status > 0) {
+		$('#newsfeed-tab-status').find('.new').text(status).show();
+	}
+	
+	// Count messages
+	var message = $('.newsItem-message.light-back').length;
+	if (message > 0) {
+		$('#newsfeed-tab-message').find('.new').text(message).show();
+	}
 }
 
 

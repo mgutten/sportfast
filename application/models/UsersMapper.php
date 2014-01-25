@@ -1159,7 +1159,7 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 					$select .= " OR ";
 				}
 				
-				$select .= "(nl." . $name . "ID IN (" . $$nameCombo . ") AND (n.details != 'request' OR n.details IS NULL))";
+				$select .= "(nl." . $name . "ID IN (" . $$nameCombo . ") AND ((n.details != 'request' AND n.details != 'out') OR n.details IS NULL))";
 				if (!$success) {
 					$success = true;
 				}
@@ -1230,7 +1230,7 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 					$select .= " OR ";
 				}
 				
-				$select .= "(nl." . $name . "ID IN (" . $$nameCombo . ") AND (n.details != 'request' OR n.details IS NULL))";
+				$select .= "(nl." . $name . "ID IN (" . $$nameCombo . ") AND ((n.details != 'request' AND n.details != 'out') OR n.details IS NULL))";
 				if (!$success) {
 					$success = true;
 				}

@@ -15,7 +15,6 @@ class GamesController extends Zend_Controller_Action
 		$gameID = $this->getRequest()->getParam('id');
         $game = new Application_Model_Game();
 		$game->getGameByID($gameID);
-
 		
 		$this->view->game = $game;
 		
@@ -157,6 +156,12 @@ class GamesController extends Zend_Controller_Action
 				// Has stash and sport requires stash and just joined this game
 				$this->view->stash = true;
 			}
+			
+			$lastVisited = $game->getLastVisited($this->view->user->userID);
+			$lastVisitedDate = DateTime::createFromFormat('Y-m-d H:i:s', $lastVisited);
+			$this->view->lastVisited = $lastVisitedDate;
+			
+			$game->setLastVisitedCurrent($this->view->user->userID);
 			
 			Zend_Session::namespaceUnset('joinedGame');
 			

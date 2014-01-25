@@ -20,7 +20,8 @@ class Application_Model_Message extends Application_Model_ModelAbstract
 									'receivingUserID' => '',
 									'read'			=> '',
 									'messageGroupID'  => '',
-									'type'			  => ''
+									'type'			  => '',
+									'confirmed'		  => ''
 									);
 									
 	protected $_primaryKey = 'teamMessageID';
@@ -39,6 +40,13 @@ class Application_Model_Message extends Application_Model_ModelAbstract
 		}
 		
 		return parent::save($loopSave);
+	}
+	
+	public function getDateTime()
+	{
+		$date = DateTime::createFromFormat('Y-m-d H:i:s', $this->dateHappened);
+		
+		return $date;
 	}
 	
 	public function getFirstName()
@@ -104,7 +112,7 @@ class Application_Model_Message extends Application_Model_ModelAbstract
 		}
 	}
 	
-	public function getBoxProfilePic($size, $id = false, $type = 'users', $class = '', $outerClass = '')
+	public function getBoxProfilePic($size, $id = false, $type = 'users', $class = '', $outerClass = '', $statusBox = false, $overlayHTML = false)
 	{
 		if ($this->hasValue('notification')) {
 			// Notification
@@ -121,7 +129,7 @@ class Application_Model_Message extends Application_Model_ModelAbstract
 			$id = $this->userID;
 		}
 
-		return parent::getBoxProfilePic($size, $id, $type, $class, $outerClass);
+		return parent::getBoxProfilePic($size, $id, $type, $class, $outerClass, $statusBox, $overlayHTML);
 	}
 	
 	public function getProfilePic($size, $id = false, $type = 'users')

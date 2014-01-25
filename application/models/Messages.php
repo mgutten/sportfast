@@ -38,6 +38,8 @@ class Application_Model_Messages extends Application_Model_ModelAbstract
 				$notification->actingUserID = $resultRow['userID'];
 				$notification->newsfeed = true;
 				$notification->text     = $resultRow['message'];
+				$user = new Application_Model_User($resultRow);
+				$notification->actingUser = $user;
 				$notification->actingFirstName = $resultRow['firstName'];
 				$notification->actingLastName = $resultRow['lastName'];
 				

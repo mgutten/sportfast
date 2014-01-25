@@ -14,7 +14,7 @@
 }
 
 .rateGame-alert-game-tab-container:hover {
-	background:#444;
+	color: #fff;
 }
 
 .rateGame-alert-game-tab-container.selected {
@@ -48,18 +48,12 @@
 	background: ;
 }
 
-#rateGame-sportRating-container {
-	position:absolute;
-	top: 0;
-	left: 50%;
-	margin-left: -6.5em;
-	width: 12em;
+.rateGame-sportRating-container {
 	padding: .1em .5em;
-	z-index: 5;
 }
 
-#rateGame-sportRating-back,
-#rateGame-sportRating-text-container {
+.rateGame-sportRating-back,
+.rateGame-sportRating-text-container {
 	position:absolute;
 	top: 0;
 	left:0;
@@ -68,7 +62,7 @@
 	opacity: .9;
 }
 
-#rateGame-sportRating-text-container {
+.rateGame-sportRating-text-container {
 	opacity: 1;
 	position:relative;
 	float:left;
@@ -77,7 +71,7 @@
 .rateGame-sportRating-user-container {
 	padding: .4em;
 	background:#fff;
-	margin-top:3.8em;
+	margin-top:.8em;
 	cursor: pointer;
 }
 

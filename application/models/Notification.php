@@ -8,6 +8,7 @@ class Application_Model_Notification extends Application_Model_ModelAbstract
 	protected $_userID;
 	protected $_attribs     = array('notificationLogID' => '',
 									'actingUserID'		=> '',
+									'actingUser'		=> '',
 									'receivingUserID'   => '',
 									'notificationID'	=> '',
 									'cityID'			=> '',
@@ -17,6 +18,9 @@ class Application_Model_Notification extends Application_Model_ModelAbstract
 									'ratingID'			=> '',
 									'parkID'			=> '',
 									'teamGameID'	    => '',
+									'userGameID'		=> '',
+									'confirmed'			=> '',
+									'lastChanged'		=> '',
 									'textData'			=> array(),
 									'text'				=> '',
 									'firstName'			=> '',
@@ -33,6 +37,7 @@ class Application_Model_Notification extends Application_Model_ModelAbstract
 									'pictureType'			=> '',
 									'url'				=> '',
 									'action'			=> '',
+									'actionType'		=> '',
 									'type'				=> '',
 									'details'			=> '',
 									'newsfeed'			=> false,
@@ -49,7 +54,27 @@ class Application_Model_Notification extends Application_Model_ModelAbstract
 	
 	public function getTimeFromNow($date = false, $maxDays = 7)
 	{
-		return parent::getTimeFromNow($this->dateHappened, $maxDays);	
+		$date = $this->getLatestDate();
+		return parent::getTimeFromNow($date, $maxDays);	
+	}
+	
+	public function getLatestDate()
+	{
+		if ($this->isJoin() &&
+			$this->hasValue('lastChanged')) {
+			$date = $this->lastChanged;
+		} else {
+			$date = $this->dateHappened;
+		}
+		
+		return $date;
+	}
+	
+	public function getDateTime()
+	{
+		$date = DateTime::createFromFormat('Y-m-d H:i:s', $this->getLatestDate());
+		
+		return $date;
 	}
 	
 	public function getPicture($size = 'small')
@@ -98,6 +123,27 @@ class Application_Model_Notification extends Application_Model_ModelAbstract
 		return str_replace($matches[0],$replace,$this->url);
 	}
 	
+	public function isJoin()
+	{
+		if ($this->actionType == 'game' 
+			&& $this->action == 'join') {
+				return true;
+			}
+			
+			return false;
+	}
+	
+	public function getJoin()
+	{
+		if ($this->confirmed == '1') {
+			return 'in';
+		} elseif ($this->confirmed == '2') {
+			return 'maybe';
+		} else {
+			return 'out';
+		}
+	}
+	
 	public function getFormattedText($currentID = false)
 	{
 		// match %sign holders in text (eg %name has joined the %sport game)
@@ -114,6 +160,14 @@ class Application_Model_Notification extends Application_Model_ModelAbstract
 			if ($this->gameID === $currentID) {
 				// On that game's page, all notifications should read "this game"
 				$possession = 'this';
+				
+				if ($this->type == 'notification' &&
+					$this->isJoin()) {
+						// On current game page and regarding joining in, out, maybe
+						$class = 'green heavy';
+						return "<a href='/users/" . $this->actingUserID . "' class='" . $class . "'>" . $this->actingUser->getShortName() . "</a> is <span class='heavy newsfeed-" . $this->getJoin() . "'>" . $this->getJoin() . "</span>.";
+					}
+				
 			} else {
 				if (($pos = strpos($this->text, '%sport')) > -1) {
 					// Sport is in notification, check to conjugate "a" to "an"
@@ -303,6 +357,7 @@ class Application_Model_Notification extends Application_Model_ModelAbstract
 					   'ratingID'  => $this->ratingID,
 					   'parkID'  => $this->parkID,
 					   'teamGameID' => $this->teamGameID,
+					   'userGameID'	=> $this->userGameID,
 					   'cityID'	 => $this->cityID,
 					   'dateHappened' => $this->dateHappened);
 					   

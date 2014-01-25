@@ -676,14 +676,33 @@ class Application_View_Helper_MemberHomepage
 			  $class = '';
 			  //$postWrapper = "</a>";
 		  } 
+		  
+		  $img = $preWrapper . "<img src='" . $notification->getPicture($size) . "' class='newsfeed-notification-img " . $class . "' />" . $postWrapper;
+		  
+		  $containerClass = '';
+		  
 		  if ($this->_view->game) {
 			  //On game page, change notifications to "this game..."
-			  $currentID     = $notification->gameID;
+			  $currentID = $notification->gameID;
+			  if ($notification->isJoin()) {
+			  	  $containerClass = 'newsItem-status newsItem-status-' . $notification->getJoin();
+				  $img = $notification->getBoxProfilePic($size, $notification->actingUserID, 'users','', '' ,$notification->confirmed);
+			  } else {
+				  $containerClass = 'newsItem-' . $notification->action;
+			  }
+			  
+			  if ($this->_view->lastVisited) {
+			  
+				  if ($notification->getDateTime()->format('U') > $this->_view->lastVisited->format('U')) { 
+					  // Is new notification since last visited
+					  $containerClass .= ' light-back';
+				  }
+			  }
 		  }
 		  
 		  
-		  $output .= "<div class='newsfeed-notification-container'>";
-		  $output .= 	$preWrapper . "<img src='" . $notification->getPicture($size) . "' class='newsfeed-notification-img " . $class . "' />" . $postWrapper;
+		  $output .= "<div class='newsfeed-notification-container " . $containerClass . "'>";
+		  $output .= 	$img;
 		  $output .= 	"<div class='newsfeed-notification-text-container'>";
 		  $output .= 		"<p class='left newsfeed-notification-text'>" . $notification->getFormattedText($currentID) . "</p>
 		  					 <span class='newsfeed-notification-time light smaller-text'>" . $notification->getTimeFromNow() . "</span>";

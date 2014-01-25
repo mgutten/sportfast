@@ -140,9 +140,15 @@ class Application_Model_MessagesMapper extends Application_Model_MapperAbstract
 					   '' as sport,
 					   '' as pictureType,
 					   'message' as type,
-					   tm.gameMessageID
+					   '' as action,
+					   '' as actionType,
+					   '' as details,
+					   tm.gameMessageID,
+					   ug.confirmed as confirmed,
+					   '' as lastChanged
 					   FROM game_messages as tm
 					INNER JOIN users as u ON tm.userID = u.userID
+					LEFT JOIN user_games ug ON ug.userID = tm.userID AND ug.gameID = tm.gameID
 					WHERE tm.gameID = '" . $gameID . "'";
 				
 		$notifications = "SELECT nl.gameID as gameID, 
@@ -154,22 +160,30 @@ class Application_Model_MessagesMapper extends Application_Model_MapperAbstract
 							   g.sport as sport,
 							   n.pictureType as pictureType,
 							   'notification' as type,
-							   '' as gameMessageID
+							   n.action as action,
+							   n.type as actionType,
+							   n.details as details,
+							   '' as gameMessageID,
+							   ug.confirmed as confirmed,
+							   ug.lastChanged as lastChanged
 							   FROM notification_log as nl
 							INNER JOIN users as u ON nl.actingUserID = u.userID
 							INNER JOIN notifications as n ON n.notificationID = nl.notificationID
 							INNER JOIN games as g ON g.gameID = nl.gameID
+							LEFT JOIN user_games as ug ON ug.userGameID = nl.userGameID
 							WHERE nl.gameID = '" . $gameID . "' 
 								AND n.public = 1 AND n.action != 'create'";
 							
 		$sql = $messages . " UNION " . $notifications;
-		$sql .= " ORDER BY dateHappened DESC LIMIT 10";
+		$sql .= " ORDER BY CASE WHEN lastChanged IS NULL OR lastChanged = '' THEN dateHappened ELSE lastChanged END DESC LIMIT 30";
 		
 		$messages = $db->fetchAll($sql);
 		
 		foreach ($messages as $message)
 		{
-			$savingClass->addMessage($message);
+				
+			$model = $savingClass->addMessage($message);
+
 		}
 		
 		return $savingClass;

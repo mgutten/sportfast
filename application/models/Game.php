@@ -130,6 +130,22 @@ class Application_Model_Game extends Application_Model_ConfirmationsAbstract
 	}
 	
 	/**
+	 * get date that user last visited game page
+	 */
+	public function getLastVisited($userID)
+	{
+		return $this->getMapper()->getLastVisited($userID, $this->gameID);
+	}
+	
+	/**
+	 * get date that user last visited game page
+	 */
+	public function setLastVisitedCurrent($userID)
+	{
+		return $this->getMapper()->setLastVisitedCurrent($userID, $this->gameID);
+	}
+	
+	/**
 	 * add user to game in db
 	 * @params ($confirmed => '0' = out, '1' = in, or '2' = maybe
 	 */

@@ -731,6 +731,21 @@ if ($this->userInGame) {
 
 <?php
 	}
+?>
+<div class='clear newsfeed-tab-container width-100'>
+	<div class='left heavy light newsfeed-tab selected' data-target='all'>
+    	<p class='inherit'>All</p>  
+    </div>
+	<div class='left heavy light newsfeed-tab' data-target='status' id='newsfeed-tab-status'>
+    	<p class='inherit'>Status</p>
+    	<p class='new white medium-back heavy smaller-text'></p>  
+    </div>
+    <div class='left heavy light newsfeed-tab' data-target='message' id='newsfeed-tab-message'>
+    	<p class='inherit'>Messages</p>
+        <p class='new white medium-back heavy smaller-text'></p>  
+    </div>
+</div>
+<?php
 echo $this->profilenewsfeed()->create($this->newsfeed);
 ?>
 

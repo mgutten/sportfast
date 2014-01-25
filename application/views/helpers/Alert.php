@@ -284,11 +284,11 @@ class Application_View_Helper_Alert
 			$sport->sportID = $game->sportID;
 			$sport->sport = $game->sport;
 			
-			$html .= "<div class='left rateGame-alert-game-tab-container " . $selected . " pointer rounded-corners' >
+			$html .= "<div class='left rateGame-alert-game-tab-container " . $selected . " pointer rounded-corners light' >
 						<img src='" . $sport->getIcon('tiny', 'solid', 'white') . "' class='left solid' tooltip='" . $sport->sport . "'/>
 						<img src='" . $sport->getIcon('tiny', 'outline') . "' class='left dark-back outline hidden'/>
-						<p class='left indent heavy white'>" . $game->getDay() . "</p>
-						<p class='clear white smaller-text parkName' tooltip='" . $fullParkName . "'>at " . $parkName . "</p>
+						<p class='left indent heavy inherit'>" . $game->getDay() . "</p>
+						<p class='clear smaller-text parkName inherit' tooltip='" . $fullParkName . "'>at " . $parkName . "</p>
 					  </div>";
 			
 			$counter++;
@@ -303,11 +303,11 @@ class Application_View_Helper_Alert
 					<div class='left rateGame-arrow' id='rateGame-leftArrow'></div>";
 					
 		$html .=	"<div class='left rateGame-alert-inner-container width-100'>
-						<div id='rateGame-sportRating-container' class='white'>
-							<div id='rateGame-sportRating-back' class=''></div>
-							<div id='rateGame-sportRating-text-container' class='inherit'>
-								<p class='largest-text inherit heavy clear width-100 center' id='rateGame-sportRating-ing'>Shooting</p>
-								<p class='clear inherit smaller-text width-100 center'>Who <span class='inherit' id='rateGame-sportRating-description'>shot better</span>?</p>
+						<div class='white clear width-100 rateGame-sportRating-container'>
+							<div class='rateGame-sportRating-back'></div>
+							<div class='inherit rateGame-sportRating-text-container'>
+								<p class='largest-text inherit heavy clear width-100 center rateGame-sportRating-ing'>Shooting</p>
+								<p class='clear inherit smaller-text width-100 center'>Who <span class='inherit rateGame-sportRating-description'>shot better</span> on <span class='inherit rateGame-sportRating-day'>Sunday</span>?</p>
 							</div>
 						</div>
 						<div class='left rateGame-sportRating-user-container animate-opacity'>

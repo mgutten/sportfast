@@ -30,14 +30,19 @@ class Application_View_Helper_ProfileNewsfeed
 
 			if ($message->hasValue('notification')) {
 				// Is notification
-				$output .= $memberHomepage->createNotification($message->notification, 'small');
+				$output .= $memberHomepage->createNotification($message->notification, 'tiny');
 			} else {
 				// Is message
 				$idType = ($message->hasValue('teamMessageID') ? 'teamMessageID' : 'gameMessageID');
-				$output .= "<div class='newsfeed-notification-container clear'>
-								<a href='/users/" . $message->userID . "' class='left'>" . $message->getBoxProfilePic('small') . "</a>";
+				
+				$containerClass = '';
+				if ($message->getDateTime()->format('U') > $this->_view->lastVisited->format('U')) {
+					$containerClass = 'light-back';
+				}
+				$output .= "<div class='newsfeed-notification-container clear newsItem-message " . $containerClass . "'>
+								<a href='/users/" . $message->userID . "' class='left'>" . $message->getBoxProfilePic('tiny', false, 'users', false, false, $message->confirmed) . "</a>";
 				$output .= "<div class='profile-message-container left' messageID='" . $message->$idType . "'>";
-				$output .= 		"<p class='light left'>" . $message->getUserName() . " said...</p>";
+				$output .= 		"<p class='light left smaller-text'>" . $message->getUserName() . " said...</p>";
 				$output .=		"<p class='newsfeed-notification-time light smaller-text'>" . $message->getTimeFromNow() . "</p>";
 				$output .=		"<p class='light-back darkest rounded-corners profile-message clear'>" . $message->message . "</p>";
 				if ($message->userID == $this->_view->user->userID) {

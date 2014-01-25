@@ -397,14 +397,21 @@ textarea.post-message {
 	height:14px;
 	border:solid 1px #fff;
 	border-bottom: none;
+	float:left;
 }
 
 .team-player-container-small > .team-confirm-img.light-background,
-.team-player-container-small > .team-confirm-img.dark-red-back {
+.team-player-container-small > .team-confirm-img.light-back,
+.team-player-container-small > .team-confirm-img.dark-red-back,
+.team-player-container-small > .team-confirm-img.green-back,
+.box-img-container-small > .team-confirm-img,
+.box-img-container-tiny > .team-confirm-img {
 	width:8px;
 	height:8px;
 	margin-top: -9px;
 }
+
+
 
 .profile-confirm {
 	height: 12px;
@@ -419,6 +426,62 @@ textarea.post-message {
 
 
 /* newsfeed section */
+.newsfeed-in,
+.newsfeed-out,
+.newsfeed-maybe {
+	padding: 0 0em;
+	color: #777 !important;
+}
+
+.newsfeed-in {
+	color: #58bf12;
+}
+
+.newsfeed-out {
+	color: #C60000;
+}
+
+.newsfeed-maybe {
+	color: #8d8d8d;
+}
+
+.newsfeed-notification-container.light-back {
+	border-bottom-color: #ddd;
+}
+
+.newsItem-message.light-back > .profile-message-container > .profile-message {
+	background: #ddd;
+}
+
+.newsfeed-tab-container {
+	margin-top: .5em;
+}
+
+.newsfeed-tab {
+	padding: .1em 0em;
+	width: 6.5em;
+	text-align: center;
+	cursor: pointer;
+	position: relative;
+}
+
+.newsfeed-tab:hover {
+	color: #8d8d8d;
+}
+
+.newsfeed-tab.selected {
+	background: #e9e9e9;
+	color: #8d8d8d;
+}
+
+.newsfeed-tab > .new {
+	position:absolute;
+	top: 4px;
+	right: 1px;
+	padding: .1em .25em 0 .25em;
+	display:none;
+}
+
 .profile-newsfeed-container {
 	width: 80%;
 }
@@ -429,13 +492,13 @@ textarea.post-message {
 
 .profile-message-container {
 	margin-left: 1em;
-	width: 88%;
+	width: 92.5%;
 }
 
 .profile-message {
 	width: auto;
 	/*border: 1px solid #bbb;*/
-	padding: .4em .6em;
+	padding: .3em .6em;
 	max-width:93%;
 }
 
@@ -444,7 +507,7 @@ textarea.post-message {
 }
 
 .newsfeed-notification-text-container {
-	width:88%;
+	width:92.5%;
 	margin-top: .4em;
 }
 
@@ -456,9 +519,6 @@ textarea.post-message {
 	float:right;
 }
 
-.newsfeed-notification-container {
-	padding-bottom: 1.5em;
-}
 
 /* narrow column */
 /* ratings */

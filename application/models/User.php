@@ -649,9 +649,9 @@ class Application_Model_User extends Application_Model_ModelAbstract
 		return parent::getProfilePic($size, $this->userID, $type);
 	}
 	
-	public function getBoxProfilePic($size, $type = 'users', $class = '', $outerClass = '', $userID = false) 
+	public function getBoxProfilePic($size, $type = 'users', $class = '', $outerClass = '', $userID = false, $statusBox = false, $overlayHTML = false) 
 	{
-		return parent::getBoxProfilePic($size, $this->userID, $type, $class, $outerClass);
+		return parent::getBoxProfilePic($size, $this->userID, $type, $class, $outerClass, $statusBox, $overlayHTML);
 	}
 	
 	public function setChangedLocation($value) 

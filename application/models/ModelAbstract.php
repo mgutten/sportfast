@@ -398,12 +398,28 @@ abstract class Application_Model_ModelAbstract
 	 *			$type => plural type that we are searching for)
 	 * @returns href for picture (str)
 	 */
-	public function getBoxProfilePic($size, $id, $type = 'users', $class = '', $outerClass = '')
+	public function getBoxProfilePic($size, $id, $type = 'users', $class = '', $outerClass = '', $statusBox = false, $overlayHTML = false)
 	{
 		$picture = $this->getProfilePic($size, $id, $type);
 		
 		$output  = "<div class='box-img-container-" . $size . " " . $outerClass . "'>";
 		$output .= 		"<img src='" . $picture . "' class='box-img-" . $size . " " . $class . "'/>";
+		
+		if ($statusBox !== false) {
+			if ($statusBox == '1') {
+				// Confirmed
+				$statusClass = 'green-back';
+			} elseif ($statusBox == '2') {
+				$statusClass = 'light-background';
+			} else {
+				$statusClass = 'dark-red-back';
+			}
+			$output .= "<div class='" . $statusClass . " team-confirm-img'></div>";
+		}
+		
+		if ($overlayHTML) {
+		}
+		
 		$output .= "</div>";
 		
 		return $output;

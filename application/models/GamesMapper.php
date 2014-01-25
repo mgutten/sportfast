@@ -1137,7 +1137,8 @@ class Application_Model_GamesMapper extends Application_Model_TypesMapperAbstrac
 		
 		$data = array('userID' => $userID,
 					  'gameID' => $gameID,
-					  'confirmed' => $confirmed);
+					  'confirmed' => $confirmed,
+					  'lastChanged' => date('Y-m-d H:i:s'));
 		$update = $insert = false;
 		$db = Zend_Db_Table::getDefaultAdapter();
 		
@@ -1148,6 +1149,8 @@ class Application_Model_GamesMapper extends Application_Model_TypesMapperAbstrac
 		} else {
 			$insert = true;
 			$db->insert('user_games', $data);
+			
+			$id = $db->lastInsertId();
 		}
 		
 		
@@ -1173,26 +1176,29 @@ class Application_Model_GamesMapper extends Application_Model_TypesMapperAbstrac
 											'n.action'		  => 'join',
 											'n.type'		  => 'game'));
 			
-			if ($confirmed == '1' ||
-				$confirmed == '2') {
-					// Is "in" or "maybe"
-					$notification = new Application_Model_Notification();
+			$notification = new Application_Model_Notification();
 					
-					$notification->actingUserID = $userID;
-					$notification->gameID = $gameID;
-					$notification->action = 'join';
-					$notification->type = 'game';
+			$notification->actingUserID = $userID;
+			$notification->gameID = $gameID;
+			$notification->userGameID = $id;
+			$notification->type = 'game';
+			$notification->action = 'join';
+			
+			$auth = Zend_Auth::getInstance();
+			
+			if ($auth->hasIdentity()) {
+				// User logged in, get their cityID
+				$notification->cityID = $auth->getIdentity()->cityID;
+			}
+			
+			if ($confirmed == '0') {
+				// Is "out"
+				$notification->details = 'out';
+			}
+			
+			$notification->save();
 					
-					$auth = Zend_Auth::getInstance();
-					
-					if ($auth->hasIdentity()) {
-						// User logged in, get their cityID
-						$notification->cityID = $auth->getIdentity()->cityID;
-					}
-					
-					$notification->save();
-				}
-		}
+		}		
 		
 		
 		return false;
@@ -1295,6 +1301,37 @@ class Application_Model_GamesMapper extends Application_Model_TypesMapperAbstrac
 		*/
 	}
 	
+	public function getLastVisited($userID, $gameID)
+	{
+		$table = $this->getDbTable();
+		$select = $table->select();
+		$select->setIntegrityCheck(false);
+		
+		$select->from(array('ug' => 'user_games'),
+					  array('lastVisited'))
+			   ->where('ug.userID = ?', $userID)
+			   ->where('ug.gameID = ?', $gameID);
+		
+		$result = $table->fetchRow($select);
+		
+		if (!$result) {
+			return false;
+		}
+		
+		return $result['lastVisited'];
+	}
+	
+	public function setLastVisitedCurrent($userID, $gameID)
+	{
+		$db = Zend_Db_Table::getDefaultAdapter();
+		
+		$lastVisited = date('Y-m-d H:i:s');
+		
+		$db->update('user_games', array('lastVisited' => $lastVisited), array('userID = ?' => $userID,
+																			  'gameID = ?' => $gameID));
+			   
+		return true;
+	}
 	
 	/**
 	 * get game subscribers (used on games/members page)
