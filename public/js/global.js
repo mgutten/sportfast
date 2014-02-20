@@ -2516,10 +2516,16 @@ function clearMarkers() {
 };
 	
 
+/* get num betweent min (inclusive) and max (inclusive) */
 function getRandomInt (min, max, exclude) {
 	var value;
 	if (typeof exclude != 'undefined' &&
 		exclude.length > 0) {
+			
+			if ((max - min) - (exclude.length - 1) == 0) {
+				// No amount to return ex: (1,2, [1,2]) cannot return anything
+				return false;
+			}
 		var tempMin,tempMax,tempValue,tempWeight;
 		var potentialValues = new Array();
 		var tempValueArray;

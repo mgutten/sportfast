@@ -592,7 +592,8 @@ class Application_Model_Game extends Application_Model_ConfirmationsAbstract
 		
 		
 		$prepend = '';
-		if ($format == 'l') {
+		if ($format == 'l' ||
+		    $format == 'D') {
 			// Format is longer day (Tuesday) show more details
 			if ($diff == 0) {
 				// Today

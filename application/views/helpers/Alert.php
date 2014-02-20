@@ -229,7 +229,13 @@ class Application_View_Helper_Alert
 		$countGames = count($games->getAll());
 		$players = "<span class='rateGame-alert-players'>";
 		$html = "<div id='rateGame-alert-container' class='alert-container'>
-					<!--<p class='clear white smaller-text '>" . $countGames . " recent game" . ($countGames == 1 ? '' : 's') . "</p>-->
+					<div class='clear rateGame-alert-header'>
+						<p class='clear width-100 center white heavy'>Want to anonymously rate your fellow players?</p>
+						<p class='clear width-100 center white smaller-text pointer underline'>How does this work?</p>
+						<p class='clear width-100 center white smaller-text hidden'>Care to anonymously rate your fellow players?</p>
+						
+					</div>
+					<p class='white bold arial alert-x pointer rateGame-x' tooltip='Close all'>X</p>
 					<div class='rateGame-alert-games-tab-container clear margin-top width-100'>"; 
 		$js   = "<script type='text/javascript'>";
 		
@@ -247,7 +253,7 @@ class Application_View_Helper_Alert
 				$fullParkName = $game->leagueLocationName;
 				$gameOpts = "{teamGameID:" . $game->teamGameID . ",";
 			}
-			$gameOpts .= "date:'" . $game->date . "',
+			$gameOpts .= "date:new Date(" . $game->gameDate->format('Y') . ", " . ($game->gameDate->format('m') - 1) . ", " . $game->gameDate->format('d') . "),
 						  park:'" . $fullParkName . "',
 						  sport: '" . strtolower($game->sport) . "',
 						  sportID: '" . $game->sportID . "'}";
@@ -284,11 +290,21 @@ class Application_View_Helper_Alert
 			$sport->sportID = $game->sportID;
 			$sport->sport = $game->sport;
 			
-			$html .= "<div class='left rateGame-alert-game-tab-container " . $selected . " pointer rounded-corners light' >
-						<img src='" . $sport->getIcon('tiny', 'solid', 'white') . "' class='left solid' tooltip='" . $sport->sport . "'/>
+			$locked = '';
+			if ($game->getTempAttrib('lockedRatings')) {
+				$num = $game->getTempAttrib('lockedRatings');
+				$locked = "<div class='rateGame-locked' tooltip='You have <span class=\"inherit heavy num\">" . $num . "</span> locked rating" . ($num == 1 ? '' : 's') . " for this game.  " . ($num == 1 ? 'It' : 'They') . " will be unlocked when you rate another player.'>
+							<img src='/images/rategame/locked.png' class='rateGame-locked-img clear'/>
+							<p class='width-100 center white heavy smaller-text rateGame-locked-txt clear'>" . $num . "</p>
+						   </div>";
+			}
+			
+			$html .= "<div class='left rateGame-alert-game-tab-container " . $selected . " pointer light' tooltip='at " . $fullParkName  . "'>
+						<img src='" . $sport->getIcon('tiny', 'solid', 'light') . "' class='left solid' tooltip='" . $sport->sport . "'/>
 						<img src='" . $sport->getIcon('tiny', 'outline') . "' class='left dark-back outline hidden'/>
 						<p class='left indent heavy inherit'>" . $game->getDay() . "</p>
-						<p class='clear smaller-text parkName inherit' tooltip='" . $fullParkName . "'>at " . $parkName . "</p>
+						<!--<p class='clear smaller-text parkName inherit' tooltip='" . $fullParkName . "'>at " . $parkName . "</p>-->
+						" . $locked . "
 					  </div>";
 			
 			$counter++;
@@ -300,39 +316,61 @@ class Application_View_Helper_Alert
 		$html .= "</div>";
 		
 		$html .= "<div class='clear rateGame-alert-outer-container width-100'>
-					<div class='left rateGame-arrow' id='rateGame-leftArrow'></div>";
-					
-		$html .=	"<div class='left rateGame-alert-inner-container width-100'>
-						<div class='white clear width-100 rateGame-sportRating-container'>
-							<div class='rateGame-sportRating-back'></div>
-							<div class='inherit rateGame-sportRating-text-container'>
-								<p class='largest-text inherit heavy clear width-100 center rateGame-sportRating-ing'>Shooting</p>
-								<p class='clear inherit smaller-text width-100 center'>Who <span class='inherit rateGame-sportRating-description'>shot better</span> on <span class='inherit rateGame-sportRating-day'>Sunday</span>?</p>
-							</div>
-						</div>
-						<div class='left rateGame-sportRating-user-container animate-opacity'>
-							<div class='clear rateGame-sportRating-user-img-container'>
-								<img src='" . $user->getProfilePic('large') . "' class='left'/>
-								<div class='rateGame-sportRating-user-name-container'>
-									<div class='transparent-black'></div>
-									<p class='width-100 center larger-text heavy white rateGame-sportRating-user-name'>" . $user->getShortName() . "</p>
-								</div>
-							</div>					
-						</div>
-						<div class='right rateGame-sportRating-user-container animate-opacity'>
-							<div class='clear rateGame-sportRating-user-img-container'>
-								<img src='" . $user->getProfilePic('large') . "' class='left'/>
-								<div class='rateGame-sportRating-user-name-container'>
-									<div class='transparent-black'></div>
-									<p class='width-100 center larger-text heavy white rateGame-sportRating-user-name'>" . $user->getShortName() . "</p>
-								</div>
-							</div>					
-						</div>
+					<div class='left rateGame-arrow-container' id='rateGame-leftArrow-container'>
+						<div class='left rateGame-arrow' id='rateGame-leftArrow'></div>
 					</div>";
 		
-		$html .= " <div class='left rateGame-arrow' id='rateGame-rightArrow'></div>
+		$html .= "<div class='left rateGame-alert-outer-inner-container'>
+					<div class='left rateGame-alert-animate-container'>";
+		
+	  for ($i = 0; $i < 3; $i++) {		
+			$html .=	"<div class='left rateGame-alert-inner-container'>
+							<div class='clear width-100 rateGame-sportRating-container'>
+								<!--<div class='rateGame-sportRating-back'></div>-->
+								<div class='inherit rateGame-sportRating-text-container darkest'>
+									<p class='jumbo-text inherit heavy clear width-100 center rateGame-sportRating-ing'></p>
+									<p class='clear inherit smaller-text width-100 center'>Who <span class='inherit rateGame-sportRating-description'></span> on <span class='inherit rateGame-sportRating-day'></span>?</p>
+									<p class='smaller-text inherit rateGame-step'>" . ($i + 1) . " of 3</p>
+								</div>
+							</div>";
+							
+			for ($b = 0; $b < 2; $b++) {
+				$html .= 	"<div class='left rateGame-sportRating-user-outer-container'>
+								<div class='left rateGame-sportRating-user-container'>
+									<div class='clear rateGame-sportRating-user-img-container animate-opacity'>
+										<img src='' class='left'/>
+										<div class='rateGame-sportRating-user-name-container'>
+											<div class='transparent-black'></div>
+											<p class='width-100 center larger-text heavy white rateGame-sportRating-user-name'>" . $user->getShortName() . "</p>
+										</div>
+									</div>					
+								</div>
+								<p class='clear width-100 smaller-text center medium margin-top pointer rateGame-noShow' tooltip='This player did not show up to the game.  <span class=\"red smaller-text\">Their ratings will be slightly penalized.</span>'>Did not show</p>
+							</div>";
+			}
+			
+							
+			$html .=		"<div class='rateGame-random' tooltip='Randomize Selection'>
+								<img src='/images/rategame/random.png' class='left'/>
+							</div>
+							
+						</div>";
+	  }
+		$html .= "</div></div>";
+		$html .= " <div class='left rateGame-arrow-container' id='rateGame-rightArrow-container'>
+					<div class='left rateGame-arrow' id='rateGame-rightArrow'></div>
+					<p class='heavy white width-100 center pointer' id='rateGame-nextGame'>NEXT GAME</p>
+					<p class='heavy white width-100 center pointer' id='rateGame-finish'>FINISH</p>
+					</div>
 				  </div>";
-					
+				  
+		$html .= "<div class='indicator-container clear hidden'>
+					<div class='indicator selected'></div>
+					<div class='indicator'></div>
+					<div class='indicator'></div>
+				  </div>";
+		
+		$html .= "<p class='green-button larger-text heavy clear hidden' id='rateGame-submit'>Submit All</p>";			
 		
 		$html .= "</div>";
 		

@@ -800,6 +800,7 @@ class SignupController extends Zend_Controller_Action
 		if ($session->type == 'game') {
 			$game = new Application_Model_Game();
 			$game->gameID = $session->id;
+			$game->cityID = $post['cityID'];
 			
 			if ($session->confirmed == '3') {
 				// Special case where user wants to be added as member but not to game currently
@@ -819,6 +820,7 @@ class SignupController extends Zend_Controller_Action
 			// Is team
 			$team = new Application_Model_Team();
 			$team->teamID = $session->id;
+			$team->cityID = $post['cityID'];
 			
 			$team->addUserToTeam($user->userID);
 			

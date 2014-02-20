@@ -38,7 +38,8 @@ class Application_Model_NotificationsMapper extends Application_Model_MapperAbst
 					 LEFT JOIN `parks` AS `p` ON p.parkID = nl.parkID
 					 LEFT JOIN `user_ratings` AS `ur` ON ur.userRatingID = nl.ratingID 
 					 WHERE (nl.cityID IN " . $cityIDRange . ") 
-						AND n.public = '1' ";
+						AND n.public = '1' 
+						AND (CASE WHEN n.action = 'join' AND n.type = 'game' THEN n.details != 'out' OR n.details IS NULL ELSE 1 = 1 END) ";
 						
 		if ($onlyNew) {
 			// Select only notifications that are newer than a minute

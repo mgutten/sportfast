@@ -130,6 +130,42 @@ class AjaxController extends Zend_Controller_Action
 	}
 	
 	/**
+	 * rate user from rateGame alert
+	 */
+	public function rateUserAction()
+	{
+		$post = $this->getRequest()->getPost();
+		$ratings = $post['ratings'];
+		
+		foreach ($ratings as $rating) {	
+			// Loop through		
+			$sportRating = new Application_Model_RelativeRating();
+			$sportRating->actingUserID = $this->view->user->userID;
+			$sportRating->setCurrent('dateHappened');
+			$sportRating->sportRatingID = $rating['sportRatingID'];
+			
+			if (isset($rating['oldGameID'])) {
+				$sportRating->oldGameID = $rating['oldGameID'];
+			} else {
+				$sportRating->teamGameID = $rating['teamGameID'];
+			}
+			
+			if (isset($rating['noShow'])) {
+				// User did not show up
+				
+				$sportRating->winningUserID = $rating['winningUserID'];
+				$sportRating->noShow = '1';
+				
+			} else {
+				$sportRating->winningUserID = $rating['winningUserID'];
+				$sportRating->losingUserID = $rating['losingUserID'];
+			}
+			
+			$sportRating->save();
+		}
+	}
+	
+	/**
 	 * rate user or park
 	 */
 	public function rateTypeAction()

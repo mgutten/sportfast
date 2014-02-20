@@ -36,9 +36,10 @@ if (!$this->noDefaultHeadTitle) {
 		
 		if ($this->rateGame) {
 		// Popup to rate users/park from last game
-			$this->headLink()->prependStylesheet($this->baseUrl() . '/css/rategame.css');
+			$this->headLink()->appendStylesheet($this->baseUrl() . '/css/rategame.css?' . $version);
 			$this->headScript()->prependFile($this->baseUrl() . '/js/rategame.js');
-			$this->headScript()->prependFile($this->baseUrl() . '/js/objects.js');			
+			$this->headScript()->prependFile($this->baseUrl() . '/js/objects.js');
+				
 		}
 		
 		echo $this->headLink() . PHP_EOL;

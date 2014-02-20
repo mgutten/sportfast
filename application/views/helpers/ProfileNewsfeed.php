@@ -36,8 +36,10 @@ class Application_View_Helper_ProfileNewsfeed
 				$idType = ($message->hasValue('teamMessageID') ? 'teamMessageID' : 'gameMessageID');
 				
 				$containerClass = '';
-				if ($message->getDateTime()->format('U') > $this->_view->lastVisited->format('U')) {
-					$containerClass = 'light-back';
+				if ($this->_view->lastVisited) {
+					if ($message->getDateTime()->format('U') > $this->_view->lastVisited->format('U')) {
+						$containerClass = 'light-back';
+					}
 				}
 				$output .= "<div class='newsfeed-notification-container clear newsItem-message " . $containerClass . "'>
 								<a href='/users/" . $message->userID . "' class='left'>" . $message->getBoxProfilePic('tiny', false, 'users', false, false, $message->confirmed) . "</a>";

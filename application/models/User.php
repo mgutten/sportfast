@@ -63,7 +63,7 @@ class Application_Model_User extends Application_Model_ModelAbstract
 		$this->getUserSportsInfo();
 		$this->getUserInfo();
 		$this->getOldUserNotifications();
-		$this->getUserSportRatings();
+		//$this->getUserSportRatings();
 		
 		return $this;
 	}

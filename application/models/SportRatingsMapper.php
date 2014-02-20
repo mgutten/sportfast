@@ -41,6 +41,20 @@ class Application_Model_SportRatingsMapper extends Application_Model_MapperAbstr
 	}
 	
 	/**
+	 * save relative rating in db
+	 */
+	public function saveRelativeRating($relativeRating)
+	{
+		$table = $this->getDbTable();
+		$select = $table->select();
+		$select->setIntegrityCheck(false);
+		
+		$select->from(array('usr' => 'user_sport_ratings'))
+			   ->where('usr.userID = ?', $relativeRating->losingUserID)
+			   ->where('usr.sportRatingID = ?', $relativeRating->sportRatingID);
+	}
+	
+	/**
 	 * get all potential ratings for sport
 	 */
 	public function getAllSportRatings($savingClass, $sportID)
@@ -203,8 +217,129 @@ class Application_Model_SportRatingsMapper extends Application_Model_MapperAbstr
 		
 		return $sports;
 	}
-						
-				 
+	
+	/**
+	 * penalize (or cancel if done for this game) player for not showing up to game
+	 */
+	public function noShow($sportRating)					
+	{
+		$table = $this->getDbTable();
+		$select = $table->select();
+		$select->setIntegrityCheck(false);
+		
+		$select->from(array('urr' => 'user_relative_ratings'))
+			   ->where('urr.' . $sportRating->getIDType() . ' = ?', $sportRating->getTypeID())
+			   ->where('urr.winningUserID = ?', $sportRating->winningUserID)
+			   ->where('urr.noShow = "1"');
+			   
+		$results = $table->fetchAll($select);
+		
+		
+		if (count($results) > 0) {
+			// Has already been penalized for this game
+			return false;
+		}
+		
+		$data = array('winningUserID' => $sportRating->winningUserID,
+					  'actingUserID' => $sportRating->actingUserID,
+					  'sportRatingID' => $sportRating->sportRatingID,
+					  $sportRating->getIDType() => $sportRating->getTypeID(),
+					  'noShow' => '1',
+					  'dateHappened' => $sportRating->dateHappened,
+					  'locked' => '0',
+					  'dateUnlocked' => $sportRating->dateUnlocked);
+					  
+		$db = Zend_Db_Table::getDefaultAdapter();
+		$db->insert('user_relative_ratings', $data);
+		
+		$userRelativeRatingID = $db->lastInsertId();
+		
+		// Save user's current ratings
+		$this->userRatingSnapshot($sportRating->winningUserID, $userRelativeRatingID, $sportRating->sportRatingID, true);
+		
+		// Update values to show new, decreased value
+		$decrease = -0.1;
+		$this->updateRelativeRatingValue($sportRating->winningUserID, $decrease, $sportRating->sportRatingID, true);
+	}
+	
+	public function getSportID($sportRatingID)
+	{
+		$table = $this->getDbTable();
+		$select = $table->select();
+		$select->setIntegrityCheck(false);
+		
+		$select->from(array('sr' => 'sport_ratings'))
+			   ->where('sr.sportRatingID = ?', $sportRatingID);
+			   
+		$result = $table->fetchRow($select);
+		
+		return $result['sportID'];
+	}
+		
+	/**
+	 * save user's rating details in old_ tables
+	 * @params ($all => should all sportRatingIDs be saved for this sport or just the one provided?)
+	 */
+	public function userRatingSnapshot($userID, $userRelativeRatingID, $sportRatingID, $all = false)
+	{
+		$db = Zend_Db_Table::getDefaultAdapter();
+		$sportID = $this->getSportID($sportRatingID);
+		
+		$oldUserSports = "INSERT INTO old_user_sports (oldUserSportID, userID, sportID, avgSkill, dateMoved) 
+							(SELECT '', us.userID, us.sportID, us.avgSkill, NOW()
+								FROM user_sports us
+								WHERE us.sportID = '" . $sportID . "'
+									AND us.userID = '" . $userID . "')";
+		
+							
+		$db->query($oldUserSports);
+		
+		
+		$oldUserSportRatings = "INSERT INTO old_user_sport_ratings (oldUserSportRatingID, userSportRatingID, sportRatingID, userID, 
+																	userRelativeRatingID, value, lastChanged, dateMoved)
+								(SELECT '', usr.userSportRatingID, usr.sportRatingID, usr.userID, '" . $userRelativeRatingID . "', 
+										usr.value, usr.lastChanged, NOW()
+									FROM user_sport_ratings usr 
+									INNER JOIN sport_ratings sr ON sr.sportRatingID = usr.sportRatingID
+									WHERE sr.sportID = '" . $sportID . "' ";
+		if (!$all) {
+			$oldUserSportRatings .= " AND usr.sportRatingID = '" . $sportRatingID . "'";
+		}
+		
+		$oldUserSportRatings .= ")";
+		
+		$db->query($oldUserSportRatings);
+		
+									
+	}
+	
+	/**
+	 * update user's ratings for either a specific sportRatingID (if !$all) or to all sportRatingIDs for that sport
+	 * @params ($change => +/- value to increase or decrease rating by,
+	 *			$all => if true, apply to all sportRatingIDs for this sport)
+	 */
+	public function updateRelativeRatingValue($userID, $change, $sportRatingID, $all = false)
+	{
+		$db = Zend_Db_Table::getDefaultAdapter();
+		$sportID = $this->getSportID($sportRatingID);
+		
+		$update = "UPDATE user_sport_ratings usr
+					INNER JOIN sport_ratings sr ON sr.sportRatingID = usr.sportRatingID
+					SET usr.value = (usr.value + " . $change . "),
+						usr.lastChange = " . $change . ",
+						usr.lastChanged = NOW()
+					WHERE
+						usr.userID = '" . $userID . "'
+						AND sr.sportID = '" . $sportID . "' ";
+		
+		if (!$all) {
+			$update .= " AND usr.sportRatingID = '" . $sportRatingID . "' ";
+		}
+		
+		$db->query($update);
+		
+		$this->saveAvg($userID, $sportID);
+	}
 	
 }
 	

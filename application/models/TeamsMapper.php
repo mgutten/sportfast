@@ -651,7 +651,6 @@ class Application_Model_TeamsMapper extends Application_Model_TypesMapperAbstrac
 										'n.type'		  => 'team'));
 		
 
-		// Is "in" or "maybe"
 		$notification = new Application_Model_Notification();
 		
 		$notification->actingUserID = $userID;
@@ -664,6 +663,8 @@ class Application_Model_TeamsMapper extends Application_Model_TypesMapperAbstrac
 		if ($auth->hasIdentity()) {
 			// User logged in, get their cityID
 			$notification->cityID = $auth->getIdentity()->cityID;
+		} elseif ($savingClass->hasValue('cityID')) {
+			$notification->cityID = $savingClass->cityID;
 		}
 		
 		$notification->save();

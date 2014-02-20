@@ -21,11 +21,48 @@ class Application_Model_RelativeRating extends Application_Model_SportRating
 									'dateHappened'	=> '',
 									'locked'		=> '',
 									'dateUnlocked'	=> '',
-									'unlockDate'	=> ''
+									'unlockDate'	=> '',
+									'noShow'		=> ''
 									);
 									
 	protected $_primaryKey = 'userRelativeRatingID';
 	protected $_dbTable = 'Application_Model_DbTable_UserSportRatings';
+
+	public function save($loopSave = false)
+	{
+		
+		if ($this->noShow == '1') {
+			// User is being penalized for not showing
+			$this->setCurrent('dateHappened');
+			$this->setCurrent('dateUnlocked');
+			$this->getMapper()->noShow($this);
+		}
+		
+		$this->getMapper()->saveRelativeRating($this);
+	}
+	
+	public function getIDType()
+	{
+		if ($this->isPickupGame()) {
+			return 'oldGameID';
+		} else {
+			return 'teamGameID';
+		}
+	}
+	
+	public function getTypeID()
+	{
+		return $this->_attribs[$this->getIDType()];
+	}
+	
+	public function isPickupGame()
+	{
+		if ($this->hasValue('oldGameID')) {
+			return true;
+		} else {
+			return false;
+		}
+	}
 
 	public function getTimeFromNow($date = false, $maxDays = 14)
 	{

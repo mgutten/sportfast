@@ -25,5 +25,31 @@ class Application_Model_SportRating extends Application_Model_ModelAbstract
 	{
 		return '/images/sports/skills/' . $size . '/' . $color . '/' . $this->ing . '.png';
 	}
+	
+	
+	/**
+	 * get str "oldGameID" or "teamGameID"
+	 */
+	public function getIDType()
+	{
+		if ($this->hasValue('oldGameID')) {
+			return 'oldGameID';
+		} else {
+			return 'teamGameID';
+		}
+	}
+	
+	/**
+	 * get str "oldGameID" or "teamGameID"
+	 */
+	public function getTypeID()
+	{
+		if ($this->hasValue('oldGameID')) {
+			return $this->_attribs['oldGameID'];
+		} else {
+			return $this->_attribs['teamGameID'];
+		}
+	}
+		
 }
 	

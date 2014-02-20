@@ -1472,7 +1472,9 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 					INNER JOIN old_games og ON og.oldGameID = oug.oldGameID
 					INNER JOIN `users` AS `u` ON oug.userID = u.userID 
 					LEFT JOIN `user_sports` AS `us` ON (us.sportID = og.sportID AND us.userID = oug.userID)
+					LEFT JOIN user_relative_ratings urr ON urr.oldGameID = oug.oldGameID AND urr.winningUserID = oug.userID AND urr.noShow = '1'
 					WHERE (oug.oldGameID IN (" . implode(',', $oldGameIDs) . "))
+						AND urr.userRelativeRatingID IS NULL
 						AND (oug.confirmed = 1)
 						AND (us.noRatings = 0
 							OR us.userSportID IS NULL)
@@ -1483,7 +1485,8 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 												WHERE oldGameID IN (" . implode(',', $oldGameIDs) . ")
 											 GROUP BY winningUserID, oldGameID
 											 HAVING COUNT(winningUserID) > 1)";
-	
+
+		
 		$db = Zend_Db_Table::getDefaultAdapter();
 		$results = $db->query($sql);
 		
@@ -1496,11 +1499,31 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 		}
 		
 		
-		
 		// Get potential ratings for sport
 		foreach ($games->getAll() as $game) {
+			if (count($game->players->getAll()) < 2) {
+				// Fewer than 2 players available to be rated, remove
+				$games->remove($game->gameID);
+			}
 			$game->sportRatings->getAllSportRatings($game->sportID);
 		}
+		
+		// Get locked ratings for user for each game
+		$lockedRatings = $this->getUserLockedRatings($userID, $oldGameIDs);
+		
+		foreach ($lockedRatings as $type => $game) {
+			if ($type == 'pickupGames') {
+				$games->setPrimaryKey('oldGameID');
+			} else {
+				$games->setPrimaryKey('teamGameID');
+			}
+			
+			foreach ($game as $key => $rating) {
+				$numRatings = count($rating);
+				$games->exists($key)->setTempAttrib('lockedRatings', $numRatings);
+			}
+		}
+		
 		// Only retrieve park if have not rated it recently
 		/*
 		$table = $this->getDbTable();
@@ -1523,6 +1546,61 @@ class Application_Model_UsersMapper extends Application_Model_MapperAbstract
 		
 		return $games;
 	}
+	
+	/**
+	 * retrieve all of user's locked ratings for specified oldGameIDs or teamGameIDs
+	 */
+	public function getUserLockedRatings($userID, $oldGameIDs = false, $teamGameIDs = false)
+	{
+		$table = $this->getDbTable();
+		$select = $table->select();
+		$select->setIntegrityCheck(false);
+		
+		$select->from(array('urr' => 'user_relative_ratings'))
+			   ->join(array('sr' => 'sport_ratings'),
+			   				'sr.sportRatingID = urr.sportRatingID')
+			   ->where('urr.winningUserID = ?', $userID)
+			   ->where('urr.locked = ?', '1');
+		
+		$where = ''; 
+		if ($oldGameIDs) {
+			$where .= 'urr.oldGameID IN (' . implode(',', $oldGameIDs) . ')';
+			
+			if ($teamGameIDs) {
+				$where .= ' OR ';
+			}
+		}
+		
+		if ($teamGameIDs) {
+			$where .= 'urr.teamGameID IN (' . implode(',', $teamGameIDs) . ')';
+		}
+		
+		if ($where) {
+			
+			$select->where($where);
+		}
+		
+		$results = $table->fetchAll($select);
+		
+		$returnArray = array('teamGames' => array(),
+							 'pickupGames' => array());
+		foreach ($results as $result) {
+			$relativeRating = new Application_Model_RelativeRating($result);
+				
+			$arrayName = ($relativeRating->isPickupGame() ? 'pickupGames' : 'teamGames');
+			
+			if (!isset($returnArray[$arrayName][$relativeRating->getTypeID()])) {
+				$returnArray[$arrayName][$relativeRating->getTypeID()] = array();
+			}
+			
+			$returnArray[$arrayName][$relativeRating->getTypeID()][] = $relativeRating;
+
+		}
+		
+		return $returnArray;
+	}
+		
+			   	
 	
 	/**
 	 * is there an active friend request between $currentUserID and $otherUserID?
