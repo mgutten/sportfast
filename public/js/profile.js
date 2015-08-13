@@ -16,6 +16,7 @@ rosterLimits.ultimate 	= {upper: 22};
 
 $(function()
 {
+	
 	/* hide buttons container if exists */
 	if ($('.profile-options-inner-container').length > 0) {
 		var ua = window.navigator.userAgent
@@ -103,7 +104,6 @@ $(function()
 			$('#game-password-reqs').hide();
 		})*/
 		
-		
 		/* show description for minimal signup on hover */
 		$('.game-signup-hover').hover(function()
 		{
@@ -148,23 +148,13 @@ $(function()
 			{
 				
 				if ($(this).is('.input-fail')) {
-					fail = $(this);
+					fail = true;
 				}
 			});
 			
 			
+			
 			if (fail) {
-				var str;
-				
-				if (fail.is('#firstName') || fail.is('#lastName')) {
-					str = 'Please enter your full name';
-				} else if (fail.is('#email')) {
-					str = 'Please enter a valid email address';
-				} else if (fail.is('#signupPassword')) {
-					str = 'Your password must be at least 8 characters';
-				}
-				
-				showConfirmationAlert(str);
 				return false;
 			}
 			
@@ -188,32 +178,7 @@ $(function()
 		}
 		
 	}
-	
-	/* populate number of new items for each tab */
-	populateNewItems();
 
-	/* toggle newsfeed show/not show */
-	$('.newsfeed-tab').click(function()
-	{
-		if ($(this).is('.selected')) {
-			return false;
-		}
-				
-		
-		$('.newsfeed-tab.selected').removeClass('selected');
-		$(this).addClass('selected');
-		
-		$(this).find('.new').hide();
-
-		
-		$('.newsfeed-notification-container').hide();
-		
-		if ($(this).attr('data-target') == 'all') {
-			$('.newsfeed-notification-container').show();
-			return false;
-		}
-		$('.newsItem-' + $(this).attr('data-target')).show();
-	})
 	
 	
 	/* fade in user description on mouseover */
@@ -391,7 +356,7 @@ $(function()
 		
 	$('#profile-option-reminder').click(function()
 	{
-		showAlert($('#emails-alert-container'));
+		showAlert($('#reminders-alert-container'));
 	})
 	
 	$('#profile-option-message').click(function()
@@ -991,15 +956,13 @@ function minimalSignup(firstName, lastName, email, password)
 
 
 /**
- * update game_subscribers email details
- * @params (onOrOff => can be 0, 1, or 2,
- *			column => what is the db column name being effected)
+ * update game_subscribers doNotEmail for game
+ * @params (onOrOff => 1 = no emails, 0 = emails)
  */
-function updateEmailAlert(gameID, onOrOff, column)
+function updateEmailAlert(gameID, onOrOff)
 {
 	var options = {gameID: gameID,
-				   onOrOff: onOrOff,
-				   column: column};
+				   onOrOff: onOrOff};
 				   
 	$.ajax({
 		url: '/ajax/update-email-alert-subscribed-game',
@@ -1062,21 +1025,6 @@ function getType()
 	var type = detailsEle.attr('idType').replace('ID','');
 	
 	return type;
-}
-
-function populateNewItems()
-{
-	// Count status
-	var status = $('.newsItem-status.light-back').length;
-	if (status > 0) {
-		$('#newsfeed-tab-status').find('.new').text(status).show();
-	}
-	
-	// Count messages
-	var message = $('.newsItem-message.light-back').length;
-	if (message > 0) {
-		$('#newsfeed-tab-message').find('.new').text(message).show();
-	}
 }
 
 

@@ -14,17 +14,10 @@ $(function()
 	/* if Tennis is selected, show type section */
 	$('#narrow-column-body-sports').children('.selectable-text.narrow-sport').click(function()
 	{
-		var sport = $(this).text().toLowerCase();
-		if (sport == 'tennis' && $(this).is('.green-bold')) {
+		if ($(this).text().toLowerCase() == 'tennis' && $(this).is('.green-bold')) {
 			$('#narrow-column-type').show();
-		} else if (sport == 'tennis' && !$(this).is('.green-bold')){
+		} else if ($(this).text().toLowerCase() == 'tennis' && !$(this).is('.green-bold')){
 			$('#narrow-column-type').hide();
-		}
-		
-		if (sport == 'other' && $(this).is('.green-bold')) {
-			$('#otherSport').show();
-		} else {
-			$('#otherSport').hide();
 		}
 	})
 	
@@ -107,7 +100,7 @@ $(function()
 		if (((page + 1) % 5 == 0) &&
 			(parseInt($('#find-num-results').text(),10) > $('.find-result-container').length)) {
 			// Next page is factor of five (ie every 30 results if 6 results per page), append more results
-			var offset = ((page + 1) * 6) + 1;
+			var offset = (page + 1) * 6;
 			buildOptions(offset);
 		}
 		
@@ -272,12 +265,11 @@ function findMatches(options, type, orderBy, offset)
 			if (offset.length < 1) {
 				// No offset, replace all data
 				$('#find-results-inner-container').html(data[0]);
-				page = 1;
 			} else {
 				$('#find-results-inner-container').append(data[0]);
 			}
 			
-			
+			page = 1;
 			$('#find-results-inner-container').css('margin-top',0);
 			
 			$('#loading').hide();			
@@ -292,11 +284,9 @@ function findMatches(options, type, orderBy, offset)
 				for (i = 0; i < data[1].length; i++) {
 					gmapMarkers.push([data[1][i][0],data[1][i][1]]);
 				}
-				
-				createMarkers();
 			}
 			
-			
+			createMarkers();
 			
 		}
 	})
@@ -628,7 +618,7 @@ function incrementPages(difference)
  */
 function buildOptions(offset)
 {
-	
+
 	offset = (typeof offset == 'undefined' ? '' : offset);
 
 	

@@ -260,7 +260,14 @@ class GamesController extends Zend_Controller_Action
 		$post = $this->getRequest()->getPost();
 
 		$game = $this->view->user->games->exists($gameID);
-		
+
+		if (!$game) {
+			// User does not have game set in session, grab from DB
+			$game = new Application_Model_Game();
+			$game->getGameByID($gameID);
+		}
+
+
 		if (empty($post['parkID']) && !empty($post['parkLocation'])) {
 			// Custom park is used
 			$park = new Application_Model_Park();
@@ -284,26 +291,26 @@ class GamesController extends Zend_Controller_Action
 			
 		}
 		
-		$game->public = ($post['visibility'] == 'private' ? 0 : 1);
-		$game->recurring = ($post['recurring'] == 'no' ? 0 : 1);
-		$game->date = $post['datetime'];
-		$game->minAge = $post['ageLimitMin'];
-		$game->maxAge = $post['ageLimitMax'];
-		$game->minSkill = $post['skillLimitMin'];
-		$game->maxSkill = $post['skillLimitMax'];
-		$game->minPlayers = $post['minPlayers'];
+		$game->public      = ($post['visibility'] == 'private' ? 0 : 1);
+		$game->recurring   = ($post['recurring'] == 'no' ? 0 : 1);
+		$game->date        = $post['datetime'];
+		$game->minAge      = $post['ageLimitMin'];
+		$game->maxAge      = $post['ageLimitMax'];
+		$game->minSkill    = $post['skillLimitMin'];
+		$game->maxSkill    = $post['skillLimitMax'];
+		$game->minPlayers  = $post['minPlayers'];
 		$game->rosterLimit = $post['rosterLimit'];
 		
 		$game->save(false);
 			
 			
-		$notification = new Application_Model_Notification();
-		$notification->action = 'edit';
-		$notification->type = 'game';
-		$notification->details = 'info';
-		$notification->gameID  = $game->gameID;
+		$notification               = new Application_Model_Notification();
+		$notification->action       = 'edit';
+		$notification->type         = 'game';
+		$notification->details      = 'info';
+		$notification->gameID       = $game->gameID;
 		$notification->actingUserID = $this->view->user->userID;
-		$notification->cityID = $this->view->user->city->cityID;
+		$notification->cityID       = $this->view->user->city->cityID;
 		
 		$notification->save();
 			

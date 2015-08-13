@@ -12,9 +12,6 @@ $(function()
 		
 		var value = $(this).text().replace(/ /g,'-').toLowerCase() + '-container';
 		
-		$('.settings-tab-finish').hide();
-		$(this).next('.settings-tab-finish').show();
-		
 		$('.settings-container').hide();
 		$('#' + value).show();
 	})
@@ -25,21 +22,6 @@ $(function()
 		changed = 'info';
 		$(this).trigger('click');
 	})
-	
-	/* delete account */
-	$('#settings-delete-account').click(function()
-	{
-		confirmAction = function() {
-			var detailsEle = $('#details-ele');
-			var userID = detailsEle.attr('actingUserID');
-			
-			deleteUser(userID);
-		}
-		
-		populateConfirmActionAlert('delete your account', "<p class='larger-margin-top medium clear width-100 center'>This action cannot be undone.</p>");
-	})
-		
-		
 	
 	
 	$('#info-save-changes').click(function()
@@ -206,23 +188,7 @@ $(function()
 		changed = 'info';
 	})
 	
-	$('input').change(function()
-	{
-		var button;
-		if (changed == 'sports') {
-			button = $('#sports-save-changes-container');
-		} else if (changed == 'info') {
-			button = $('#info-save-changes-container')
-		}
-		
-		if (button.css('display') != 'block') {
-			button.css({'opacity': 0,
-						'display': 'block'})
-				  .stop().animate({opacity: 1}, 800);
-		}
-	})
-	
-	$(document).bind('mouseup.changed',function() {
+	$(document).bind('click.changed',function() {
 		
 		var button;
 		if (changed == 'sports') {
@@ -260,21 +226,6 @@ $(function()
 		
 })
 
-/**
- * ajax delete user from db
- */
-function deleteUser(userID)
-{
-	
-	$.ajax({
-		url: '/ajax/delete-user',
-		type: 'POST',
-		data: {userID: userID},
-		success: function(data) {
-			reloadPage();
-		}
-	})
-}
 
 /**
  * ajax remove sport from user
@@ -295,6 +246,24 @@ function removeSportFromUser(userID, sport)
 	})
 }
 
+/**
+ * update game_subscribers doNotEmail for game
+ * @params (onOrOff => 1 = no emails, 0 = emails)
+ */
+function updateEmailAlert(gameID, onOrOff)
+{
+	var options = {gameID: gameID,
+				   onOrOff: onOrOff};
+				   
+	$.ajax({
+		url: '/ajax/update-email-alert-subscribed-game',
+		type: 'POST',
+		data: {options: options},
+		success: function(data) {
+			showConfirmationAlert('Updated');
+		}
+	})
+}
 
 /**
  * custom callback function from slider to update hidden input skill
@@ -318,7 +287,7 @@ function updateSkillHiddenInput(sliderEle, value)
 function getSportName(ele) 
 {
 	var sportFormEle = $(ele).parents('.signup-sports-form');
-	var sportTitle   = sportFormEle.find('.sport-title');
+	var sportTitle   = sportFormEle.find('.signup-sports-title');
 	var sport        = sportTitle.text().toLowerCase();
 	
 	return sport;
@@ -326,7 +295,6 @@ function getSportName(ele)
 
 function buildSliders()
 {
-	
 	/* sliders */
 	var width = $('.signup-skill-slider').width();
 	// strackbar requires element to not be hidden (offset().left)
@@ -344,6 +312,5 @@ function buildSliders()
 										 trackerHeight: 20, 
 										 trackerWidth: 19 })
 	// Hide element again
-	
 	$('.signup-sports-hidden,#sports-container').hide();
 }

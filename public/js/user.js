@@ -26,28 +26,8 @@ $(function()
 		
 	})
 	
-	
-	/* show user availabilty on click */
-	$('.user-availability-show').click(function()
-	{
-		$(this).parent().find('.availabilty-calendar-container').show();
-		$(this).hide();
-		$(this).parent().find('.user-availability-hide').show();
-	})
-	
-	$('.user-availability-hide').click(function()
-	{
-		$(this).next('.availabilty-calendar-container').hide();
-		$(this).hide();
-		$(this).parent().find('.user-availability-show').show();
-	})
-	
 	$("#user-player-request").click(function()
 	{
-		if ($(this).is('.clicked')) {
-			return;
-		}
-		
 		var detailsEle = $('#user-details');
 		var actingUserID = detailsEle.attr('actingUserID');
 		var receivingUserID = detailsEle.attr('receivingUserID');
@@ -56,10 +36,6 @@ $(function()
 		var details = ''
 		var idType = '';
 		var typeID = '';
-		
-		$(this).addClass('clicked')
-			   .text('Request sent')
-		
 
 		createNotification(idType, typeID, actingUserID, receivingUserID, action, type, details);
 		showConfirmationAlert('Request sent.');

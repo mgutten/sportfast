@@ -1,13 +1,8 @@
 // homepage.js
 var fadeInterval;
 var buttonPosition = new Array;
-
 buttonPosition[0] = {top: '336px',
 					 left: '637px'};
-/* for tennis picture
-buttonPosition[0] = {top: '295px',
-					 left: '825px'};
-*/
 buttonPosition[1] = {top: '224px',
 					 left: '575px'};
 buttonPosition[2] = {top: '208px',
@@ -17,7 +12,7 @@ buttonPosition[3] = {top: '248px',
 									 					 
 
 $(function()
-{	
+{		
 	setFadeInterval(5500)
 	
 								
@@ -40,22 +35,19 @@ $(function()
 		
 	})
 	
-	if (!isSafari()) {
-		// Safari is slow to animate images, do not allow to animate
-		$('.homepage-description-container').hover(function()
-		{
-			$(this).find('.homepage-description-img')
-					.css({'height': '100px',
-						  'width': '100px',
-						  'margin-left': '-50px'});
-		}, function()
-		{
-			$(this).find('.homepage-description-img')
-					.css({'height': '90px',
-						  'width': '90px',
-						  'margin-left': '-45px'});
-		});
-	}
+	$('.homepage-description-container').hover(function()
+	{
+		$(this).find('.homepage-description-img')
+				.css({'height': '100px',
+					  'width': '100px',
+					  'margin-left': '-50px'});
+	}, function()
+	{
+		$(this).find('.homepage-description-img')
+				.css({'height': '90px',
+					  'width': '90px',
+					  'margin-left': '-45px'});
+	});
 										
 		
 				
@@ -102,18 +94,5 @@ function changeButtonPosition(index)
 							  left: buttonPosition[index]['left']});
 }
 	
-function isSafari()
-{
-	var ua = navigator.userAgent.toLowerCase(); 
- if (ua.indexOf('safari')!=-1){ 
-  	 if(ua.indexOf('chrome')  > -1){
-    	return false;
-   	 } else {
-		// Safari
-   		return true;
-   	}
-  }
-  
-  return false;
-}
+
 

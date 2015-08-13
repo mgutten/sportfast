@@ -6,21 +6,8 @@ $(function()
 {
 	
 	/* usermap stuff */
-	if (gmapMarkers.length > 0) {
-		initializeMap(37.98, -122.5, 12, false, createMarkers);
-		setZoom();
-	}
-	
-	
-	$('.admin-flagged-confirm,.admin-flagged-remove').click(function()
-	{
-		
-		var userRatingID = $(this).attr('userRatingID');
-		var remove = ($(this).is('.admin-flagged-confirm') ? 0 : 1);
-		
-		updateFlaggedRating(userRatingID, remove);
-	})
-	
+	initializeMap(37.98, -122.5, 12, createMarkers);
+	setZoom();
 })
 
 /**
@@ -97,23 +84,4 @@ function createMarkers()
 
 	}
 	
-}
-
-/**
- * either remove or set to true a flagged user rating
- */
-function updateFlaggedRating(userRatingID, remove)
-{
-	var options = {userRatingID: userRatingID,
-				   remove: remove};
-				   
-	$.ajax({
-		url: '/ajax/update-flagged-rating',
-		type: 'POST',
-		data: {options: options},
-		success: function()
-		{
-			reloadPage();
-		}
-	})
 }

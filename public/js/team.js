@@ -8,151 +8,19 @@ $(function()
 	teamID = $('#team-details').attr('teamID');
 	
 	
-	/* OPTIONS ONCLICK SHOW ALERT/REDIRECT */
-	$('#profile-option-reserves').click(function()
-	{
-		showAlert($('#reserves-alert-container'));
-	})
-	
-	$('#profile-option-schedule').click(function()
-	{
-		showAlert($('#manage-schedule-alert-container'));
-	})
-	
-	$('#profile-option-edit').click(function()
-	{
-		showAlert($('#manage-team-info-alert-container'));
-	})
-	
-	$('#profile-option-delete').click(function()
-	{
-		confirmAction = function () {
-						var detailsEle = getDetailsEle();
-						var userID = detailsEle.attr('actingUserID');
-						var idType = detailsEle.attr('idType');
-						var typeID = detailsEle.attr(idType);
-						var actingUserID = userID;
-						var receivingUserID;
-						var action = 'delete';
-						var type   = idType.replace(/ID/, '');
-						var details;		
-
-						//createNotification(idType, typeID, actingUserID, receivingUserID, action, type, details);
-
-						cancelType(idType, typeID);
-						$('*').css('cursor', 'progress');
-						
-						//changedAlert = true;
-						//reloadPage();
-				}
-				
-		var detailsEle = getDetailsEle();
-		var text = 'delete ' + detailsEle.attr('teamName');
-		var postContent = "<p class='clear margin-top light width-100 center'>This action cannot be undone.</p>";
-
-		populateConfirmActionAlert(text, postContent);
-	})
-	
 	$('.schedule-in,.schedule-out').click(function()
 	{
-		//reloadPage();
+		reloadPage();
 	})
 	
-	
-	/* click on edit team's logo */
-	$('#team-manage-team-info-img').click(function()
-	{
-		$('#team-manage-team-info-img-container').show();
-		
-	})
-	
-	/* team reserves */
-	$('#team-show-reserves').click(function()
-	{
-		$(this).hide();
-		$('#team-hide-reserves').show();
-		$('#team-reserves-container').show();
-	})
-	
-	$('#team-hide-reserves').click(function()
-	{
-		$(this).hide();
-		$('#team-show-reserves').show();
-		$('#team-reserves-container').hide();
-	})
-	
-	/* highlight/remove highlight of reserve player */
-	$('.team-reserve-player').click(function()
-	{
-		var img = $(this).find('.animate-opacity');
-		
-		if (img.is('.clicked')) {
-			img.removeClass('clicked');
-		} else {
-			img.addClass('clicked');
+	$('#team-players-container').hover(
+		function() {
+			$('.team-player-going-description-container').stop().animate({opacity: 1}, 300);
+		},
+		function() {
+			$('.team-player-going-description-container').stop().animate({opacity: 0}, 300);
 		}
-		
-		testReserveInvites();
-	});
-	
-	$('#team-reserve-invite').click(function()
-	{
-		
-	
-		var detailsEle = getDetailsEle();
-		var teamID = detailsEle.attr('teamID');
-		var teamGameID = detailsEle.attr('nextGameID');
-		
-		var reserves = getReserveInvites();
-		
-		$('#team-hide-reserves').trigger('click');
-		
-		inviteToTeamGame(teamID, teamGameID, reserves);
-	});
-	
-	/* show reserve alert on click of "add" in reserve list */
-	$('#team-reserve-add').click(function()
-	{
-		showAlert($('#reserves-alert-container'));
-	})
-	
-	
-	/* remove user from reserves */
-	$(document).on('click', '.team-reserve-remove', function()
-	{
-		var detailsEle = getDetailsEle();
-		var teamID = detailsEle.attr('teamID');
-		var userID = $(this).attr('userID');
-		
-		addUserToReserve(teamID, userID, true);
-		
-		$(this).parents('.team-reserve-player').remove();
-		
-		changedAlert = true;
-	})
-
-	
-	/* edit team img avatar */
-	$('.create-team-avatar').hover(function()
-	{
-		var src = $(this).attr('src').replace('/small/','/medium/');
-		$('#team-manage-team-info-img').attr('src', src);
-	},
-	function()
-	{
-		var src = $('.create-team-avatar-selected').attr('src').replace('/small/','/medium/');
-		$('#team-manage-team-info-img').attr('src', src);
-	})
-	.click(function()
-	{
-		$('.create-team-avatar-selected').removeClass('create-team-avatar-selected');
-		$(this).addClass('create-team-avatar-selected');
-		
-		changedAvatar = $(this).attr('avatar');
-		
-		$('#team-manage-team-info-confirm-container').show();
-	})
-		
+	)
 	
 	/* clear entire team schedule */
 	$('#team-manage-calendar-clear').click(function()
@@ -178,23 +46,9 @@ $(function()
 		}
 		
 		clickedDay = $(this);
-		var hour = 24;
-		var date = new Date();
 		
-		
-		if (typeof $(this).attr('time') != 'undefined' &&
-			$(this).is('.calendar-today')) {
-				// Is today and there was an event, should show win/loss?
-				var timeArray = parseTimeAttrib($(this).attr('time'));
-				hour = parseInt(timeArray.hour, 10) + (timeArray.ampm == 'p' ? 12 : 0);
-			}
-				
-		
-		if (($(this).is('a.calendar-transparent,a.calendar-more-transparent') && !$(this).is('a.calendar-no-select'))
-			|| ($(this).is('.calendar-today') && 
-				$(this).is('.calendar-dark') &&
-				hour < date.getHours())) {
-			// Old event (or event that happened earlier in the day today), let change win or loss
+		if ($(this).is('a.calendar-transparent,a.calendar-more-transparent') && !$(this).is('a.calendar-no-select')) {
+			// Old event, let change win or loss
 			var tooltip = $('#tooltip-team-manage-winOrLoss');
 			tooltip.css({left: $(this).position().left,
 						 top:  $(this).position().top + $(this).height()});
@@ -209,7 +63,6 @@ $(function()
 			
 			$('#tooltip-team-manage-winOrLoss').find('.inner-shadow,.member-schedule-button-selected')
 											   .removeClass('inner-shadow member-schedule-button-selected');
-											   
 			var winOrLoss = $(this).attr('winOrLoss');
 			var selectedButton;
 			
@@ -237,8 +90,6 @@ $(function()
 			var tooltip = $('#tooltip-team-manage-addGame');
 			var date = getDateClicked($(this));
 			$('#team-manage-schedule-date').text(date.monthName + ' ' + date.day);
-			
-			$('#teamManageScheduleLocation').attr('locationID', '');
 			
 			// Hide other tooltip
 			$('#tooltip-team-manage-winOrLoss').find('.x').trigger('click');
@@ -459,8 +310,6 @@ $(function()
 			showAlert($('#manage-remove-player-alert-container'));
 		} else if (val == 'edit team') {
 			showAlert($('#manage-team-info-alert-container'));
-		} else if (val == 'reserves') {
-			showAlert($('#reserves-alert-container'))
 		} else if (val == 'delete team') {
 			
 			confirmAction = function () {
@@ -477,8 +326,7 @@ $(function()
 						//createNotification(idType, typeID, actingUserID, receivingUserID, action, type, details);
 						
 						cancelType(idType, typeID);
-						
-						//changedAlert = true;
+						changedAlert = true;
 						//reloadPage();
 				}
 				
@@ -492,8 +340,6 @@ $(function()
 		
 
 	});
-	
-	
 	
 	$('.calendar-captain').click(function()
 	{
@@ -525,27 +371,6 @@ $(function()
 	
 	
 })
-
-/**
- * invite user(s) to team game
- */
-function inviteToTeamGame(teamID, teamGameID, reserves)
-{
-	
-	var options = {teamID: teamID,
-				   teamGameID: teamGameID,
-				   userIDs: reserves};
-	
-	$.ajax({
-		url: '/ajax/invite-to-team-game',
-		type: 'POST',
-		data: {options: options},
-		success: function(data) {
-
-			showConfirmationAlert('Invites sent');
-		}
-	})
-}
 
 /**
  * remove team games from db
@@ -652,102 +477,6 @@ function searchDbForLeagueLocation(name, address, callback)
 					callback(locations);
 				}
 	})
-}
-
-/**
- * Ajax call to add user to reserve list of team
- */
-function addUserToReserve(teamID, userID, remove)
-{
-	if (typeof remove == 'undefined') {
-		remove = '';
-	}
-	
-	$.ajax({
-		url: '/ajax/add-user-to-reserve',
-		type: 'POST',
-		data: {teamID: teamID,
-			   userID: userID,
-			   remove: remove},
-		success: function(data) {
-				
-				}
-	})
-}
-
-/**
- * result clicked from search function in reserve alert
- */
-function addUserToList(userID, userName)
-{
-	changedAlert = true;
-	
-	$('#team-reserve-none').hide();
-	
-	var detailsEle = getDetailsEle();
-	var teamID = detailsEle.attr('teamID');
-	
-	addUserToReserve(teamID, userID);
-	
-	//var copiedEle = $('#team-reserve-alert-container').children().first();
-	//var copiedHTML = copiedEle.html();
-	
-	//var div = "<div class='" + copiedEle.attr('class') + "'></div>";
-	//$('#team-reserve-alert-container').append(div);
-	
-	var space = userName.indexOf(" ")
-	var lastLetter = userName[space + 1];
-	var firstName = userName.substr(0,space);
-	userName = firstName + ' ' + lastLetter
-
-	
-	var newEle = $('#team-reserve-alert-container').children('.team-reserve-player').last().clone()
-												   .removeClass('hidden')
-												   .appendTo('#team-reserve-alert-container');
-	
-	newEle.find('.team-reserve-remove').attr('userID', userID);
-	
-	newEle.find('.team-reserve-name').html(userName);
-	
-	newEle.find('img').attr('onError', "this.src='/images/users/profile/pic/medium/default.jpg'")
-					  .attr('src', '/images/users/profile/pic/medium/' + userID + '.jpg');
-}
-	
-
-/**
- * test if invites are available to be sent to reserve players
- */
-function testReserveInvites()
-{
-	var shown = getReserveInvites();
-	
-	if (shown) {
-		// Show invites button
-		$('#team-reserve-invite').show();
-	} else {
-		$('#team-reserve-invite').hide();
-	}
-}
-
-/**
- * get all the invited reserves
- */
-function getReserveInvites()
-{
-	var returnArray = new Array();
-	$('.team-reserve-player').each(function()
-	{
-		if ($(this).find('img').is('.clicked')) {
-			var userID = $(this).attr('userID');
-			returnArray.push(userID);
-		}
-	})
-	
-	if (returnArray.length < 1) {
-		return false;
-	}
-	
-	return returnArray;
 }
 
 function populateLeagueLocationResults(locations)

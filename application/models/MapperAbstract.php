@@ -191,7 +191,7 @@ abstract class Application_Model_MapperAbstract
 		$timeOffset = $timeOffset * 1/3600; // Convert to hours
 		
 		// Adjust returned time (which refers to GMT) to DST (Denver, CO)
-		$timeOffset = $timeOffset + 7; // +6 when Spring forward daylight savings time, +7 when fall back
+		$timeOffset = $timeOffset + 7 - date('I'); // +6 when Spring forward daylight savings time, +7 when fall back
 		
 		return $timeOffset;
 	}

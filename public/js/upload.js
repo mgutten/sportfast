@@ -15,47 +15,6 @@ $(function()
 		$(this).parents('form').submit();
 	})
 	
-	/* delete profile picture */
-	$('#upload-delete-picture').click(function()
-	{
-		confirmAction = function()
-		{
-			deleteProfilePicture();
-		};
-		
-		populateConfirmActionAlert('delete your current profile picture', "<p class='clear margin-top medium width-100 center'>You will not be able to join any games.</p>");
-	})
-	
-	$('#confirm-action').click(function()
-	{
-		confirmAction();
-	})
-	
-	$('#deny-action').click(function()
-	{
-		$(this).parents('.alert-container').find('.alert-x').trigger('click');
-	})
-	
-	$('#signup-import-alert-cancel').click(function()
-	{
-		$('#signup-import-main-img,.narrow-column-picture').css({width: 'auto',
-																 height: 'auto',
-																 marginTop: 0,
-																 marginLeft: 0})
-														   .attr('src', '/images/users/profile/pic/large/default.jpg');
-														   
-		$('.signup-alert-rotate').hide();
-		
-		fileInfo = new Object();
-		
-		jcropAPI.destroy();
-		
-		$('#signup-import-alert-img').css({width: 'auto',
-																 height: 'auto',
-																 marginTop: 0,
-																 marginLeft: 0})
-									 .attr('src','/images/global/profile/xl/default.jpg')
-	})
 	
 	/* ajax submit of import profile pic */
 	$('#upload-profile-pic').ajaxForm({success: function(data) {
@@ -82,7 +41,6 @@ $(function()
 													
 													$('.signup-alert-rotate').show();				
 													$('#signup-import-alert-accept').show();
-													$('#signup-import-alert-cancel').show();
 																				 
 													
 												}
@@ -102,21 +60,6 @@ $(function()
 	});
 	
 })
-
-/**
- * delete profile picture
- */
-function deleteProfilePicture()
-{
-	$.ajax({
-		url: '/ajax/delete-profile-picture',
-		type: 'POST',
-		data: {},
-		success: function(data) {
-			window.location = '/';
-		}
-	})
-}
 
 
 /**

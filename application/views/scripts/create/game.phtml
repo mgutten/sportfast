@@ -188,7 +188,9 @@ $userContent = $this->form->parkName;
 
 <div class='clear largest-text darkest hidden width-100' id='parkName-main-container'><span class='inherit'>at </span><span class='inherit heavy' id='parkName-main'></span></div>
 <script type='text/javascript'>
+var gmapMarkers = markerDetails = [];
 <?php 
+
 	   if (!empty($this->parks)) {
 		   // Matches exist
 		   ?>
@@ -208,9 +210,9 @@ $userContent = $this->form->parkName;
 	<?php } ?>
 	
 
-userLocation = [<?php echo '"' . $this->user->getLocation()->latitude . '","' . $this->user->getLocation()->longitude . '"';?>];
+var userLocation = [<?php echo '"' . $this->user->getLocation()->latitude . '","' . $this->user->getLocation()->longitude . '"';?>];
 
-userContent = '<?php echo $userContent;?>'
+var userContent = '<?php echo $userContent;?>'
 </script>
 
 

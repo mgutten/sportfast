@@ -32,10 +32,6 @@ $(function()
 		showAlert($('#forgot-alert-container'))
 	}
 	
-	if ($('#already-alert-container').length > 0) {
-		showAlert($('#already-alert-container'))
-	}
-	
 })
 
 

@@ -5,14 +5,6 @@
 	width: 8.5em;
 }
 
-.availabilty-calendar-container {
-	display:none;
-}
-
-.availability {
-	cursor: default;
-}
-
 /* top user info section */
 
 #profile-buttons-container {
@@ -122,20 +114,6 @@
 	width: 100%;
 }
 
-.user-rating-container {
-	width: 32.3%;
-	margin-right: 1%;
-}
-
-.user-rating-container-last {
-	margin-right:0;
-	width: 33.3%;
-}
-
-.user-rating-container-first {
-	margin-bottom: 2px;
-}
-
 .user-sport-rating-overall-outer {
 	width: 98%;
 	height: 1.3em;
@@ -170,10 +148,6 @@
 
 .user-sport-type {
 	margin-left: .8em;
-}
-
-.user-sport-typeSuffix {
-	margin-left: 1.2em;
 }
 	
 /* user narrow column */

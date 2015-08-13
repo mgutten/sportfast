@@ -2,11 +2,6 @@
 
 /* overwrites */
 
-.schedule-container {
-	margin-right: 1.5em;
-	margin-top: .2em;
-}
-
 .body-column-wide {
 	width: 76%;
 }
@@ -21,8 +16,7 @@
 }
 
 .profile-name {
-	/*max-width: 9.5em;*/
-	max-width: 13em;
+	max-width: 9.5em;
 }
 
 /* top section */
@@ -39,6 +33,10 @@
 
 #team-next-game-container {
 	padding: 1em;
+}
+
+.team-player-going-description-container {
+	opacity: 0;
 }
 
 
@@ -78,7 +76,6 @@
 #manage-schedule-alert-container {
 	margin-top: -16em;
 	margin-left: -16em;
-	width: 30.5em;
 }
 
 #tooltip-team-manage-winOrLoss,#tooltip-team-manage-addGame {
@@ -176,25 +173,6 @@
 	color: #bbb;
 }
 
-#team-manage-team-info-img-container {
-	margin-left: 1em;
-	width: 90%;
-}
-
-#team-manage-team-info-img:hover {
-	outline: 1px solid #58bf12;
-}
-
-#team-manage-team-info-img-outer-container {
-	width:25%;
-}
-
-.create-team-avatar-selected {
-	border: solid 1px #58bf12;
-	margin-top:-2px;
-	margin-left:-2px;
-}
-
 /* remove players alert 
 .team-manage-remove-player-overlay {
 	float:left;
@@ -205,71 +183,6 @@
 }
 */
 
-/* reserves */
-.team-reserve-player {
-	position:relative;
-	margin-left: 1px;
-	margin-top: 1px;
-}
 
-.team-reserve-confirmed,
-.team-reserve-not-confirmed {
-	width: 10px;
-	height: 10px;
-	background: #58bf12;
-	position:absolute;
-	bottom: -1px;
-	left: -1px;
-	border: 1px solid white;
-}
 
-.team-reserve-not-confirmed {
-	background: #C60000;
-}
-
-.team-reserve-player > div > img.animate-opacity {
-	filter: alpha(opacity = 60);
-	opacity: .6;
-}
-
-#reserves-alert-container {
-	width: 32em;
-	height:auto;
-	margin-left: -16em;
-	margin-top: -6em;
-}
-
-#team-reserve-invite {
-	width: 3em;
-}
-
-#userName-container {
-	margin: 1.5em auto;
-	display:block;
-	float: none;
-	width: 20em;
-}
-
-#userName {
-	width: 19.3em;
-}
-
-.create-userName-result {
-	padding: .5em;
-	width: 100%;
-	background:#fff;
-	border-top: 1px solid #e9e9e9;
-}
-
-.create-userName-result.selected {
-	background: #e9e9e9 !important;
-}
-
-#create-userName-results-container {
-	width: 95%;
-}
-
-#team-canceled-back {
-	margin-left:9.3em;
-}
 	 

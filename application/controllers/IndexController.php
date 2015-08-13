@@ -18,8 +18,7 @@ class IndexController extends Zend_Controller_Action
 			// Non-member homepage
 			$this->view->whiteBacking = false;
 		} else {
-			// Member homepage			
-			
+			// Member homepage
 			$this->view->narrowColumn = 'right';
 								
 			$session = new Zend_Session_Namespace('first_visit');

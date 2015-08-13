@@ -232,7 +232,6 @@ abstract class Application_Model_ModelAbstract
 		return $this;
 	}
 	
-	
 	public function setPrimaryKey($value) 
 	{
 		$this->_primaryKey = $value;

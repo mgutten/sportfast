@@ -16,15 +16,12 @@ class Application_Model_Sport extends Application_Model_ModelAbstract
 									'often'			  => '',
 									'skillCurrent'    => '',
 									'skillInitial'    => '',
-									'avgSkill'		  => '',
-									'skill'			  => '',
 									'userSportID'	  => '',
 									'sportsmanship'	  => '',
 									'attendance'	  => '',
 									'formats'		  => '',
 									'overall'		  => '',
 									'ratings'		  => '',
-									'sportRatings'	  => '',
 									'noRatings'		  => ''
 									);
 									
@@ -213,13 +210,6 @@ class Application_Model_Sport extends Application_Model_ModelAbstract
 		return $this->_attribs['ratings'];
 	}
 
-	public function getSportRatings() 
-	{
-		if (!$this->hasValue('sportRatings')) {
-			$this->_attribs['sportRatings']= new Application_Model_SportRatings();
-		}
-		return $this->_attribs['sportRatings'];
-	}
 	
 	public function getFormat($format) 
 	{

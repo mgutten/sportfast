@@ -110,7 +110,7 @@ This game happens every week.  Here are the historical stats for this game.
 <?php } ?>
 
 <script type='text/javascript'>
-chartData = [['Week', 'Players','No Game'],<?php 
+var chartData = [['Week', 'Players','No Game'],<?php 
 			foreach ($this->history['games'] as $game) {
 				if ($game->totalPlayers >= $game->minPlayers) {
 					// successful game, first series
@@ -125,7 +125,7 @@ chartData = [['Week', 'Players','No Game'],<?php
 			}
 			?>];
 			
-pieChartData = [
+var pieChartData = [
           ['Type', 'Total'],
           ['Successful Game',<?php echo $this->history['successGames'];?> ],
           ['Failed Game', <?php echo $this->history['failedGames'];?>],

@@ -82,6 +82,7 @@ if ($this->captain) {
 ?>
 																 
 <script>
+var membersArray = [];
 <?php
 	foreach ($members as $member) {
 		echo "membersArray.push('" . $member->userID . "');";

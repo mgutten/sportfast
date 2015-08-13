@@ -554,7 +554,7 @@ class Application_Model_Game extends Application_Model_ConfirmationsAbstract
 		return $matchDescription;
 	}
 	
-	public function getDay($format = 'l')
+	public function getDay($format = 'l', $thisAndNext = true)
 	{
 		$curDate  = new DateTime('now');
 		$gameDate = DateTime::createFromFormat('Y-m-d H:i:s', $this->date);
@@ -592,8 +592,9 @@ class Application_Model_Game extends Application_Model_ConfirmationsAbstract
 		
 		
 		$prepend = '';
-		if ($format == 'l' ||
-		    $format == 'D') {
+		if (($format == 'l' ||
+		    $format == 'D') &&
+		    $thisAndNext) {
 			// Format is longer day (Tuesday) show more details
 			if ($diff == 0) {
 				// Today

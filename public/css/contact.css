@@ -10,24 +10,18 @@
 	margin-top: -15em;
 }
 
-#contact-subheader {
-	margin-top: 1.5em;
-}
-
 #contact-inner-container {
-	width: 95%;
+	width: 100%;
 }
 
 #question {
-	width: 32.7em;
+	width: 34.7em;
 	height: 10em;
-	max-width: 32.7em;
-	max-height: 10em;
 }
 
 #question-container {
 	height: 11em;
-	width: 33.4em;
+	width: 35.4em;
 }
 
 #question-container > .input-overlay {

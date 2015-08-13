@@ -38,28 +38,9 @@ $(function()
 		$('#create-header-sport').attr('clicked', 'true')
 		
 		$('.create-game-sport-type-container').hide();
-		$('#otherSport-container').hide();
-		
-		if (sport.toLowerCase() == 'other') {
-			$('#otherSport-container').show();
-			$('.create-section-inner').css('visibility','visible');
-			$('#missingSport-container').hide();
-			return;
-		}
-		
-		if (typeof $(this).attr('missingSport') != 'undefined') {
-			// User is missing this sport from profile, show link to account settings
-			$('#missingSport').text(sport)
-			$('#missingSport-container').show();
-			$('.create-section-inner').css('visibility', 'hidden');
-			return;
-		} else {
-			$('.create-section-inner').css('visibility','visible');
-			$('#missingSport-container').hide();
-		}
 		
 		selectSport($(this));
-		
+		$('#create-header-sport').text('cat');
 		testDate();
 	})
 	.mouseenter(function()
@@ -76,19 +57,6 @@ $(function()
 		var sport = $(this).parents('.create-game-sport-type-container').attr('sport');
 
 		selectSport($('#' + sport));
-		
-		testDate();
-	})
-	
-	/* entering custom sport */
-	$('#otherSport').keyup(function()
-	{
-		var sport = $(this).val();
-		$(this).attr('sport', sport);
-		
-		$('#create-header-sport').text(capitalize(sport));
-		
-		selectSport($(this));
 	})
 	
 	
@@ -125,7 +93,7 @@ $(function()
 		
 	})
 	
-	$('.dropdown-menu-options-container').find('.dropdown-menu-option-container').click(function()
+	$('.dropdown-menu-options-container').children('.dropdown-menu-option-container').click(function()
 	{
 		var parentID  = $(this).parents('.dropdown-menu-options-container').attr('dropdown-menu')
 		var selectEle = $('#' + parentID).find('p.dropdown-menu-option-text');
@@ -135,23 +103,7 @@ $(function()
 		
 		$(document).trigger('click');
 		
-		if ($(this).parents('#dropdown-menu-hidden-container-hour').length > 0 ||
-			$(this).parents('#dropdown-menu-hidden-container-min').length > 0 ||
-			$(this).parents('#dropdown-menu-hidden-container-ampm').length > 0) {
-				// Test date for hour dropdowns
-				testDate();
-			}
-	})
-	
-	/* change skill limits */
-	$('#dropdown-menu-minSkill').find('.dropdown-menu-option-text').click(function()
-	{
-		limitSkills($(this), 'min');
-	})
-	
-	$('#dropdown-menu-maxSkill').find('.dropdown-menu-option-text').click(function()
-	{
-		limitSkills($(this), 'max');
+		testDate();
 	})
 	
 	
@@ -209,7 +161,7 @@ $(function()
 	
 	
 	/* show alert for create team avatar */
-	$('#create-teamInfo-avatar-container').click(function()
+	$('#create-teamInfo-avatar').click(function()
 	{
 		showAlert($('#avatars-alert-container'));
 	})
@@ -262,7 +214,7 @@ $(function()
 	if (isGame()) {
 		// Create game, initialize google map
 		
-		initializeMap(37.98, -122.5, 11, false, mapLoaded);
+		initializeMap(37.98, -122.5, 11, mapListeners);
 	}
 	
 })
@@ -329,9 +281,10 @@ function getAvailableUsers(month, date, year, hour, sportID)
 		data: {options: options},
 		success: function(data) {
 			
-			var percent = Math.floor(data * .25)
-			//$('#available-players-percent').text(percent);
 			$('#available-players').text(data);
+			
+			var percent = Math.floor(data * .25)
+			$('#available-players-percent').text(percent);
 			
 			if ($('#available-players-container').css('display') != 'block') {
 				$('#available-players-container').css({'opacity': 0,
@@ -379,16 +332,15 @@ function findParks(options)
 		type: 'POST',
 		data: {options: options},
 		success: function(data) {
-			
 			data = JSON.parse(data);
+			
 			
 			gmapMarkers  = new Array();
 			markerDetails = new Array();
 			if (typeof data[1] != 'undefined') {
-				
 				for (i = 0; i < data[1].length; i++) {
 					gmapMarkers.push([data[1][i][0],data[1][i][1]]);
-					markerDetails.push([data[2][i][0],data[2][i][1],data[2][i][2],data[2][i][3], data[2][i][4]]);
+					markerDetails.push([data[2][i][0],data[2][i][1],data[2][i][2],data[2][i][3]]);
 				}
 			}
 			
@@ -399,19 +351,6 @@ function findParks(options)
 }
 
 	
-/**
- * first time map is loaded
- */
-function mapLoaded()
-{
-	// Hide map until it is time to view it
-	google.maps.event.addListenerOnce(gmap, 'idle', function(){
-		$('.create-section-inner-gmap').css({display:'none'});
-	});
-	
-	
-	mapListeners();
-}
 
 /**
  * create map listeners
@@ -420,7 +359,6 @@ function mapListeners()
 {
 	google.maps.event.addListener(gmap, "rightclick", function(event)
     {
-		
 		if (userMarker) {
 			userMarker.setMap(null);
 		}
@@ -430,21 +368,9 @@ function mapListeners()
 		
 		userMarker.setIcon('/images/global/gmap/markers/green_reverse.png');
 		
-		markerClickListeners(userMarker, userContent, $('#parkName').text(), 0);
+		markerClickListeners(userMarker, userContent, $('#parkName').text());
 		
-		//new google.maps.event.trigger(userMarker, 'click');
-		
-		if (infowindow) {
-			infowindow.close();
-		}
-		
-		infowindow = new google.maps.InfoWindow({
-									  content: userContent,
-									  position: event.latLng,
-									  maxWidth: 200
-								  });
-			
-		infowindow.open(gmap, userMarker)
+		new google.maps.event.trigger(userMarker, 'click');
 		
 		var parkLocation = 'POINT' + event.latLng;
 		
@@ -509,16 +435,12 @@ function createMarkers()
 function addMarkerListeners(marker, count)
 {
 		
-		markerHoverListeners(marker, markerDetails[count][0])
+		markerHoverListeners(marker)
 		
-		var content =  "<p class='left darkest futura heavy'>" + markerDetails[count][0] + "</p><div class='clear'>" + markerDetails[count][1] + "</div>";
+		var content =  "<p class='darkest futura heavy'>" + markerDetails[count][0] + "</p><div class='clear'>" + markerDetails[count][1] + "</div>";
 		
 		if (parseInt(markerDetails[count][2],10) == 1) {
 			content += "<div class='clear' tooltip='Stash available'><img src='/images/global/logo/logo/green/tiny.png' class='left indent'/> <p class='left light smaller-text larger-margin-top'>Stash Available</p></div>";
-		}
-		if (parseInt(markerDetails[count][4],10) > 0) {
-			// membershipRequired
-			content += "<p class='clear red' tooltip='This location requires a membership'>Membership Required</p>";
 		}
 		
 		markerClickListeners(marker, content, markerDetails[count][0], markerDetails[count][3]);
@@ -526,9 +448,8 @@ function addMarkerListeners(marker, count)
 
 function markerClickListeners(marker, content, parkName, parkID)
 {
-
-	google.maps.event.addListener(marker, "click", function(e) {
-		
+	google.maps.event.addListener(marker, "click", function() {
+			
 			this.parkName = parkName;
 			this.parkID   = parkID;
 			
@@ -538,9 +459,9 @@ function markerClickListeners(marker, content, parkName, parkID)
 			if (infowindow) {
 				infowindow.close();
 			}
-			
 			infowindow = new google.maps.InfoWindow({
-									  content: content
+									  content: content,
+									  maxWidth: 200
 								  });
 			
 			infowindow.open(gmap, marker)
@@ -548,25 +469,18 @@ function markerClickListeners(marker, content, parkName, parkID)
 }
 
 
-function markerHoverListeners(marker, parkName)
+function markerHoverListeners(marker)
 {
-	google.maps.event.addListener(marker, "mouseover", function(e) {
-		
-		$('#parkName-main').text(parkName);
-		$('#parkName-main-container').show();
-		
-		this.setIcon('/images/global/gmap/markers/green_reverse.png');
-	});
+		google.maps.event.addListener(marker, "mouseover", function(e) {
 	
-	google.maps.event.addListener(marker, "mouseout", function(e) {
+          	this.setIcon('/images/global/gmap/markers/green_reverse.png');
+        });
 		
-		if (selectedPark) {
-			$('#parkName-main').text(selectedPark);
-		} else {
-			$('#parkName-main').text('');
-		}
-		this.setIcon('/images/global/gmap/markers/green.png');
-	});
+		google.maps.event.addListener(marker, "mouseout", function(e) {
+			
+          	this.setIcon('/images/global/gmap/markers/green.png');
+        });
+
 }
 
 
@@ -684,8 +598,6 @@ function selectSport(ele)
 	$('#narrow-column-sport').text(capitalize(sport));
 	$('#narrow-column-team').show();
 	
-	
-	
 	if (isGame()) {
 		mapMoved();
 	} else {
@@ -717,7 +629,7 @@ function selectPark(parkName, parkID)
 		// Park has not been selected before
 		animateNextSection($('#parkName-main-container').parents('.create-section'));
 	}
-	selectedPark = parkName;
+	selectedPark = true;
 	
 	if (typeof parkID != 'undefined') {
 		// parkID is set
@@ -800,44 +712,6 @@ function isGame()
 	}
 }
 
-/**
- * limit max and min values for skill limits
- * @params(clickedEle => $(this) of clicked element from dropdown,
- *		   minOrMax => str 'min' or 'max' that was clicked)
- */
-function limitSkills(clickedEle,minOrMax) {
-	
-	var value = parseInt(clickedEle.attr('value'),10);
-	var oppositeSkill = (minOrMax == 'min' ? $('#skillLimitMax') : $('#skillLimitMin'));
-	var currentSkill = (minOrMax == 'min' ? $('#skillLimitMin') : $('#skillLimitMax'));
-	var oppositeName = (minOrMax == 'min' ? 'max' : 'min');
-		
-	if (value == currentSkill.val()) {
-		return;
-	}
-	
-	currentSkill.val(value);
-	
-	var left,right;
-	
-	if (minOrMax == 'min') {
-		left = value;
-		right = $('#skillLimitMax').val();
-	} else {
-		left = $('#skillLimitMin').val();
-		right = value;
-	}
-	
-	if (left > right) {
-		$('#dropdown-menu-' + oppositeName + 'Skill').find('.dropdown-menu-option-text').each(function()
-		{
-			if (parseInt($(this).attr('value'),10) == parseInt(value,10)) {
-				$(this).trigger('click');
-			} 
-		})
-	}
-}
-	
 function populateNarrowColumnTime()
 {
 	if (selectedDay) {
@@ -892,7 +766,7 @@ function populateSportInfo(data)
 	
 	
 	
-	//$('#rosterLimit').val(rosterLimit); Commented out to default roster limit to nothing
+	$('#rosterLimit').val(rosterLimit);
 	$('#minPlayers').val(data.minPlayers);
 	
 }
@@ -914,7 +788,7 @@ function populateSimilarGames(results)
 			}
 			
 			var result = results[i];
-			output += "<a href='/games/" + result['gameID'] + "' class='clear create-similar-game-container animate-darker' target='_blank'>";
+			output += "<a href='/games/" + result['gameID'] + "' class='clear create-similar-game-container animate-darker'>";
 			output += 	"<img src='/images/parks/profile/pic/medium/" + result['parkID'] + ".jpg' onerror=\"this.src='/images/parks/profile/pic/medium/default.jpg'\" class='left'/>";
 			output +=	"<div class='left larger-indent'>";
 			output +=		"<p class='left largest-text heavy darkest'>" + result['gameTitle'] + "</p>";

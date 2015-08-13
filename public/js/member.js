@@ -5,57 +5,8 @@ var newsfeedTimeout;
 var zoomChanged;
 var paginationClicked;
 var selectedMarker;
-var pastPlayedGmapMarkers = new Array();
-var homeMapTipHovered = false;
 
 $(function() {
-		
-	if ($('#member-find-minimal-container').length > 0) {
-		var top = $('#header-section-title-container-find').position().top
-		
-		//$('#member-find-minimal-container').css('top', top);
-	}
-	
-	/* hide "drag the map" overlay onhover */
-	$('#member-move-map-container').hover(function()
-	{
-		homeMapTipHovered = true;
-		$(this).stop().animate({opacity: 1}, 400);
-		return;
-	}, function()
-	{
-		homeMapTipHovered = false;
-		$(this).stop().animate({opacity: .2}, 400);
-		return;
-	})
-	
-	$('#member-find-outer-container').hover(function()
-	{
-		if (homeMapTipHovered) {
-			return;
-		}
-		
-		$(this).find('#member-move-map-container').stop().animate({opacity:.2}, {duration: 400, complete: function() {
-																									
-		}})
-	}, function()
-	{
-		$(this).find('#member-move-map-container').stop().animate({opacity:1}, {duration: 400, complete: function() {
-																									
-		}})
-	})
-	
-	
-	/* do not show map suggestion again */
-	$('#member-move-map-hide').click(function()
-	{
-		$('#member-move-map-container').hide();
-		
-		var attribs = {'homeMapTip': '0'};
-		
-		editUser(attribs, 'alert');
-	});
-		
 	
 	$(document).on('click','.dropdown-menu-option-container', function(e)
 	{
@@ -80,26 +31,6 @@ $(function() {
 		
 		mapMoved();
 		
-	})
-	
-	$('.member-find-tab').click(function()
-	{
-		$('.member-find-tab').removeClass('selected');
-		$(this).addClass('selected');
-		
-		var bodyEle;
-		
-		if ($(this).is('#member-find-tab-new')) {
-			bodyEle = $('#member-find-body');
-			newClicked();
-		} else {
-			// Is past tab
-			bodyEle = $('#member-find-past');
-			pastClicked();
-		}
-		
-		$('.member-find-body-container').hide();
-		bodyEle.show();
 	})
 	
 	
@@ -164,14 +95,14 @@ $(function() {
 	
 	$(document).on('mouseenter','.member-game',function()
 	{
-		var gameIndex = $(this).attr('gameIndex') - 1;
+		var gameIndex = $(this).attr('gameIndex');
 		markers[gameIndex].setIcon('/images/global/gmap/markers/green_reverse.png')
 		markers[gameIndex].setZIndex(1200);
 		
 		
 	})
 	$(document).on('mouseleave','.member-game',function() {
-		var gameIndex = $(this).attr('gameIndex') - 1;
+		var gameIndex = $(this).attr('gameIndex');
 		markers[gameIndex].setIcon('/images/global/gmap/markers/green.png');
 		markers[gameIndex].setZIndex();
 		
@@ -187,7 +118,7 @@ $(function() {
 		
 		setTimeout(function() {paginationClicked = false}, 100);
 		
-		getShownContainer().find('.member-find-pagination.light-back').removeClass('light-back');
+		$('.member-find-pagination.light-back').removeClass('light-back');
 		$(this).addClass('light-back');
 
 	});
@@ -246,122 +177,54 @@ $(function() {
 	preloadImageArray.push('/images/global/gmap/markers/green.png');
 	preloadImageArray.push('/images/global/gmap/markers/green_reverse.png');
 	
-	
-	var opt = {minZoom: 8,
-			   maxZoom: 12};
-	
-	initializeMap(37.98, -122.5, 10, opt, firstMapLoad);
-	//setZoom();
+	initializeMap(37.98, -122.5, 11, createMarkers);
+	setZoom();
 
 	// Update newsfeed every 2 minutes (if update, must change ajax call in notificationsMapper
 	newsfeedTimeout = setInterval(function() { getNewsfeed('new') }, 120000);
 
 })
 
-/**
- * past games tab was clicked
- */
-function pastClicked()
-{
-	showPastMarkers();
-	$('#member-move-map-container').hide();
-}
-
-/**
- * new games tab clicked
- */
-function newClicked()
-{
-	
-	gmap.setZoom(10);
-	
-	var latLon = new google.maps.LatLng(userLocation[0], userLocation[1]);
-	gmap.setCenter(latLon);
-	
-	google.maps.event.trigger(gmap, 'dragend');
-
-	$('#member-move-map-container').show();
-}
-	
-
-/**
- * show past played games on map 
- */
-function showPastMarkers()
-{
-	createMarkers(pastPlayedGmapMarkers, true);
-}
-
-/**
- * function to run first time map loads
- */
-function firstMapLoad()
-{
-	google.maps.event.addListener(gmap, 'zoom_changed', function(event) {
-		// Set timeout to prevent event from triggering more than once
-
-		if (!isPastGames()) {
-			clearTimeout(zoomChanged);
-	
-			zoomChanged = setTimeout(mapMoved, 50);
-		}
-
-	})
-	
-	
-	google.maps.event.addListener(gmap, 'dragend', function(event) {
-		// Set timeout to prevent event from triggering more than once
-
-		if (!isPastGames()) {
-			clearTimeout(zoomChanged);
-			zoomChanged = setTimeout(mapMoved, 50);
-		}
-		
-	})
-	
-	if (isPastGames()) {
-		pastClicked();
-	} else {
-		createMarkers();
-		newClicked();
-	}
-}
-
 
 /**
  * create gmap markers
  */
-function createMarkers(markerArray, fitBounds)
-{		
+function createMarkers()
+{	
+
 	// Clear prior markers
 	clearMarkers();
 	
 	var marker, i, latLon, index;
 	var bounds  = new google.maps.LatLngBounds();
 	
+
 	
-	if (typeof markerArray == 'undefined') {
-		markerArray = gmapMarkers;
-	}
+	//google.maps.event.removeListener(dragListener);
+	google.maps.event.addListenerOnce(gmap, 'zoom_changed', function(event) {
+		// Set timeout to prevent event from triggering more than once
+			clearTimeout(zoomChanged);
+			zoomChanged = setTimeout(mapMoved, 50);
+
+	})
 	
-	if (markerArray.length == 0) {
+	google.maps.event.addListenerOnce(gmap, 'dragend', function(event) {
+		// Set timeout to prevent event from triggering more than once
+			clearTimeout(zoomChanged);
+			zoomChanged = setTimeout(mapMoved, 50);
+	})
+	
+	
+	if (gmapMarkers.length == 0) {
 		return false;
 	}
 	
 	
-	var animateContainer;
-	if (isPastGames()) {
-		animateContainer = $('#member-find-past').find('.member-find-lower-inner-container');
-	} else {
-		animateContainer = $('#member-find-body').find('.member-find-lower-inner-container');
-	}
 	
-	
-	
-	for (i = 0; i < markerArray.length; i++) {
+	for (i = 0; i < gmapMarkers.length; i++) {
 		// Create markers here
-
-		latLon = new google.maps.LatLng(markerArray[i][0], markerArray[i][1]);
+		
+		latLon = new google.maps.LatLng(gmapMarkers[i][0], gmapMarkers[i][1]);
 		marker = new google.maps.Marker({
 						position: latLon,
 						map: gmap,
@@ -396,16 +259,15 @@ function createMarkers(markerArray, fitBounds)
         });
 		*/
 		
-		if (i > (animateContainer.first().children('.member-game').length - 1)) {
+		if (i > ($('.member-find-lower-inner-container').first().children('.member-game').length) - 1) {
 			marker.setVisible(false);
+		} else {
+			/*bounds.extend(latLon);
+			gmap.setCenter(bounds.getCenter());
+			gmap.fitBounds(bounds);
+			*/
 		}
 		
-		if (fitBounds) {
-			bounds.extend(latLon);
-			gmap.fitBounds(bounds);
-			gmap.setCenter(bounds.getCenter());
-			
-		}
 
 	}
 	
@@ -435,12 +297,10 @@ function addMarkerListeners(marker)
 			
 			var classy = 'member-game';
 			
-			var shownContainer = getShownContainer();
-			
 			$.each(index,function(key, value) {
 				
-				shownContainer.find('.' + classy + ':eq(' + value +')').css('background','');
-				shownContainer.find('.' + classy + ':eq(' + value +')').addClass('light-green-back');
+				$('.' + classy + ':eq(' + value +')').css('background','');
+				$('.' + classy + ':eq(' + value +')').addClass('light-green-back');
 			})
         });
 		
@@ -466,17 +326,14 @@ function addMarkerListeners(marker)
 		
 			var classy = 'member-game';
 			
-			var shownContainer = getShownContainer();
-						
 			$.each(index,function(key, value) {
-				shownContainer.find('.' + classy + ':eq(' + value +')').removeClass('light-green-back');
+				$('.' + classy + ':eq(' + value +')').removeClass('light-green-back');
 			})
         });
 		
 		google.maps.event.addListener(marker, "click", function() {
-			var index = $.inArray(this,markers);
-			var shownContainer = getShownContainer();
-			window.location = shownContainer.find('.member-game:eq(' + index +')').attr('href');
+			index = $.inArray(this,markers);
+			window.location = $('.member-game:eq(' + index +')').attr('href');
         });
 }
 
@@ -526,17 +383,14 @@ function animateFindContainer(page)
 	
 	$('.member-find-lower-outer-inner-container').animate({marginLeft: marginLeft}, 200);
 	*/
+	var marginTop = -1 * ($('.member-find-lower-inner-container').height() * (page - 1));
 	
-	var container = getShownContainer();
-	
-	var marginTop = -1 * (container.find('.member-find-lower-inner-container').height() * (page - 1));
-	
-	if (marginTop == parseInt(container.find('.member-find-lower-outer-inner-container').css('margin-top'),10)) {
+	if (marginTop == parseInt($('.member-find-lower-outer-inner-container').css('margin-top'),10)) {
 		// Same page as is currently selected, return
 		return;
 	}
 	
-	container.find('.member-find-lower-outer-inner-container').stop().animate({marginTop: marginTop}, 400);
+	$('.member-find-lower-outer-inner-container').stop().animate({marginTop: marginTop}, 400);
 	
 	hideShowMarkers(page);
 }
@@ -549,13 +403,12 @@ function hideShowMarkers(page)
 {
 	page -= 1;
 	var start = 0; // Where to start marker count from
-	var container = getShownContainer();
 	for (i = 0; i < page; i++) {
 		// Add number of games in each page from previous pages
-		start += container.find('.member-find-lower-inner-container:eq(' + i + ')').children('.member-game').length;
+		start += $('.member-find-lower-inner-container:eq(' + i + ')').children('.member-game').length;
 	}
 
-	var end   = start + container.find('.member-find-lower-inner-container:eq(' + page + ')').children('.member-game').length;
+	var end   = start + $('.member-find-lower-inner-container:eq(' + page + ')').children('.member-game').length;
 	var latLon;
 	var bounds  = new google.maps.LatLngBounds();
 	gmap.initialZoom = true; // Set initial zoom to force zoom constraint
@@ -623,7 +476,6 @@ function loadFind(points)
 			   points: points,
 			   time: time},
 		success: function(matches) {
-			
 			matches = JSON.parse(matches);
 			$('#member-find-body').html(matches[0]);
 			$('#member-find-body').show();
@@ -700,30 +552,6 @@ function populateNewsfeed(data, position)
 	} else {
 		// Append data
 		$('.notifications-container').append(output);
-	}
-}
-
-/**
- * get shown container for map (is new games or past games?)
- */
-function getShownContainer()
-{
-	if (isPastGames()) {
-		return $('#member-find-past');
-	} else {
-		return $('#member-find-body');
-	}
-}
-
-/**
- * is past games tab selected for map
- */
-function isPastGames() 
-{
-	if ($('#member-find-tab-past').is('.selected')) {
-		return true;
-	} else {
-		return false;
 	}
 }
 

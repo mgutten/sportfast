@@ -34,7 +34,12 @@ class Application_View_Helper_ChangeCaptain
 		
 		foreach ($typeModel->captains as $captain => $true) {
 			$player = $typeModel->players->getUser($captain);
-			$captains .= "<p class='clear largest-text darkest heavy team-manage-team-info-name default team-manage-team-info-captain-real' userID='" . $player->userID . "' id='change-captain-name-" . $player->userID . "' defaultName='" . $typeModel->players->getUser($captain)->getLimitedName('fullName',21) . "'>"
+			if (!$player) {
+				// Has not joined game, so captain's name details are not stored in $typeModel, retrieve from db
+				$player = new Application_Model_User();
+				$player->getUserBy('u.userID', $captain);
+			}
+			$captains .= "<p class='clear largest-text darkest heavy team-manage-team-info-name default team-manage-team-info-captain-real' userID='" . $player->userID . "' id='change-captain-name-" . $player->userID . "' defaultName='" . $player->getLimitedName('fullName',21) . "'>"
 							 . $player->getLimitedName('fullName', 21) . "
 						</p><span class='left header red hidden largest-text remove-captain pointer'>x</span>";
 		}
@@ -48,12 +53,6 @@ class Application_View_Helper_ChangeCaptain
 		
 		$output = $pictures . $captains;
 		
-		if ($typeModel instanceof Application_Model_Game) {
-			// Is game
-			
-			
-			
-		}
 					
 		return $output;
 	}

@@ -18,13 +18,16 @@ if (!$this->loggedIn) {
 	$this->headLink()->prependStylesheet($this->baseUrl() . '/css/member.css');
 	$this->headScript()->prependFile($this->baseUrl() . '/js/member.js');
 	$this->headScript()->prependFile('https://maps.googleapis.com/maps/api/js?key=AIzaSyAhxSMQ-WQux2nzTW4dBoKmpfGHVQOk7r8&sensor=false');
+	
 	echo $this->memberhomepage();
 	?>
     <script type='text/javascript'>
+    var gmapMarkers = pastPlayedGmapMarkers = [];
 	<?php 
 	   if (!empty($this->matches)) {
 		   // Matches exist
 		   ?>
+
 		gmapMarkers = [		<?php
 								 foreach ($this->matches as $match) {
 									 if ($match instanceof Application_Model_Game) {
@@ -51,7 +54,7 @@ if (!$this->loggedIn) {
 	}
 	?>
 					
-		userLocation = [<?php echo '"' . $this->user->getLocation()->latitude . '","' . $this->user->getLocation()->longitude . '"';?>];
+		var userLocation = [<?php echo '"' . $this->user->getLocation()->latitude . '","' . $this->user->getLocation()->longitude . '"';?>];
 	</script> 
     <?php
 }

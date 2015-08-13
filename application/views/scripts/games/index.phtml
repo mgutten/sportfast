@@ -249,29 +249,13 @@ echo $this->placeholder('absolute')->captureStart();
 	
 echo $this->placeholder('absolute')->captureEnd();
 
+
 // Narrow left column
 $this->placeholder('narrowColumn')->captureStart();
 
 //if ($this->userInGame) {
 	// User is attending, show quick stats
-	if ($this->gameOn) {	
-		$gameFull = $maybe = '';
-		if ($this->gameFull) {
-			$gameFull = ' (FULL)';
-		}
-		if ($this->maybeConfirmedPlayers > 0) {
-			$maybe = "<p class='white smaller-text clear'>+" . $this->maybeConfirmedPlayers . " maybe</p>";
-		}
-		
-		echo "<div class='green-back white heavy narrow-overlay-container dropshadow'><p class='left inherit'>" . $this->confirmedPlayers . " " . ($this->confirmedPlayers == 1 ? 'player' : 'players') . " " . $gameFull .   "</p>" . $maybe . "</div>";
-	} else {
-		echo "<div class='dark-red-back white heavy narrow-overlay-container dropshadow' tooltip='" . ($this->game->minPlayers - $this->totalPlayers) . " more players are needed in order for this game to happen.'>"
-			 . $this->confirmedPlayers . " " . ($this->confirmedPlayers == 1 ? 'player' : 'players') . " <br>
-			 <span class='white'>" . $this->playersNeeded  . " needed</span>"
-			 
-			 . ($this->game->canceled ? "<br>CANCELED" : '') .
-			 "</div>";
-	}
+	
 //}
 
 echo "<img src='" . $this->game->getProfilePic('large', 'parks') . "' class='rounded-corners narrow-column-picture dropshadow'/>";
@@ -503,6 +487,26 @@ if (!$this->gameFull ||
 	*/
 } else {
 	echo "<p class='right medium larger-margin-top'>This game is full.</p>";
+}
+
+// Quick view of num players/game on/etc
+if ($this->gameOn) {	
+	$gameFull = $maybe = '';
+	if ($this->gameFull) {
+		$gameFull = ' (FULL)';
+	}
+	if ($this->maybeConfirmedPlayers > 0) {
+		$maybe = "<p class='white smaller-text clear'>+" . $this->maybeConfirmedPlayers . " maybe</p>";
+	}
+	
+	echo "<div class='green-back white heavy narrow-overlay-container dropshadow'><p class='left inherit'>" . $this->confirmedPlayers . " " . ($this->confirmedPlayers == 1 ? 'player' : 'players') . " " . $gameFull .   "</p>" . $maybe . "</div>";
+} else {
+	echo "<div class='dark-red-back white heavy narrow-overlay-container dropshadow' tooltip='" . ($this->game->minPlayers - $this->totalPlayers) . " more players are needed in order for this game to happen.'>"
+		 . $this->confirmedPlayers . " " . ($this->confirmedPlayers == 1 ? 'player' : 'players') . " <br>
+		 <span class='white'>" . $this->playersNeeded  . " needed</span>"
+		 
+		 . ($this->game->canceled ? "<br>CANCELED" : '') .
+		 "</div>";
 }
             
 if ($this->userInGame) {

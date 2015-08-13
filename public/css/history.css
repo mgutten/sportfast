@@ -61,24 +61,3 @@
 #history-charts-inner-container {
 	width: 300%;
 }
-
-.history-most-regular-name {
-	width: 7em;
-	margin-left: .5em;
-	margin-right: .5em;
-}
-
-.history-most-regular-counter {
-	/*margin-left: 17em;*/
-	width: 1.6em;
-	margin-left: .2em;
-}
-
-.history-most-regular-container {
-	padding-top: .1em;
-	padding-bottom: .1em;
-}
-
-.history-most-regular-outer-container {
-	margin-left:8em;
-}

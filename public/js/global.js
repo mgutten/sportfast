@@ -733,6 +733,7 @@ $(function()
 
 		fadeOutInputOverlay($(this), false);
 		
+		
 	})
 	.on('focusout', 'input[type=text],input[type=password],textarea', function()
 	{
@@ -818,18 +819,15 @@ $(function()
 			
 			if (newMonthEle.length < 1) {
 				// Does not exist
-
 				return false;
 			}
 			
-			/*
 			if (newMonth > (curDate.getMonth() + 1)) {
 				// Show arrows if currently in past month and move to current month 
 				newMonthEle.find('#calendar-right-arrow').hide();
 			} else {
 				newMonthEle.find('#calendar-right-arrow').show();
 			}
-			*/
 			
 		} else {
 			// Left arrow
@@ -841,14 +839,12 @@ $(function()
 				return false;
 			}
 			
-			/*
 			if (newMonth < (curDate.getMonth() + 1)) {
 				// Show arrows if currently in past month and move to current month 
 				newMonthEle.find('#calendar-left-arrow').hide();
 			} else {
 				newMonthEle.find('#calendar-left-arrow').show();
 			}
-			*/
 		}
 		
 		curMonthEle.hide();
@@ -1811,8 +1807,7 @@ function animateNotShow(ele, down, fadeIn)
  */
 function showAlert(alertEle, opacity)
 {
-	if ($('.alert-black-back').css('display') != 'none' &&
-		!alertEle.is('#confirm-action-alert-container')) {
+	if ($('.alert-black-back').css('display') != 'none') {
 		return;
 	}
 	var finalOpacity = (typeof opacity != 'undefined' ? opacity : '.85')
@@ -2515,97 +2510,6 @@ function clearMarkers() {
 
 };
 	
-
-/* get num betweent min (inclusive) and max (inclusive) */
-function getRandomInt (min, max, exclude) {
-	var value;
-	if (typeof exclude != 'undefined' &&
-		exclude.length > 0) {
-			
-			if ((max - min) - (exclude.length - 1) == 0) {
-				// No amount to return ex: (1,2, [1,2]) cannot return anything
-				return false;
-			}
-		var tempMin,tempMax,tempValue,tempWeight;
-		var potentialValues = new Array();
-		var tempValueArray;
-		tempMin = min;
-    	for (var i = 0; i < exclude.length + 1; i++) {
-			if (i == (exclude.length)) {
-				// Last one
-				if (max != exclude[i - 1]) {
-					tempMax = max;
-				} else {
-					break;
-				}
-				
-			} else {
-				tempMax = exclude[i] - 1;
-			}
-			
-			if (i == 0) {
-				if (exclude[i] == min) {
-					tempMin += 1;
-				}
-			}
-			
-			tempValue = getRandomInt(tempMin, tempMax);
-			tempWeight = (tempMax - tempMin + 2)/max;
-			
-			tempValueArray = [tempValue, tempWeight];
-			
-			potentialValues.push(tempValueArray);
-			
-			tempMin = tempMax + 2;
-		}
-		
-		for (var i = 0; i < potentialValues.length; i++) {
-			
-			var weight = potentialValues[i][1];
-
-			if (weight + Math.random() >= 1) {
-				value = potentialValues[i][0];
-				break;
-			} else if (i == (potentialValues.length - 1)) {
-				value = potentialValues[i][0];
-			}
-		}
-			
-	} else {
-		value = Math.floor(Math.random() * (max - min + 1)) + min;
-	}
-	
-	return value;
-	
-	/**
-	 * used to test this function for accuracy
-	 
-	var used;
-	var b = 0;
-	var second, first;
-	var min = 2;
-	var max = 3;
-	for (var i = 0; i < 1000; i++) {
-		if (b == 0) {
-			used = new Array();
-			first = getRandomInt(min, max);
-			used.push(first);
-			b++;
-		} else {
-			
-			second = getRandomInt(min, max,used);
-			if (isNaN(second)) {
-				alert(first);
-			}
-				
-			b = 0;
-			if (first != second) {
-				alert(first + '-' + second);
-			}
-		}
-	}
-		*/
-}
 
 /**
  * reload page after settimeout delay to allow ajax to complete

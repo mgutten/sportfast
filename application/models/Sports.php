@@ -51,7 +51,6 @@ class Application_Model_Sports extends Application_Model_ModelAbstract
 		$sport = strtolower($sport);
 		if (!isset($this->_attribs['sports'][$sport])) {
 			$this->_attribs['sports'][$sport] = new Application_Model_Sport();
-			$this->_attribs['sports'][$sport]->sport = $sport;
 		}
 		return $this->_attribs['sports'][$sport];
 	}
@@ -106,8 +105,8 @@ class Application_Model_Sports extends Application_Model_ModelAbstract
 	public static function overallSort($a,$b) 
 	{
 		// Weight order based on skillDifference and # of players (weight skillDifference more)
-		$a = $a->avgSkill;
-		$b = $b->avgSkill;
+		$a = $a->overall;
+		$b = $b->overall;
 		
        	if ($a == $b) {
 			return 0;

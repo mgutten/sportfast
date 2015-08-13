@@ -219,7 +219,6 @@ $(function() {
 	})
 	*/
 	
-	/* receive reminder emails? */
 	$('#reminders-alert-yesno-container').children('.selectable-text').click(function()
 	{
 		
@@ -227,46 +226,7 @@ $(function() {
 		var detailsEle = getDetailsEle();
 		var gameID = detailsEle.attr('gameID');
 		
-		updateEmailAlert(gameID, doNotEmail, 'doNotEmail');
-		
-	})
-	
-	/* send gameon emails? */
-	$('#reminders-alert-gameon-admin-yesno-container,#reminders-alert-gameon-admin-who-container').children('.selectable-text').click(function()
-	{
-		var gameOn;
-		if ($('#reminders-alert-gameon-admin-yesno-container').find('.selectable-text.green-bold').text().toLowerCase() == 'yes') {
-			// Game on to be sent, 1 or 2?
-			if ($('#reminders-alert-gameon-admin-who-container').find('.selectable-text.green-bold').text().toLowerCase() == 'all members') {
-				// send to everyone, value 1
-				gameOn = '1';
-			} else {
-				gameOn = '2';
-			}
-			
-			$('#reminders-alert-gameon-container').show();
-		} else {
-			// Game on not to be sent
-			gameOn = '0';
-			$('#reminders-alert-gameon-container').hide();
-		}
-		
-		var detailsEle = getDetailsEle();
-		var gameID = detailsEle.attr('gameID');
-		
-		updateEmailAlert(gameID, gameOn, 'gameOn');
-		
-	})
-	
-	/* receive gameon emails? */
-	$('#reminders-alert-gameon-yesno-container').children('.selectable-text').click(function()
-	{	
-
-		var emailGameOn = ($(this).text().toLowerCase() == 'yes' ? '1' : '0');
-		var detailsEle = getDetailsEle();
-		var gameID = detailsEle.attr('gameID');
-		
-		updateEmailAlert(gameID, emailGameOn, 'emailGameOn');
+		updateEmailAlert(gameID, doNotEmail);
 		
 	})
 	

@@ -104,6 +104,7 @@ echo "<img src='/images/global/loading.gif' id='loading' class='hidden'/>";
 ?>
 
 <script type='text/javascript'>
+	var gmapMarkers = [];
 	<?php 
 	   if (!empty($this->matches)) {
 		   // Matches exist
@@ -129,5 +130,5 @@ echo "<img src='/images/global/loading.gif' id='loading' class='hidden'/>";
 					  ]
 	<?php } ?>
 					
-		userLocation = [<?php echo '"' . $this->user->getLocation()->latitude . '","' . $this->user->getLocation()->longitude . '"';?>];
+		var userLocation = [<?php echo '"' . $this->user->getLocation()->latitude . '","' . $this->user->getLocation()->longitude . '"';?>];
 </script> 

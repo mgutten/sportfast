@@ -39,7 +39,7 @@ class Application_View_Helper_PlayersSection
 				
 				if ($counter >= 14 && $limited) {
 					// Only show 14 players
-					$output .= "<a href='/" . $type . "/" . $typeID . "/players' class='medium margin-top clear-right smaller-text'>" . ($totalPlayers - $counter) . " more players</a>";
+					$output .= "<a href='/" . $type . "/" . $typeID . "/players' class='medium margin-top clear-right smaler-text'>" . ($totalPlayers - $counter) . " more players</a>";
 					break;
 				}
 				/*$output .= "<a href='/users/" . $player->userID . "' class='left team-player-container'>";

@@ -3,14 +3,10 @@
 	height: 10em;
 }
 
-.profile-name-container {
-	margin-top: .2em;
-}
-
 /* ratings */
 
 .park-num-ratings {
-	margin-top: 1.6em;
+	margin-top: 1.75em;
 	margin-left: .75em;
 }
 
@@ -62,10 +58,6 @@
 	width: 11.2em;
 }
 
-.park-random-rating-star {
-	margin-top: .2em;
-}
-
 /* nearby parks */
 .park-short-container {
 	width: auto;
@@ -83,7 +75,5 @@
 	left:0;
 	width: 96%;
 	background: #fff;
-	filter: alpha(opacity = 85);
-	opacity: .85;
 	padding: .2em 2% .2em 2%;
 }

@@ -580,7 +580,7 @@ class Application_View_Helper_MemberHomepage
 				$typeClass= 'bold';
 				$dateTime = DateTime::createFromFormat('Y-m-d H:i:s', $match->date);
 				$newDate  = $dateTime->format('m n');
-				$day      = $match->getDay('D');
+				$day      = $match->getDay('D', false);
 				$hour	  = $match->getHour();
 				$dateDesc = $dateTime->format('M j');
 				$id		  = $match->gameID;
@@ -738,7 +738,7 @@ class Application_View_Helper_MemberHomepage
 			$ratingsOutput .= "<p class='width-100 clear center darkest'>" . $sport->sport . "</p>";
 			$ratingsOutput .= "<a href='/users/" . $this->_view->user->userID . "/ratings/" . strtolower($sport->sport) . "' class='width-100 clear center green bold jumbo-text'>" . $sport->avgSkill . "</a>";
 			$ratingsOutput .= "<div class='width-100 clear'>";
-			
+			/*
 			foreach ($sport->sportRatings->getTopSkills(3) as $rating) {
 				// Create individual rating breakdown
 				$ratingsOutput .= "<div class='rating-individual-container'>";
@@ -746,14 +746,15 @@ class Application_View_Helper_MemberHomepage
 				$ratingsOutput .= "<p class='green bold larger-text width-100 center clear'>" . $rating->value . "</p>";
 				$ratingsOutput .= "</div>";
 			}
-			/*
+			*/
+			
 			foreach ($ratingOrder as $rating => $label) {
 				// Create individual rating breakdown
 				$ratingsOutput .= "<div class='rating-individual-container'>";
 				$ratingsOutput .= "<p class='green smaller-text width-100 center clear rating-label'>" . $label . "</p>";
 				$ratingsOutput .= "<p class='green bold larger-text width-100 center clear'>" . $sport->$rating . "</p>";
 				$ratingsOutput .= "</div>";
-			}*/
+			}
 			
 			/*$ratingsOutput .= "<div class='rating-individual-container'>";
 			$ratingsOutput .= "<p class='green smaller-text width-100 center clear'>skill</p>";

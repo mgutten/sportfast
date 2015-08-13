@@ -20,6 +20,7 @@ $this->headScript()->prependFile('https://maps.googleapis.com/maps/api/js?key=AI
 ?>
 
 <script type='text/javascript'>
+	var gmapMarkers = [];
 	<?php 
 	   if (!empty($this->users)) {
 		   // Matches exist

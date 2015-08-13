@@ -31,11 +31,10 @@ class UsersController extends Zend_Controller_Action
 		//$user->getUserFriendsGroupsTeams();
 		$user->getUserTeams();
 		$user->getUserFriends();
-		//$user->getUserRatings();
-		$user->getUserSportRatings();
+		$user->getUserRatings();
 		$user->getUserGames(false);
-				
-		$this->view->currentUser = $user;		
+		
+		$this->view->currentUser = $user;
 
 		$session = new Zend_Session_Namespace('userSport');
 		if ($session->sport) {
@@ -102,7 +101,7 @@ class UsersController extends Zend_Controller_Action
 	
 	public function ratingsAction()
     {
-		$this->view->narrowColumn = false;
+		$this->view->narrowColumn = 'right';
 		$uri = Zend_Controller_Front::getInstance()->getRequest()->getRequestUri();
 		$this->view->currentURI = rtrim($uri,'/');
 		$this->view->baseURI    = preg_replace('/\/ratings(\/\w+)?/','',$this->view->currentURI);
@@ -117,25 +116,16 @@ class UsersController extends Zend_Controller_Action
         $user = new Application_Model_User();
 		$user->getUserByID($userID);
 		$user->getUserSportsInfo();
-		$user->getUserSportStats();
 		
 		$this->view->currentUser = $user;
 		$this->view->userID = $userID;
-				
+		
 		$this->view->sport = $this->view->currentUser->getSport($sport);
 		$this->view->ratingOrder = array('skillCurrent'  => 'skill',
 										 'sportsmanship' => 'sprtmn',
 										 'attendance'	 => 'attnd');
 		
-		$recentRatings = new Application_Model_SportRatings();
-		$this->view->recentRatings = $recentRatings->getUserRelativeRatings($user->userID);
-		
-		$this->view->giveStats = $recentRatings->getUserGiveRatingsStats($user->userID);
-		
-		$this->view->avgStats = $user->getUserAvgChart(90);
-		
 		$this->view->lastRating = DateTime::createFromFormat('Y-m-d H:i:s', $this->view->user->lastRating)->format('U');
-
 
 		if ($user->userID == $this->view->user->userID) {
 			// User is on own ratings page
@@ -145,12 +135,12 @@ class UsersController extends Zend_Controller_Action
 		}
 		
 		$this->view->ratings = $ratings = $user->getUserRatings()->getSport($sport)->ratings;
-		//$this->view->numRatings = $ratings->countRatings(false, false);
-		//$this->view->ratingWidth = $ratings->getStarWidth('quality') . '%';
+		$this->view->numRatings = $ratings->countRatings(false, false);
+		$this->view->ratingWidth = $ratings->getStarWidth('quality') . '%';
 		
-		//$ratings->skillInitial = $this->view->sport->skillInitial;
-		//$ratings->attendance = $this->view->sport->attendance;
-		//$ratings->sportsmanship = $this->view->sport->sportsmanship;
+		$ratings->skillInitial = $this->view->sport->skillInitial;
+		$ratings->attendance = $this->view->sport->attendance;
+		$ratings->sportsmanship = $this->view->sport->sportsmanship;
 		
 		// Chart data
 		$chartRatings = $ratings->getRatingsForChart('overall', '6');
@@ -161,12 +151,8 @@ class UsersController extends Zend_Controller_Action
 		$this->view->chartRatingsSportsmanship = $chartRatings;
 		
 		// Narrow column data
-		$oldData = array();
-		foreach ($user->sports as $sport) {
-			$oldData[strtolower($sport->sport)] = $sport->getUserSportData($user->userID);
-		}
-		
-		/*
+		$oldData = $this->view->sport->getUserSportData($user->userID);
+
 		$calories = $oldData['calories'] * 160; // Used to be user weight, but removed weight so use average weight of 160
 		$curDate  = new DateTime('now');
 		$numWeeks = $curDate->diff($user->getJoinedDate())->format('%a') / 7;
@@ -179,11 +165,9 @@ class UsersController extends Zend_Controller_Action
 		}
 		$oldData['calories'] = $calories;
 		$oldData['caloriesPerWeek'] = round($caloriesPerWeek);
-		*/
 		$this->view->sportStats = $oldData;
 		
 		
-		/*
 		$dropdown = Zend_Controller_Action_HelperBroker::getStaticHelper('Dropdown');
 		
 		$sportArray = array();
@@ -195,7 +179,7 @@ class UsersController extends Zend_Controller_Action
 		
 		$this->view->sportButton = $dropdown->dropdownButton('sports', $sportArray, ucwords($sport));
 		
-		*/
+
 		
 	}
 	

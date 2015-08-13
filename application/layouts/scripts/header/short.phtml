@@ -19,7 +19,7 @@
 
 <script>
 	// Used to determine if user is logged in for global.js (to run notification polling)
-	loggedIn = "<?php echo date('Y-m-d H:i:s');?>";
+	var loggedIn = "<?php echo date('Y-m-d H:i:s');?>";
 
 </script>
 
@@ -114,7 +114,36 @@ Feedback
 <div id='confirm-alert' class='heavy white dropshadow center'>
 Request sent
 </div>
-
+	
+    <nav class='mobile'>
+    
+    	
+        <div class='dropdown' data-target='#dropdown-container'></div>
+        <div id='logo-container' class='left'><a href='/'><img src='/images/mobile/nav/logo.png' class='logo auto-center' /></a></div>
+        <div class='notification' data-target='#notifications-container'>
+        
+        	<div class='green-back nav-notification-indicator-container'>
+                <p class='white centered arial nav-notification-indicator'><?php echo $this->user->notifications->countUnread();?></p>
+            </div>
+        
+        </div>
+        
+        <div class='clear dark-back dropshadow' id='dropdown-container'>
+        	
+            <ul class='clear width-100'>
+            	<?php
+					$class = 'darkest heavy';
+				?>
+            	<a href='/users/<?php echo $this->user->userID;?>'><li><img src='<?php echo $this->user->getProfilePic('tiny');?>' class='left' /><p class='<?php echo $class;?> name left indent'><?php echo $this->user->shortName;?></p></li></a>
+                <a href='/'><li><p class='<?php echo $class;?>'>Home</p></li></a>
+                <a href='/users/<?php echo $this->user->userID;?>/settings'><li><p class='<?php echo $class;?>'>Account Settings</p></li></a>
+                <a href='/login/logout'><li><p class='<?php echo $class;?>'>Logout</p></li></a>
+            
+            </ul>
+            
+        </div>
+        
+    </nav>
 
     <div class='centered-body body-wrapper'>
     	<div class='header-nav-container-short'>
@@ -189,8 +218,8 @@ Request sent
              </div>
              
              <div class='nav-back-short' id='nav-back-notification'>
-             	<div class='green-back' id='nav-notification-indicator-container'>
-                	<p class='white centered arial' id='nav-notification-indicator'><?php echo $this->user->notifications->countUnread();?></p>
+             	<div class='green-back nav-notification-indicator-container'>
+                	<p class='white centered arial nav-notification-indicator'><?php echo $this->user->notifications->countUnread();?></p>
                 </div>
              </div>
              <div id='nav-back-notification-reverse'>
@@ -203,3 +232,4 @@ Request sent
             </p>
             <p class='lighter arial header-nav-location-text location pointer' id='header-city'><?php echo ucwords($this->user->getCity()->city) . ', ' . strtoupper($this->user->getCity()->state);?></p>
         </div>
+        

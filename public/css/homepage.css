@@ -4,11 +4,10 @@
 /* fixes */
 
 .header-bar.dropshadow {
-	/* problem with dropshadow and homepage imgs overlap 
+	/* problem with dropshadow and homepage imgs overlap */
 	-moz-box-shadow:    none;
  	-webkit-box-shadow: none;
   	box-shadow:         none;
-	*/
 }
 
 /* end fixes */
@@ -22,8 +21,8 @@
 	min-width:61.25em;
 	height:400px;
 	overflow:hidden;
-	z-index:1;
 	background:#222;
+	z-index:1;
 }
 
 img.homepage-large-img {

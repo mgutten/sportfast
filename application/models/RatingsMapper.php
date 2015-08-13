@@ -48,7 +48,6 @@ class Application_Model_RatingsMapper extends Application_Model_MapperAbstract
 	}
 	
 	
-	
 	/**
 	 * get user ratings for use with chart on ratings page
 	 * @params ($interval => # of months back to retrieve information (e.g. get 4 months of data separated by month)
@@ -80,7 +79,9 @@ class Application_Model_RatingsMapper extends Application_Model_MapperAbstract
 		return $ratings;
 		//}
 	}
-	 			   
+	 
+			
+				   
 	
 	
 	/**

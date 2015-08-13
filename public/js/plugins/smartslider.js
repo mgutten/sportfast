@@ -20,8 +20,6 @@
                 callback: null
             }, options);
 			
-			
-			
             return this.each(function() {
                 var mousecaptured = false;
                 var mouseDown = false;
@@ -219,7 +217,6 @@
                     var isForward = isForwardDirection(cursorPosition, previousMousePosition);
 
                     var trackerPosition = getpositionvalue(ltracker.css('left'));
-					
 		
                     if (cursorPosition >= sliderLeft && cursorPosition <= (sliderRight)) {
 

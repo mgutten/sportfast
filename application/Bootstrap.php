@@ -14,7 +14,6 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 	
 	protected function _initSession()
 	{
-		// Allows use of sessions/cookies between subdomains (www and non www)
 		Zend_Session::setOptions(array(
 			'cookie_domain' => '.sportfast.com',
 			'name'          => 'SportfastSession'
@@ -104,16 +103,16 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 			
 			
 			$session = new Zend_Session_Namespace('rating');
-			
-			if (!isset($session->rating) || true == true) {
+			$session->rating = true;
+			if (!isset($session->rating)) {
 				
 				// Only show ratings popups once per session
-				$games = $user->getLastGames();
-				if ($games) {
-					// Game happened in the last week that user played in, make rate 2 users or park and user
-						$this->view->rateGame = $games;
+				$game = $user->getLastGame();
+				if ($game) {
+					if ($game->players->hasValue('users')) {
+						// Game happened in the last week that user played in, make rate 2 users or park and user
+						$this->view->rateGame = $game;
 						
-						/*
 						$sport = new Application_Model_Sport();
 						$sport->sportID = $game->sportID;
 						$sport->sport   = $game->sport;
@@ -125,9 +124,8 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 						$form = new Application_Form_RateGame();
 						$form->sport->setValue($game->sport);
 						$this->view->rateGameForm = $form;
-						*/
 						
-					
+					}
 				}
 			}
 			$session->rating = true;

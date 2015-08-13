@@ -1917,9 +1917,19 @@ class MailController extends Zend_Controller_Action
 		}
 		
 		if (isset($games['teamGames']['twoDays'])) {
+			$usedTeams = array();
 			foreach ($games['teamGames']['twoDays'] as $team) {
 				// Is team game that is happening in 2 days
+				if (isset($usedTeams[$team->teamID])) {
+					continue;
+				}
+				$usedTeams[$team->teamID] = true;
+				$usedEmails = array();
 				foreach ($team->players->getAll() as $user) {
+					if (isset($usedEmails[$user->username])) {
+						continue;
+					}
+					
 					$game = $team->games->_attribs['games'][0];
 					$time = ($game->gameDate->format('i') > 0 ? $game->gameDate->format('g:ia') : $game->gameDate->format('ga'));
 					
@@ -1931,6 +1941,7 @@ class MailController extends Zend_Controller_Action
 					$mail->Password = 'sportfast.9';                           
 					//$mail->SMTPSecure = "ssl";
 					
+					$usedEmails[$user->username] = true;
 					
 					$mail->From = 'support@sportfast.com';
 					$mail->FromName = 'Sportfast';

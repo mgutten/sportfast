@@ -22,7 +22,7 @@ if (!$this->noDefaultHeadTitle) {
 		
 		$this->headLink()->prependStylesheet($this->baseUrl() . '/css/global.css') . PHP_EOL;
 		
-		$version = '1.123'; // VERSION FOR JS AND CSS
+		$version = '1.126'; // VERSION FOR JS AND CSS to force refresh of cache
 		
 		foreach ($this->headLink() as $key => $item) {
 			// Add version number to css
@@ -55,9 +55,16 @@ if (!$this->noDefaultHeadTitle) {
 			$item->attributes['src'] .= '?' . $version;
 		}
 		
-		echo $this->headScript()->prependFile($this->baseUrl() . '/js/jquery-1.9.1.min.js') . PHP_EOL;
-									
+		$this->headScript()->prependFile('//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js') . PHP_EOL;
+		
+		if ($this->user) {		
+			// Is logged in, display mobile scripts/css	if appropriate		
  ?>
+ <link rel='stylesheet' href='<?php echo $this->baseUrl() . '/css/mobile.css';?>' media='screen and (max-device-width:568px)'/>
+ <meta name='viewport'  content="width=device-width, initial-scale=1.0">
+ <?php
+}
+?>
 </head>
 <body onunload=''>
 <?php
@@ -101,5 +108,33 @@ if ($this->topAlert) {
   ga('send', 'pageview');
 
 </script>
+<?php 
+
+echo $this->headScript();
+
+if ($this->user) {
+	// Is logged in, test for mobile and include appropriate scripts
+	echo "<script>
+	(function() {
+		
+		if (isMobile()) {
+
+			var jqueryMobile = document.createElement('script');
+			jqueryMobile.src = '" .  $this->baseUrl() . "/js/plugins/jquerymobile/jquery.mobile.custom.min.js';
+			$('body').append(jqueryMobile);
+			
+			var mobileJs = document.createElement('script');
+			mobileJs.src = '" .  $this->baseUrl() . "/js/mobile.js';
+			$('body').append(mobileJs);
+			
+		}
+	})();
+	</script>";
+}
+/*
+<script src='" .  $this->baseUrl() . "/js/plugins/jquerymobile/jquery.mobile.custom.min.js' media='screen and (max-device-width:568px)'></script>
+	 		<script src='" .  $this->baseUrl() . "/js/mobile.js' media='screen and (max-device-width:568px)'></script>
+	 		*/
+?>
 </body>
 </html>

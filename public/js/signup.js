@@ -11,10 +11,10 @@ var sportFormTimeout;
 var confirmAction;
 var typing;
 var keyPressed;
-var emailRegex = "[a-zA-Z\\-\\s]+(?=(\\,|\\n)+)";
 
 $(function()
 {
+	
 	/* update narrow column name value onkeyup */
 	$('#firstName,#lastName').keyup(function(e)
 	{
@@ -76,7 +76,6 @@ $(function()
 	{
 		clearTimeout(sportFormTimeout);
 		sportFormTimeout = setTimeout(function() {
-			inputEmail();
 			toggleAll();
 		}, 50);
 	})
@@ -483,10 +482,6 @@ $(function()
 			$('#signup-sports-what').removeClass('red')
 		}
 		
-		if (sport == 'other') {
-			$('#profile-invite-emails-outer-container').css('visibility', 'visible');
-		}
-		
 		// Not currently selected
 		removeOld = false;
 		// Make background green
@@ -546,17 +541,8 @@ $(function()
 		// Change hidden input for this sport to active
 		$('#' + sport + 'Active').val(false);
 		
-		if (sport == 'other') {
-			$('#profile-invite-emails-outer-container').css('visibility', 'hidden');
-		}
-		
 		toggleAll();
 		
-	})
-	
-	$('#profile-invite-emails').keyup(function()
-	{
-		toggleAll();
 	})
 	
 	/* select all hours of day on click of day name */
@@ -904,31 +890,24 @@ $(function()
 				if ($(this).is('.selected-green')) {
 					// Sport is selected
 					var sport = $(this).attr('tooltip');
-					if ($('#signup-sports-form-' + sport.toLowerCase()).find('.signup-sports-complete').text().toLowerCase() != 'complete'
-						&& sport.toLowerCase() != 'other') {
+					if ($('#signup-sports-form-' + sport.toLowerCase()).find('.signup-sports-complete').text().toLowerCase() != 'complete') {
 						// Is not fully filled out
 						fail = true;
 						sports += (sports == '' ? sport : '<br>' + sport);
 					}
 				}
 			})
-			
-			var ele = $('.emails');
 						
 			if (fail) {	
-		
 				$('#signup-incomplete-sports').html(sports);	
 				showAlert($('#signup-incomplete-alert-container'));
 				
 				confirmAction = function() {
-						setEmails(ele);
 						$('#signupForm').submit();
 				}
 				
 				return;
 			}
-			
-			setEmails(ele);
 			
 			$('#signupForm').submit();
 		}
@@ -1057,10 +1036,7 @@ function testPicture()
  */
 function testBasic()
 {
-	var fail = submitFormTestSports(false);
-	if (!fail ||
-		(fail && ($('#signup-sport-icon-other').is('.selected-green')
-				  && $('.invite-email').length > 0))) {
+	if (!submitFormTestSports(false)) {
 		// All basic inputs are valid
 		return true;
 	} else {
@@ -1553,13 +1529,13 @@ function updateSportHiddenInputSelectable(sectionEle)
  */
 function updateSkillHiddenInput(sliderEle, value) 
 {
-
+	
 	var sport		   = getSportName(sliderEle);
-	var hiddenEle 	   = $('#' + sport + 'Rating');	
+	var hiddenEle 	   = $('#' + sport + 'Rating');
 	
 	hiddenEle.val(value);
-			
-	populateSliderText(sliderEle, value);
+		
+	populateSliderText (sliderEle, value);
 }
 
 
