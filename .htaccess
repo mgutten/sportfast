@@ -1,12 +1,13 @@
-
 RewriteEngine on
+
+SetEnvIf Host local.sportfast.com APPLICATION_ENV=development
 
 RewriteCond %{HTTP_HOST} ^sporfast\.com$ [OR]
 RewriteCond %{HTTP_HOST} ^www\.sporfast\.com$
 RewriteRule ^(.*)$ "http\:\/\/sportfast\.com\/$1" [R=301,L]
 
-# Use PHP5.4 Single php.ini as default
-AddHandler application/x-httpd-php54s .php
+# Use PHP5.4 Single php.ini as default (switch to php5.4 on server)
+#AddHandler application/x-httpd-php54s .php
 RewriteCond %{REQUEST_FILENAME} -s [OR]
 RewriteCond %{REQUEST_FILENAME} -l [OR]
 RewriteCond %{REQUEST_FILENAME} -d
