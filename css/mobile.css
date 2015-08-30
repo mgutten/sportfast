@@ -1,0 +1,219 @@
+/* CSS included for smart phones */
+
+.mobile {
+	display: block;
+}
+
+#body-white-back {
+	margin-top: 25px;
+	margin-left: 0;
+	width: 94%;
+	padding-left: 3%;
+	padding-right: 3%;
+}
+
+.centered-body.body-wrapper {
+	margin-bottom: 0;
+}
+
+/* hide global elements */
+
+#feedback,
+.footer,
+.push,
+.header-nav-container-short,
+.header-nav-container-location,
+.body-column-narrow {
+	display:none;
+}
+
+.body-column-wide {
+	width: 100%;
+}
+
+.centered-body {
+	width: 100%;
+}
+
+#header-bar-location {
+	display: none;
+}
+
+div#header-bar-short {
+	height: 35px;
+	position: fixed;
+}
+
+.container {
+	overflow: hidden;
+}
+
+/* navigation */
+
+nav.mobile {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 35px;
+	z-index: 10;
+	
+}
+
+.header-bar {
+	border-bottom:solid 2px white;
+}
+
+.logo {
+	float:left;
+	margin-left: 2px;
+}
+
+.notification,
+.dropdown {
+	cursor: pointer;
+	float:right;
+	margin-right: 7px;
+	margin-top: 1px;
+	width: 30px;
+	height: 30px;
+	background-image: url(/images/mobile/nav/notification_sprite.png);
+	background-position: 0 0;
+	margin-bottom: 4px;
+	position:relative;
+	z-index: 11;
+}
+
+.dropdown {
+	float:left;
+	margin-left: 10px;
+	margin-top: 0;
+	background-image: url(/images/mobile/nav/dropdown_sprite.png);
+}
+
+.notification.selected,
+.dropdown.selected {
+	background-position: 0 -29px;
+	
+}
+
+#dropdown-container {
+	width: 240px;
+	display:none;
+}
+
+#dropdown-container ul {
+	padding-left: 0;
+	background:#e9e9e9;
+	outline: solid 1px #222;
+}
+
+#dropdown-container ul img {
+	width: 26px;
+}
+
+#dropdown-container ul .name {
+	margin-top: 2px;
+}
+
+#dropdown-container ul a {
+	width: 92%;
+	padding: 8px 0 8px 8%;
+	border-bottom: 1px solid #ccc;
+	border-top: 1px solid #f9f9f9;
+	float:left;
+	clear:both;
+}
+
+#dropdown-container ul a:first-child {
+	border-top: none;
+}
+
+.nav-notification-indicator-container {
+	margin: 2px 0 0 15px;
+}
+
+#notifications-container {
+	left: auto;
+	right: 0;
+	top: 35px;
+	width: 88%;
+	position: fixed;
+}
+
+.notification-picture-sports {
+	margin-left: 3.4%;
+	margin-right: 3.4%;
+}
+
+.notification-text {
+	margin-left: 3%;
+	word-wrap: break-word;
+}
+
+.notification-remove {
+	padding: 0 .5%;
+}
+
+.notification-button-container {
+	margin-top: .2em;
+	width: 72%;
+}
+
+.notification-join {
+	margin-left: 14%;
+}
+
+.newsfeed-notification-time {
+	width: 17%;
+	text-align:center;
+}
+
+.alert-container {
+	margin-left: 0 !important;
+	left: 1% !important;
+}
+
+
+@media screen and (min-width:321px)  {
+	/* landscape */
+	.jumbo-text,
+	.user-name,
+	.profile-name {
+		font-size: 2.3em;
+	}
+	
+	.largest-text {
+		font-size: 1.6em;
+	}
+	
+	#notifications-container {
+		max-height: 225px;
+	}
+
+	#logo-container {
+		width: 76.5%;
+	}
+}
+
+@media screen and (max-width:320px)  {
+	/* portrait */
+	.jumbo-text,
+	.user-name,
+	.profile-name {
+		font-size: 2em;
+	}
+	
+	.largest-text {
+		font-size: 1.5em;
+	}
+	
+	#notifications-container {
+		max-height: 332px;
+	}
+
+	#logo-container {
+		width: 71%;
+	}
+	
+}

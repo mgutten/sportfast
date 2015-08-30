@@ -1,0 +1,66 @@
+/* CSS Document */
+
+#profile-invite-emails {
+	width: 98%;
+	resize:none;
+	box-shadow:none;
+	outline:none;
+	border:none;
+	float:left;
+	clear:none;
+	height: 2em;
+}
+
+
+
+#profile-invite-emails-outer-container {
+	width: 100%;
+	border: 1px solid #e9e9e9;
+}
+
+#profile-invite-emails-container {
+	height: 1.5em;
+	margin:.2em 0;
+}
+
+.invite-email-container {
+	padding: 3px 0;
+}
+
+
+.invite-email-container:first-child {
+	padding-top: 0;
+}
+
+.invite-email,
+.invite-email-x {
+	padding: 3px 6px;
+}
+
+.invite-email-x {
+	padding-right: 7px;
+	padding-left: 7px;
+}
+
+.invite-email-x:hover {
+	background: #e0e0e0;
+}
+
+#profile-invite-parsedEmails {
+	max-height: 11.3em;
+	overflow-y: auto;
+}
+
+#profile-invite-emails-container > .input-overlay {
+	margin-top: -.9em;
+	
+}
+
+#input-overlay-emailsTextArea > span {
+	color: #a9a9a9;
+}
+
+#invite-numEmails-container {
+	filter: alpha(opacity = 0);
+	opacity: 0;
+}

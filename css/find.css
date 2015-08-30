@@ -1,0 +1,256 @@
+/* find.css */
+
+/* header section */
+#find-looking-container {
+	padding: .5em .3em .3em .75em;
+}
+
+#looking-for {
+	width: 5.5em;
+}
+
+#dropdown-menu-looking-for {
+	min-width: 5.5em;
+}
+
+#find-order-by {
+	font-size: .85em;
+	margin: 1.1em 0 0 1em;
+}
+
+#find-order-by > p.selectable-text {
+	font-size: 1em;
+	margin: 0 0 0 .8em;
+}
+
+#find-order-by > p.selectable-text.green-bold {
+	font-family: "Futura-Book", Arial;
+}
+
+.header-section-title-container {
+	margin-top: 0;
+}
+
+/* map */
+#gmap {
+	width: 99%;
+	height: 180px;
+	float:left;
+}
+
+a.find-result-container.light-back {
+	background: #e9e9e9;
+}
+
+/* narrow column */
+.find-type-container {
+	width: 40%;
+	margin-left: 5%;
+}
+
+.selectable-text {
+	font-size: .9em;
+	margin: 0;
+	padding: .1em 0 .1em 0;
+	width: 5.5em;
+}
+
+.narrow-sport.right {
+	float:right;
+}
+
+.narrow-sport.clear {
+	margin-left: .4em;
+}
+
+#otherSport-container {
+	display:none;
+}
+
+#slider-container-skill {
+	float:left;
+	margin-top: .5em;
+	width: 12em;
+}
+
+#skillMin-container,
+#skillMax-container,
+#ageMin-container,
+#ageMax-container {
+	font-size: .8em;
+	width: 3em;
+	margin-left: 4em;
+	clear:both;
+}
+
+#skillMax-container,
+#ageMax-container {
+	margin-left: 0em;
+	clear:none;
+}
+
+.skill-separator {
+	font-size: 1.2em;
+	margin: .3em .4em 0 .3em;
+}
+
+.checkbox-container {
+	clear:both;
+	margin-top: .5em;
+}
+
+#skillMin-container > input,
+#skillMax-container > input,
+#ageMin-container > input,
+#ageMax-container > input {
+	width: 2.3em;
+	text-align: center;
+	padding-left: 0;
+}
+
+#checkbox-container-skillAny,
+#checkbox-container-ageAny,
+#checkbox-container-skillSpecific,
+#checkbox-container-timeUser,
+#checkbox-container-timeAny,
+#checkbox-container-ageSpecific {
+	margin-top: .5em;
+	clear:both;
+}
+
+
+
+/* results */
+.find-results-outer-container {
+	overflow:hidden;
+	height: 45em;
+	margin-top: .5em;
+	margin-bottom: .5em;
+}
+
+.find-results-inner-container {
+	height: 45em;
+}
+
+#find-order-by > .selectable-text {
+	width: auto;
+}
+
+.find-result-players-container {
+	margin-right: .5em;
+}
+
+.find-players {
+	margin-top: -.3em;
+}
+
+#pagination-last {
+	margin-left: .4em;
+}
+
+#loading {
+	position:absolute;
+	left: 38%;
+	top: 40%;
+}
+
+
+.find-join {
+	margin: 1em .8em 0 0;
+}
+
+
+/* paginations (bars) */
+.find-results-pagination-container {
+	height: 24px;
+}
+.find-pagination-firstLast {
+	width: 10%;
+	background:#fff;
+}
+
+.find-pagination-prev,.find-pagination-next {
+	width: 80%;
+	background:#fff;
+}
+
+.pagination-img {
+	padding-top: .4em;
+	padding-bottom: .3em;
+	margin: 0 auto;
+	display:block;
+}
+
+/* find players */
+
+.find-player-right-container {
+	width: 8em;
+}
+
+.find-player-overall {
+	padding: .05em 0;
+	margin-top: 0em;
+	width: 2.5em;
+	margin-left: auto;
+	margin-right:auto;
+	float:none;
+	display:block;
+}
+
+.find-player-lower {
+	width: 32.1%;
+	margin-top: 2px;
+	margin-right: 2px;
+	padding: .3em 0;
+}
+
+.find-player-lower:last-child {
+	margin-right: 0;
+}
+
+.find-looking-for {
+	margin: 1em 0 0 0;
+}
+
+.sport-holder {
+	height: .9em;
+}
+
+/* find parks */
+
+.find-park-right-container {
+	width: 6em;
+}
+
+.find-park-distance {
+	letter-spacing: -2px;
+}
+
+.find-stash {
+	margin-top: .2em;
+}
+
+.find-result-parks > .find-result-left-container {
+	width: 60%;
+}
+
+/* search terms */
+#headerSearchMain > .input-container {
+	margin-top: -.2em;
+}
+
+#headerSearchMain > .input-container > #headerSearchBar {
+	background:#fff;
+	border: solid 1px #e9e9e9;
+	width: 18em;
+}
+
+#headerSearchMain > #search {
+	margin-top: 0;
+	margin-right: .3em;
+}
+
+.find-search-result {
+	width: 98%;
+}
+

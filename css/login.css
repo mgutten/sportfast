@@ -1,0 +1,88 @@
+/* login.css */
+#login-form-back {
+	float:left;
+	clear:both;
+}
+
+#login-form-container {
+	margin:18em auto 0 auto;
+	width:25em;
+}
+
+
+#username-main,#password-main {
+	width:15em;
+	
+}
+
+#username-main-container,#password-main-container {
+	font-size:1.3em;
+}
+
+#login-header {
+	float:left;
+	font-size:1.4em;
+	width:auto;
+	margin:1em 0 0 0;
+}
+
+#login-header-img {
+	float:left;
+	width:50px;
+	height:50px;
+	margin: 0 0 0 .5em;
+}
+
+#loginFormMain > .dropdown-checkbox-forgot-container {
+	margin: 1em 0 0 2em;
+}
+
+#password-main-errors {
+	float:left;
+	clear:both;
+	margin-left: 1.8em;
+	width:85%;
+}
+
+input.dropdown-login-submit {
+	margin: .5em 1.15em 0 0;
+}
+
+#loginFormMain > #login {
+	font-size: 1.2em;
+}
+
+
+/* forgot password */
+#login-forgot-back {
+	width: 20em;
+}
+
+#email-container {
+	font-size: 1.1em;
+}
+
+#email {
+	width: 16em;
+}
+
+#valid, #invalid {
+	margin: .75em 0 0 .2em;
+}
+
+#submit {
+	float:right;
+	margin-top: .5em;
+}
+
+#forgot-alert-container,
+#already-alert-container {
+	margin-top: -10em;
+	margin-left: -17em;
+	width: 34em;
+}
+
+#already-alert-container {
+	margin-top: -5em;
+}
+	

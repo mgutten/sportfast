@@ -1,0 +1,43 @@
+/* CSS Document */
+.faq-answer,.faq-question {
+	width: 98%;
+	padding: .1em 1%;
+	position: relative;
+	z-index: 2;
+}
+
+.faq-answer {
+	z-index: 1;
+	width: 96%;
+	padding: .1em 2% .6em 2%;
+}
+
+.faq-answer-container {
+	overflow:hidden;
+}
+
+#faq-contact {
+	margin-left: 1.9em;
+}
+
+/* pickup and league pages */
+.pickup-left {
+	width: 9em;
+	margin-left: 5em;
+}
+.pickup-right {
+	margin-left: 2em;
+}
+
+#pickup-notes {
+	margin-left: 4em;
+}
+
+/* about us */
+.about-team-member {
+	margin:1em 0 .5em 0;
+}
+
+.about-team-position {
+	margin-top: .2em;
+}

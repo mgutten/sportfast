@@ -1,0 +1,735 @@
+/* signup.css */
+
+/* overwrite */
+#profile-invite-emails-container {
+	height: 1.2em;
+}
+
+#profile-invite-emails-outer-container {
+	width: 25%;
+	float: right;
+	margin: .5em 7em 0 0;
+	visibility:hidden;
+}
+
+/* signup section overlay */
+
+.signup-section-container {
+	float:left;
+	clear:both;
+	width:100%;
+	margin-top: 3em;
+}
+
+#signup-section-container1 {
+	margin-top: 2em;
+}
+
+#signup-section-container1 > .input-container > input {
+	width: 11.5em;
+}
+
+#signup-section-container1 > .input-container > input#email {
+	width: 24.7em;
+}
+
+#signup-section-container3 {
+	margin-top: 1em;
+}
+
+.header-section-title-container {
+	height: 49px;
+	margin-bottom: 1em;
+}
+
+#signup-required {
+	margin-top: .75em;
+}
+
+.signup-step-revise {
+	float:left;
+	clear:both;
+	margin-bottom: -.1em;
+}
+
+.signup-section-steps {
+	float:right;
+	font-size:1.2em;
+	margin-top:.3em;
+}
+
+.signup-step {
+	float:left;
+	clear:none;
+	font-size: .8em;
+	margin: .25em .2em 0 .2em;
+	font-family: Arial, Helvetica, sans-serif;
+	
+}
+
+.signup-step-bold {
+	float:left;
+}
+
+#checkbox-container-noAddress {
+	font-size: .9em;
+	margin: .2em 0 0 1.9em;
+}
+
+#noAddress-text {
+	position:absolute;
+	z-index: 10;
+	display:none;
+}
+
+#signup-account-address-warning {
+	margin: -2.5em 0 .5em 1.5em;
+	opacity: 0;
+	filter: alpha(opacity = 0);
+}
+
+/* end signup section overlay */
+
+
+/* custom input styling */	
+
+.input-container {
+	margin-left: 1em;
+	margin-top: 0em;
+	font-size: 1.06em;
+	padding-right: .1em;
+}
+
+
+.input-container#username-container, 
+.input-container#password-container {
+	font-size: .85em;
+	margin: .5em 0;
+	padding: 0 1em;
+}
+
+input.short-input {
+	width: 2em;
+}
+
+#heightFeet-container {
+	clear: both;
+}
+
+#heightInches-container {
+	margin-left: .55em;
+}
+
+#dobMonth-container {
+	clear:both;
+}
+
+.signup-profile-desc {
+	margin-left: 1.4em;
+}
+
+#sexDropdown {
+	width:5.7em;
+	font-size:1.06em;
+	margin-left: 1em;
+	margin-bottom: .7em;
+	margin-top: .8em;
+}
+
+#sexDropdown > .dropdown-menu-selected {
+	padding-top: .35em;
+	padding-bottom: .2em;
+}
+
+.signup-sex-img {
+	float:left;
+	width:30px;
+	height:30px;
+	margin: 0em 0 0 .2em;
+	background:url('/images/signup/sex/male_sprite.png');
+	overflow:hidden;
+}
+
+#signup-sex-female {
+	background:url('/images/signup/sex/female_sprite.png');
+}
+
+#signup-sex-female.signup-sex-selected {
+	background-position: 0px -30px;
+}
+
+#signup-sex-male.signup-sex-selected {
+	background-position: 0px -29px;
+}
+	
+
+#signup-sex-female:hover {
+	background-position: 0px -30px;
+}
+
+.signup-sex-img:hover {
+	background-position: 0px -29px;
+}
+
+.signup-sex-img#signup-sex-male {
+	margin-left: .1em;
+	clear:both;
+}
+
+#signup-sex-container {
+	margin: 0em 0 0 1.2em;
+	float:left;
+	text-align:center;
+	border-radius: 5px;
+	-moz-border-radius: 5px;
+	border:1px solid #E0E0E0;
+	padding: .1em .1em;
+}
+
+#signup-sex-container > p {
+	float:left;
+	font-size:.8em;
+}
+	
+/*
+#signup-sex-container.signup-sex-container-fail {
+	background: #BF0404;
+}
+*/
+.signup-clear-large {
+	height: 3em;
+	width: 100%;
+}
+
+#age-container {
+	clear:both;
+}
+
+#age-indicator {
+	margin-top: .3em;
+}
+
+#ageDropdown {
+	clear:both;
+	margin-left:1em;
+	font-size:1.06em;
+	width:7em;
+}
+
+#ageDropdown > .dropdown-menu-selected {
+	padding: .3em;
+}
+
+.signup-dob-slash {
+	float:left;
+	margin: .4em 0 0 .2em;
+}
+
+.signup-dimension-indicator {
+	opacity: 0;
+	filter: alpha(opacity = 0);
+	margin-top: -.2em;
+}
+
+#weight-indicator {
+	margin-top: .4em;
+}
+
+
+#dobDay-container, #dobYear-container {
+	margin-left:.2em;
+}
+
+.signup-question-mark {
+	float:left;
+	margin: 1em 0 0 .2em;
+	font-size: .9em;
+}
+
+input.input-success, div.input-success {
+	background: #E6FFE6;
+	border: 1px solid #58bf12;
+}
+
+/* on global.css 
+input.input-fail, div.input-fail {
+	background: #EDA9A9;
+	border: 1px solid #C60000;
+}*/
+
+#signup-password-reqs {
+	float:left;
+	font-size:.9em;
+	margin:0em 0 0 .5em;
+}
+
+#signup-password-reqs > ul {
+	padding-left:1em;
+}
+
+#zipcode-container {
+	width: 11em;
+}
+
+#streetAddress-container {
+	width: 63.5%;
+}
+
+#streetAddress {
+	width: 98%;
+}
+
+#zipcode {
+	width: 95%;
+}
+
+#signup-account-zipcode-city {
+	float:left;
+	clear:both;
+	margin: -1.2em 0em 0 76%;
+}
+
+ul.green {
+	float:left;
+	clear:both;
+	margin: 0 0 0 1em;
+	font-size:.9em;
+}
+
+/* end custom styling of inputs */
+
+/* narrow column */
+
+.narrow-column-picture {
+	border:none;
+	width: auto;
+	height: auto;
+}
+
+#signup-checklist {
+	padding-left:.1em;
+}
+
+#signup-checklist > li {
+	margin-top: 7px;
+	line-height: 1em;
+	list-style-type: none;
+}
+
+div.signup-narrow-column-img-container {
+	margin: 0;
+}
+
+.narrow-column-value {
+	float:left;
+	clear:both;
+}
+
+.narrow-column-fade {
+	display:none;
+}
+
+#account-first-name {
+	margin-right: .25em;
+}
+
+
+/* end narrow column */
+
+
+/* sports section */
+
+#signup-sports-container {
+	overflow: hidden;
+	position:relative;
+}
+
+.signup-sports-complete {
+	margin-right: .5em;
+	margin-top: -1em;
+}
+
+#signup-sports-what {
+	float:left;
+	clear:both;
+	font-size: 1.6em;
+	margin: 0 0 .5em 0;
+	width:100%;
+}
+
+.signup-sport-icon-container {
+	float:left;
+	margin-top: -.5em;
+}
+
+.signup-sport-icon,.signup-sport-icon-narrow-column {
+	float:left;
+	clear:both;
+	margin: 0 0 0 1em;
+	background: #8d8d8d;
+}
+
+.signup-sport-icon:hover {
+	background: #666;
+}
+
+.signup-sport-icon.selected-green {
+	background: #58bf12;
+}
+
+.signup-sport-icon-narrow-column{
+	clear:none;
+	margin-left: .4em;
+	display:none;
+	
+}
+
+#signup-sports-icons-container {
+	margin: 0 auto;
+	width: 29em;
+
+}
+
+.signup-sports-form {
+	width: 96%;
+	float:left;
+	clear:both;
+	/*border: 1px solid #E0E0E0;*/
+	display:none;
+	padding: 1.5em .5em;
+	
+}
+
+.signup-sports-hidden {
+	margin-top: .5em;
+	position:relative;
+	z-index: 1;
+}
+
+.signup-sports-form-section {
+	float:left;
+	clear:both;
+	padding: .2em 0em .4em .7em;
+	width: 98%;
+	border-bottom: 1px solid #e0e0e0;
+}
+
+.signup-sports-form-section-title {
+	float:left;
+	margin-bottom: .4em;
+}
+
+.signup-sports-form-section-title-description {
+	opacity: 0;
+	filter: alpha(opacity = 0);
+}
+
+.signup-skill-slider {
+
+	width:40em;
+	height: 1em;
+	margin: .3em 0 0em 0;
+}
+
+.signup-slider-value {
+	width:7.5em;
+}
+
+.signup-sports-selectable {
+	/*font-size: 1.3em;*/
+	float:left;
+	margin: 0em 1.2em 0 0;
+	padding: .2em .4em;
+}
+
+.signup-sports-selectable:hover {
+	background:#e3e3e3;
+}
+
+.signup-sports-selectable.green-bold {
+	font-family: 'Futura-Book';
+	color: #fff;
+	background: #58bf12;
+}
+
+.signup-sports-skill > .selectable-text {
+	margin-right: 1em;
+}
+
+.signup-sports-title {
+	font-size: 1.8em;
+	width: 10em;
+	padding: .2em 0 .3em 0;
+	margin-bottom:-10px;
+}
+
+.signup-sports-remove {
+	float:right;
+	position:relative;
+	z-index:2;
+	margin: 0 0 -.1em 0;
+	padding: .1em .27em 0em .3em;
+	background:#BF0000;
+	-moz-border-radius: 3px;
+	font-size:.8em;
+	border-radius: 3px;
+	opacity: 0;
+	filter: alpha(opacity = 0);
+}
+
+.signup-sports-availability {
+	/*border-bottom: none;*/
+}
+
+.signup-sports-ratings {
+	border-bottom:none;
+}
+
+.signup-sports-availability-copy-container {
+	float:right;
+}
+
+.signup-sports-availability-copy-container > p,.signup-sports-availability-copy-option-container  {
+	margin: .15em 0 0 .5em;
+	float:left;
+}
+
+.availabilty-calendar-container {
+	margin-top: .3em;
+}
+
+/* upload pic alert */
+
+#signup-import-alert-container {
+	width: 44em;
+	height: 26em;
+	margin: -13em 0 0 -22em;
+	position: fixed;
+}
+
+.signup-import-alert-img {
+	float:left;
+	width: 450px;
+	height: 360px;
+}
+
+#signup-import-alert-img-holder {
+	display:none;
+}
+
+.signup-import-alert-text-container {
+	float:right;
+	width: 33.3%;
+}
+
+#signup-import-alert-button {
+	float:left;
+	clear:both;
+	margin: 4em 0 0 3em;
+	width: 7em;
+	padding-bottom: 0;
+	padding-top: .1em;
+}
+
+#signup-import-alert-guidelines {
+	float:left;
+	clear:both;
+	margin: 0 0 0 3em;
+	padding:0;
+	font-size: .9em;
+}
+
+#signup-import-alert-guidelines-header {
+	float:left;
+	margin: 2em 0 0 1em;
+}
+
+.signup-alert-rotate {
+	margin: 0 2em 0 2em;
+}
+
+#signup-alert-rotate-container {
+	height: 40px;
+	margin-top: 1em;
+}
+
+
+#signup-import-alert-accept {
+	margin: 0em 1.2em 0 0;	
+}
+
+#signup-import-alert-cancel {
+	margin-top: .8em;
+}
+
+#signup-import-alert-accept-container {
+	margin-top: 2.4em;
+}
+
+#signup-import-loading {
+	position:absolute;
+	top:45%;
+	left:22%;
+	width:150px;
+	height:15px;
+	border:1px solid #bbb;
+	display:none;
+	z-index:999;
+}
+
+#loading-bar {
+	background:#8d8d8d;
+	height:15px;
+	width:0;
+}
+
+
+
+/* end upload pic alert */
+
+/* import section */
+
+#signup-why-profile {
+	margin-left: 1em;
+	margin-bottom: .4em;
+}
+
+.signup-import-main-img-container,
+.signup-import-main-img-container-medium {
+	float:left;
+	clear:both;
+	overflow:hidden;
+	width: 199px;
+	height: 160px;
+	border: 1px solid #444;
+	margin-left: 10em;
+	position:relative;
+}
+
+.why-profile {
+	margin-left: 13.7em;
+	margin-bottom: .3em;
+}
+
+.signup-import-main-img-container-medium {
+	width: 119px;
+	height: 96px;
+	margin-left: 1.1em;
+}
+
+.signup-import-main-img {
+	float:left;
+	clear:both;
+	margin: 0 0 0 0;
+}
+
+#signup-import-upload-overlay {
+	position:absolute;
+	top: 50%;
+	left: 0;
+	padding: .2em 0;
+	margin-top: -.7em;
+}
+
+.signup-import-main-current-text {
+	float:left;
+	margin-left: 1.5em;
+	width: 100%;
+}
+
+.signup-import-main-text-container {
+	float:left;
+	margin: 0 0 0 2em;
+	width: 72%;
+}
+
+#signup-import-main-upload-button-container {
+	float:left;
+	clear:both;
+	width: 100%;
+	height: 2.7em;
+}
+
+#signup-import-main-upload-button {
+	float: none;
+	margin: .75em auto;
+	width: 8em;
+}
+
+/* end signup import */
+
+/* signup agree section */
+.signup-agree-pledges-container {
+	float:left;
+	clear:both;
+	width: 90%;
+	margin: 1em 0 0 10%;
+}
+
+.signup-agree-pledge-container {
+	float:left;
+	clear:both;
+	width: 100%;
+	margin-top: 1em;
+}
+
+.signup-agree-pledge-short {
+	float:left;
+	font-size: 1.5em;
+}
+
+.signup-agree-pledge-description {
+	float:left;
+	clear:none;
+	width: auto;
+	margin: .5em 0 0 .5em;
+}
+
+#checkbox-container-agree {
+	margin: 4em 0 0 1.5em;
+}
+
+#checkbox-text-agree {
+	margin-top: -.15em;
+}
+
+/* type */
+.signup-type-prefix-container > .selectable-text:nth-child(even) {
+	margin-left: 4.6em;
+}
+
+/* finish button */
+
+#signup-finish {
+	float:left;
+	clear:both;
+	width: 93%;
+	font-size: 2em;
+	margin-top: 1em;
+}
+
+/* verification page */
+#signup-validate-container {
+	position:absolute;
+	top: 50%;
+	margin-top: -7em;
+	width: 40em;
+	left: 50%;
+	margin-left: -20em;
+}
+
+/* incomplete alert */
+#signup-incomplete-alert-container {
+	width:32em;
+	margin-left: -16em;
+	margin-top: -5em;
+	position:fixed;
+}
+
+#signup-incomplete-alert-container > .alert-body-container > .clear.button {
+	margin-left: 11.2em;
+}
+
+#signup-incomplete-alert-container > .alert-body-container > .left.button {
+	margin-left: 2em;
+}
