@@ -27,12 +27,6 @@ class MailController extends Zend_Controller_Action
 		}
   }
 
-  public function openAction() {
-    $request = $this->getRequest();
-    $user_id = $request->getParam('user_id');
-    echo $user_id;
-  }
-
 	/**
 	 * message all players of team/game
 	 */
