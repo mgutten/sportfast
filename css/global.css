@@ -2727,3 +2727,9 @@ input[type=text].selectable-input {
 .overlay-pic-large {
 	height: 160px;
 }
+
+/* Ads */
+.footer .ads .ad-center.leaderboard {
+	width: 768px;
+	margin: 0 auto 5px auto;
+}
