@@ -405,7 +405,7 @@ class MailController extends Zend_Controller_Action
 			$headers .= "Reply-To: donotreply@sportfast.com" . "\r\n";
 
 
-			mail('guttenberg.m@gmail.com', $subject, $message, $headers);
+			// mail('guttenberg.m@gmail.com', $subject, $message, $headers);
 		}
 	}
 
@@ -1912,7 +1912,7 @@ class MailController extends Zend_Controller_Action
 			$headers .= "From: support@sportfast.com\r\n";
 			$headers .= "Reply-To: donotreply@sportfast.com\r\n";
 
-			mail('guttenberg.m@gmail.com', $subject, $adminMessage, $headers);
+			// mail('guttenberg.m@gmail.com', $subject, $adminMessage, $headers);
 		}
 
 		if (isset($games['teamGames']['twoDays'])) {
@@ -1977,7 +1977,7 @@ class MailController extends Zend_Controller_Action
 				$headers .= "From: support@sportfast.com\r\n";
 				$headers .= "Reply-To: donotreply@sportfast.com\r\n";
 
-				mail('guttenberg.m@gmail.com', $subject, $message, $headers);
+				// mail('guttenberg.m@gmail.com', $subject, $message, $headers);
 			}
 		}
 
@@ -2033,7 +2033,7 @@ class MailController extends Zend_Controller_Action
 				$headers .= "From: support@sportfast.com\r\n";
 				$headers .= "Reply-To: donotreply@sportfast.com\r\n";
 
-				mail('guttenberg.m@gmail.com', $subject, $message, $headers);
+				// mail('guttenberg.m@gmail.com', $subject, $message, $headers);
 			}
 		}
 
@@ -2390,7 +2390,7 @@ class MailController extends Zend_Controller_Action
 		$headers .= "From: support@sportfast.com\r\n";
 		$headers .= "Reply-To: donotreply@sportfast.com\r\n";
 
-		mail('guttenberg.m@gmail.com', 'ADMIN: Remind Verification', $usernames, $headers);
+		// mail('guttenberg.m@gmail.com', 'ADMIN: Remind Verification', $usernames, $headers);
 	}
 
 	public function buildRemindVerifyMessage($user)
@@ -2804,7 +2804,7 @@ class MailController extends Zend_Controller_Action
 				*/
 			}
 			// Temp email admin to notify when game is created
-			mail('guttenberg.m@gmail.com', 'ADMIN: ' . $subject, $this->buildGameCreatedMessage($game, $user->userID), $headers);
+			// mail('guttenberg.m@gmail.com', 'ADMIN: ' . $subject, $this->buildGameCreatedMessage($game, $user->userID), $headers);
 		}
 	}
 
@@ -3061,7 +3061,7 @@ class MailController extends Zend_Controller_Action
 
 				$this->mailCancelGame($user->username, $game);
 			}
-			mail('guttenberg.m@gmail.com', 'ADMIN: Game Canceled', $game->sport);
+			// mail('guttenberg.m@gmail.com', 'ADMIN: Game Canceled', $game->sport);
 		}
 
 		// Email game on users
@@ -3085,7 +3085,7 @@ class MailController extends Zend_Controller_Action
 				$emailedUsers[] = $user->fullName;
 			}
 
-			mail('guttenberg.m@gmail.com', 'ADMIN: Game on', $game->sport . implode('\n',$emailedUsers));
+			// mail('guttenberg.m@gmail.com', 'ADMIN: Game on', $game->sport . implode('\n',$emailedUsers));
 		}
 	}
 
