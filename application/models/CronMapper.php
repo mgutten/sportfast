@@ -45,7 +45,7 @@ class Application_Model_CronMapper extends Application_Model_MapperAbstract
 										g.minPlayers, g.canceled, g.cancelReason, g.remove, g.sportfastCreated, COUNT(ug.userID), (NOW() + INTERVAL " . $this->getTimeOffset() . " HOUR)
 									FROM games g 
 									LEFT JOIN user_games ug ON (ug.gameID = g.gameID AND ug.confirmed = '1')
-									WHERE g.date < (NOW() + INTERVAL " . $this->getTimeOffset() . " HOUR - INTERVAL 90 MINUTE) 
+									WHERE g.date < (NOW() + INTERVAL " . $this->getTimeOffset() . " HOUR - INTERVAL 270 MINUTE) 
 									AND g.gameID != (SELECT MAX(gameID) FROM games)
 									AND g.parkID != 0
 									AND g.sportID != 0
@@ -116,7 +116,7 @@ class Application_Model_CronMapper extends Application_Model_MapperAbstract
 		$updateGames = "UPDATE games SET date = DATE_ADD(date,INTERVAL 1 WEEK),
 										 canceled = 0,
 										 cancelReason = '' 
-							WHERE date < (NOW() + INTERVAL " . $this->getTimeOffset() . " HOUR - INTERVAL 90 MINUTE)
+							WHERE date < (NOW() + INTERVAL " . $this->getTimeOffset() . " HOUR - INTERVAL 270 MINUTE)
 								AND recurring = 1
 								AND (remove IS NULL OR
 									 remove = '0000-00-00')";
