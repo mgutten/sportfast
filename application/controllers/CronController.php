@@ -149,13 +149,13 @@ class CronController extends Zend_Controller_Action
 	{
 		$mapper = $this->getMapper();
 		
-		
+		// BUG: Games were being marked as "remove" in the getInactiveGames function
 		//$inactiveUsers = $mapper->getInactiveUsers();
-		$inactiveTeams = $mapper->getInactiveTeams();
-		$inactiveGames = $mapper->getInactiveGames();
+		// $inactiveTeams = $mapper->getInactiveTeams();
+		// $inactiveGames = $mapper->getInactiveGames();
 		
-		return $this->_forward('warn-inactive', 'mail', null, array('inactiveTeams' => $inactiveTeams,
-																	'inactiveGames'	=> $inactiveGames));
+		// return $this->_forward('warn-inactive', 'mail', null, array('inactiveTeams' => $inactiveTeams,
+		// 															'inactiveGames'	=> $inactiveGames));
 		//$mapper->removeInactiveTeams();
 	}
 	
