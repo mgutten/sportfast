@@ -80,7 +80,7 @@ class MailController extends Zend_Controller_Action
 			$mail->Host = 'box774.bluehost.com';
 			$mail->SMTPAuth = true;
 			$mail->Username = 'support@sportfast.com';
-			$mail->Password = 'Sportfast.9!';
+			$mail->Password = 'S4@rqTJa][';
 			//$mail->SMTPSecure = "ssl";
 
 
@@ -202,7 +202,7 @@ class MailController extends Zend_Controller_Action
 			$mail->Host = 'box774.bluehost.com';
 			$mail->SMTPAuth = true;
 			$mail->Username = 'support@sportfast.com';
-			$mail->Password = 'Sportfast.9!';
+			$mail->Password = 'S4@rqTJa][';
 			//$mail->SMTPSecure = "ssl";
 
 
@@ -321,7 +321,7 @@ class MailController extends Zend_Controller_Action
 				$mail->Host = 'box774.bluehost.com';  				  // Specify main and backup server
 				$mail->SMTPAuth = true;                               // Enable SMTP authentication
 				$mail->Username = 'support@sportfast.com';            // SMTP username
-				$mail->Password = 'Sportfast.9!';                      // SMTP password
+				$mail->Password = 'S4@rqTJa][';                      // SMTP password
 				//$mail->SMTPSecure = "ssl";
 
 
@@ -370,7 +370,7 @@ class MailController extends Zend_Controller_Action
 				$mail->Host = 'box774.bluehost.com';  				  // Specify main and backup server
 				$mail->SMTPAuth = true;                               // Enable SMTP authentication
 				$mail->Username = 'support@sportfast.com';            // SMTP username
-				$mail->Password = 'Sportfast.9!';                      // SMTP password
+				$mail->Password = 'S4@rqTJa][';                      // SMTP password
 				//$mail->SMTPSecure = "ssl";
 
 
@@ -665,7 +665,7 @@ class MailController extends Zend_Controller_Action
 			$mail->Host = 'box774.bluehost.com';
 			$mail->SMTPAuth = true;
 			$mail->Username = 'support@sportfast.com';
-			$mail->Password = 'Sportfast.9!';
+			$mail->Password = 'S4@rqTJa][';
 			//$mail->SMTPSecure = "ssl";
 
 
@@ -711,7 +711,7 @@ class MailController extends Zend_Controller_Action
 			$mail->Host = 'box774.bluehost.com';  				  // Specify main and backup server
 			$mail->SMTPAuth = true;                               // Enable SMTP authentication
 			$mail->Username = 'support@sportfast.com';            // SMTP username
-			$mail->Password = 'Sportfast.9!';                      // SMTP password
+			$mail->Password = 'S4@rqTJa][';                      // SMTP password
 			//$mail->SMTPSecure = "ssl";
 
 
@@ -1276,7 +1276,7 @@ class MailController extends Zend_Controller_Action
 		$mail->Host = 'box774.bluehost.com';
 		$mail->SMTPAuth = true;
 		$mail->Username = 'support@sportfast.com';
-		$mail->Password = 'Sportfast.9!';
+		$mail->Password = 'S4@rqTJa][';
 		//$mail->SMTPSecure = "ssl";
 
 		$mail->From = 'support@sportfast.com';
@@ -1373,7 +1373,7 @@ class MailController extends Zend_Controller_Action
 		$mail->Host = 'box774.bluehost.com';
 		$mail->SMTPAuth = true;
 		$mail->Username = 'support@sportfast.com';
-		$mail->Password = 'Sportfast.9!';
+		$mail->Password = 'S4@rqTJa][';
 		//$mail->SMTPSecure = "ssl";
 
 
@@ -1450,7 +1450,7 @@ class MailController extends Zend_Controller_Action
 		$mail->Host = 'box774.bluehost.com';
 		$mail->SMTPAuth = true;
 		$mail->Username = 'support@sportfast.com';
-		$mail->Password = 'Sportfast.9!';
+		$mail->Password = 'S4@rqTJa][';
 		//$mail->SMTPSecure = "ssl";
 
 		$mail->From = 'support@sportfast.com';
@@ -1527,7 +1527,7 @@ class MailController extends Zend_Controller_Action
 		$mail->Host = 'box774.bluehost.com';
 		$mail->SMTPAuth = true;
 		$mail->Username = 'support@sportfast.com';
-		$mail->Password = 'Sportfast.9!';
+		$mail->Password = 'S4@rqTJa][';
 		//$mail->SMTPSecure = "ssl";
 
 
@@ -1633,7 +1633,7 @@ class MailController extends Zend_Controller_Action
 			$mail->Host = 'box774.bluehost.com';
 			$mail->SMTPAuth = true;
 			$mail->Username = 'support@sportfast.com';
-			$mail->Password = 'Sportfast.9!';
+			$mail->Password = 'S4@rqTJa][';
 			//$mail->SMTPSecure = "ssl";
 
 
@@ -1671,7 +1671,7 @@ class MailController extends Zend_Controller_Action
 			$mail->Host = 'box774.bluehost.com';
 			$mail->SMTPAuth = true;
 			$mail->Username = 'support@sportfast.com';
-			$mail->Password = 'Sportfast.9!';
+			$mail->Password = 'S4@rqTJa][';
 			//$mail->SMTPSecure = "ssl";
 
 
@@ -1874,7 +1874,7 @@ class MailController extends Zend_Controller_Action
 				$mail->Host = 'box774.bluehost.com';
 				$mail->SMTPAuth = true;
 				$mail->Username = 'support@sportfast.com';
-				$mail->Password = 'Sportfast.9!';
+				$mail->Password = 'S4@rqTJa][';
 				//$mail->SMTPSecure = "ssl";
 
 
@@ -1937,7 +1937,7 @@ class MailController extends Zend_Controller_Action
 					$mail->Host = 'box774.bluehost.com';
 					$mail->SMTPAuth = true;
 					$mail->Username = 'support@sportfast.com';
-					$mail->Password = 'Sportfast.9!';
+					$mail->Password = 'S4@rqTJa][';
 					//$mail->SMTPSecure = "ssl";
 
 					$usedEmails[$user->username] = true;
@@ -1993,7 +1993,7 @@ class MailController extends Zend_Controller_Action
 					$mail->Host = 'box774.bluehost.com';
 					$mail->SMTPAuth = true;
 					$mail->Username = 'support@sportfast.com';
-					$mail->Password = 'Sportfast.9!';
+					$mail->Password = 'S4@rqTJa][';
 					//$mail->SMTPSecure = "ssl";
 
 
@@ -2178,7 +2178,7 @@ class MailController extends Zend_Controller_Action
 			$mail->Host = 'box774.bluehost.com';
 			$mail->SMTPAuth = true;
 			$mail->Username = 'support@sportfast.com';
-			$mail->Password = 'Sportfast.9!';
+			$mail->Password = 'S4@rqTJa][';
 			//$mail->SMTPSecure = "ssl";
 
 
@@ -2362,7 +2362,7 @@ class MailController extends Zend_Controller_Action
 			$mail->Host = 'box774.bluehost.com';
 			$mail->SMTPAuth = true;
 			$mail->Username = 'support@sportfast.com';
-			$mail->Password = 'Sportfast.9!';
+			$mail->Password = 'S4@rqTJa][';
 			//$mail->SMTPSecure = "ssl";
 
 
@@ -2779,7 +2779,7 @@ class MailController extends Zend_Controller_Action
 				$mail->Host = 'box774.bluehost.com';
 				$mail->SMTPAuth = true;
 				$mail->Username = 'support@sportfast.com';
-				$mail->Password = 'Sportfast.9!';
+				$mail->Password = 'S4@rqTJa][';
 				//$mail->SMTPSecure = "ssl";
 
 
